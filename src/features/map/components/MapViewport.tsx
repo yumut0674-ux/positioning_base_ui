@@ -21,7 +21,8 @@ export function MapViewport() {
   const [floorImage] = useImage(DEMO_FLOOR_PLAN.imageUrl, "anonymous");
   const viewport = useIpsStore((state) => state.viewport);
   const layers = useIpsStore((state) => state.layers);
-  const tags = useIpsStore((state) => Object.values(state.tags));
+  const tagsById = useIpsStore((state) => state.tags);
+  const tags = useMemo(() => Object.values(tagsById), [tagsById]);
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const setViewport = useIpsStore((state) => state.setViewport);
   const selectTag = useIpsStore((state) => state.selectTag);

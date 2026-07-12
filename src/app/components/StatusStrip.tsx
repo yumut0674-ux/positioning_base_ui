@@ -1,10 +1,12 @@
 import { CircleGauge, Clock3, CloudCog, Database } from "lucide-react";
+import { useMemo } from "react";
 import { useFps } from "@/src/shared/hooks/useFps";
 import { useIpsStore } from "../store/useIpsStore";
 
 export function StatusStrip() {
   const fps = useFps();
-  const tagCount = useIpsStore((state) => Object.keys(state.tags).length);
+  const tagsById = useIpsStore((state) => state.tags);
+  const tagCount = useMemo(() => Object.keys(tagsById).length, [tagsById]);
   return (
     <footer className="status-strip">
       <div><span className="status-online"><i /> SIMULATION LINK</span><small>24 ms latency</small></div>
