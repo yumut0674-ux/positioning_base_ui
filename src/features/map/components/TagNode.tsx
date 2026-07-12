@@ -30,7 +30,7 @@ function TagNodeComponent({ tag, transform, selected, onSelect }: TagNodeProps) 
       {selected && <Circle radius={20} stroke={tag.color} strokeWidth={1} opacity={0.42} dash={[4, 3]} />}
       <Circle radius={13} fill={tag.color} opacity={0.13} />
       <Circle radius={6.5} fill={tag.color} shadowColor={tag.color} shadowBlur={12} />
-      <Circle radius={2.3} fill="#07120f" />
+      <Circle radius={2.3} fill="#ffffff" />
       {typeof tag.direction === "number" && (
         <Line
           points={[0, -9, 0, -17]}
@@ -41,9 +41,9 @@ function TagNodeComponent({ tag, transform, selected, onSelect }: TagNodeProps) 
         />
       )}
       <Group x={12} y={-26}>
-        <Rect width={88} height={30} fill="#0b111d" opacity={0.94} cornerRadius={4} stroke="#273143" strokeWidth={1} />
-        <Text x={8} y={6} width={74} text={tag.id} fill="#e8edf6" fontSize={10} fontStyle="bold" fontFamily="Inter, sans-serif" />
-        <Text x={8} y={18} width={74} text={`${tag.x.toFixed(2)}, ${tag.y.toFixed(2)} m`} fill="#78869c" fontSize={8} fontFamily="monospace" />
+        <Rect width={88} height={30} fill="#ffffff" opacity={0.96} cornerRadius={4} stroke="#c6d5e1" strokeWidth={1} shadowColor="#506780" shadowBlur={10} shadowOpacity={0.12} />
+        <Text x={8} y={6} width={74} text={tag.id} fill="#162133" fontSize={10} fontStyle="bold" fontFamily="Inter, sans-serif" />
+        <Text x={8} y={18} width={74} text={`${tag.x.toFixed(2)}, ${tag.y.toFixed(2)} m`} fill="#66788e" fontSize={8} fontFamily="monospace" />
       </Group>
     </Group>
   );

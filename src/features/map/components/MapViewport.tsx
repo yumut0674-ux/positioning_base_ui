@@ -69,10 +69,10 @@ export function MapViewport() {
     const lines: React.ReactNode[] = [];
     const step = transform.metersToPixels(1);
     for (let x = 0; x <= DEMO_FLOOR_PLAN.canvasSize.width; x += step) {
-      lines.push(<Line key={`x-${x}`} points={[x, 0, x, DEMO_FLOOR_PLAN.canvasSize.height]} stroke="#314156" strokeWidth={x % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.3} />);
+      lines.push(<Line key={`x-${x}`} points={[x, 0, x, DEMO_FLOOR_PLAN.canvasSize.height]} stroke="#8ab4c8" strokeWidth={x % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.34} />);
     }
     for (let y = 0; y <= DEMO_FLOOR_PLAN.canvasSize.height; y += step) {
-      lines.push(<Line key={`y-${y}`} points={[0, y, DEMO_FLOOR_PLAN.canvasSize.width, y]} stroke="#314156" strokeWidth={y % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.3} />);
+      lines.push(<Line key={`y-${y}`} points={[0, y, DEMO_FLOOR_PLAN.canvasSize.width, y]} stroke="#8ab4c8" strokeWidth={y % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.34} />);
     }
     return lines;
   }, [transform]);
@@ -104,22 +104,22 @@ export function MapViewport() {
         <Layer listening={false} visible={layers.grid}><Group {...mapGroupProps}>{gridLines}</Group></Layer>
         <Layer listening={false} visible={layers.floorPlan}>
           <Group {...mapGroupProps}>
-            <Rect width={1280} height={720} fill="#d8d9d8" />
-            {floorImage && <KonvaImage image={floorImage} width={1280} height={720} opacity={0.74} />}
-            <Rect width={1280} height={720} fill="#09101a" opacity={0.12} />
+            <Rect width={1280} height={720} fill="#eef5f7" />
+            {floorImage && <KonvaImage image={floorImage} width={1280} height={720} opacity={0.9} />}
+            <Rect width={1280} height={720} fill="#d8f5f0" opacity={0.08} />
           </Group>
         </Layer>
         <Layer listening={false} visible={layers.references}>
           <Group {...mapGroupProps}>
-            <Line points={[0, 720, 150, 720]} stroke="#5de4c7" strokeWidth={2} />
-            <Text x={8} y={690} text="5 m" fill="#5de4c7" fontSize={12} fontFamily="monospace" />
+            <Line points={[0, 720, 150, 720]} stroke="#00a896" strokeWidth={2} />
+            <Text x={8} y={690} text="5 m" fill="#087f73" fontSize={12} fontFamily="monospace" />
           </Group>
         </Layer>
         <Layer listening={false} visible={layers.anchors}>
           <Group {...mapGroupProps}>
             {DEMO_ANCHORS.map((anchor) => {
               const point = transform.worldToCanvas(anchor);
-              return <Group key={anchor.id} x={point.x} y={point.y}><Circle radius={9} fill="#101827" stroke="#7aa2f7" strokeWidth={2} /><Circle radius={2.5} fill="#7aa2f7" /><Text x={12} y={-6} text={anchor.id} fill="#7890b7" fontSize={9} fontFamily="monospace" /></Group>;
+              return <Group key={anchor.id} x={point.x} y={point.y}><Circle radius={9} fill="#ffffff" stroke="#3578e5" strokeWidth={2} /><Circle radius={2.5} fill="#3578e5" /><Text x={12} y={-6} text={anchor.id} fill="#395d8a" fontSize={9} fontFamily="monospace" /></Group>;
             })}
           </Group>
         </Layer>
@@ -131,14 +131,14 @@ export function MapViewport() {
         </Layer>
         <Layer listening={false} visible={layers.routes}>
           <Group {...mapGroupProps}>
-            <Line points={[260, 486, 334, 473, 407, 498, 471, 478]} stroke="#5de4c7" strokeWidth={1.5} opacity={0.38} dash={[5, 8]} tension={0.35} />
+            <Line points={[260, 486, 334, 473, 407, 498, 471, 478]} stroke="#00a896" strokeWidth={1.5} opacity={0.46} dash={[5, 8]} tension={0.35} />
           </Group>
         </Layer>
         <Layer listening={false} visible={layers.selection}><Group {...mapGroupProps} /></Layer>
         <Layer listening={false}>
           <Group x={18} y={size.height - 38}>
-            <Rect width={182} height={24} fill="#080d16" opacity={0.88} cornerRadius={4} stroke="#263142" />
-            <Text x={10} y={7} text="WORLD CRS  ·  METERS" fill="#66768d" fontSize={9} fontFamily="monospace" />
+            <Rect width={182} height={24} fill="#ffffff" opacity={0.9} cornerRadius={4} stroke="#c4d4df" />
+            <Text x={10} y={7} text="WORLD CRS  ·  METERS" fill="#60758d" fontSize={9} fontFamily="monospace" />
           </Group>
         </Layer>
       </Stage>
