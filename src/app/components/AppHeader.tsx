@@ -5,7 +5,7 @@ import { LogoMark } from "@/src/shared/components/LogoMark";
 export function AppHeader() {
   return (
     <header className="app-header">
-      <div className="brand"><LogoMark /><div><strong>ATLAS</strong><span>IPS CONTROL</span></div></div>
+      <div className="brand"><LogoMark /><div><strong>GEKON</strong><span>IPS CONTROL</span></div></div>
       <div className="site-context">
         <span className="context-index">01</span>
         <div><small>ACTIVE SITE</small><strong>{DEMO_FLOOR_PLAN.building}</strong></div>

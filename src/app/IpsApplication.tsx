@@ -11,11 +11,16 @@ import { CoordinateInspector } from "@/src/features/map/components/CoordinateIns
 import { LayerVisibilityPanel } from "@/src/features/layers/components/LayerVisibilityPanel";
 import { TagInformationPanel } from "@/src/features/tracking/components/TagInformationPanel";
 import { useRealtimeTracking } from "@/src/features/tracking/hooks/useRealtimeTracking";
+import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { DEMO_FLOOR_PLAN } from "@/src/features/map/config/demoMap";
-import { CircleDot, Crosshair, Maximize2, Ruler, Scan, Upload } from "lucide-react";
+import { CircleDot, Crosshair, Layers3, Maximize2, Ruler, Scan, Upload } from "lucide-react";
 
 function LiveMapWorkspace() {
   useRealtimeTracking();
+  const showInspector = useIpsStore((state) => state.showInspector);
+  const toggleInspector = useIpsStore((state) => state.toggleInspector);
+  const showLayersPanel = useIpsStore((state) => state.showLayersPanel);
+  const toggleLayersPanel = useIpsStore((state) => state.toggleLayersPanel);
   return (
     <div className="ips-shell">
       <AppHeader />
@@ -27,10 +32,11 @@ function LiveMapWorkspace() {
         </div>
         <div className="map-frame">
           <MapViewport />
-          <CoordinateInspector />
-          <LayerVisibilityPanel />
+          {showInspector && <CoordinateInspector />}
+          {showLayersPanel && <LayerVisibilityPanel />}
           <div className="mini-toolbar" aria-label="Map tools">
-            <button className="active" title="Select"><Crosshair size={16} /></button>
+            <button className={showInspector ? "active" : ""} title="Toggle Inspector" onClick={toggleInspector}><Crosshair size={16} /></button>
+            <button className={showLayersPanel ? "active" : ""} title="Toggle Layers" onClick={toggleLayersPanel}><Layers3 size={16} /></button>
             <button title="Measure"><Ruler size={16} /></button>
             <button title="Focus"><Scan size={16} /></button>
             <span />
