@@ -1,0 +1,170 @@
+{
+  "input": "C:\\Users\\1548u\\.codex\\plugins\\cache\\openai-curated-remote\\openai-templates\\0.1.0\\skills\\artifact-template-experiment-analysis\\assets\\reference.docx",
+  "fonts_by_char_count": {
+    "Georgia": 7435
+  },
+  "direct_run_formatting_runs": 236,
+  "direct_paragraph_formatting_paragraphs": 51,
+  "heading_like_paragraphs_not_heading_style": [
+    {
+      "para_index": 107,
+      "text": "Version",
+      "style": "normal"
+    },
+    {
+      "para_index": 109,
+      "text": "Prepared By",
+      "style": "normal"
+    },
+    {
+      "para_index": 111,
+      "text": "Reviewers",
+      "style": "normal"
+    },
+    {
+      "para_index": 113,
+      "text": "Date Prepared",
+      "style": "normal"
+    },
+    {
+      "para_index": 115,
+      "text": "Reporting Window",
+      "style": "normal"
+    },
+    {
+      "para_index": 117,
+      "text": "Status",
+      "style": "normal"
+    },
+    {
+      "para_index": 119,
+      "text": "Field",
+      "style": "normal"
+    },
+    {
+      "para_index": 120,
+      "text": "Details",
+      "style": "normal"
+    },
+    {
+      "para_index": 121,
+      "text": "Experiment Name",
+      "style": "normal"
+    },
+    {
+      "para_index": 123,
+      "text": "Experiment Key",
+      "style": "normal"
+    },
+    {
+      "para_index": 125,
+      "text": "Owner Team",
+      "style": "normal"
+    },
+    {
+      "para_index": 127,
+      "text": "Business Owner",
+      "style": "normal"
+    },
+    {
+      "para_index": 129,
+      "text": "Product Surface",
+      "style": "normal"
+    },
+    {
+      "para_index": 131,
+      "text": "Primary Objective",
+      "style": "normal"
+    },
+    {
+      "para_index": 133,
+      "text": "Control (Variant A)",
+      "style": "normal"
+    },
+    {
+      "para_index": 135,
+      "text": "Treatment (Variant B)",
+      "style": "normal"
+    },
+    {
+      "para_index": 137,
+      "text": "Allocation",
+      "style": "normal"
+    },
+    {
+      "para_index": 139,
+      "text": "Unit of Randomization",
+      "style": "normal"
+    },
+    {
+      "para_index": 141,
+      "text": "Audience",
+      "style": "normal"
+    },
+    {
+      "para_index": 143,
+      "text": "Exclusions",
+      "style": "normal"
+    }
+  ],
+  "examples": {
+    "direct_run_formatting": [
+      {
+        "para_index": 1,
+        "run_text": "Experiment Report",
+        "style": "Heading 2"
+      },
+      {
+        "para_index": 7,
+        "run_text": "Experiment ",
+        "style": "Title"
+      },
+      {
+        "para_index": 8,
+        "run_text": "Report Name",
+        "style": "Title"
+      },
+      {
+        "para_index": 24,
+        "run_text": "Author",
+        "style": "Heading 3"
+      },
+      {
+        "para_index": 25,
+        "run_text": "Month DD, YYYY",
+        "style": "Heading 3"
+      }
+    ],
+    "direct_paragraph_formatting": [
+      {
+        "para_index": 31,
+        "text": "[Describe what this document records, including the experiment objective, execution, analysis, and decision it supports.",
+        "style": "normal"
+      },
+      {
+        "para_index": 32,
+        "text": "[Explain why this record is being maintained, who should use it, and how it supports auditability, replication, or futur",
+        "style": "normal"
+      },
+      {
+        "para_index": 33,
+        "text": "",
+        "style": "normal"
+      },
+      {
+        "para_index": 35,
+        "text": "[Describe the company, product, user journey, and observed problem or opportunity. Summarize the evidence that motivated",
+        "style": "normal"
+      },
+      {
+        "para_index": 36,
+        "text": "[Explain why this test surface and intervention were selected, including expected value, operational risk, reversibility",
+        "style": "normal"
+      }
+    ]
+  },
+  "notes": [
+    "Direct formatting is not always wrong, but it often causes inconsistent output when templates change.",
+    "Heading-like paragraphs not using Heading styles can break TOC and accessibility."
+  ]
+}
