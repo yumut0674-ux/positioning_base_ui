@@ -30,6 +30,7 @@ button { color: inherit; font: inherit; }
     radial-gradient(circle at 18% 88%, rgba(53, 120, 229, .16) 0, transparent 34%),
     linear-gradient(135deg, #f7fbff 0%, #edf5fa 48%, #e8eff6 100%);
 }
+.ips-shell.anchors-mode { grid-template-columns: 218px minmax(0, 1fr); }
 
 .app-header {
   grid-column: 1 / -1;
@@ -169,6 +170,7 @@ button { color: inherit; font: inherit; }
 
 @media (max-width: 1180px) {
   .ips-shell { grid-template-columns: 68px minmax(0, 1fr) 260px; }
+  .ips-shell.anchors-mode { grid-template-columns: 68px minmax(0, 1fr); }
   .brand { width: 68px; padding: 0 20px; }
   .brand > div:last-child, .app-sidebar button span, .app-sidebar nav > small, .sidebar-system div, .sidebar-footer button span { display: none; }
   .app-sidebar button { justify-content: center; padding: 0; }

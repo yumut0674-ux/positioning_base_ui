@@ -10,14 +10,21 @@ const NAVIGATION = [
   { label: "Analytics", icon: BarChart3 },
 ];
 
-export function AppSidebar() {
+export type WorkspaceView = "map" | "anchors";
+
+interface AppSidebarProps {
+  readonly activeView: WorkspaceView;
+  readonly onViewChange: (view: WorkspaceView) => void;
+}
+
+export function AppSidebar({ activeView, onViewChange }: AppSidebarProps) {
   return (
     <aside className="app-sidebar">
       <nav aria-label="Primary navigation">
         <small>MONITOR</small>
-        {NAVIGATION.slice(0, 1).map(({ label, icon: Icon, active }) => <button key={label} className={active ? "active" : ""}><Icon size={17} /><span>{label}</span></button>)}
+        {NAVIGATION.slice(0, 1).map(({ label, icon: Icon }) => <button key={label} className={activeView === "map" ? "active" : ""} onClick={() => onViewChange("map")}><Icon size={17} /><span>{label}</span></button>)}
         <small>MANAGE</small>
-        {NAVIGATION.slice(1, 6).map(({ label, icon: Icon, badge, alert }) => <button key={label}><Icon size={17} /><span>{label}</span>{badge && <em className={alert ? "alert" : ""}>{badge}</em>}</button>)}
+        {NAVIGATION.slice(1, 6).map(({ label, icon: Icon, badge, alert }) => <button key={label} className={label === "Anchors" && activeView === "anchors" ? "active" : ""} onClick={label === "Anchors" ? () => onViewChange("anchors") : undefined}><Icon size={17} /><span>{label}</span>{badge && <em className={alert ? "alert" : ""}>{badge}</em>}</button>)}
         <small>INSIGHTS</small>
         {NAVIGATION.slice(6).map(({ label, icon: Icon }) => <button key={label}><Icon size={17} /><span>{label}</span></button>)}
       </nav>

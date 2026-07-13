@@ -2,11 +2,13 @@
 
 import { useCallback, useMemo, useRef } from "react";
 import { Circle, Group, Image as KonvaImage, Layer, Line, Rect, Stage, Text } from "react-konva";
+import { useQuery } from "@tanstack/react-query";
 import type Konva from "konva";
 import useImage from "use-image";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { useElementSize } from "@/src/shared/hooks/useElementSize";
 import { DEMO_ANCHORS, DEMO_CALIBRATION, DEMO_FLOOR_PLAN } from "../config/demoMap";
+import { fetchAnchors } from "../services/anchorApi";
 import { CoordinateTransformService } from "../services/CoordinateTransformService";
 import { TagNode } from "./TagNode";
 
@@ -23,6 +25,12 @@ export function MapViewport() {
   const layers = useIpsStore((state) => state.layers);
   const tagsById = useIpsStore((state) => state.tags);
   const tags = useMemo(() => Object.values(tagsById), [tagsById]);
+  const anchorQuery = useQuery({
+    queryKey: ["anchors"],
+    queryFn: fetchAnchors,
+    refetchOnWindowFocus: false,
+  });
+  const anchors = anchorQuery.data?.length ? anchorQuery.data : DEMO_ANCHORS;
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const setViewport = useIpsStore((state) => state.setViewport);
   const selectTag = useIpsStore((state) => state.selectTag);
@@ -117,7 +125,7 @@ export function MapViewport() {
         </Layer>
         <Layer listening={false} visible={layers.anchors}>
           <Group {...mapGroupProps}>
-            {DEMO_ANCHORS.map((anchor) => {
+            {anchors.map((anchor) => {
               const point = transform.worldToCanvas(anchor);
               return <Group key={anchor.id} x={point.x} y={point.y}><Circle radius={9} fill="#ffffff" stroke="#3578e5" strokeWidth={2} /><Circle radius={2.5} fill="#3578e5" /><Text x={12} y={-6} text={anchor.id} fill="#395d8a" fontSize={9} fontFamily="monospace" /></Group>;
             })}

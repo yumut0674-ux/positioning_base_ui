@@ -1,4 +1,4 @@
-import type { FloorPlanDefinition, MapCalibration } from "../types/map.types";
+import type { AnchorDefinition, FloorPlanDefinition, MapCalibration } from "../types/map.types";
 
 export const DEMO_FLOOR_PLAN: FloorPlanDefinition = {
   id: "hq-l1",
@@ -25,4 +25,4 @@ export const DEMO_ANCHORS = [
   { id: "A-04", x: 2.7, y: 2.8 },
   { id: "A-05", x: 21.3, y: 2.8 },
   { id: "A-06", x: 39.5, y: 2.8 },
-] as const;
+] as const satisfies readonly AnchorDefinition[];

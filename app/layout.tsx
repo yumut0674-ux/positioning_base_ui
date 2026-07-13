@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "GEKON IPS Control",
   description: "Industrial-grade indoor positioning and real-time asset tracking console.",
-  icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
+  icons: { icon: "/favicon.svg?v=2", shortcut: "/favicon.svg?v=2" },
   openGraph: {
     title: "GEKON IPS Control",
     description: "Industrial-grade indoor positioning and real-time asset tracking console.",

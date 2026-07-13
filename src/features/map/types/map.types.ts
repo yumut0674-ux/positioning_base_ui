@@ -31,3 +31,13 @@ export interface FloorPlanDefinition {
   readonly canvasSize: Size2D;
   readonly worldSize: Size2D;
 }
+
+export interface AnchorDefinition extends Point2D {
+  readonly id: string;
+  readonly name?: string | null;
+  readonly z?: number | null;
+  readonly status?: string;
+  readonly note?: string | null;
+  readonly floorLevel?: number | null;
+  readonly locationDesc?: string | null;
+}
