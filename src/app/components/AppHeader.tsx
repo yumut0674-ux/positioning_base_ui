@@ -17,7 +17,7 @@ export function AppHeader() {
       <div className="header-actions">
         <button aria-label="Search"><Search size={17} /></button>
         <button aria-label="Notifications" className="notification"><Bell size={17} /><i /></button>
-        <div className="operator"><CircleUserRound size={24} /><div><strong>A. Demir</strong><small>CONTROL OPERATOR</small></div></div>
+        <div className="operator"><CircleUserRound size={24} /><div><strong>Umut Başev</strong><small>CONTROL OPERATOR</small></div></div>
       </div>
     </header>
   );

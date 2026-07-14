@@ -86,7 +86,7 @@ button { color: inherit; font: inherit; }
 .app-sidebar .collapse { position: absolute; width: 23px; height: 23px; left: 205px; bottom: 39px; justify-content: center; border: 1px solid #c6d5e1; background: #ffffff; z-index: 12; box-shadow: 0 8px 18px rgba(53, 75, 100, .12); }
 
 .workspace { grid-row: 2; min-width: 0; min-height: 0; padding: 18px 16px 12px 18px; display: flex; flex-direction: column; }
-.workspace-heading { height: 49px; display: flex; align-items: flex-start; justify-content: space-between; }
+.workspace-heading { flex: 0 0 auto; margin-bottom: 24px; padding-bottom: 2px; display: flex; align-items: flex-start; justify-content: space-between; }
 .workspace-heading span { color: #6e8198; font: 8px ui-monospace, monospace; letter-spacing: .14em; }
 .workspace-heading h1 { margin: 5px 0 0; font-size: 17px; font-weight: 650; letter-spacing: 0; color: #101b2d; }
 .workspace-meta { display: flex; align-items: center; gap: 7px; padding: 8px 0; }

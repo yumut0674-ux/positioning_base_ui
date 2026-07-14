@@ -15,6 +15,7 @@ import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { DEMO_FLOOR_PLAN } from "@/src/features/map/config/demoMap";
 import { CircleDot, Crosshair, Layers3, Maximize2, Ruler, Scan, Upload } from "lucide-react";
 import { AnchorManagementPanel } from "@/app/anchors/page";
+import { TagManagementPanel } from "@/app/tags/page";
 
 function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: WorkspaceView; readonly onViewChange: (view: WorkspaceView) => void }) {
   useRealtimeTracking();
@@ -23,11 +24,11 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
   const showLayersPanel = useIpsStore((state) => state.showLayersPanel);
   const toggleLayersPanel = useIpsStore((state) => state.toggleLayersPanel);
   return (
-    <div className={`ips-shell ${activeView === "anchors" ? "anchors-mode" : ""}`}>
+    <div className={`ips-shell ${activeView !== "map" ? "anchors-mode" : ""}`}>
       <AppHeader />
       <AppSidebar activeView={activeView} onViewChange={onViewChange} />
       <main className="workspace">
-        {activeView === "anchors" ? <AnchorManagementPanel embedded /> : <>
+        {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : <>
           <div className="workspace-heading">
             <div><span>LIVE OPERATIONS / {DEMO_FLOOR_PLAN.level.toUpperCase()}</span><h1>{DEMO_FLOOR_PLAN.name}</h1></div>
             <div className="workspace-meta"><i /><span>LIVE POSITIONING</span><strong>3 ACTIVE</strong></div>
