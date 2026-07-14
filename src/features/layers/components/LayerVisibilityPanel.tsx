@@ -3,16 +3,16 @@ import { useIpsStore } from "@/src/app/store/useIpsStore";
 import type { MapLayerId } from "@/src/features/map/types/map.types";
 
 const LAYER_LABELS: Array<[MapLayerId, string]> = [
-  ["floorPlan", "Floor plan"], ["grid", "Metric grid"], ["anchors", "UWB anchors"],
-  ["tags", "Live tags"], ["routes", "Route trail"], ["sensors", "Sensors"],
+  ["floorPlan", "Kat planı"], ["grid", "Metrik ızgara"], ["anchors", "UWB Anchor'lar"],
+  ["tags", "Canlı Tag'ler"], ["routes", "Rota izi"], ["sensors", "Sensörler"],
 ];
 
 export function LayerVisibilityPanel() {
   const layers = useIpsStore((state) => state.layers);
   const toggleLayer = useIpsStore((state) => state.toggleLayer);
   return (
-    <section className="floating-panel layers-panel" aria-label="Layer visibility">
-      <div className="panel-title"><span><Layers3 size={14} /> Layers</span><small>06</small></div>
+    <section className="floating-panel layers-panel" aria-label="Katman görünürlüğü">
+      <div className="panel-title"><span><Layers3 size={14} /> Katmanlar</span><small>06</small></div>
       <div className="layer-list">
         {LAYER_LABELS.map(([id, label]) => (
           <button key={id} onClick={() => toggleLayer(id)} className={layers[id] ? "is-visible" : ""}>

@@ -2,9 +2,9 @@ import type { AnchorDefinition, FloorPlanDefinition, MapCalibration } from "../t
 
 export const DEMO_FLOOR_PLAN: FloorPlanDefinition = {
   id: "hq-l1",
-  name: "Operations Hall",
-  building: "North Campus",
-  level: "Level 01",
+  name: "Operasyon Salonu",
+  building: "Kuzey Kampüsü",
+  level: "Kat 01",
   imageUrl: "/floor-plan.jpg",
   canvasSize: { width: 1280, height: 720 },
   worldSize: { width: 42.67, height: 24 },

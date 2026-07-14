@@ -9,26 +9,26 @@ export function TagInformationPanel() {
     <motion.aside className="tag-panel" initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }}>
       <div className="tag-panel-header">
         <div className="tag-icon" style={{ color: selectedTag.color }}><Box size={19} /></div>
-        <div><small>TRACKED ASSET</small><h2>{selectedTag.name}</h2></div>
-        <span className="live-pill"><i /> LIVE</span>
+        <div><small>İZLENEN VARLIK</small><h2>{selectedTag.name}</h2></div>
+        <span className="live-pill"><i /> CANLI</span>
       </div>
-      <div className="tag-identity"><code>{selectedTag.id}</code><span>{selectedTag.status}</span></div>
+      <div className="tag-identity"><code>{selectedTag.id}</code><span>{selectedTag.status === "active" ? "aktif" : selectedTag.status === "idle" ? "beklemede" : selectedTag.status}</span></div>
       <div className="tag-position">
-        <div><small>X POSITION</small><strong>{selectedTag.x.toFixed(2)}</strong><span>meters</span></div>
-        <div><small>Y POSITION</small><strong>{selectedTag.y.toFixed(2)}</strong><span>meters</span></div>
+        <div><small>X KONUMU</small><strong>{selectedTag.x.toFixed(2)}</strong><span>metre</span></div>
+        <div><small>Y KONUMU</small><strong>{selectedTag.y.toFixed(2)}</strong><span>metre</span></div>
       </div>
       <div className="tag-metrics">
-        <div><BatteryMedium size={15} /><span>Battery</span><strong>{selectedTag.battery}%</strong></div>
-        <div><Radio size={15} /><span>Signal</span><strong>-62 dBm</strong></div>
-        <div><LocateFixed size={15} /><span>Accuracy</span><strong>± 0.18 m</strong></div>
+        <div><BatteryMedium size={15} /><span>Pil</span><strong>{selectedTag.battery}%</strong></div>
+        <div><Radio size={15} /><span>Sinyal</span><strong>-62 dBm</strong></div>
+        <div><LocateFixed size={15} /><span>Doğruluk</span><strong>± 0.18 m</strong></div>
       </div>
       <div className="activity-block">
-        <div><span>Recent activity</span><small>LAST 30 SEC</small></div>
-        <div className="sparkline" aria-label="Recent movement signal">
+        <div><span>Son hareketlilik</span><small>SON 30 SN</small></div>
+        <div className="sparkline" aria-label="Son hareket sinyali">
           {[28, 44, 35, 62, 48, 76, 54, 83, 66, 74, 59, 88, 72, 92].map((height, index) => <i key={index} style={{ height: `${height}%` }} />)}
         </div>
       </div>
-      <button className="route-button"><Route size={15} /> Open route history <span>↗</span></button>
+      <button className="route-button"><Route size={15} /> Rota geçmişini aç <span>↗</span></button>
     </motion.aside>
   );
 }

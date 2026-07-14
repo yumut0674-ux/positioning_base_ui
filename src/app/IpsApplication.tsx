@@ -30,23 +30,23 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
       <main className="workspace">
         {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : <>
           <div className="workspace-heading">
-            <div><span>LIVE OPERATIONS / {DEMO_FLOOR_PLAN.level.toUpperCase()}</span><h1>{DEMO_FLOOR_PLAN.name}</h1></div>
-            <div className="workspace-meta"><i /><span>LIVE POSITIONING</span><strong>3 ACTIVE</strong></div>
+            <div><span>CANLI OPERASYONLAR / {DEMO_FLOOR_PLAN.level.toUpperCase()}</span><h1>{DEMO_FLOOR_PLAN.name}</h1></div>
+            <div className="workspace-meta"><i /><span>CANLI KONUMLANDIRMA</span><strong>3 AKTİF</strong></div>
           </div>
           <div className="map-frame">
             <MapViewport />
             {showInspector && <CoordinateInspector />}
             {showLayersPanel && <LayerVisibilityPanel />}
-            <div className="mini-toolbar" aria-label="Map tools">
-              <button className={showInspector ? "active" : ""} title="Toggle Inspector" onClick={toggleInspector}><Crosshair size={16} /></button>
-              <button className={showLayersPanel ? "active" : ""} title="Toggle Layers" onClick={toggleLayersPanel}><Layers3 size={16} /></button>
-              <button title="Measure"><Ruler size={16} /></button>
-              <button title="Focus"><Scan size={16} /></button>
+            <div className="mini-toolbar" aria-label="Harita araçları">
+              <button className={showInspector ? "active" : ""} title="Denetçiyi aç/kapat" onClick={toggleInspector}><Crosshair size={16} /></button>
+              <button className={showLayersPanel ? "active" : ""} title="Katmanları aç/kapat" onClick={toggleLayersPanel}><Layers3 size={16} /></button>
+              <button title="Ölçüm"><Ruler size={16} /></button>
+              <button title="Odakla"><Scan size={16} /></button>
               <span />
-              <button title="Fullscreen"><Maximize2 size={16} /></button>
-              <button title="Load floor plan"><Upload size={16} /></button>
+              <button title="Tam ekran"><Maximize2 size={16} /></button>
+              <button title="Kat planını yükle"><Upload size={16} /></button>
             </div>
-            <div className="map-indicator"><CircleDot size={13} /> PLAN CALIBRATED <span>30 PX/M</span></div>
+            <div className="map-indicator"><CircleDot size={13} /> PLAN KALİBRE EDİLDİ <span>30 PX/M</span></div>
           </div>
         </>}
       </main>

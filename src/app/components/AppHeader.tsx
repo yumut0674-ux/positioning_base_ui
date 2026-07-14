@@ -5,19 +5,19 @@ import { LogoMark } from "@/src/shared/components/LogoMark";
 export function AppHeader() {
   return (
     <header className="app-header">
-      <div className="brand"><LogoMark /><div><strong>GEKON</strong><span>IPS CONTROL</span></div></div>
+      <div className="brand"><LogoMark /><div><strong>GEKON</strong><span>IPS KONTROL</span></div></div>
       <div className="site-context">
         <span className="context-index">01</span>
-        <div><small>ACTIVE SITE</small><strong>{DEMO_FLOOR_PLAN.building}</strong></div>
+        <div><small>AKTİF SAHA</small><strong>{DEMO_FLOOR_PLAN.building}</strong></div>
         <ChevronDown size={14} />
         <div className="context-divider" />
-        <div><small>FLOOR</small><strong>{DEMO_FLOOR_PLAN.level}</strong></div>
+        <div><small>KAT</small><strong>{DEMO_FLOOR_PLAN.level}</strong></div>
         <ChevronDown size={14} />
       </div>
       <div className="header-actions">
-        <button aria-label="Search"><Search size={17} /></button>
-        <button aria-label="Notifications" className="notification"><Bell size={17} /><i /></button>
-        <div className="operator"><CircleUserRound size={24} /><div><strong>Umut Başev</strong><small>CONTROL OPERATOR</small></div></div>
+        <button aria-label="Ara"><Search size={17} /></button>
+        <button aria-label="Bildirimler" className="notification"><Bell size={17} /><i /></button>
+        <div className="operator"><CircleUserRound size={24} /><div><strong>Umut Başev</strong><small>KONTROL OPERATÖRÜ</small></div></div>
       </div>
     </header>
   );

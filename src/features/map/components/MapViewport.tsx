@@ -146,13 +146,13 @@ export function MapViewport() {
         <Layer listening={false}>
           <Group x={18} y={size.height - 38}>
             <Rect width={182} height={24} fill="#ffffff" opacity={0.9} cornerRadius={4} stroke="#c4d4df" />
-            <Text x={10} y={7} text="WORLD CRS  ·  METERS" fill="#60758d" fontSize={9} fontFamily="monospace" />
+            <Text x={10} y={7} text="DÜNYA CRS  ·  METRE" fill="#60758d" fontSize={9} fontFamily="monospace" />
           </Group>
         </Layer>
       </Stage>
-      <div className="canvas-actions" aria-label="Map controls">
-        <button onClick={() => setViewport({ x: 42, y: 36, scale: 0.82 })} title="Reset view">RESET</button>
-        <button onClick={fitToScreen} title="Fit map to viewport">FIT</button>
+      <div className="canvas-actions" aria-label="Harita kontrolleri">
+        <button onClick={() => setViewport({ x: 42, y: 36, scale: 0.82 })} title="Görünümü sıfırla">SIFIRLA</button>
+        <button onClick={fitToScreen} title="Haritayı alana sığdır">SIĞDIR</button>
       </div>
       <div className="zoom-readout">{Math.round(viewport.scale * 100)}%</div>
     </div>

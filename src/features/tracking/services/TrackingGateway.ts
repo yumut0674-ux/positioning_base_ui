@@ -7,8 +7,8 @@ export interface TrackingGateway {
 
 const TAG_BLUEPRINTS = [
   { id: "TAG-001", name: "Forklift 07", color: "#5de4c7", x: 8.8, y: 7.8, battery: 86 },
-  { id: "TAG-014", name: "Operator A14", color: "#f6c760", x: 21.4, y: 12.4, battery: 71 },
-  { id: "TAG-028", name: "Pallet 28", color: "#7aa2f7", x: 31.2, y: 4.2, battery: 94 },
+  { id: "TAG-014", name: "Operatör A14", color: "#f6c760", x: 21.4, y: 12.4, battery: 71 },
+  { id: "TAG-028", name: "Palet 28", color: "#7aa2f7", x: 31.2, y: 4.2, battery: 94 },
 ] as const;
 
 export class SocketTrackingGateway implements TrackingGateway {

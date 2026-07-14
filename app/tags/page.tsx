@@ -61,7 +61,7 @@ export function TagManagementPanel({ embedded = false }: { readonly embedded?: b
   return <main className={`${styles.page} ${embedded ? styles.embedded : ""}`}>
     <section className={styles.content}>
       <header className={styles.header}>
-        <div><div className={styles.eyebrow}><Boxes size={14} /> VARLIK YÖNETİMİ</div><h1>Tracked Assets</h1><p>Tag isimlerini ve aktiflik durumlarını yönetin.</p></div>
+        <div><div className={styles.eyebrow}><Boxes size={14} /> VARLIK YÖNETİMİ</div><h1>Tag Yönetimi</h1><p>Tag isimlerini ve aktiflik durumlarını yönetin.</p></div>
         <div className={styles.headerActions}><button className={styles.ghostButton} type="button" onClick={() => void reload(true)} disabled={refreshing}><RefreshCw size={16} className={refreshing ? styles.spin : ""} /> Yenile</button><button className={styles.primaryButton} type="button" onClick={() => { setForm(EMPTY_TAG); setIsNew(true); setFormOpen(true); }}><Plus size={17} /> Yeni Tag Ekle</button></div>
       </header>
       <section className={styles.metrics} aria-label="Tag özeti">
