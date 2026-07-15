@@ -10,9 +10,9 @@ export function TagInformationPanel() {
       <div className="tag-panel-header">
         <div className="tag-icon" style={{ color: selectedTag.color }}><Box size={19} /></div>
         <div><small>İZLENEN VARLIK</small><h2>{selectedTag.name}</h2></div>
-        <span className="live-pill"><i /> CANLI</span>
+        <span className="live-pill"><i /> {selectedTag.status === "active" ? "CANLI" : "PASİF"}</span>
       </div>
-      <div className="tag-identity"><code>{selectedTag.id}</code><span>{selectedTag.status === "active" ? "aktif" : selectedTag.status === "idle" ? "beklemede" : selectedTag.status}</span></div>
+      <div className="tag-identity"><code>{selectedTag.id}</code><span>{selectedTag.status === "active" ? "aktif" : "pasif"}</span></div>
       <div className="tag-position">
         <div><small>X KONUMU</small><strong>{selectedTag.x.toFixed(2)}</strong><span>metre</span></div>
         <div><small>Y KONUMU</small><strong>{selectedTag.y.toFixed(2)}</strong><span>metre</span></div>

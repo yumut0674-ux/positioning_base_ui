@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { queryPostgres } from "@/src/server/postgresClient";
+import { trackingBuffer } from "@/src/server/trackingBuffer";
 
 export const runtime = "nodejs";
 
@@ -36,7 +37,7 @@ INSERT INTO tags (tag_code, tag_name, display_name, status) VALUES
 ON CONFLICT (tag_code) DO NOTHING;`;
 
 function cleanTag(input: TagInput): TagInput {
-  const id = input.id?.trim();
+  const id = input.id?.trim().toUpperCase();
   if (!id || id.length > 100) throw new Error("Tag ID is required and must be 100 characters or fewer");
   return { id, displayName: input.displayName?.trim().slice(0, 150) || null, status: input.status?.trim().slice(0, 30) || "active" };
 }
@@ -68,7 +69,11 @@ function errorResponse(error: unknown, fallback: string) {
 }
 
 export async function GET() {
-  try { return NextResponse.json({ tags: await getTags(true) }); }
+  try {
+    const tags = await getTags(true);
+    trackingBuffer.invalidateRegisteredTagCache();
+    return NextResponse.json({ tags });
+  }
   catch (error) { return errorResponse(error, "Tag database query failed"); }
 }
 
@@ -77,6 +82,7 @@ async function save(request: Request) {
   const tags = Array.isArray(body) ? body : "tags" in body ? body.tags : [body];
   if (!tags?.length) throw new Error("No tags provided");
   await queryPostgres(`${schemaSql}${upsertSql(tags)}`);
+  trackingBuffer.invalidateRegisteredTagCache();
   return getTags();
 }
 
@@ -93,6 +99,7 @@ export async function DELETE(request: Request) {
     const id = new URL(request.url).searchParams.get("id")?.trim();
     if (!id) return NextResponse.json({ error: "Tag ID is required" }, { status: 400 });
     await queryPostgres(`${schemaSql}DELETE FROM tags WHERE tag_code = ${sqlString(id)};`);
+    trackingBuffer.invalidateRegisteredTagCache();
     return NextResponse.json({ tags: await getTags() });
   } catch (error) { return errorResponse(error, "Tag delete failed"); }
 }

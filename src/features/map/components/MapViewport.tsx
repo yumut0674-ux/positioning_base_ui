@@ -2,13 +2,11 @@
 
 import { useCallback, useMemo, useRef } from "react";
 import { Circle, Group, Image as KonvaImage, Layer, Line, Rect, Stage, Text } from "react-konva";
-import { useQuery } from "@tanstack/react-query";
 import type Konva from "konva";
 import useImage from "use-image";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { useElementSize } from "@/src/shared/hooks/useElementSize";
-import { DEMO_ANCHORS, DEMO_CALIBRATION, DEMO_FLOOR_PLAN } from "../config/demoMap";
-import { fetchAnchors } from "../services/anchorApi";
+import { DEMO_CALIBRATION, DEMO_FLOOR_PLAN } from "../config/demoMap";
 import { CoordinateTransformService } from "../services/CoordinateTransformService";
 import { TagNode } from "./TagNode";
 
@@ -24,13 +22,8 @@ export function MapViewport() {
   const viewport = useIpsStore((state) => state.viewport);
   const layers = useIpsStore((state) => state.layers);
   const tagsById = useIpsStore((state) => state.tags);
+  const anchors = useIpsStore((state) => state.anchors);
   const tags = useMemo(() => Object.values(tagsById), [tagsById]);
-  const anchorQuery = useQuery({
-    queryKey: ["anchors"],
-    queryFn: fetchAnchors,
-    refetchOnWindowFocus: false,
-  });
-  const anchors = anchorQuery.data?.length ? anchorQuery.data : DEMO_ANCHORS;
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const setViewport = useIpsStore((state) => state.setViewport);
   const selectTag = useIpsStore((state) => state.selectTag);

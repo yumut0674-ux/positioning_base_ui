@@ -8,6 +8,13 @@ export interface AnchorHealthLog {
   readonly createdAt: string;
 }
 
+function notify(anchors: AnchorDefinition[]): AnchorDefinition[] {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("anchor-definitions-updated", { detail: anchors }));
+  }
+  return anchors;
+}
+
 export async function fetchAnchors(): Promise<AnchorDefinition[]> {
   const response = await fetch("/api/anchors", {
     headers: { accept: "application/json" },
@@ -33,7 +40,7 @@ export async function saveAnchor(anchor: AnchorDefinition, isNew: boolean): Prom
     headers: { "content-type": "application/json", accept: "application/json" },
     body: JSON.stringify({ anchors: [anchor] }),
   });
-  return readAnchorResponse(response);
+  return notify(await readAnchorResponse(response));
 }
 
 export async function deleteAnchor(anchorId: string): Promise<AnchorDefinition[]> {
@@ -41,7 +48,7 @@ export async function deleteAnchor(anchorId: string): Promise<AnchorDefinition[]
     method: "DELETE",
     headers: { accept: "application/json" },
   });
-  return readAnchorResponse(response);
+  return notify(await readAnchorResponse(response));
 }
 
 export async function fetchAnchorHealthLogs(anchorId: string): Promise<AnchorHealthLog[]> {
