@@ -10,6 +10,7 @@ import { MapViewport } from "@/src/features/map/components/MapViewport";
 import { CoordinateInspector } from "@/src/features/map/components/CoordinateInspector";
 import { LayerVisibilityPanel } from "@/src/features/layers/components/LayerVisibilityPanel";
 import { TagInformationPanel } from "@/src/features/tracking/components/TagInformationPanel";
+import { TagSearchPanel } from "@/src/features/tracking/components/TagSearchPanel";
 import { useRealtimeTracking } from "@/src/features/tracking/hooks/useRealtimeTracking";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { DEMO_FLOOR_PLAN } from "@/src/features/map/config/demoMap";
@@ -24,6 +25,8 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
   const toggleInspector = useIpsStore((state) => state.toggleInspector);
   const showLayersPanel = useIpsStore((state) => state.showLayersPanel);
   const toggleLayersPanel = useIpsStore((state) => state.toggleLayersPanel);
+  const tags = useIpsStore((state) => state.tags);
+  const activeTagCount = Object.values(tags).filter((tag) => tag.status === "active").length;
   return (
     <div className={`ips-shell ${activeView !== "map" ? "anchors-mode" : ""}`}>
       <AppHeader />
@@ -31,8 +34,12 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
       <main className="workspace">
         {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : activeView === "support" ? <SupportContactPanel embedded /> : <>
           <div className="workspace-heading">
-            <div><span>CANLI OPERASYONLAR / {DEMO_FLOOR_PLAN.level.toUpperCase()}</span><h1>{DEMO_FLOOR_PLAN.name}</h1></div>
-            <div className="workspace-meta"><i /><span>CANLI KONUMLANDIRMA</span><strong>3 AKTİF</strong></div>
+            <div className="workspace-heading-content">
+              <span>CANLI OPERASYONLAR / {DEMO_FLOOR_PLAN.level.toUpperCase()}</span>
+              <h1>{DEMO_FLOOR_PLAN.name}</h1>
+            </div>
+            <TagSearchPanel />
+            <div className="workspace-meta"><i /><span>CANLI KONUMLANDIRMA</span><strong>{activeTagCount} AKTİF</strong></div>
           </div>
           <div className="map-frame">
             <MapViewport />

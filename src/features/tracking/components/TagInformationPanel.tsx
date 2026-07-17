@@ -1,4 +1,4 @@
-import { BatteryMedium, Box, LocateFixed, Radio, Route } from "lucide-react";
+import { BatteryMedium, Box, Route } from "lucide-react";
 import { motion } from "framer-motion";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 
@@ -19,8 +19,6 @@ export function TagInformationPanel() {
       </div>
       <div className="tag-metrics">
         <div><BatteryMedium size={15} /><span>Pil</span><strong>{selectedTag.battery}%</strong></div>
-        <div><Radio size={15} /><span>Sinyal</span><strong>-62 dBm</strong></div>
-        <div><LocateFixed size={15} /><span>Doğruluk</span><strong>± 0.18 m</strong></div>
       </div>
       <div className="activity-block">
         <div><span>Son hareketlilik</span><small>SON 30 SN</small></div>
