@@ -184,6 +184,11 @@ button { color: inherit; font: inherit; }
 .tag-identity { margin: 17px 0 13px; padding: 9px 0; display: flex; justify-content: space-between; border-top: 1px solid #d0dee8; border-bottom: 1px solid #d0dee8; }
 .tag-identity code { color: #40546d; font: 9px ui-monospace, monospace; }
 .tag-identity span { color: #087f73; text-transform: uppercase; font: 7px ui-monospace, monospace; }
+.tag-location-address { margin-bottom: 12px; padding: 10px 11px; border: 1px solid #d0dee8; border-radius: 5px; background: #f7fbff; }
+.tag-location-address > div { display: flex; align-items: center; gap: 6px; }
+.tag-location-address svg { color: var(--accent); }
+.tag-location-address small { color: #76879c; font: 7px ui-monospace, monospace; letter-spacing: .12em; }
+.tag-location-address strong { display: block; margin-top: 7px; color: #22324a; font-size: 10px; font-weight: 650; line-height: 1.45; overflow-wrap: anywhere; }
 .tag-position { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .tag-position > div { padding: 11px; border: 1px solid #d0dee8; background: #f7fbff; border-radius: 5px; }
 .tag-position small { display: block; color: #76879c; font: 7px ui-monospace, monospace; }
