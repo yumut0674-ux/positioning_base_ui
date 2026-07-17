@@ -16,6 +16,7 @@ import { DEMO_FLOOR_PLAN } from "@/src/features/map/config/demoMap";
 import { CircleDot, Crosshair, Layers3, Maximize2, Ruler, Scan, Upload } from "lucide-react";
 import { AnchorManagementPanel } from "@/app/anchors/page";
 import { TagManagementPanel } from "@/app/tags/page";
+import { SupportContactPanel } from "@/src/features/support/components/SupportContactPanel";
 
 function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: WorkspaceView; readonly onViewChange: (view: WorkspaceView) => void }) {
   useRealtimeTracking();
@@ -28,7 +29,7 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
       <AppHeader />
       <AppSidebar activeView={activeView} onViewChange={onViewChange} />
       <main className="workspace">
-        {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : <>
+        {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : activeView === "support" ? <SupportContactPanel embedded /> : <>
           <div className="workspace-heading">
             <div><span>CANLI OPERASYONLAR / {DEMO_FLOOR_PLAN.level.toUpperCase()}</span><h1>{DEMO_FLOOR_PLAN.name}</h1></div>
             <div className="workspace-meta"><i /><span>CANLI KONUMLANDIRMA</span><strong>3 AKTİF</strong></div>
@@ -58,6 +59,13 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
 
 export function IpsApplication() {
   const [queryClient] = useState(() => new QueryClient({ defaultOptions: { queries: { staleTime: 15_000, retry: 1 } } }));
-  const [activeView, setActiveView] = useState<WorkspaceView>("map");
-  return <QueryClientProvider client={queryClient}><HashRouter><LiveMapWorkspace activeView={activeView} onViewChange={setActiveView} /></HashRouter></QueryClientProvider>;
+  const [activeView, setActiveView] = useState<Exclude<WorkspaceView, "history">>("map");
+  const changeView = (view: WorkspaceView) => {
+    if (view === "history") {
+      window.location.assign("/history");
+      return;
+    }
+    setActiveView(view);
+  };
+  return <QueryClientProvider client={queryClient}><HashRouter><LiveMapWorkspace activeView={activeView} onViewChange={changeView} /></HashRouter></QueryClientProvider>;
 }

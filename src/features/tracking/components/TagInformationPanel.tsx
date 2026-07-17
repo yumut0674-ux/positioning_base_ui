@@ -28,7 +28,7 @@ export function TagInformationPanel() {
           {[28, 44, 35, 62, 48, 76, 54, 83, 66, 74, 59, 88, 72, 92].map((height, index) => <i key={index} style={{ height: `${height}%` }} />)}
         </div>
       </div>
-      <button className="route-button"><Route size={15} /> Rota geçmişini aç <span>↗</span></button>
+      <button className="route-button" type="button" onClick={() => window.location.assign(`/history?tag=${encodeURIComponent(selectedTag.id)}`)}><Route size={15} /> Rota geçmişini aç <span>↗</span></button>
     </motion.aside>
   );
 }
