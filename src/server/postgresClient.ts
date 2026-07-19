@@ -311,7 +311,7 @@ export async function queryPostgres(sql: string): Promise<PgRow[]> {
     socket.write(message("Q", cstring(sql)));
 
     while (true) {
-      const packet = await readMessage(socket);
+      const packet = await readMessage();
 
       if (packet.type === "T") {
         fields = parseRowDescription(packet.payload);

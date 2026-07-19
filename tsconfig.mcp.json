@@ -1,0 +1,18 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": false,
+    "incremental": false,
+    "noEmit": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "mcp/**/*.ts",
+    "src/server/location/**/*.ts",
+    "src/server/postgresClient.ts",
+    "src/features/map/config/locationZones.ts",
+    "src/features/map/services/LocationResolverService.ts",
+    "app/api/location/**/*.ts"
+  ],
+  "exclude": ["node_modules", ".next", "dist", "tests"]
+}

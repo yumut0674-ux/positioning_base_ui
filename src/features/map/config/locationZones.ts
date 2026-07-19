@@ -1,13 +1,27 @@
-export interface LocationZone {
+export interface LocationZonePoint {
+  readonly x: number;
+  readonly y: number;
+}
+
+interface LocationZoneBase {
   readonly id: string;
   readonly floorPlanId: string;
+  readonly label: string;
+  readonly priority: number;
+}
+
+export interface RectangleLocationZone extends LocationZoneBase {
   readonly minX: number;
   readonly maxX: number;
   readonly minY: number;
   readonly maxY: number;
-  readonly label: string;
-  readonly priority: number;
 }
+
+export interface PolygonLocationZone extends LocationZoneBase {
+  readonly polygon: readonly LocationZonePoint[];
+}
+
+export type LocationZone = RectangleLocationZone | PolygonLocationZone;
 
 export const LOCATION_ZONES = [
   { id: "l1-asrs", floorPlanId: "hq-l1", minX: 28.3, maxX: 37.7, minY: 14.0, maxY: 19.4, label: "Kat 01 · Kitap Silosu (ASRS)", priority: 1 },
@@ -19,4 +33,4 @@ export const LOCATION_ZONES = [
   { id: "l1-main-area", floorPlanId: "hq-l1", minX: 5.0, maxX: 37.7, minY: 5.3, maxY: 12.0, label: "Kat 01 · Ana Derslik / Açık Alan", priority: 7 },
 ] as const satisfies readonly LocationZone[];
 
-export const LOCATION_ZONE_FALLBACK_LABEL = "Kat 01 · Tanımlı alan dışında";
+export const LOCATION_ZONE_FALLBACK_LABEL = "Tanımlı alan dışında";
