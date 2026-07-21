@@ -1,0 +1,18 @@
+{
+  "map": {
+    "source": "system",
+    "mapId": "hq-l1",
+    "image": "/floor-plan.jpg",
+    "widthPx": 1280,
+    "heightPx": 720,
+    "calibration": {
+      "type": "affine",
+      "points": [
+        { "id": "origin", "pixel": { "x": 0, "y": 720 }, "world": { "x": 0, "y": 0 } },
+        { "id": "x-axis", "pixel": { "x": 1280, "y": 720 }, "world": { "x": 42.67, "y": 0 } },
+        { "id": "y-axis", "pixel": { "x": 0, "y": 0 }, "world": { "x": 0, "y": 24 } }
+      ]
+    }
+  },
+  "regions": []
+}

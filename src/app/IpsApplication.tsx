@@ -14,10 +14,11 @@ import { TagSearchPanel } from "@/src/features/tracking/components/TagSearchPane
 import { useRealtimeTracking } from "@/src/features/tracking/hooks/useRealtimeTracking";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { MAP_CALIBRATION, MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
-import { CircleDot, Crosshair, Layers3, Maximize2, Ruler, Scan, Upload } from "lucide-react";
+import { CircleDot, Crosshair, Layers3, Maximize2, Ruler, Scan } from "lucide-react";
 import { AnchorManagementPanel } from "@/app/anchors/page";
 import { TagManagementPanel } from "@/app/tags/page";
 import { SupportContactPanel } from "@/src/features/support/components/SupportContactPanel";
+import { RegionManagementPanel } from "@/src/features/regions/components/RegionManagementPanel";
 
 function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: WorkspaceView; readonly onViewChange: (view: WorkspaceView) => void }) {
   useRealtimeTracking();
@@ -32,7 +33,7 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
       <AppHeader />
       <AppSidebar activeView={activeView} onViewChange={onViewChange} />
       <main className="workspace">
-        {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : activeView === "support" ? <SupportContactPanel embedded /> : <>
+        {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : <>
           <div className="workspace-heading">
             <div className="workspace-heading-content">
               <span>CANLI OPERASYONLAR / {MAP_FLOOR_PLAN.level.toUpperCase()}</span>
@@ -52,7 +53,6 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
               <button title="Odakla"><Scan size={16} /></button>
               <span />
               <button title="Tam ekran"><Maximize2 size={16} /></button>
-              <button title="Kat planını yükle"><Upload size={16} /></button>
             </div>
             <div className="map-indicator"><CircleDot size={13} /> PLAN KALİBRE EDİLDİ <span>{MAP_CALIBRATION.pixelsPerMeter} PX/M</span></div>
           </div>

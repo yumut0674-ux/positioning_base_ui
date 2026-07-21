@@ -11,7 +11,7 @@ const NAVIGATION = [
   { label: "Analizler", icon: BarChart3 },
 ];
 
-export type WorkspaceView = "map" | "tags" | "anchors" | "history" | "support";
+export type WorkspaceView = "map" | "tags" | "anchors" | "regions" | "history" | "support";
 
 interface AppSidebarProps {
   readonly activeView: WorkspaceView;
@@ -26,7 +26,7 @@ export function AppSidebar({ activeView, onViewChange }: AppSidebarProps) {
         {NAVIGATION.slice(0, 1).map(({ label, icon: Icon }) => <button key={label} className={activeView === "map" ? "active" : ""} onClick={() => onViewChange("map")}><Icon size={17} /><span>{label}</span></button>)}
         <small>YÖNET</small>
         {NAVIGATION.slice(1, 7).map(({ label, icon: Icon, badge, alert }) => {
-          const view = label === "İzlenen Varlıklar" ? "tags" : label === "Anchors" ? "anchors" : label === "Rota Geçmişi" ? "history" : label === "Destek ve İletişim" ? "support" : null;
+          const view = label === "İzlenen Varlıklar" ? "tags" : label === "Anchors" ? "anchors" : label === "Bölgeler" ? "regions" : label === "Rota Geçmişi" ? "history" : label === "Destek ve İletişim" ? "support" : null;
           const onClick = view ? () => onViewChange(view) : undefined;
           return <button key={label} className={view === activeView ? "active" : ""} onClick={onClick}><Icon size={17} /><span>{label}</span>{badge && <em className={alert ? "alert" : ""}>{badge}</em>}</button>;
         })}
