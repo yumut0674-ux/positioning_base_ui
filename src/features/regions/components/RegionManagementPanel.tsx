@@ -73,6 +73,11 @@ export function RegionManagementPanel() {
     : selectedPoint?.type === "polygon" ? `Polygon köşesi ${selectedPoint.index + 1}`
       : selectedPoint?.type === "entrance" ? selectedRegion?.entrances[selectedPoint.index]?.label ?? `Giriş ${selectedPoint.index + 1}`
         : "Seçili nokta";
+  const coordinateItems = selectedRegion ? [
+    ...selectedRegion.polygon.map((point, index) => ({ type: "polygon" as const, index, label: `Köşe ${index + 1}`, point })),
+    ...(selectedRegion.roomCenter ? [{ type: "center" as const, index: 0, label: "Oda merkezi", point: selectedRegion.roomCenter }] : []),
+    ...selectedRegion.entrances.map((point, index) => ({ type: "entrance" as const, index, label: point.label, point })),
+  ] : [];
 
   useEffect(() => {
     const stored = window.localStorage.getItem("ips-regions-config");
@@ -339,12 +344,20 @@ export function RegionManagementPanel() {
         <aside className={styles.properties}>
           <div className={styles.panelTitle}><div><span>ÖZELLİKLER</span><strong>{selectedRegion ? "Seçili bölge" : "Bölge seçilmedi"}</strong></div></div>
           {!selectedRegion ? <div className={styles.empty}><MousePointer2 size={24} /><strong>Bir bölge seçin</strong><span>Özellikleri burada düzenleyebilirsiniz.</span></div> : <>
-            <label><span>Bölge adı</span><input value={selectedRegion.name} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, name: event.target.value }))} /></label>
-            <div className={styles.fieldRow}><label><span>Kimlik</span><input value={selectedRegion.id} readOnly /></label><label className={styles.colorField}><span>Renk</span><input type="color" value={selectedRegion.color} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, color: event.target.value }))} /></label></div>
-            <div className={styles.metrics}><div><span>POLYGON</span><strong>{selectedRegion.polygon.length}</strong><small>köşe</small></div><div><span>GİRİŞLER</span><strong>{selectedRegion.entrances.length}</strong><small>nokta</small></div></div>
-            <section className={styles.coordinateSection}><h2>Gerçek dünya koordinatları</h2>{selectedRegion.roomCenter ? <p>Merkez: <code>{selectedRegion.roomCenter.world.x.toFixed(2)}, {selectedRegion.roomCenter.world.y.toFixed(2)} m</code></p> : <p>Oda merkezi tanımlanmadı.</p>}<small>Haritadaki bir noktayı seçerek koordinatlarını ince ayarlayabilirsiniz.</small></section>
-            {selectedPoint && selectedCoordinate && <section className={styles.pointEditor}>
-              <div className={styles.pointEditorTitle}><div><span>SEÇİLİ NOKTA</span><strong>{selectedPointLabel}</strong></div><i style={{ background: selectedPoint.type === "entrance" ? "#f29f05" : selectedRegion.color }} /></div>
+            <section className={styles.pointListSection}>
+              <div className={styles.pointListTitle}><span>NOKTA KOORDİNATLARI</span><strong>{coordinateItems.length} nokta</strong></div>
+              {coordinateItems.length === 0 ? <div className={styles.pointPrompt}><Crosshair size={18} /><span>Polygon, merkez veya giriş eklediğinizde koordinatlar burada görünecek.</span></div> : <div className={styles.pointList}>
+                {coordinateItems.map((item) => {
+                  const active = selectedPoint?.type === item.type && selectedPoint.index === item.index;
+                  return <button key={`${item.type}-${item.index}`} className={active ? styles.activePoint : ""} onClick={() => { setSelectedPoint({ type: item.type, index: item.index }); setTool("select"); }}>
+                    <i style={{ background: item.type === "entrance" ? "#f29f05" : selectedRegion.color }} />
+                    <div><strong>{item.label}</strong><span>px {item.point.pixel.x.toFixed(2)}, {item.point.pixel.y.toFixed(2)}</span><small>m {item.point.world.x.toFixed(3)}, {item.point.world.y.toFixed(3)}</small></div>
+                  </button>;
+                })}
+              </div>}
+            </section>
+            {selectedPoint && selectedCoordinate ? <section className={styles.pointEditor}>
+              <div className={styles.pointEditorTitle}><div><span>İNCE AYAR</span><strong>{selectedPointLabel}</strong></div><i style={{ background: selectedPoint.type === "entrance" ? "#f29f05" : selectedRegion.color }} /></div>
               <div className={styles.coordinateGrid}>
                 <label><span>Pixel X</span><input type="number" step="0.01" value={selectedCoordinate.pixel.x} onChange={(event) => updateSelectedPixel("x", event.currentTarget.valueAsNumber)} /></label>
                 <label><span>Pixel Y</span><input type="number" step="0.01" value={selectedCoordinate.pixel.y} onChange={(event) => updateSelectedPixel("y", event.currentTarget.valueAsNumber)} /></label>
@@ -352,7 +365,11 @@ export function RegionManagementPanel() {
                 <label><span>Gerçek Y (m)</span><input type="number" step="0.001" value={selectedCoordinate.world.y} onChange={(event) => updateSelectedWorld("y", event.currentTarget.valueAsNumber)} /></label>
               </div>
               <small>Bir değer değiştiğinde karşılığı sistem kalibrasyonuna göre otomatik hesaplanır.</small>
-            </section>}
+            </section> : coordinateItems.length > 0 && <div className={styles.selectHint}><MousePointer2 size={14} /> İnce ayar için listeden veya haritadan bir nokta seçin.</div>}
+            <label><span>Bölge adı</span><input value={selectedRegion.name} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, name: event.target.value }))} /></label>
+            <div className={styles.fieldRow}><label><span>Kimlik</span><input value={selectedRegion.id} readOnly /></label><label className={styles.colorField}><span>Renk</span><input type="color" value={selectedRegion.color} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, color: event.target.value }))} /></label></div>
+            <div className={styles.metrics}><div><span>POLYGON</span><strong>{selectedRegion.polygon.length}</strong><small>köşe</small></div><div><span>GİRİŞLER</span><strong>{selectedRegion.entrances.length}</strong><small>nokta</small></div></div>
+            <section className={styles.coordinateSection}><h2>Gerçek dünya koordinatları</h2>{selectedRegion.roomCenter ? <p>Merkez: <code>{selectedRegion.roomCenter.world.x.toFixed(2)}, {selectedRegion.roomCenter.world.y.toFixed(2)} m</code></p> : <p>Oda merkezi tanımlanmadı.</p>}<small>Haritadaki bir noktayı seçerek koordinatlarını ince ayarlayabilirsiniz.</small></section>
             {selectedPoint && <button className={styles.deletePoint} onClick={deleteSelectedPoint}><X size={14} /> Seçili noktayı sil</button>}
             {errors.length > 0 && <div className={styles.errors}>{errors.map((error) => <p key={error}>{error}</p>)}</div>}
             <button className={styles.deleteZone} onClick={deleteRegion}><Trash2 size={14} /> Bölgeyi sil</button>
