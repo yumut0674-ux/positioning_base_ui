@@ -13,7 +13,7 @@ import { TagInformationPanel } from "@/src/features/tracking/components/TagInfor
 import { TagSearchPanel } from "@/src/features/tracking/components/TagSearchPanel";
 import { useRealtimeTracking } from "@/src/features/tracking/hooks/useRealtimeTracking";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
-import { DEMO_FLOOR_PLAN } from "@/src/features/map/config/demoMap";
+import { MAP_CALIBRATION, MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
 import { CircleDot, Crosshair, Layers3, Maximize2, Ruler, Scan, Upload } from "lucide-react";
 import { AnchorManagementPanel } from "@/app/anchors/page";
 import { TagManagementPanel } from "@/app/tags/page";
@@ -35,8 +35,8 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
         {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : activeView === "support" ? <SupportContactPanel embedded /> : <>
           <div className="workspace-heading">
             <div className="workspace-heading-content">
-              <span>CANLI OPERASYONLAR / {DEMO_FLOOR_PLAN.level.toUpperCase()}</span>
-              <h1>{DEMO_FLOOR_PLAN.name}</h1>
+              <span>CANLI OPERASYONLAR / {MAP_FLOOR_PLAN.level.toUpperCase()}</span>
+              <h1>{MAP_FLOOR_PLAN.name}</h1>
             </div>
             <TagSearchPanel />
             <div className="workspace-meta"><i /><span>CANLI KONUMLANDIRMA</span><strong>{activeTagCount} AKTİF</strong></div>
@@ -54,7 +54,7 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
               <button title="Tam ekran"><Maximize2 size={16} /></button>
               <button title="Kat planını yükle"><Upload size={16} /></button>
             </div>
-            <div className="map-indicator"><CircleDot size={13} /> PLAN KALİBRE EDİLDİ <span>30 PX/M</span></div>
+            <div className="map-indicator"><CircleDot size={13} /> PLAN KALİBRE EDİLDİ <span>{MAP_CALIBRATION.pixelsPerMeter} PX/M</span></div>
           </div>
         </>}
       </main>

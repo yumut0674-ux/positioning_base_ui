@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { DEMO_ANCHORS } from "@/src/features/map/config/demoMap";
+import { DEFAULT_ANCHORS } from "@/src/features/map/config/mapConfig";
 import type { AnchorDefinition } from "@/src/features/map/types/map.types";
 import { queryPostgres } from "@/src/server/postgresClient";
 
@@ -51,7 +51,7 @@ FROM anchors a ORDER BY a.anchor_code;`;
 
 function seedAnchorsSql(): string {
   return `INSERT INTO anchors (anchor_code, anchor_name, x, y, z, status, note, floor_level, location_desc)
-VALUES ${DEMO_ANCHORS.map((anchor) => `(${anchorValues(anchor)})`).join(",\n")}
+VALUES ${DEFAULT_ANCHORS.map((anchor) => `(${anchorValues(anchor)})`).join(",\n")}
 ON CONFLICT (anchor_code) DO NOTHING;`;
 }
 

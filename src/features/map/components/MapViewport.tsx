@@ -6,19 +6,21 @@ import type Konva from "konva";
 import useImage from "use-image";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { useElementSize } from "@/src/shared/hooks/useElementSize";
-import { DEMO_CALIBRATION, DEMO_FLOOR_PLAN } from "../config/demoMap";
+import {
+  DEFAULT_MAP_VIEWPORT,
+  MAP_CALIBRATION,
+  MAP_FLOOR_PLAN,
+  MAP_VIEWPORT_LIMITS,
+} from "../config/mapConfig";
 import { CoordinateTransformService } from "../services/CoordinateTransformService";
 import { TagNode } from "./TagNode";
-
-const MIN_ZOOM = 0.38;
-const MAX_ZOOM = 3.4;
 
 export function MapViewport() {
   const hostRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const panOriginRef = useRef({ x: 0, y: 0 });
   const size = useElementSize(hostRef);
-  const [floorImage] = useImage(DEMO_FLOOR_PLAN.imageUrl, "anonymous");
+  const [floorImage] = useImage(MAP_FLOOR_PLAN.imageUrl, "anonymous");
   const viewport = useIpsStore((state) => state.viewport);
   const layers = useIpsStore((state) => state.layers);
   const tagsById = useIpsStore((state) => state.tags);
@@ -28,18 +30,18 @@ export function MapViewport() {
   const setViewport = useIpsStore((state) => state.setViewport);
   const selectTag = useIpsStore((state) => state.selectTag);
   const setCursorWorld = useIpsStore((state) => state.setCursorWorld);
-  const transform = useMemo(() => new CoordinateTransformService(DEMO_CALIBRATION), []);
+  const transform = useMemo(() => new CoordinateTransformService(MAP_CALIBRATION), []);
 
   const fitToScreen = useCallback(() => {
-    const padding = 64;
+    const padding = MAP_VIEWPORT_LIMITS.fitPadding;
     const scale = Math.min(
-      (size.width - padding * 2) / DEMO_FLOOR_PLAN.canvasSize.width,
-      (size.height - padding * 2) / DEMO_FLOOR_PLAN.canvasSize.height,
+      (size.width - padding * 2) / MAP_FLOOR_PLAN.canvasSize.width,
+      (size.height - padding * 2) / MAP_FLOOR_PLAN.canvasSize.height,
     );
     setViewport({
       scale,
-      x: (size.width - DEMO_FLOOR_PLAN.canvasSize.width * scale) / 2,
-      y: (size.height - DEMO_FLOOR_PLAN.canvasSize.height * scale) / 2,
+      x: (size.width - MAP_FLOOR_PLAN.canvasSize.width * scale) / 2,
+      y: (size.height - MAP_FLOOR_PLAN.canvasSize.height * scale) / 2,
     });
   }, [setViewport, size.height, size.width]);
 
@@ -49,7 +51,13 @@ export function MapViewport() {
     const pointer = stage?.getPointerPosition();
     if (!pointer) return;
     const direction = event.evt.deltaY > 0 ? -1 : 1;
-    const nextScale = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, viewport.scale * Math.pow(1.08, direction)));
+    const nextScale = Math.min(
+      MAP_VIEWPORT_LIMITS.maxZoom,
+      Math.max(
+        MAP_VIEWPORT_LIMITS.minZoom,
+        viewport.scale * Math.pow(MAP_VIEWPORT_LIMITS.wheelZoomFactor, direction),
+      ),
+    );
     const mapPoint = {
       x: (pointer.x - viewport.x) / viewport.scale,
       y: (pointer.y - viewport.y) / viewport.scale,
@@ -69,11 +77,11 @@ export function MapViewport() {
   const gridLines = useMemo(() => {
     const lines: React.ReactNode[] = [];
     const step = transform.metersToPixels(1);
-    for (let x = 0; x <= DEMO_FLOOR_PLAN.canvasSize.width; x += step) {
-      lines.push(<Line key={`x-${x}`} points={[x, 0, x, DEMO_FLOOR_PLAN.canvasSize.height]} stroke="#8ab4c8" strokeWidth={x % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.34} />);
+    for (let x = 0; x <= MAP_FLOOR_PLAN.canvasSize.width; x += step) {
+      lines.push(<Line key={`x-${x}`} points={[x, 0, x, MAP_FLOOR_PLAN.canvasSize.height]} stroke="#8ab4c8" strokeWidth={x % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.34} />);
     }
-    for (let y = 0; y <= DEMO_FLOOR_PLAN.canvasSize.height; y += step) {
-      lines.push(<Line key={`y-${y}`} points={[0, y, DEMO_FLOOR_PLAN.canvasSize.width, y]} stroke="#8ab4c8" strokeWidth={y % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.34} />);
+    for (let y = 0; y <= MAP_FLOOR_PLAN.canvasSize.height; y += step) {
+      lines.push(<Line key={`y-${y}`} points={[0, y, MAP_FLOOR_PLAN.canvasSize.width, y]} stroke="#8ab4c8" strokeWidth={y % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.34} />);
     }
     return lines;
   }, [transform]);
@@ -105,15 +113,15 @@ export function MapViewport() {
         <Layer listening={false} visible={layers.grid}><Group {...mapGroupProps}>{gridLines}</Group></Layer>
         <Layer listening={false} visible={layers.floorPlan}>
           <Group {...mapGroupProps}>
-            <Rect width={1280} height={720} fill="#eef5f7" />
-            {floorImage && <KonvaImage image={floorImage} width={1280} height={720} opacity={0.9} />}
-            <Rect width={1280} height={720} fill="#d8f5f0" opacity={0.08} />
+            <Rect width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} fill="#eef5f7" />
+            {floorImage && <KonvaImage image={floorImage} width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} opacity={0.9} />}
+            <Rect width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} fill="#d8f5f0" opacity={0.08} />
           </Group>
         </Layer>
         <Layer listening={false} visible={layers.references}>
           <Group {...mapGroupProps}>
-            <Line points={[0, 720, 150, 720]} stroke="#00a896" strokeWidth={2} />
-            <Text x={8} y={690} text="5 m" fill="#087f73" fontSize={12} fontFamily="monospace" />
+            <Line points={[0, MAP_FLOOR_PLAN.canvasSize.height, transform.metersToPixels(5), MAP_FLOOR_PLAN.canvasSize.height]} stroke="#00a896" strokeWidth={2} />
+            <Text x={8} y={MAP_FLOOR_PLAN.canvasSize.height - 30} text="5 m" fill="#087f73" fontSize={12} fontFamily="monospace" />
           </Group>
         </Layer>
         <Layer listening={false} visible={layers.anchors}>
@@ -144,7 +152,7 @@ export function MapViewport() {
         </Layer>
       </Stage>
       <div className="canvas-actions" aria-label="Harita kontrolleri">
-        <button onClick={() => setViewport({ x: 42, y: 36, scale: 0.82 })} title="Görünümü sıfırla">SIFIRLA</button>
+        <button onClick={() => setViewport(DEFAULT_MAP_VIEWPORT)} title="Görünümü sıfırla">SIFIRLA</button>
         <button onClick={fitToScreen} title="Haritayı alana sığdır">SIĞDIR</button>
       </div>
       <div className="zoom-readout">{Math.round(viewport.scale * 100)}%</div>

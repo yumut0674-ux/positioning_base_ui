@@ -9,12 +9,16 @@ import useImage from "use-image";
 import { AppHeader } from "@/src/app/components/AppHeader";
 import { AppSidebar, type WorkspaceView } from "@/src/app/components/AppSidebar";
 import { StatusStrip } from "@/src/app/components/StatusStrip";
-import { DEMO_FLOOR_PLAN } from "@/src/features/map/config/demoMap";
+import { MAP_CALIBRATION, MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
+import { CoordinateTransformService } from "@/src/features/map/services/CoordinateTransformService";
 import { buildLocationTimeline, type HistoricalPosition, type LocationStay } from "@/src/features/map/services/RouteTimelineService";
 import { useElementSize } from "@/src/shared/hooks/useElementSize";
 import styles from "./history.module.css";
 
 type CanvasPoint = readonly [number, number];
+
+const HISTORY_MAP_TRANSFORM = new CoordinateTransformService(MAP_CALIBRATION);
+const HISTORY_GRID_STEP = 80;
 
 const TAG_OPTIONS = [{ id: "TAG-001", name: "Forklift 07" }, { id: "TAG-014", name: "Personel A14" }, { id: "TAG-028", name: "Palet 28" }];
 const BASE_ROUTE: readonly { readonly x: number; readonly y: number; readonly minute: number }[] = [
@@ -34,7 +38,8 @@ function readRequestedTag(): string | null {
 }
 
 function worldToCanvas(position: Pick<HistoricalPosition, "x" | "y">): CanvasPoint {
-  return [position.x * 30, DEMO_FLOOR_PLAN.canvasSize.height - position.y * 30];
+  const point = HISTORY_MAP_TRANSFORM.worldToCanvas(position);
+  return [point.x, point.y];
 }
 
 function buildHistory(tagId: string, startDate: string, endDate: string, seed: number): HistoricalPosition[] {
@@ -70,7 +75,7 @@ export default function HistoryPage() {
   const hostRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const size = useElementSize(hostRef);
-  const [floorImage] = useImage(DEMO_FLOOR_PLAN.imageUrl, "anonymous");
+  const [floorImage] = useImage(MAP_FLOOR_PLAN.imageUrl, "anonymous");
   const [requestedTag] = useState(readRequestedTag);
   const [selectedTag, setSelectedTag] = useState(() => readRequestedTag() ?? TAG_OPTIONS[0].id);
   const [startDate, setStartDate] = useState("2026-07-15T08:00");
@@ -82,8 +87,8 @@ export default function HistoryPage() {
 
   const fitMap = useCallback(() => {
     const padding = 62;
-    const scale = Math.min((size.width - padding * 2) / DEMO_FLOOR_PLAN.canvasSize.width, (size.height - padding * 2) / DEMO_FLOOR_PLAN.canvasSize.height);
-    setViewport({ scale, x: (size.width - DEMO_FLOOR_PLAN.canvasSize.width * scale) / 2, y: (size.height - DEMO_FLOOR_PLAN.canvasSize.height * scale) / 2 });
+    const scale = Math.min((size.width - padding * 2) / MAP_FLOOR_PLAN.canvasSize.width, (size.height - padding * 2) / MAP_FLOOR_PLAN.canvasSize.height);
+    setViewport({ scale, x: (size.width - MAP_FLOOR_PLAN.canvasSize.width * scale) / 2, y: (size.height - MAP_FLOOR_PLAN.canvasSize.height * scale) / 2 });
   }, [size.height, size.width]);
 
   useEffect(() => {
@@ -94,7 +99,7 @@ export default function HistoryPage() {
 
   const tagOptions = requestedTag && !TAG_OPTIONS.some((tag) => tag.id === requestedTag) ? [...TAG_OPTIONS, { id: requestedTag, name: "Seçili Tag" }] : TAG_OPTIONS;
   const activeTag = tagOptions.find((tag) => tag.id === selectedTag) ?? tagOptions[0];
-  const timeline = useMemo(() => buildLocationTimeline(positions, DEMO_FLOOR_PLAN.id), [positions]);
+  const timeline = useMemo(() => buildLocationTimeline(positions, MAP_FLOOR_PLAN.id), [positions]);
   const pointValues = useMemo(() => positions.flatMap((position) => worldToCanvas(position)), [positions]);
   const distance = useMemo(() => routeDistance(positions), [positions]);
   const selectedStay = timeline.find((stay) => stay.id === selectedStayId) ?? null;
@@ -147,14 +152,14 @@ export default function HistoryPage() {
     <AppSidebar activeView="history" onViewChange={changeView} />
     <main className={`workspace ${styles.workspace}`}>
       <div className="workspace-heading">
-        <div><span>HAREKET ANALİZİ / {DEMO_FLOOR_PLAN.level.toUpperCase()}</span><h1>Rota Geçmişi</h1></div>
+        <div><span>HAREKET ANALİZİ / {MAP_FLOOR_PLAN.level.toUpperCase()}</span><h1>Rota Geçmişi</h1></div>
         <div className="workspace-meta"><i /><span>GEÇMİŞ KONUM VERİSİ</span><strong>{activeTag.id}</strong></div>
       </div>
       <section className={styles.mapFrame}>
         <div ref={hostRef} className={styles.mapCanvas}>
           <Stage ref={stageRef} width={size.width} height={size.height} x={viewport.x} y={viewport.y} draggable onWheel={handleWheel} onDragEnd={(event) => setViewport((current) => ({ ...current, x: event.target.x(), y: event.target.y() }))}>
-            <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}><Rect width={1280} height={720} fill="#e7f0f4" />{floorImage && <KonvaImage image={floorImage} width={1280} height={720} opacity={.68} />}<Rect width={1280} height={720} fill="#d8f5f0" opacity={.1} /></Group></Layer>
-            <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}>{Array.from({ length: 17 }, (_, index) => <Line key={`vertical-${index}`} points={[index * 80, 0, index * 80, 720]} stroke="#6f9db1" strokeWidth={.4} opacity={.16} />)}{Array.from({ length: 10 }, (_, index) => <Line key={`horizontal-${index}`} points={[0, index * 80, 1280, index * 80]} stroke="#6f9db1" strokeWidth={.4} opacity={.16} />)}</Group></Layer>
+            <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}><Rect width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} fill="#e7f0f4" />{floorImage && <KonvaImage image={floorImage} width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} opacity={.68} />}<Rect width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} fill="#d8f5f0" opacity={.1} /></Group></Layer>
+            <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}>{Array.from({ length: Math.ceil(MAP_FLOOR_PLAN.canvasSize.width / HISTORY_GRID_STEP) + 1 }, (_, index) => <Line key={`vertical-${index}`} points={[index * HISTORY_GRID_STEP, 0, index * HISTORY_GRID_STEP, MAP_FLOOR_PLAN.canvasSize.height]} stroke="#6f9db1" strokeWidth={.4} opacity={.16} />)}{Array.from({ length: Math.ceil(MAP_FLOOR_PLAN.canvasSize.height / HISTORY_GRID_STEP) + 1 }, (_, index) => <Line key={`horizontal-${index}`} points={[0, index * HISTORY_GRID_STEP, MAP_FLOOR_PLAN.canvasSize.width, index * HISTORY_GRID_STEP]} stroke="#6f9db1" strokeWidth={.4} opacity={.16} />)}</Group></Layer>
             <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}>
               <Line points={pointValues} stroke="#00a896" strokeWidth={12} opacity={selectedStay ? .06 : .15} tension={.32} lineCap="round" lineJoin="round" />
               <Line points={pointValues} stroke="#3578e5" strokeWidth={3.5} opacity={selectedStay ? .2 : .95} tension={.32} lineCap="round" lineJoin="round" shadowColor="#00a896" shadowBlur={12} shadowOpacity={selectedStay ? .12 : .48} />
@@ -167,7 +172,7 @@ export default function HistoryPage() {
           </Stage>
         </div>
         <div className={styles.vignette} />
-        <div className={styles.mapMeta}><CircleDot size={13} /> PLAN KALİBRE EDİLDİ <span>30 PX/M</span></div>
+        <div className={styles.mapMeta}><CircleDot size={13} /> PLAN KALİBRE EDİLDİ <span>{MAP_CALIBRATION.pixelsPerMeter} PX/M</span></div>
         <div className={styles.zoomReadout}>{Math.round(viewport.scale * 100)}%</div>
         <div className={styles.mapTools}><button type="button" onClick={fitMap} title="Haritayı sığdır"><Maximize2 size={16} /></button><button type="button" title="Katmanlar"><Layers3 size={16} /></button><button type="button" title="Odak noktası"><Crosshair size={16} /></button></div>
         <motion.aside className={styles.sidebar} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>

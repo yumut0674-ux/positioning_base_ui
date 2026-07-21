@@ -1,13 +1,13 @@
 import { BatteryMedium, Box, MapPin, Route } from "lucide-react";
 import { motion } from "framer-motion";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
-import { DEMO_FLOOR_PLAN } from "@/src/features/map/config/demoMap";
+import { MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
 import { resolveLocation } from "@/src/features/map/services/LocationResolverService";
 
 export function TagInformationPanel() {
   const selectedTag = useIpsStore((state) => state.selectedTagId ? state.tags[state.selectedTagId] : undefined);
   if (!selectedTag) return null;
-  const locationAddress = resolveLocation(selectedTag.x, selectedTag.y, DEMO_FLOOR_PLAN.id);
+  const locationAddress = resolveLocation(selectedTag.x, selectedTag.y, MAP_FLOOR_PLAN.id);
   return (
     <motion.aside className="tag-panel" initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }}>
       <div className="tag-panel-header">
