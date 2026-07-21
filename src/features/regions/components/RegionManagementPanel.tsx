@@ -11,7 +11,7 @@ import {
 import { MAP_FLOOR_PLAN, MAP_VIEWPORT_LIMITS } from "@/src/features/map/config/mapConfig";
 import { useElementSize } from "@/src/shared/hooks/useElementSize";
 import { DEFAULT_REGIONS_CONFIG } from "../config/defaultRegionsConfig";
-import { createAffineTransform, withWorldCoordinates } from "../services/affineTransform";
+import { createAffineTransform, createInverseAffineTransform, withWorldCoordinates } from "../services/affineTransform";
 import type { CoordinatePair, RegionDefinition, RegionEditorTool, RegionsConfig } from "../types/region.types";
 import styles from "./regions.module.css";
 
@@ -63,7 +63,16 @@ export function RegionManagementPanel() {
   const [errors, setErrors] = useState<readonly string[]>([]);
 
   const transform = useMemo(() => createAffineTransform(config.map.calibration.points), [config.map.calibration.points]);
+  const inverseTransform = useMemo(() => createInverseAffineTransform(config.map.calibration.points), [config.map.calibration.points]);
   const selectedRegion = config.regions.find((region) => region.id === selectedRegionId) ?? null;
+  const selectedCoordinate = !selectedRegion || !selectedPoint ? null
+    : selectedPoint.type === "center" ? selectedRegion.roomCenter
+      : selectedPoint.type === "polygon" ? selectedRegion.polygon[selectedPoint.index] ?? null
+        : selectedRegion.entrances[selectedPoint.index] ?? null;
+  const selectedPointLabel = selectedPoint?.type === "center" ? "Oda merkezi"
+    : selectedPoint?.type === "polygon" ? `Polygon köşesi ${selectedPoint.index + 1}`
+      : selectedPoint?.type === "entrance" ? selectedRegion?.entrances[selectedPoint.index]?.label ?? `Giriş ${selectedPoint.index + 1}`
+        : "Seçili nokta";
 
   useEffect(() => {
     const stored = window.localStorage.getItem("ips-regions-config");
@@ -154,13 +163,31 @@ export function RegionManagementPanel() {
     }
   };
 
-  const updatePoint = (type: NonNullable<SelectedPoint>["type"], index: number, pixel: { x: number; y: number }) => {
+  const updateCoordinate = (type: NonNullable<SelectedPoint>["type"], index: number, point: CoordinatePair) => {
     if (!selectedRegion) return;
-    const point = withWorldCoordinates(pixel, transform);
     updateRegion(selectedRegion.id, (region) => {
       if (type === "center") return { ...region, roomCenter: point };
       if (type === "polygon") return { ...region, polygon: region.polygon.map((value, itemIndex) => itemIndex === index ? point : value) };
       return { ...region, entrances: region.entrances.map((value, itemIndex) => itemIndex === index ? { ...value, ...point } : value) };
+    });
+  };
+
+  const updatePoint = (type: NonNullable<SelectedPoint>["type"], index: number, pixel: { x: number; y: number }) => {
+    updateCoordinate(type, index, withWorldCoordinates(pixel, transform));
+  };
+
+  const updateSelectedPixel = (axis: "x" | "y", value: number) => {
+    if (!selectedPoint || !selectedCoordinate || !Number.isFinite(value)) return;
+    updatePoint(selectedPoint.type, selectedPoint.index, { ...selectedCoordinate.pixel, [axis]: value });
+  };
+
+  const updateSelectedWorld = (axis: "x" | "y", value: number) => {
+    if (!selectedPoint || !selectedCoordinate || !Number.isFinite(value)) return;
+    const world = { ...selectedCoordinate.world, [axis]: value };
+    const pixel = inverseTransform(world);
+    updateCoordinate(selectedPoint.type, selectedPoint.index, {
+      pixel: { x: Math.round(pixel.x * 100) / 100, y: Math.round(pixel.y * 100) / 100 },
+      world: { x: Math.round(world.x * 1000) / 1000, y: Math.round(world.y * 1000) / 1000 },
     });
   };
 
@@ -315,7 +342,17 @@ export function RegionManagementPanel() {
             <label><span>Bölge adı</span><input value={selectedRegion.name} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, name: event.target.value }))} /></label>
             <div className={styles.fieldRow}><label><span>Kimlik</span><input value={selectedRegion.id} readOnly /></label><label className={styles.colorField}><span>Renk</span><input type="color" value={selectedRegion.color} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, color: event.target.value }))} /></label></div>
             <div className={styles.metrics}><div><span>POLYGON</span><strong>{selectedRegion.polygon.length}</strong><small>köşe</small></div><div><span>GİRİŞLER</span><strong>{selectedRegion.entrances.length}</strong><small>nokta</small></div></div>
-            <section className={styles.coordinateSection}><h2>Gerçek dünya koordinatları</h2>{selectedRegion.roomCenter ? <p>Merkez: <code>{selectedRegion.roomCenter.world.x.toFixed(2)}, {selectedRegion.roomCenter.world.y.toFixed(2)} m</code></p> : <p>Oda merkezi tanımlanmadı.</p>}<small>Pixel koordinatları sistem kalibrasyonuyla otomatik olarak metreye çevrilir.</small></section>
+            <section className={styles.coordinateSection}><h2>Gerçek dünya koordinatları</h2>{selectedRegion.roomCenter ? <p>Merkez: <code>{selectedRegion.roomCenter.world.x.toFixed(2)}, {selectedRegion.roomCenter.world.y.toFixed(2)} m</code></p> : <p>Oda merkezi tanımlanmadı.</p>}<small>Haritadaki bir noktayı seçerek koordinatlarını ince ayarlayabilirsiniz.</small></section>
+            {selectedPoint && selectedCoordinate && <section className={styles.pointEditor}>
+              <div className={styles.pointEditorTitle}><div><span>SEÇİLİ NOKTA</span><strong>{selectedPointLabel}</strong></div><i style={{ background: selectedPoint.type === "entrance" ? "#f29f05" : selectedRegion.color }} /></div>
+              <div className={styles.coordinateGrid}>
+                <label><span>Pixel X</span><input type="number" step="0.01" value={selectedCoordinate.pixel.x} onChange={(event) => updateSelectedPixel("x", event.currentTarget.valueAsNumber)} /></label>
+                <label><span>Pixel Y</span><input type="number" step="0.01" value={selectedCoordinate.pixel.y} onChange={(event) => updateSelectedPixel("y", event.currentTarget.valueAsNumber)} /></label>
+                <label><span>Gerçek X (m)</span><input type="number" step="0.001" value={selectedCoordinate.world.x} onChange={(event) => updateSelectedWorld("x", event.currentTarget.valueAsNumber)} /></label>
+                <label><span>Gerçek Y (m)</span><input type="number" step="0.001" value={selectedCoordinate.world.y} onChange={(event) => updateSelectedWorld("y", event.currentTarget.valueAsNumber)} /></label>
+              </div>
+              <small>Bir değer değiştiğinde karşılığı sistem kalibrasyonuna göre otomatik hesaplanır.</small>
+            </section>}
             {selectedPoint && <button className={styles.deletePoint} onClick={deleteSelectedPoint}><X size={14} /> Seçili noktayı sil</button>}
             {errors.length > 0 && <div className={styles.errors}>{errors.map((error) => <p key={error}>{error}</p>)}</div>}
             <button className={styles.deleteZone} onClick={deleteRegion}><Trash2 size={14} /> Bölgeyi sil</button>

@@ -49,7 +49,7 @@
 .mapControls button { min-height: 29px; padding: 0 9px; border: 0; border-right: 1px solid #bdcedb; border-radius: 0; font: 8px ui-monospace, monospace; }
 .mapControls span { min-width: 45px; color: #5f7389; text-align: center; font: 8px ui-monospace, monospace; }
 .mapStatus { position: absolute; z-index: 3; left: 12px; bottom: 12px; max-width: calc(100% - 105px); padding: 7px 9px; border: 1px solid #c5d6e2; border-radius: 4px; background: rgba(255,255,255,.92); color: #5e748a; font: 8px ui-monospace, monospace; box-shadow: 0 8px 20px rgba(53,75,100,.1); }
-.properties > label, .fieldRow, .metrics, .coordinateSection, .deletePoint, .deleteZone, .errors { margin-left: 13px; margin-right: 13px; }
+.properties > label, .fieldRow, .metrics, .coordinateSection, .pointEditor, .deletePoint, .deleteZone, .errors { margin-left: 13px; margin-right: 13px; }
 .properties > label { margin-top: 14px; }
 .properties label > span { display: block; margin-bottom: 6px; color: #647a90; font-size: 9px; }
 .properties input { width: 100%; min-width: 0; height: 34px; padding: 0 9px; border: 1px solid #c9d9e5; border-radius: 5px; outline: none; background: #fff; color: #26394f; font-size: 9px; }
@@ -67,6 +67,16 @@
 .coordinateSection p { margin: 0 0 7px; color: #687e94; font-size: 8px; }
 .coordinateSection code { color: #087f73; font-size: 8px; }
 .coordinateSection small { color: #8294a7; font-size: 7px; line-height: 1.45; }
+.pointEditor { margin-top: 12px; padding: 11px; border: 1px solid #b9d9d5; border-radius: 5px; background: linear-gradient(145deg, #f2fbf9, #f7fbff); box-shadow: 0 7px 18px rgba(53,75,100,.07); }
+.pointEditorTitle { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.pointEditorTitle span, .pointEditorTitle strong { display: block; }
+.pointEditorTitle span { color: #72899c; font: 7px ui-monospace, monospace; letter-spacing: .12em; }
+.pointEditorTitle strong { margin-top: 4px; color: #24445b; font-size: 10px; }
+.pointEditorTitle i { width: 9px; height: 28px; border-radius: 5px; }
+.coordinateGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.coordinateGrid label > span { margin-bottom: 5px; color: #60798e; font: 8px ui-monospace, monospace; }
+.coordinateGrid input { height: 32px; color: #17364c; font: 9px ui-monospace, monospace; }
+.pointEditor > small { display: block; margin-top: 9px; color: #748a9d; font-size: 7px; line-height: 1.45; }
 .deletePoint, .deleteZone { width: calc(100% - 26px); min-height: 32px; margin-top: 12px; font-size: 9px; }
 .deletePoint { color: #a36f0f; border-color: #eddcb8; background: #fff9ec; }
 .deleteZone { margin-top: auto; color: #b33f4d; border-color: #efc6cc; background: #fff2f3; }

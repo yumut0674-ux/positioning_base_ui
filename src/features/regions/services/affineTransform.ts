@@ -48,6 +48,15 @@ export function createAffineTransform(points: readonly CalibrationPoint[]) {
   });
 }
 
+export function createInverseAffineTransform(points: readonly CalibrationPoint[]) {
+  const reversed: readonly CalibrationPoint[] = points.map((point) => ({
+    id: point.id,
+    pixel: point.world,
+    world: point.pixel,
+  }));
+  return createAffineTransform(reversed);
+}
+
 export function withWorldCoordinates(
   pixel: CoordinatePair["pixel"],
   transform: ReturnType<typeof createAffineTransform>,
