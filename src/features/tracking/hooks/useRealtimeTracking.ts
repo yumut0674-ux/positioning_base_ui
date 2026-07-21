@@ -58,7 +58,6 @@ export function useRealtimeTracking(): void {
       name,
       color: current?.color ?? colorForTag(tagId),
       status: "active" as const,
-      battery: incoming.battery ?? current?.battery ?? 100,
       timestamp: incoming.timestamp,
       x: incoming.x,
       y: incoming.y,

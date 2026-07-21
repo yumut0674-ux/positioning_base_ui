@@ -2,7 +2,7 @@ import { create } from "zustand";
 import type { Point2D } from "@/src/shared/types/geometry";
 import type { AnchorDefinition, MapLayerId, ViewportState } from "@/src/features/map/types/map.types";
 import { DEFAULT_MAP_VIEWPORT } from "@/src/features/map/config/mapConfig";
-import { TAG_LIVE_TIMEOUT_MS, type TrackedTag } from "@/src/features/tracking/types/tracking.types";
+import { TAG_LIVE_TIMEOUT_MS, type TagStatus, type TrackedTag } from "@/src/features/tracking/types/tracking.types";
 import type { TagDefinition } from "@/src/features/tracking/services/tagApi";
 
 interface IpsState {
@@ -54,7 +54,7 @@ export const useIpsStore = create<IpsState>((set) => ({
   refreshTagActivity: (now = Date.now()) => set((state) => {
     let changed = false;
     const tags = Object.fromEntries(Object.entries(state.tags).map(([id, tag]) => {
-      const status = now - tag.timestamp <= TAG_LIVE_TIMEOUT_MS ? "active" : "offline";
+      const status: TagStatus = now - tag.timestamp <= TAG_LIVE_TIMEOUT_MS ? "active" : "offline";
       if (tag.status !== status) changed = true;
       return [id, tag.status === status ? tag : { ...tag, status }];
     }));

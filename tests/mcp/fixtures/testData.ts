@@ -24,7 +24,7 @@ export function currentEnvelope(status: "live" | "stale" | "offline" = "live"): 
     entityId: 28, entityName: "Palet 28", tagCode: "TAG-028",
     position: { x: 13.4, y: 8.2, zoneName: "Ana Alan", floorPlanId: "hq-l1" },
     observedAt: new Date(FIXED_NOW.getTime() - ageSeconds * 1_000).toISOString(),
-    ageSeconds, trackingStatus: status, battery: 84,
+    ageSeconds, trackingStatus: status,
   }, status === "live" ? "complete" : "stale", [], now);
 }
 
@@ -43,7 +43,7 @@ export function historyEnvelope(): ApiEnvelope<LocationHistoryData> {
     entityId: 28, entityName: "Palet 28", from: "2026-07-18T00:00:00+03:00", to: "2026-07-19T00:00:00+03:00",
     format: "route_points", points: [{
       x: 7.8, y: 12.1, observedAt: "2026-07-18T13:59:48+03:00",
-      zoneName: "Depo A", floorPlanId: "hq-l1", tagCode: "TAG-028", battery: 84,
+      zoneName: "Depo A", floorPlanId: "hq-l1", tagCode: "TAG-028",
     }], gaps: [], returnedCount: 1, sampled: false, sourcePointCount: 1,
   }, "complete", [], now);
 }

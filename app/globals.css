@@ -194,10 +194,6 @@ button { color: inherit; font: inherit; }
 .tag-position small { display: block; color: #76879c; font: 7px ui-monospace, monospace; }
 .tag-position strong { display: inline-block; margin: 8px 5px 0 0; font: 20px ui-monospace, monospace; font-weight: 400; color: #122037; }
 .tag-position span { color: #7b8ea3; font-size: 7px; }
-.tag-metrics { margin-top: 12px; }
-.tag-metrics > div { height: 34px; display: grid; grid-template-columns: 22px 1fr auto; align-items: center; border-bottom: 1px solid #d7e3ec; color: #61758d; font-size: 9px; }
-.tag-metrics svg { color: #5b7aa4; }
-.tag-metrics strong { color: #22324a; font: 8px ui-monospace, monospace; }
 .activity-block { margin-top: 18px; padding: 12px; background: #f5fbff; border: 1px solid #d0dee8; border-radius: 5px; }
 .activity-block > div:first-child { display: flex; justify-content: space-between; color: #526980; font-size: 8px; text-transform: uppercase; }
 .activity-block small { color: #8495a9; font: 7px ui-monospace, monospace; }

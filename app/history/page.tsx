@@ -51,7 +51,6 @@ function buildHistory(tagId: string, startDate: string, endDate: string, seed: n
       x: point.x + Math.sin(seed + index * .73) * .12,
       y: point.y + Math.cos(seed * .6 + index * .45) * .1,
       timestamp: new Date(startTime + point.minute * 60_000).toISOString(),
-      battery: Math.max(54, 94 - index * 1.3),
     }))
     .filter((position) => Number.isFinite(endTime) && new Date(position.timestamp).getTime() <= endTime);
 }

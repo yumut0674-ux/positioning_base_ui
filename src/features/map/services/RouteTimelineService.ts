@@ -5,7 +5,6 @@ export interface HistoricalPosition {
   readonly x: number;
   readonly y: number;
   readonly timestamp: string;
-  readonly battery?: number;
 }
 
 export interface LocationStay {

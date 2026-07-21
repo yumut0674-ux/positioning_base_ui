@@ -1,6 +1,6 @@
 "use client";
 
-import { BatteryMedium, Clock3, Search, Star, X } from "lucide-react";
+import { Clock3, Search, Star, X } from "lucide-react";
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import type { TrackedTag } from "@/src/features/tracking/types/tracking.types";
@@ -64,7 +64,6 @@ function TagResult({ tag, index, listboxId, isHighlighted, isSelected, isFavorit
       </span>
       <span className="tag-search-result-meta">
         <span className={`tag-search-live-state ${isOffline ? "is-offline" : ""}`}>{isOffline ? "PASİF" : "CANLI"}</span>
-        <span><BatteryMedium size={13} aria-hidden="true" /> %{Math.round(tag.battery)}</span>
         <span><Clock3 size={12} aria-hidden="true" /> {formatUpdateTime(tag.timestamp)}</span>
       </span>
       <button

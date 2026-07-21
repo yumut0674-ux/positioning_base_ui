@@ -33,15 +33,15 @@ class FakeEntities implements EntityRepository {
 
 class FakePositions implements PositionRepository {
   public latestPosition: PositionRecord | null = {
-    tagCode: "TAG-NEW", x: 100, y: 100, battery: 50,
+    tagCode: "TAG-NEW", x: 100, y: 100,
     observedAt: "2026-07-19T11:29:50.000Z", gapBeforeSeconds: null,
   };
   public seenAssignments: readonly TagAssignment[] = [];
   public historyCallCount = 0;
   public timelineCallCount = 0;
   public timelinePositions: readonly PositionRecord[] = [
-    { tagCode: "TAG-OLD", x: 7, y: 7, battery: 80, observedAt: "2026-07-18T13:00:00+03:00", gapBeforeSeconds: null },
-    { tagCode: "TAG-NEW", x: 8, y: 8, battery: 79, observedAt: "2026-07-18T16:00:00+03:00", gapBeforeSeconds: 10 },
+    { tagCode: "TAG-OLD", x: 7, y: 7, observedAt: "2026-07-18T13:00:00+03:00", gapBeforeSeconds: null },
+    { tagCode: "TAG-NEW", x: 8, y: 8, observedAt: "2026-07-18T16:00:00+03:00", gapBeforeSeconds: 10 },
   ];
   public latest(): Promise<PositionRecord | null> { return Promise.resolve(this.latestPosition); }
   public nearest(): Promise<PositionRecord | null> { return Promise.resolve(null); }
@@ -49,8 +49,8 @@ class FakePositions implements PositionRepository {
     this.historyCallCount += 1;
     this.seenAssignments = assignments;
     return Promise.resolve({ positions: [
-      { tagCode: "TAG-OLD", x: 7, y: 7, battery: 80, observedAt: "2026-07-18T10:00:00.000Z", gapBeforeSeconds: null },
-      { tagCode: "TAG-NEW", x: 8, y: 8, battery: 79, observedAt: "2026-07-18T13:00:00.000Z", gapBeforeSeconds: 10 },
+      { tagCode: "TAG-OLD", x: 7, y: 7, observedAt: "2026-07-18T10:00:00.000Z", gapBeforeSeconds: null },
+      { tagCode: "TAG-NEW", x: 8, y: 8, observedAt: "2026-07-18T13:00:00.000Z", gapBeforeSeconds: 10 },
     ], sourcePointCount: 2, processingTruncated: false });
   }
   public timelineHistory(assignments: readonly TagAssignment[]): Promise<PositionHistoryResult> {
@@ -102,10 +102,10 @@ test("silinmiş/eski tag geçmişte görünür ama güncel aktif tag sayılmaz",
 test("zone_timeline örneklenmemiş kayıtları oda aralıklarına birleştirir", async () => {
   const positions = new FakePositions();
   positions.timelinePositions = [
-    { tagCode: "TAG-OLD", x: 1, y: 1, battery: 80, observedAt: "2026-07-19T10:39:28+03:00", gapBeforeSeconds: null },
-    { tagCode: "TAG-OLD", x: 2, y: 1, battery: 79, observedAt: "2026-07-19T10:45:00+03:00", gapBeforeSeconds: 332 },
-    { tagCode: "TAG-NEW", x: 20, y: 1, battery: 78, observedAt: "2026-07-19T10:52:14+03:00", gapBeforeSeconds: 434 },
-    { tagCode: "TAG-NEW", x: 21, y: 1, battery: 77, observedAt: "2026-07-19T11:02:30+03:00", gapBeforeSeconds: 616 },
+    { tagCode: "TAG-OLD", x: 1, y: 1, observedAt: "2026-07-19T10:39:28+03:00", gapBeforeSeconds: null },
+    { tagCode: "TAG-OLD", x: 2, y: 1, observedAt: "2026-07-19T10:45:00+03:00", gapBeforeSeconds: 332 },
+    { tagCode: "TAG-NEW", x: 20, y: 1, observedAt: "2026-07-19T10:52:14+03:00", gapBeforeSeconds: 434 },
+    { tagCode: "TAG-NEW", x: 21, y: 1, observedAt: "2026-07-19T11:02:30+03:00", gapBeforeSeconds: 616 },
   ];
   // Repository gap değeri gerçek ardışık ham kaydı ifade eder. Bu testte zone birleşimini sınamak için normal akışı kullan.
   positions.timelinePositions = positions.timelinePositions.map((position, index) => ({
@@ -137,8 +137,8 @@ test("zone_timeline örneklenmemiş kayıtları oda aralıklarına birleştirir"
 test("beş dakikadan uzun veri boşluğu aynı zone'u iki aralığa böler", async () => {
   const positions = new FakePositions();
   positions.timelinePositions = [
-    { tagCode: "TAG-NEW", x: 1, y: 1, battery: 80, observedAt: "2026-07-19T10:00:00+03:00", gapBeforeSeconds: null },
-    { tagCode: "TAG-NEW", x: 1, y: 1, battery: 79, observedAt: "2026-07-19T10:10:01+03:00", gapBeforeSeconds: 601 },
+    { tagCode: "TAG-NEW", x: 1, y: 1, observedAt: "2026-07-19T10:00:00+03:00", gapBeforeSeconds: null },
+    { tagCode: "TAG-NEW", x: 1, y: 1, observedAt: "2026-07-19T10:10:01+03:00", gapBeforeSeconds: 601 },
   ];
   const result = await new LocationService(new FakeEntities(), positions, () => "Oda 34").history({
     entityId: 28, from: "2026-07-19T10:00:00+03:00", to: "2026-07-19T11:00:00+03:00",

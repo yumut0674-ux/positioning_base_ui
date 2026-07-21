@@ -8,7 +8,7 @@ Girdi: `{ "query": "Palet 28", "limit": 10 }`. `query` trim edilir, 1–100 kara
 
 ## `get_current_location`
 
-Girdi: `{ "entityId": 28 }`; pozitif tam sayı zorunludur. Yanıt entity/tag, koordinat, zone, floor plan, `observedAt`, `ageSeconds`, battery ve `trackingStatus` içerir. Varsayılan eşikler: `<=30s live`, `<=300s stale`, sonrası `offline`. `stale/offline` konumlar `dataStatus=stale` döner.
+Girdi: `{ "entityId": 28 }`; pozitif tam sayı zorunludur. Yanıt entity/tag, koordinat, zone, floor plan, `observedAt`, `ageSeconds` ve `trackingStatus` içerir. Varsayılan eşikler: `<=30s live`, `<=300s stale`, sonrası `offline`. `stale/offline` konumlar `dataStatus=stale` döner.
 
 ## `get_location_at_time`
 
@@ -37,7 +37,7 @@ Girdi: `{ "entityId": 28, "from": "2026-07-18T00:00:00+03:00", "to": "2026-07-19
 }
 ```
 
-Timeline kayıtlarında koordinat, battery, tag, floor plan veya ham position bulunmaz. PostgreSQL tarihleri ISO 8601 `Europe/Istanbul` (`+03:00`) biçimine normalize edilir. Kalibre edilmiş oda sınırı yoksa oda adı uydurulmaz; `Tanımlı alan dışında` kullanılır.
+Timeline kayıtlarında koordinat, tag, floor plan veya ham position bulunmaz. PostgreSQL tarihleri ISO 8601 `Europe/Istanbul` (`+03:00`) biçimine normalize edilir. Kalibre edilmiş oda sınırı yoksa oda adı uydurulmaz; `Tanımlı alan dışında` kullanılır.
 
 ## Hata kodları
 

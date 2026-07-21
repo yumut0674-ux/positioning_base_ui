@@ -5,8 +5,7 @@ export type TrackingPosition = {
   readonly tagCode: string;
   readonly x: number;
   readonly y: number;
-  readonly battery: number | null;
-  readonly createdAt: string;
+  readonly timestamp: string;
 };
 
 const schemaSql = `
@@ -15,7 +14,6 @@ CREATE TABLE IF NOT EXISTS tag_location_history (
   tag_code VARCHAR(100) NOT NULL,
   x DOUBLE PRECISION NOT NULL,
   y DOUBLE PRECISION NOT NULL,
-  battery DOUBLE PRECISION,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_tag_location_history_tag_time
@@ -81,9 +79,9 @@ export class TrackingBuffer extends EventEmitter {
     this.flushing = true;
     const batch = this.queue.splice(0, this.queue.length);
     try {
-      const values = batch.map((position) => `(${sqlString(position.tagCode)}, ${position.x}, ${position.y}, ${position.battery ?? "NULL"}, ${sqlString(position.createdAt)}::timestamptz)`).join(",\n");
+      const values = batch.map((position) => `(${sqlString(position.tagCode)}, ${position.x}, ${position.y}, ${sqlString(position.timestamp)}::timestamptz)`).join(",\n");
       await queryPostgres(`${schemaSql}
-INSERT INTO tag_location_history (tag_code, x, y, battery, created_at)
+INSERT INTO tag_location_history (tag_code, x, y, created_at)
 VALUES ${values};`);
     } catch (error) {
       this.queue.unshift(...batch);
@@ -98,5 +96,4 @@ VALUES ${values};`);
   }
 }
 
-// Next.js module caching keeps one buffer and one EventEmitter shared by API route calls.
 export const trackingBuffer = new TrackingBuffer();

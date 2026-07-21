@@ -6,9 +6,9 @@ export interface TrackingGateway {
 }
 
 const TAG_BLUEPRINTS = [
-  { id: "TAG-001", name: "Forklift 07", color: "#5de4c7", x: 8.8, y: 7.8, battery: 86 },
-  { id: "TAG-014", name: "Operatör A14", color: "#f6c760", x: 21.4, y: 12.4, battery: 71 },
-  { id: "TAG-028", name: "Palet 28", color: "#7aa2f7", x: 31.2, y: 4.2, battery: 94 },
+  { id: "TAG-001", name: "Forklift 07", color: "#5de4c7", x: 8.8, y: 7.8 },
+  { id: "TAG-014", name: "Operatör A14", color: "#f6c760", x: 21.4, y: 12.4 },
+  { id: "TAG-028", name: "Palet 28", color: "#7aa2f7", x: 31.2, y: 4.2 },
 ] as const;
 
 export class SocketTrackingGateway implements TrackingGateway {
@@ -23,11 +23,11 @@ export class SocketTrackingGateway implements TrackingGateway {
   }
 }
 
-type SsePositionPayload = { readonly tagCode: string; readonly x: number; readonly y: number; readonly battery: number | null; readonly createdAt: string; };
+type SsePositionPayload = { readonly tagCode: string; readonly x: number; readonly y: number; readonly timestamp: string; };
 
-/** Browser gateway for the /api/tracking/stream Server-Sent Events feed. */
+/** Browser gateway for the ingest route's co-located Server-Sent Events feed. */
 export class SseTrackingGateway implements TrackingGateway {
-  public constructor(private readonly endpoint = "/api/tracking/stream") {}
+  public constructor(private readonly endpoint = "/api/tracking/ingest") {}
 
   public connect(onPosition: (position: PositionMessage) => void): () => void {
     const source = new EventSource(this.endpoint);
@@ -35,8 +35,9 @@ export class SseTrackingGateway implements TrackingGateway {
       try {
         const payload = JSON.parse((event as MessageEvent<string>).data) as SsePositionPayload;
         if (!payload.tagCode || !Number.isFinite(payload.x) || !Number.isFinite(payload.y)) return;
-        const timestamp = Date.parse(payload.createdAt);
-        onPosition({ id: payload.tagCode, x: payload.x, y: payload.y, battery: payload.battery, timestamp: Number.isFinite(timestamp) ? timestamp : Date.now() });
+        const timestamp = Date.parse(payload.timestamp);
+        if (!Number.isFinite(timestamp)) return;
+        onPosition({ id: payload.tagCode, x: payload.x, y: payload.y, timestamp });
       } catch {
         // Ignore malformed external messages without closing the live stream.
       }
@@ -56,7 +57,6 @@ export class MockTrackingGateway implements TrackingGateway {
           id: tag.id,
           x: tag.x + Math.cos(tick + index * 2.1) * (index === 1 ? 2.8 : 1.25),
           y: tag.y + Math.sin(tick * 0.78 + index) * (index === 2 ? 1.8 : 0.9),
-          battery: tag.battery,
           timestamp: Date.now(),
         });
       });

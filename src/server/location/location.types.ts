@@ -65,7 +65,6 @@ export interface PositionRecord {
   readonly tagCode: string;
   readonly x: number;
   readonly y: number;
-  readonly battery: number | null;
   readonly observedAt: string;
   readonly gapBeforeSeconds: number | null;
 }
@@ -91,7 +90,6 @@ export interface CurrentLocationData {
   readonly observedAt: string;
   readonly ageSeconds: number;
   readonly trackingStatus: TrackingStatus;
-  readonly battery: number | null;
 }
 
 export interface LocationAtTimeData {
@@ -112,7 +110,6 @@ export interface RoutePoint {
   readonly zoneName: string;
   readonly floorPlanId: typeof FLOOR_PLAN_ID;
   readonly tagCode: string;
-  readonly battery: number | null;
 }
 
 export interface ZoneTimelineEntry {

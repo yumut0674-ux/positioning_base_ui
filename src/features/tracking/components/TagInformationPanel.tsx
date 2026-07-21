@@ -1,4 +1,4 @@
-import { BatteryMedium, Box, MapPin, Route } from "lucide-react";
+import { Box, MapPin, Route } from "lucide-react";
 import { motion } from "framer-motion";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
@@ -23,9 +23,6 @@ export function TagInformationPanel() {
       <div className="tag-position">
         <div><small>X KONUMU</small><strong>{selectedTag.x.toFixed(2)}</strong><span>metre</span></div>
         <div><small>Y KONUMU</small><strong>{selectedTag.y.toFixed(2)}</strong><span>metre</span></div>
-      </div>
-      <div className="tag-metrics">
-        <div><BatteryMedium size={15} /><span>Pil</span><strong>{selectedTag.battery}%</strong></div>
       </div>
       <div className="activity-block">
         <div><span>Son hareketlilik</span><small>SON 30 SN</small></div>

@@ -39,7 +39,7 @@ function buildGaps(positions: readonly PositionRecord[]): readonly DataGap[] {
 }
 
 function toRoutePoint(position: PositionRecord, zoneResolver: ZoneResolver): RoutePoint {
-  return { ...resolvedPosition(position, zoneResolver), observedAt: position.observedAt, tagCode: position.tagCode, battery: position.battery };
+  return { ...resolvedPosition(position, zoneResolver), observedAt: position.observedAt, tagCode: position.tagCode };
 }
 
 function toTimeline(positions: readonly PositionRecord[], zoneResolver: ZoneResolver): readonly ZoneTimelineEntry[] {
@@ -100,7 +100,7 @@ export class LocationService {
     const warnings = this.entityService.warningsFor(entity);
     return successEnvelope({
       entityId, entityName: entity.name, tagCode: assignment.tagCode, position: resolvedPosition(position, this.zoneResolver),
-      observedAt: position.observedAt, ageSeconds, trackingStatus: status, battery: position.battery,
+      observedAt: position.observedAt, ageSeconds, trackingStatus: status,
     }, status === "live" ? (warnings.length ? "partial" : "complete") : "stale", warnings, now);
   }
 

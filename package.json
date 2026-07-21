@@ -6,11 +6,12 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "vinext dev",
+    "dev": "vinext dev --hostname 0.0.0.0",
     "build": "vinext build",
     "start": "vinext start",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "test:mcp": "node --import tsx --test tests/mcp/all.test.ts",
+    "test:tracking": "node --import tsx --test tests/trackingIngest.test.ts",
     "test:mcp:integration": "node --import tsx --test tests/mcp/integration.test.ts",
     "mcp:start": "node --import tsx mcp/server.ts",
     "typecheck": "tsc --noEmit",

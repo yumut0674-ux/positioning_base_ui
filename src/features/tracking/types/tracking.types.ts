@@ -9,14 +9,12 @@ export interface TrackedTag extends Point2D {
   readonly name: string;
   readonly color: string;
   readonly status: TagStatus;
-  readonly battery: number;
   readonly direction?: number;
   readonly timestamp: number;
 }
 
 export interface PositionMessage extends Point2D {
   readonly id: string;
-  readonly battery?: number | null;
   readonly timestamp: number;
 }
 
