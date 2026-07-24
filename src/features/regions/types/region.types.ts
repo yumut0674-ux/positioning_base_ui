@@ -22,6 +22,11 @@ export interface RegionDefinition {
 }
 
 export interface RegionsConfig {
+  readonly engine?: {
+    readonly entryConfirmationCount?: number;
+    readonly exitConfirmationCount?: number;
+    readonly exitMarginMeters?: number;
+  };
   readonly map: {
     readonly source: "system";
     readonly mapId: string;

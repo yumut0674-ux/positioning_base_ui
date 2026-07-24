@@ -96,4 +96,11 @@ VALUES ${values};`);
   }
 }
 
-export const trackingBuffer = new TrackingBuffer();
+declare global {
+  var __uwbTrackingBuffer: TrackingBuffer | undefined;
+}
+
+// Vinext/Vite can re-evaluate server modules during development. Keep one
+// buffer instance so timers and listeners do not accumulate after hot reloads.
+export const trackingBuffer = globalThis.__uwbTrackingBuffer ?? new TrackingBuffer();
+globalThis.__uwbTrackingBuffer ??= trackingBuffer;

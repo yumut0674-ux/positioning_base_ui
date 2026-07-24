@@ -6,13 +6,17 @@ import { Circle, Group, Image as KonvaImage, Layer, Line, Rect, Stage, Text } fr
 import useImage from "use-image";
 import {
   Check, Crosshair, Download, DoorOpen, Hexagon, MousePointer2, Plus, Save,
-  Trash2, Upload, X,
+  Power, Trash2, Upload, X,
 } from "lucide-react";
 import { MAP_FLOOR_PLAN, MAP_VIEWPORT_LIMITS } from "@/src/features/map/config/mapConfig";
 import { useElementSize } from "@/src/shared/hooks/useElementSize";
 import { DEFAULT_REGIONS_CONFIG } from "../config/defaultRegionsConfig";
 import { createAffineTransform, createInverseAffineTransform, withWorldCoordinates } from "../services/affineTransform";
 import type { CoordinatePair, RegionDefinition, RegionEditorTool, RegionsConfig } from "../types/region.types";
+import {
+  fetchRegionEngineStatus, REGION_ENGINE_STATUS_CHANGED_EVENT, reloadRegionEngineConfig, updateRegionEngineStatus,
+  type RegionEngineStatusResponse,
+} from "../services/regionEngineApi";
 import styles from "./regions.module.css";
 
 type SelectedPoint = { readonly type: "polygon" | "center" | "entrance"; readonly index: number } | null;
@@ -61,6 +65,8 @@ export function RegionManagementPanel() {
   const [viewport, setViewport] = useState<Viewport>(INITIAL_VIEWPORT);
   const [status, setStatus] = useState("Sistem haritası kullanılıyor");
   const [errors, setErrors] = useState<readonly string[]>([]);
+  const [engineStatus, setEngineStatus] = useState<RegionEngineStatusResponse | null>(null);
+  const [engineUpdating, setEngineUpdating] = useState(false);
 
   const transform = useMemo(() => createAffineTransform(config.map.calibration.points), [config.map.calibration.points]);
   const inverseTransform = useMemo(() => createInverseAffineTransform(config.map.calibration.points), [config.map.calibration.points]);
@@ -105,6 +111,32 @@ export function RegionManagementPanel() {
     };
     void load();
   }, []);
+
+  useEffect(() => {
+    void fetchRegionEngineStatus().then(setEngineStatus).catch((error) => {
+      setStatus(error instanceof Error ? error.message : "Oda tespit modu durumu alınamadı");
+    });
+  }, []);
+
+  const toggleRegionEngine = async () => {
+    if (!engineStatus || engineUpdating) return;
+    setEngineUpdating(true);
+    setErrors([]);
+    try {
+      const next = await updateRegionEngineStatus(!engineStatus.enabled);
+      setEngineStatus(next);
+      setStatus(next.enabled
+        ? `Oda Tespit Modu aktif · processed SSE :${next.processedPort}`
+        : `Oda Tespit Modu kapalı · raw akış :${next.rawPort}`);
+      window.dispatchEvent(new CustomEvent(REGION_ENGINE_STATUS_CHANGED_EVENT, { detail: next }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Oda tespit modu değiştirilemedi";
+      setErrors([message]);
+      setStatus(message);
+    } finally {
+      setEngineUpdating(false);
+    }
+  };
 
   const updateRegion = useCallback((id: string, updater: (region: RegionDefinition) => RegionDefinition) => {
     setConfig((current) => ({ ...current, regions: current.regions.map((region) => region.id === id ? updater(region) : region) }));
@@ -227,8 +259,9 @@ export function RegionManagementPanel() {
     setConfig(normalized);
     try {
       const response = await fetch("/api/regions", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify(normalized) });
-      const payload = await response.json() as { error?: string };
+      const payload = await response.json() as { error?: string; config?: RegionsConfig };
       if (!response.ok) throw new Error(payload.error || "Config dosyasına yazılamadı");
+      await reloadRegionEngineConfig(payload.config ?? normalized);
       setStatus("Bölgeler config/regions.json dosyasına kaydedildi");
     } catch (error) {
       setErrors([error instanceof Error ? error.message : "Config dosyasına yazılamadı"]);
@@ -282,6 +315,18 @@ export function RegionManagementPanel() {
       <header className={styles.header}>
         <div><span>BÖLGE YÖNETİMİ / {MAP_FLOOR_PLAN.level.toUpperCase()}</span><h1>Bölgeler Paneli</h1></div>
         <div className={styles.systemMap}><Check size={14} /><span>SİSTEM HARİTASI</span><strong>{MAP_FLOOR_PLAN.name}</strong></div>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={engineStatus?.enabled ?? false}
+          className={`${styles.engineToggle} ${engineStatus?.enabled ? styles.engineToggleEnabled : ""}`}
+          disabled={!engineStatus || engineUpdating}
+          onClick={() => void toggleRegionEngine()}
+        >
+          <Power size={14} />
+          <span>ODA TESPİT MODU</span>
+          <strong>{engineUpdating ? "GÜNCELLENİYOR" : engineStatus?.enabled ? `AKTİF · :${engineStatus.processedPort}` : "KAPALI"}</strong>
+        </button>
         <div className={styles.headerActions}>
           <input ref={fileInputRef} type="file" accept="application/json,.json" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) void importConfig(file); event.currentTarget.value = ""; }} />
           <button onClick={() => fileInputRef.current?.click()}><Upload size={14} /> Config yükle</button>

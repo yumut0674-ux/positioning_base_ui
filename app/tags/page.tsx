@@ -6,6 +6,7 @@ import { FormEvent, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { deleteTag, saveTag, type TagDefinition } from "@/src/features/tracking/services/tagApi";
+import { useRealtimeTracking } from "@/src/features/tracking/hooks/useRealtimeTracking";
 import styles from "../anchors/anchors.module.css";
 
 const EMPTY_TAG: TagDefinition = { id: "", displayName: "", status: "active" };
@@ -19,6 +20,7 @@ function Status({ status }: { readonly status: string }) { return <span classNam
 export function TagManagementPanel({ embedded = false }: { readonly embedded?: boolean }) {
   const tagDefinitions = useIpsStore((state) => state.tagDefinitions);
   const trackedTags = useIpsStore((state) => state.tags);
+  const observedTags = useIpsStore((state) => state.observedTags);
   const setTagDefinitions = useIpsStore((state) => state.setTagDefinitions);
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -31,15 +33,15 @@ export function TagManagementPanel({ embedded = false }: { readonly embedded?: b
   const [deleting, setDeleting] = useState(false);
 
   const registeredTags = useMemo(() => Object.values(tagDefinitions), [tagDefinitions]);
-  const liveStatus = (tagId: string) => trackedTags[tagId]?.status === "active" ? "active" : "offline";
+  const liveStatus = (tagId: string) => observedTags[tagId]?.status === "active" || trackedTags[tagId]?.status === "active" ? "active" : "offline";
   const visibleTags = registeredTags.filter((tag) => {
     const matchesSearch = `${tag.id} ${tag.displayName}`.toLowerCase().includes(search.toLowerCase());
     return matchesSearch && (filter === "all" || liveStatus(tag.id) === filter);
   });
-  const unknownTags = useMemo(() => Object.values(trackedTags).filter((tag) => {
+  const unknownTags = useMemo(() => Object.values(observedTags).filter((tag) => {
     const matchesSearch = `${tag.id} ${tag.name}`.toLowerCase().includes(search.toLowerCase());
     return !tagDefinitions[tag.id] && matchesSearch && (filter === "all" || tag.status === filter);
-  }), [filter, search, tagDefinitions, trackedTags]);
+  }), [filter, observedTags, search, tagDefinitions]);
   const activeCount = registeredTags.filter((tag) => liveStatus(tag.id) === "active").length;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -96,4 +98,7 @@ export function TagManagementPanel({ embedded = false }: { readonly embedded?: b
   </main>;
 }
 
-export default function TagsPage() { return <TagManagementPanel />; }
+export default function TagsPage() {
+  useRealtimeTracking();
+  return <TagManagementPanel />;
+}

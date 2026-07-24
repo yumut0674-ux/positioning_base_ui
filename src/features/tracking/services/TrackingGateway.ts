@@ -23,7 +23,16 @@ export class SocketTrackingGateway implements TrackingGateway {
   }
 }
 
-type SsePositionPayload = { readonly tagCode: string; readonly x: number; readonly y: number; readonly timestamp: string; };
+type SsePositionPayload = {
+  readonly tagCode: string;
+  readonly x: number;
+  readonly y: number;
+  readonly timestamp: string;
+  readonly positionSource?: PositionMessage["positionSource"];
+  readonly regionInference?: PositionMessage["regionInference"];
+  readonly rawPosition?: PositionMessage["rawPosition"];
+  readonly lastRawDataTimestamp?: string;
+};
 
 /** Browser gateway for the ingest route's co-located Server-Sent Events feed. */
 export class SseTrackingGateway implements TrackingGateway {
@@ -37,7 +46,16 @@ export class SseTrackingGateway implements TrackingGateway {
         if (!payload.tagCode || !Number.isFinite(payload.x) || !Number.isFinite(payload.y)) return;
         const timestamp = Date.parse(payload.timestamp);
         if (!Number.isFinite(timestamp)) return;
-        onPosition({ id: payload.tagCode, x: payload.x, y: payload.y, timestamp });
+        onPosition({
+          id: payload.tagCode,
+          x: payload.x,
+          y: payload.y,
+          timestamp,
+          positionSource: payload.positionSource,
+          regionInference: payload.regionInference,
+          rawPosition: payload.rawPosition,
+          lastRawDataTimestamp: payload.lastRawDataTimestamp,
+        });
       } catch {
         // Ignore malformed external messages without closing the live stream.
       }

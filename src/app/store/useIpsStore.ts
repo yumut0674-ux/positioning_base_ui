@@ -9,6 +9,7 @@ interface IpsState {
   readonly viewport: ViewportState;
   readonly layers: Record<MapLayerId, boolean>;
   readonly tags: Record<string, TrackedTag>;
+  readonly observedTags: Record<string, TrackedTag>;
   readonly anchors: readonly AnchorDefinition[];
   readonly tagDefinitions: Record<string, TagDefinition>;
   readonly selectedTagId: string | null;
@@ -19,6 +20,7 @@ interface IpsState {
   setViewport: (viewport: ViewportState) => void;
   toggleLayer: (layer: MapLayerId) => void;
   upsertTag: (tag: TrackedTag) => void;
+  observeTag: (tag: TrackedTag) => void;
   refreshTagActivity: (now?: number) => void;
   setAnchors: (anchors: readonly AnchorDefinition[]) => void;
   setTagDefinitions: (tags: readonly TagDefinition[]) => void;
@@ -41,6 +43,7 @@ export const useIpsStore = create<IpsState>((set) => ({
     selection: true,
   },
   tags: {},
+  observedTags: {},
   anchors: [],
   tagDefinitions: {},
   selectedTagId: "TAG-001",
@@ -51,17 +54,20 @@ export const useIpsStore = create<IpsState>((set) => ({
   setViewport: (viewport) => set({ viewport }),
   toggleLayer: (layer) => set((state) => ({ layers: { ...state.layers, [layer]: !state.layers[layer] } })),
   upsertTag: (tag) => set((state) => ({ tags: { ...state.tags, [tag.id]: tag } })),
+  observeTag: (tag) => set((state) => ({ observedTags: { ...state.observedTags, [tag.id]: tag } })),
   refreshTagActivity: (now = Date.now()) => set((state) => {
     let changed = false;
-    const tags = Object.fromEntries(Object.entries(state.tags).map(([id, tag]) => {
+    const refresh = (source: Record<string, TrackedTag>) => Object.fromEntries(Object.entries(source).map(([id, tag]) => {
       const status: TagStatus = now - tag.timestamp <= TAG_LIVE_TIMEOUT_MS ? "active" : "offline";
       if (tag.status !== status) changed = true;
       return [id, tag.status === status ? tag : { ...tag, status }];
     }));
-    return changed ? { tags } : state;
+    const tags = refresh(state.tags);
+    const observedTags = refresh(state.observedTags);
+    return changed ? { tags, observedTags } : state;
   }),
   setAnchors: (anchors) => set({ anchors }),
-  setTagDefinitions: (tags) => set({ tagDefinitions: Object.fromEntries(tags.map((tag) => [tag.id, tag])) }),
+  setTagDefinitions: (tags) => set({ tagDefinitions: Object.fromEntries(tags.map((tag) => [tag.id.toUpperCase(), tag])) }),
   selectTag: (selectedTagId) => set({ selectedTagId }),
   setCursorWorld: (cursorWorld) => set({ cursorWorld }),
   toggleInspector: () => set((state) => ({ showInspector: !state.showInspector })),

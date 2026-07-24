@@ -92,6 +92,68 @@ actions tied to the current ChatGPT user. Leave public content anonymous.
 - `npm test`: build the starter and verify its rendered loading skeleton
 - `npm run db:generate`: generate Drizzle migrations after schema changes
 
+## Region Position Engine
+
+The optional room-detection mode keeps the existing raw flow unchanged:
+
+```text
+POST http://localhost:3000/api/tracking/ingest
+  -> raw SSE http://localhost:3000/api/tracking/ingest
+```
+
+When **Oda Tespit Modu** is enabled from the Regions panel, the backend reads
+`config/regions.json` once, builds world-coordinate polygon indexes, consumes
+the same raw events in memory, and publishes resolved positions over a separate
+SSE endpoint:
+
+```text
+processed SSE http://localhost:3001/api/tracking/ingest
+```
+
+The browser closes its previous EventSource before switching between raw and
+processed feeds. Raw coordinates remain unchanged in persistence; a vehicle
+confirmed inside a room is represented at `roomCenter.world` only in the
+processed message. Added fields (`positionSource`, `regionInference`,
+`rawPosition`, and `lastRawDataTimestamp`) are optional extensions to the
+existing `tagCode`, `x`, `y`, `timestamp` schema.
+
+Copy the values from `.env.example` into `.env.local` as needed. Defaults are:
+
+- `RAW_POSITION_PORT=3000`
+- `REGION_POSITION_PORT=3001`
+- `REGION_BROADCAST_INTERVAL_MS=1000`
+- `REGION_POSITION_ALLOWED_ORIGIN=*`
+
+In local vinext development the lightweight SSE output listener reserves the
+processed port at startup, so an occupied port fails fast with a clear error;
+it runs no scheduler until a processed client connects. In a regular Node
+runtime the controller binds it on activation and enabling returns HTTP 409 if
+the port is occupied. Region inference, vehicle state, and periodic broadcasts
+run only while the mode is active. Status is controlled through:
+
+```http
+GET /api/region-engine/status
+PUT /api/region-engine/status
+Content-Type: application/json
+
+{"enabled":true}
+```
+
+Region inference tuning lives at the top level of `config/regions.json`:
+
+```json
+{
+  "engine": {
+    "entryConfirmationCount": 2,
+    "exitConfirmationCount": 2,
+    "exitMarginMeters": 0.5
+  }
+}
+```
+
+Run the raw-ingest, engine state-machine, scheduler, and port-conflict tests
+with `npm run test:tracking`.
+
 ## Learn More
 
 - [vinext Documentation](https://github.com/cloudflare/vinext)

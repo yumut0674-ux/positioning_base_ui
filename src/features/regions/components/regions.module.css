@@ -1,11 +1,18 @@
 .panel { height: 100%; min-height: 0; display: flex; flex-direction: column; color: #162133; }
-.header { min-height: 58px; display: grid; grid-template-columns: minmax(180px, 1fr) auto auto; align-items: start; gap: 18px; }
+.header { min-height: 58px; display: grid; grid-template-columns: minmax(180px, 1fr) auto auto auto; align-items: start; gap: 12px; }
 .header > div:first-child > span { display: block; margin-top: 2px; color: #6e8198; font: 8px ui-monospace, monospace; letter-spacing: .14em; }
 .header h1 { margin: 5px 0 0; color: #101b2d; font-size: 17px; font-weight: 650; }
 .systemMap { min-width: 170px; display: grid; grid-template-columns: 19px 1fr; align-items: center; padding: 7px 10px; border: 1px solid #bae2dc; border-radius: 5px; background: #e9f8f5; }
 .systemMap svg { grid-row: 1 / 3; color: #087f73; }
 .systemMap span { color: #087f73; font: 7px ui-monospace, monospace; letter-spacing: .1em; }
 .systemMap strong { margin-top: 2px; color: #33536a; font-size: 9px; font-weight: 600; }
+.engineToggle { min-width: 155px; display: grid; grid-template-columns: 20px 1fr; align-items: center; padding: 7px 10px; border: 1px solid #cbd8e1; border-radius: 5px; background: #f5f8fa; color: #6c7f91; text-align: left; cursor: pointer; }
+.engineToggle svg { grid-row: 1 / 3; }
+.engineToggle span { font: 7px ui-monospace, monospace; letter-spacing: .08em; }
+.engineToggle strong { margin-top: 2px; color: #52677b; font-size: 9px; }
+.engineToggleEnabled { color: #087f73; border-color: #87cec4; background: #e5f7f4; box-shadow: 0 0 0 2px rgba(0,168,150,.06); }
+.engineToggleEnabled strong { color: #087f73; }
+.engineToggle:disabled { opacity: .6; cursor: wait; }
 .headerActions { display: flex; gap: 7px; padding-top: 3px; }
 .headerActions button, .panelTitle button, .tools button, .mapControls button, .deletePoint, .deleteZone { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #c5d6e2; border-radius: 5px; background: #f7fbff; color: #52667d; cursor: pointer; }
 .headerActions button { min-height: 32px; padding: 0 10px; font-size: 9px; }
@@ -106,7 +113,7 @@
   .editor { grid-template-columns: 175px minmax(0,1fr) 250px; }
   .tools button span { display: none; }
   .systemMap { display: none; }
-  .header { grid-template-columns: minmax(150px,1fr) auto; }
+  .header { grid-template-columns: minmax(150px,1fr) auto auto; }
 }
 
 @media (max-width: 850px) {

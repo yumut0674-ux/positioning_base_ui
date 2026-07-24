@@ -288,13 +288,29 @@ async function authenticate(
 function connect(config: PgConfig): Promise<net.Socket> {
   return new Promise((resolve, reject) => {
     const socket = net.createConnection({ host: config.host, port: config.port });
-    socket.setTimeout(5000);
-    socket.once("connect", () => resolve(socket));
-    socket.once("error", reject);
-    socket.once("timeout", () => {
+    const timeout = setTimeout(() => {
+      cleanup();
       socket.destroy();
       reject(new Error("PostgreSQL connection timed out"));
-    });
+    }, 5_000);
+    timeout.unref?.();
+
+    const cleanup = () => {
+      clearTimeout(timeout);
+      socket.off("connect", onConnect);
+      socket.off("error", onError);
+    };
+    const onConnect = () => {
+      cleanup();
+      resolve(socket);
+    };
+    const onError = (error: Error) => {
+      cleanup();
+      reject(error);
+    };
+
+    socket.once("connect", onConnect);
+    socket.once("error", onError);
   });
 }
 

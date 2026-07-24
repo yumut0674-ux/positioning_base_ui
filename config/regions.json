@@ -1,4 +1,9 @@
 {
+  "engine": {
+    "entryConfirmationCount": 2,
+    "exitConfirmationCount": 2,
+    "exitMarginMeters": 0.5
+  },
   "map": {
     "source": "system",
     "mapId": "hq-l1",

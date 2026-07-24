@@ -1,9 +1,13 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { fetchAnchors } from "@/src/features/map/services/anchorApi";
 import { SseTrackingGateway } from "../services/TrackingGateway";
 import { ExponentialMovingAverageFilter } from "../services/positionFilters";
 import { fetchTags, type TagDefinition } from "../services/tagApi";
+import {
+  fetchRegionEngineStatus, processedStreamUrl, REGION_ENGINE_STATUS_CHANGED_EVENT,
+  type RegionEngineStatusResponse,
+} from "@/src/features/regions/services/regionEngineApi";
 
 const TAG_COLORS = ["#5de4c7", "#f6c760", "#7aa2f7", "#dc7b8b", "#b892ff"];
 
@@ -14,12 +18,45 @@ function colorForTag(tagId: string): string {
 
 export function useRealtimeTracking(): void {
   const upsertTag = useIpsStore((state) => state.upsertTag);
+  const observeTag = useIpsStore((state) => state.observeTag);
   const refreshTagActivity = useIpsStore((state) => state.refreshTagActivity);
   const setAnchors = useIpsStore((state) => state.setAnchors);
   const setTagDefinitions = useIpsStore((state) => state.setTagDefinitions);
-  const gateway = useMemo(() => new SseTrackingGateway(), []);
+  const [engineStatus, setEngineStatus] = useState<RegionEngineStatusResponse | null>(null);
+  const engineEnabled = engineStatus?.enabled ?? false;
+  const processedPort = engineStatus?.processedPort ?? null;
+  const rawGateway = useMemo(() => new SseTrackingGateway("/api/tracking/ingest"), []);
+  const processedGateway = useMemo(
+    () => engineEnabled && processedPort !== null ? new SseTrackingGateway(processedStreamUrl(processedPort)) : null,
+    [engineEnabled, processedPort],
+  );
   const filter = useMemo(() => new ExponentialMovingAverageFilter(), []);
   const displayNames = useRef(new Map<string, string>());
+  const engineStatusRevision = useRef(0);
+
+  useEffect(() => {
+    let active = true;
+    const refresh = () => {
+      const revision = engineStatusRevision.current;
+      void fetchRegionEngineStatus().then((value) => {
+        if (active && revision === engineStatusRevision.current) setEngineStatus(value);
+      }).catch(() => undefined);
+    };
+    const onStatusChanged = (event: Event) => {
+      engineStatusRevision.current += 1;
+      const status = (event as CustomEvent<RegionEngineStatusResponse>).detail;
+      if (status) setEngineStatus(status);
+      else refresh();
+    };
+    refresh();
+    const timer = window.setInterval(refresh, 15_000);
+    window.addEventListener(REGION_ENGINE_STATUS_CHANGED_EVENT, onStatusChanged);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+      window.removeEventListener(REGION_ENGINE_STATUS_CHANGED_EVENT, onStatusChanged);
+    };
+  }, []);
 
   useEffect(() => {
     const applyNames = (tags: TagDefinition[]) => {
@@ -49,23 +86,49 @@ export function useRealtimeTracking(): void {
     };
   }, [setAnchors, setTagDefinitions]);
 
-  useEffect(() => gateway.connect((incoming) => {
+  useEffect(() => rawGateway.connect((incoming) => {
     const tagId = incoming.id.toUpperCase();
-    const name = displayNames.current.get(tagId) || tagId;
-    const current = useIpsStore.getState().tags[tagId];
-    const next = {
+    const currentObserved = useIpsStore.getState().observedTags[tagId];
+    const observed = {
       id: tagId,
-      name,
-      color: current?.color ?? colorForTag(tagId),
+      name: displayNames.current.get(tagId) || tagId,
+      color: currentObserved?.color ?? colorForTag(tagId),
       status: "active" as const,
       timestamp: incoming.timestamp,
       x: incoming.x,
       y: incoming.y,
     };
-    if (!current) return upsertTag(next);
+    observeTag(observed);
+
+    // Ham akış her zaman tag keşfi için dinlenir. Oda tespit modu kapalıyken
+    // aynı veri haritanın da doğrudan konum kaynağıdır.
+    if (engineEnabled) return;
+    const current = useIpsStore.getState().tags[tagId];
+    if (!current) return upsertTag(observed);
     const position = filter.next(current, incoming);
-    upsertTag({ ...next, ...position });
-  }), [filter, gateway, upsertTag]);
+    upsertTag({ ...observed, ...position });
+  }), [engineEnabled, filter, observeTag, rawGateway, upsertTag]);
+
+  useEffect(() => {
+    if (!processedGateway) return;
+    return processedGateway.connect((incoming) => {
+      const tagId = incoming.id.toUpperCase();
+      const name = displayNames.current.get(tagId) || tagId;
+      const current = useIpsStore.getState().tags[tagId];
+      const next = {
+        id: tagId,
+        name,
+        color: current?.color ?? colorForTag(tagId),
+        status: "active" as const,
+        timestamp: incoming.timestamp,
+        x: incoming.x,
+        y: incoming.y,
+      };
+      if (!current) return upsertTag(next);
+      const position = incoming.positionSource ? incoming : filter.next(current, incoming);
+      upsertTag({ ...next, ...position });
+    });
+  }, [filter, processedGateway, upsertTag]);
 
   useEffect(() => {
     const timer = window.setInterval(() => refreshTagActivity(), 1_000);

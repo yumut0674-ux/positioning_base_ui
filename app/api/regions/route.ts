@@ -3,6 +3,8 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 import { DEFAULT_REGIONS_CONFIG } from "@/src/features/regions/config/defaultRegionsConfig";
 import type { RegionDefinition, RegionsConfig } from "@/src/features/regions/types/region.types";
+import { compileRegionsConfig } from "@/src/server/regionEngine/configLoader";
+import { regionEngineController } from "@/src/server/regionEngine/controller";
 
 export const runtime = "nodejs";
 
@@ -27,13 +29,12 @@ function cleanRegion(value: unknown): RegionDefinition {
     if (!isPoint(coordinate.pixel) || !isPoint(coordinate.world)) throw new Error(`${name}: pixel ve world koordinatları zorunludur`);
     return { pixel: coordinate.pixel, world: coordinate.world };
   };
-  if (!region.roomCenter) throw new Error(`${name}: oda merkezi zorunludur`);
   return {
     id: id.slice(0, 100),
     name: name.slice(0, 150),
     color: /^#[0-9a-f]{6}$/i.test(region.color ?? "") ? region.color! : "#00a896",
     polygon: region.polygon.map(cleanPair),
-    roomCenter: cleanPair(region.roomCenter),
+    roomCenter: region.roomCenter ? cleanPair(region.roomCenter) : null,
     entrances: Array.isArray(region.entrances) ? region.entrances.map((entrance, index) => ({
       ...cleanPair(entrance),
       id: entrance.id?.trim().slice(0, 100) || `entrance-${index + 1}`,
@@ -44,9 +45,15 @@ function cleanRegion(value: unknown): RegionDefinition {
 
 function cleanConfig(value: unknown): RegionsConfig {
   if (!value || typeof value !== "object") throw new Error("Geçersiz config");
-  const body = value as { regions?: unknown };
+  const body = value as { regions?: unknown; engine?: RegionsConfig["engine"] };
   if (!Array.isArray(body.regions)) throw new Error("regions alanı bir liste olmalıdır");
-  return { ...DEFAULT_REGIONS_CONFIG, regions: body.regions.map(cleanRegion) };
+  const config: RegionsConfig = {
+    ...DEFAULT_REGIONS_CONFIG,
+    engine: { ...DEFAULT_REGIONS_CONFIG.engine, ...body.engine },
+    regions: body.regions.map(cleanRegion),
+  };
+  compileRegionsConfig(config);
+  return config;
 }
 
 export async function GET() {
@@ -62,6 +69,7 @@ export async function PUT(request: Request) {
   try {
     const config = cleanConfig(await request.json());
     await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+    regionEngineController.reloadConfig(config);
     return NextResponse.json({ config });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Bölge config kaydı başarısız";

@@ -16,6 +16,15 @@ export interface TrackedTag extends Point2D {
 export interface PositionMessage extends Point2D {
   readonly id: string;
   readonly timestamp: number;
+  readonly positionSource?: "RAW" | "REGION_CENTER";
+  readonly regionInference?: {
+    readonly enabled: boolean;
+    readonly state: string;
+    readonly regionId: string | null;
+    readonly confidence?: number;
+  };
+  readonly rawPosition?: { readonly x: number; readonly y: number; readonly timestamp: string };
+  readonly lastRawDataTimestamp?: string;
 }
 
 export interface PositionFilter {

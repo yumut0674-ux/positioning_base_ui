@@ -2,6 +2,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import path from "node:path";
 import type { Plugin } from "vite";
+import type { RegionsConfig } from "../src/features/regions/types/region.types";
+import { compileRegionsConfig } from "../src/server/regionEngine/configLoader";
 
 const MAX_CONFIG_BYTES = 2 * 1024 * 1024;
 
@@ -51,6 +53,7 @@ export function localRegionsConfig(): Plugin {
               return;
             }
             const config = { ...incoming, map: saved.map, regions: incoming.regions };
+            compileRegionsConfig(config as RegionsConfig);
             await writeFile(configPath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
             sendJson(response, 200, { config });
             return;
