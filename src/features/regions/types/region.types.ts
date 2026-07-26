@@ -1,3 +1,5 @@
+import type { PositionAnimationConfig } from "@/src/features/tracking/types/tracking.types";
+
 export interface CoordinatePair {
   readonly pixel: { readonly x: number; readonly y: number };
   readonly world: { readonly x: number; readonly y: number };
@@ -38,6 +40,7 @@ export interface RegionsConfig {
       readonly points: readonly CalibrationPoint[];
     };
   };
+  readonly positionAnimation?: PositionAnimationConfig;
   readonly regions: readonly RegionDefinition[];
 }
 

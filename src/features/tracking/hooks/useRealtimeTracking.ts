@@ -8,6 +8,13 @@ import {
   fetchRegionEngineStatus, processedStreamUrl, REGION_ENGINE_STATUS_CHANGED_EVENT,
   type RegionEngineStatusResponse,
 } from "@/src/features/regions/services/regionEngineApi";
+import {
+  DEFAULT_POSITION_ANIMATION_CONFIG,
+  POSITION_ANIMATION_CONFIG_CHANGED_EVENT,
+  resolvePositionAnimationConfig,
+} from "../config/positionAnimationConfig";
+import { PositionAnimationController } from "../services/PositionAnimationController";
+import type { RegionsConfig } from "@/src/features/regions/types/region.types";
 
 const TAG_COLORS = ["#5de4c7", "#f6c760", "#7aa2f7", "#dc7b8b", "#b892ff"];
 
@@ -16,7 +23,7 @@ function colorForTag(tagId: string): string {
   return TAG_COLORS[sum % TAG_COLORS.length];
 }
 
-export function useRealtimeTracking(): void {
+export function useRealtimeTracking(): PositionAnimationController {
   const upsertTag = useIpsStore((state) => state.upsertTag);
   const observeTag = useIpsStore((state) => state.observeTag);
   const refreshTagActivity = useIpsStore((state) => state.refreshTagActivity);
@@ -33,6 +40,52 @@ export function useRealtimeTracking(): void {
   const filter = useMemo(() => new ExponentialMovingAverageFilter(), []);
   const displayNames = useRef(new Map<string, string>());
   const engineStatusRevision = useRef(0);
+  const positionAnimation = useMemo(
+    () => new PositionAnimationController(DEFAULT_POSITION_ANIMATION_CONFIG),
+    [],
+  );
+  const [animationEnabled, setAnimationEnabled] = useState(DEFAULT_POSITION_ANIMATION_CONFIG.enabled);
+
+  useEffect(() => {
+    let active = true;
+    const applyConfig = (value: unknown) => {
+      try {
+        const config = resolvePositionAnimationConfig(value);
+        positionAnimation.setConfig(config);
+        setAnimationEnabled(config.enabled);
+      } catch (error) {
+        console.error("POSITION_ANIMATION_CONFIG_ERROR", error);
+      }
+    };
+    void fetch("/api/regions", { cache: "no-store" })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Konum animasyon config'i alınamadı");
+        return response.json() as Promise<{ config: RegionsConfig }>;
+      })
+      .then((payload) => {
+        if (active) applyConfig(payload.config.positionAnimation);
+      })
+      .catch(() => undefined);
+    const onConfigChanged = (event: Event) => {
+      applyConfig((event as CustomEvent<RegionsConfig["positionAnimation"]>).detail);
+    };
+    window.addEventListener(POSITION_ANIMATION_CONFIG_CHANGED_EVENT, onConfigChanged);
+    return () => {
+      active = false;
+      window.removeEventListener(POSITION_ANIMATION_CONFIG_CHANGED_EVENT, onConfigChanged);
+    };
+  }, [positionAnimation]);
+
+  useEffect(() => {
+    if (!animationEnabled) return;
+    let frame = 0;
+    const animationLoop = () => {
+      positionAnimation.update(Date.now());
+      frame = window.requestAnimationFrame(animationLoop);
+    };
+    frame = window.requestAnimationFrame(animationLoop);
+    return () => window.cancelAnimationFrame(frame);
+  }, [animationEnabled, positionAnimation]);
 
   useEffect(() => {
     let active = true;
@@ -104,10 +157,14 @@ export function useRealtimeTracking(): void {
     // aynı veri haritanın da doğrudan konum kaynağıdır.
     if (engineEnabled) return;
     const current = useIpsStore.getState().tags[tagId];
-    if (!current) return upsertTag(observed);
+    if (!current) {
+      positionAnimation.ingest(tagId, { ...incoming, positionSource: "RAW" });
+      return upsertTag(observed);
+    }
     const position = filter.next(current, incoming);
+    positionAnimation.ingest(tagId, { ...position, timestamp: incoming.timestamp, positionSource: "RAW" });
     upsertTag({ ...observed, ...position });
-  }), [engineEnabled, filter, observeTag, rawGateway, upsertTag]);
+  }), [engineEnabled, filter, observeTag, positionAnimation, rawGateway, upsertTag]);
 
   useEffect(() => {
     if (!processedGateway) return;
@@ -124,14 +181,22 @@ export function useRealtimeTracking(): void {
         x: incoming.x,
         y: incoming.y,
       };
-      if (!current) return upsertTag(next);
-      const position = incoming.positionSource ? incoming : filter.next(current, incoming);
+      const position = current && !incoming.positionSource ? filter.next(current, incoming) : incoming;
+      positionAnimation.ingest(tagId, {
+        x: position.x,
+        y: position.y,
+        timestamp: incoming.timestamp,
+        positionSource: incoming.positionSource ?? "RAW",
+        regionId: incoming.regionInference?.regionId,
+      });
       upsertTag({ ...next, ...position });
     });
-  }, [filter, processedGateway, upsertTag]);
+  }, [filter, positionAnimation, processedGateway, upsertTag]);
 
   useEffect(() => {
     const timer = window.setInterval(() => refreshTagActivity(), 1_000);
     return () => window.clearInterval(timer);
   }, [refreshTagActivity]);
+
+  return positionAnimation;
 }

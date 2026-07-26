@@ -43,3 +43,7 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+
+# Python terminal MCP demo
+/mcp/.venv/
+/mcp/__pycache__/

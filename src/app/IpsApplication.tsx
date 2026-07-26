@@ -21,7 +21,7 @@ import { SupportContactPanel } from "@/src/features/support/components/SupportCo
 import { RegionManagementPanel } from "@/src/features/regions/components/RegionManagementPanel";
 
 function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: WorkspaceView; readonly onViewChange: (view: WorkspaceView) => void }) {
-  useRealtimeTracking();
+  const positionAnimation = useRealtimeTracking();
   const showInspector = useIpsStore((state) => state.showInspector);
   const toggleInspector = useIpsStore((state) => state.toggleInspector);
   const showLayersPanel = useIpsStore((state) => state.showLayersPanel);
@@ -43,7 +43,7 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
             <div className="workspace-meta"><i /><span>CANLI KONUMLANDIRMA</span><strong>{activeTagCount} AKTİF</strong></div>
           </div>
           <div className="map-frame">
-            <MapViewport />
+            <MapViewport positionAnimation={positionAnimation} />
             {showInspector && <CoordinateInspector />}
             {showLayersPanel && <LayerVisibilityPanel />}
             <div className="mini-toolbar" aria-label="Harita araçları">

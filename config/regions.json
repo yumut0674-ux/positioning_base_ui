@@ -49,6 +49,19 @@
       ]
     }
   },
+  "positionAnimation": {
+    "enabled": true,
+    "mode": "buffered_interpolation",
+    "interpolationDelayMs": 1200,
+    "maximumBufferSize": 10,
+    "maximumSegmentDurationMs": 2500,
+    "maximumExtrapolationMs": 250,
+    "stalePositionTimeoutMs": 4000,
+    "teleportDistanceMeters": 6,
+    "teleportAnimationDurationMs": 300,
+    "regionTransitionDurationMs": 500,
+    "easing": "linear"
+  },
   "regions": [
     {
       "id": "zone-91d9e84c",
@@ -98,12 +111,12 @@
       ],
       "roomCenter": {
         "pixel": {
-          "x": 318.68,
-          "y": 308.86
+          "x": 555.34,
+          "y": 181.88
         },
         "world": {
-          "x": 10.624,
-          "y": 13.705
+          "x": 18.513,
+          "y": 17.937
         }
       },
       "entrances": []

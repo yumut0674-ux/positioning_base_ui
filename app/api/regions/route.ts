@@ -5,6 +5,7 @@ import { DEFAULT_REGIONS_CONFIG } from "@/src/features/regions/config/defaultReg
 import type { RegionDefinition, RegionsConfig } from "@/src/features/regions/types/region.types";
 import { compileRegionsConfig } from "@/src/server/regionEngine/configLoader";
 import { regionEngineController } from "@/src/server/regionEngine/controller";
+import { resolvePositionAnimationConfig } from "@/src/features/tracking/config/positionAnimationConfig";
 
 export const runtime = "nodejs";
 
@@ -45,11 +46,12 @@ function cleanRegion(value: unknown): RegionDefinition {
 
 function cleanConfig(value: unknown): RegionsConfig {
   if (!value || typeof value !== "object") throw new Error("Geçersiz config");
-  const body = value as { regions?: unknown; engine?: RegionsConfig["engine"] };
+  const body = value as { regions?: unknown; engine?: RegionsConfig["engine"]; positionAnimation?: unknown };
   if (!Array.isArray(body.regions)) throw new Error("regions alanı bir liste olmalıdır");
   const config: RegionsConfig = {
     ...DEFAULT_REGIONS_CONFIG,
     engine: { ...DEFAULT_REGIONS_CONFIG.engine, ...body.engine },
+    positionAnimation: resolvePositionAnimationConfig(body.positionAnimation),
     regions: body.regions.map(cleanRegion),
   };
   compileRegionsConfig(config);
@@ -59,7 +61,13 @@ function cleanConfig(value: unknown): RegionsConfig {
 export async function GET() {
   try {
     const saved = JSON.parse(await readFile(configPath, "utf8")) as RegionsConfig;
-    return NextResponse.json({ config: { ...saved, map: DEFAULT_REGIONS_CONFIG.map } });
+    return NextResponse.json({
+      config: {
+        ...saved,
+        map: DEFAULT_REGIONS_CONFIG.map,
+        positionAnimation: resolvePositionAnimationConfig(saved.positionAnimation),
+      },
+    });
   } catch {
     return NextResponse.json({ config: DEFAULT_REGIONS_CONFIG });
   }

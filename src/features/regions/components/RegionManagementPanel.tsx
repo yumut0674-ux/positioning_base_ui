@@ -13,6 +13,7 @@ import { useElementSize } from "@/src/shared/hooks/useElementSize";
 import { DEFAULT_REGIONS_CONFIG } from "../config/defaultRegionsConfig";
 import { createAffineTransform, createInverseAffineTransform, withWorldCoordinates } from "../services/affineTransform";
 import type { CoordinatePair, RegionDefinition, RegionEditorTool, RegionsConfig } from "../types/region.types";
+import { POSITION_ANIMATION_CONFIG_CHANGED_EVENT } from "@/src/features/tracking/config/positionAnimationConfig";
 import {
   fetchRegionEngineStatus, REGION_ENGINE_STATUS_CHANGED_EVENT, reloadRegionEngineConfig, updateRegionEngineStatus,
   type RegionEngineStatusResponse,
@@ -262,6 +263,10 @@ export function RegionManagementPanel() {
       const payload = await response.json() as { error?: string; config?: RegionsConfig };
       if (!response.ok) throw new Error(payload.error || "Config dosyasına yazılamadı");
       await reloadRegionEngineConfig(payload.config ?? normalized);
+      window.dispatchEvent(new CustomEvent(
+        POSITION_ANIMATION_CONFIG_CHANGED_EVENT,
+        { detail: (payload.config ?? normalized).positionAnimation },
+      ));
       setStatus("Bölgeler config/regions.json dosyasına kaydedildi");
     } catch (error) {
       setErrors([error instanceof Error ? error.message : "Config dosyasına yazılamadı"]);

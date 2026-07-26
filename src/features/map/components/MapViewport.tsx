@@ -14,8 +14,9 @@ import {
 } from "../config/mapConfig";
 import { CoordinateTransformService } from "../services/CoordinateTransformService";
 import { TagNode } from "./TagNode";
+import type { PositionAnimationController } from "@/src/features/tracking/services/PositionAnimationController";
 
-export function MapViewport() {
+export function MapViewport({ positionAnimation }: { readonly positionAnimation: PositionAnimationController }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const panOriginRef = useRef({ x: 0, y: 0 });
@@ -135,7 +136,7 @@ export function MapViewport() {
         <Layer listening={false} visible={layers.sensors}><Group {...mapGroupProps} /></Layer>
         <Layer visible={layers.tags}>
           <Group {...mapGroupProps}>
-            {tags.map((tag) => <TagNode key={tag.id} tag={tag} transform={transform} selected={tag.id === selectedTagId} onSelect={selectTag} />)}
+            {tags.map((tag) => <TagNode key={tag.id} tag={tag} transform={transform} positionAnimation={positionAnimation} selected={tag.id === selectedTagId} onSelect={selectTag} />)}
           </Group>
         </Layer>
         <Layer listening={false} visible={layers.routes}>

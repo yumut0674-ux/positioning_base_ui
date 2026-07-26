@@ -27,7 +27,7 @@ type SsePositionPayload = {
   readonly tagCode: string;
   readonly x: number;
   readonly y: number;
-  readonly timestamp: string;
+  readonly timestamp?: string;
   readonly positionSource?: PositionMessage["positionSource"];
   readonly regionInference?: PositionMessage["regionInference"];
   readonly rawPosition?: PositionMessage["rawPosition"];
@@ -44,8 +44,9 @@ export class SseTrackingGateway implements TrackingGateway {
       try {
         const payload = JSON.parse((event as MessageEvent<string>).data) as SsePositionPayload;
         if (!payload.tagCode || !Number.isFinite(payload.x) || !Number.isFinite(payload.y)) return;
-        const timestamp = Date.parse(payload.timestamp);
-        if (!Number.isFinite(timestamp)) return;
+        const receivedAt = Date.now();
+        const parsedTimestamp = typeof payload.timestamp === "string" ? Date.parse(payload.timestamp) : Number.NaN;
+        const timestamp = Number.isFinite(parsedTimestamp) ? parsedTimestamp : receivedAt;
         onPosition({
           id: payload.tagCode,
           x: payload.x,

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { CalendarRange, ChevronDown, CircleDot, Clock3, Crosshair, History, Layers3, Loader2, MapPin, MapPinned, Maximize2, Route, Search } from "lucide-react";
+import { CalendarRange, ChevronDown, CircleDot, Clock3, Crosshair, History, Layers3, Loader2, MessageCircle, MapPin, MapPinned, Maximize2, Route, Search } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Circle, Group, Image as KonvaImage, Layer, Line, Rect, Stage, Text } from "react-konva";
 import type Konva from "konva";
@@ -9,6 +9,7 @@ import useImage from "use-image";
 import { AppHeader } from "@/src/app/components/AppHeader";
 import { AppSidebar, type WorkspaceView } from "@/src/app/components/AppSidebar";
 import { StatusStrip } from "@/src/app/components/StatusStrip";
+import { HistoryChatWidget } from "@/src/features/assistant/components/HistoryChatWidget";
 import { MAP_CALIBRATION, MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
 import { CoordinateTransformService } from "@/src/features/map/services/CoordinateTransformService";
 import { buildLocationTimeline, type HistoricalPosition, type LocationStay } from "@/src/features/map/services/RouteTimelineService";
@@ -30,6 +31,14 @@ const BASE_ROUTE: readonly { readonly x: number; readonly y: number; readonly mi
 
 function parseLocalDate(value: string): number {
   return new Date(`${value}:00+03:00`).getTime();
+}
+
+function toIstanbulIsoString(value: string): string | undefined {
+  const cleaned = value.trim();
+  if (!cleaned) return undefined;
+  if (/(Z|[+-]\d{2}:\d{2})$/i.test(cleaned)) return cleaned;
+  const withSeconds = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(cleaned) ? `${cleaned}:00` : cleaned;
+  return `${withSeconds}+03:00`;
 }
 
 function readRequestedTag(): string | null {
@@ -83,6 +92,7 @@ export default function HistoryPage() {
   const [loading, setLoading] = useState(false);
   const [selectedStayId, setSelectedStayId] = useState<string | null>(null);
   const [viewport, setViewport] = useState({ x: 0, y: 0, scale: .9 });
+  const [assistantDraftRequestId, setAssistantDraftRequestId] = useState(0);
 
   const fitMap = useCallback(() => {
     const padding = 62;
@@ -98,6 +108,8 @@ export default function HistoryPage() {
 
   const tagOptions = requestedTag && !TAG_OPTIONS.some((tag) => tag.id === requestedTag) ? [...TAG_OPTIONS, { id: requestedTag, name: "Seçili Tag" }] : TAG_OPTIONS;
   const activeTag = tagOptions.find((tag) => tag.id === selectedTag) ?? tagOptions[0];
+  const assistantFrom = useMemo(() => toIstanbulIsoString(startDate), [startDate]);
+  const assistantTo = useMemo(() => toIstanbulIsoString(endDate), [endDate]);
   const timeline = useMemo(() => buildLocationTimeline(positions, MAP_FLOOR_PLAN.id), [positions]);
   const pointValues = useMemo(() => positions.flatMap((position) => worldToCanvas(position)), [positions]);
   const distance = useMemo(() => routeDistance(positions), [positions]);
@@ -120,6 +132,9 @@ export default function HistoryPage() {
       refreshHistory(selectedTag, startDate, endDate);
       setLoading(false);
     }, 700);
+  };
+  const askAssistantAboutActiveTag = () => {
+    setAssistantDraftRequestId((current) => current + 1);
   };
   const focusStay = (stay: LocationStay) => {
     if (stay.positions.length === 0 || size.width <= 1 || size.height <= 1) return;
@@ -174,6 +189,7 @@ export default function HistoryPage() {
         <div className={styles.mapMeta}><CircleDot size={13} /> PLAN KALİBRE EDİLDİ <span>{MAP_CALIBRATION.pixelsPerMeter} PX/M</span></div>
         <div className={styles.zoomReadout}>{Math.round(viewport.scale * 100)}%</div>
         <div className={styles.mapTools}><button type="button" onClick={fitMap} title="Haritayı sığdır"><Maximize2 size={16} /></button><button type="button" title="Katmanlar"><Layers3 size={16} /></button><button type="button" title="Odak noktası"><Crosshair size={16} /></button></div>
+        <HistoryChatWidget tagCode={selectedTag} entityName={activeTag.name} from={assistantFrom} to={assistantTo} floorPlanId={MAP_FLOOR_PLAN.id} draftText={activeTag.name} draftRequestId={assistantDraftRequestId} />
         <motion.aside className={styles.sidebar} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>
           <div className={styles.panelHeader}><span className={styles.iconFrame}><History size={18} /></span><div><small>HAREKET ANALİZİ</small><h2>Rota Geçmişi</h2></div></div>
           <p className={styles.intro}>Tag seçin, tarih aralığını belirleyin ve hareket akışını inceleyin.</p>
@@ -182,6 +198,7 @@ export default function HistoryPage() {
             <div className={styles.dateGrid}><label><span><CalendarRange size={13} /> BAŞLANGIÇ</span><input type="datetime-local" value={startDate} onChange={(event) => { const value = event.target.value; setStartDate(value); refreshHistory(selectedTag, value, endDate); }} /></label><label><span><Clock3 size={13} /> BİTİŞ</span><input type="datetime-local" value={endDate} min={startDate} onChange={(event) => { const value = event.target.value; setEndDate(value); refreshHistory(selectedTag, startDate, value); }} /></label></div>
           </div>
           <button type="button" className={styles.searchButton} onClick={fetchHistory} disabled={loading}>{loading ? <Loader2 size={16} className={styles.spin} /> : <Search size={16} />}{loading ? "Geçmiş aranıyor" : "Geçmişi Getir"}</button>
+          <button type="button" className={styles.askAssistantButton} onClick={askAssistantAboutActiveTag}><MessageCircle size={15} /> AI'a Sor</button>
           <motion.section className={styles.summary} key={positions[0]?.timestamp} initial={{ opacity: .4, y: 5 }} animate={{ opacity: 1, y: 0 }}><div className={styles.summaryTitle}><Route size={14} /><span>ROTA ÖZETİ</span><i>DEMO</i></div><div className={styles.stats}><div><small>BULUNAN NOKTA</small><strong>{positions.length}</strong><em>konum kaydı</em></div><div><small>TOPLAM MESAFE</small><strong>{distance.toFixed(1)}<b>m</b></strong><em>tahmini rota</em></div><div><small>ZİYARET EDİLEN BÖLGE</small><strong>{visitedLocationCount}</strong><em>benzersiz alan</em></div><div><small>TOPLAM TAKİP</small><strong>{formatDuration(totalDuration)}</strong><em>veri aralığı</em></div></div></motion.section>
           <section className={styles.timeline} aria-label="Konum zaman çizelgesi"><div className={styles.timelineHeader}><div className={styles.timelineTitle}><MapPin size={14} /><span>KONUM ZAMAN ÇİZELGESİ</span></div><span className={styles.timelineCount}>{visitedLocationCount} BÖLGE</span></div>{selectedStay && <button type="button" className={styles.showAll} onClick={() => { setSelectedStayId(null); fitMap(); }}>Tüm rotayı göster</button>}<div className={styles.timelineList}>{timeline.map((stay) => <button key={stay.id} type="button" className={`${styles.timelineRow} ${selectedStayId === stay.id ? styles.selectedTimelineRow : ""} ${stay.isDataGap ? styles.gapTimelineRow : ""}`} onClick={() => chooseStay(stay)}><span className={styles.timelineMarker} aria-hidden="true" /><span className={styles.timelineContent}><span className={styles.timelineTime}>{formatTime(stay.startedAt)} — {formatTime(stay.endedAt)} <b>· {formatDuration(stay.durationMs)}</b></span><strong>{stay.locationLabel}</strong>{!stay.isDataGap && longestStay?.id === stay.id && <em>EN UZUN KALIŞ</em>}</span></button>)}</div>{longestStay && <p className={styles.longestSummary}>En uzun kalış: <strong>{longestStay.locationLabel}</strong> · {formatDuration(longestStay.durationMs)}</p>}</section>
           <div className={styles.legend}><span><i className={styles.startDot} /> Başlangıç</span><span><i className={styles.routeDot} /> Rota</span><span><i className={styles.endDot} /> Bitiş</span></div>

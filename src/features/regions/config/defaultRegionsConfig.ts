@@ -1,5 +1,6 @@
 import { MAP_CALIBRATION, MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
 import type { CalibrationPoint, RegionsConfig } from "../types/region.types";
+import { DEFAULT_POSITION_ANIMATION_CONFIG } from "@/src/features/tracking/config/positionAnimationConfig";
 
 export const SYSTEM_MAP_CALIBRATION_POINTS: readonly CalibrationPoint[] = [
   { id: "origin", pixel: { x: 0, y: MAP_FLOOR_PLAN.canvasSize.height }, world: { x: 0, y: 0 } },
@@ -21,6 +22,7 @@ export const DEFAULT_REGIONS_CONFIG: RegionsConfig = {
     heightPx: MAP_FLOOR_PLAN.canvasSize.height,
     calibration: { type: "affine", points: SYSTEM_MAP_CALIBRATION_POINTS },
   },
+  positionAnimation: DEFAULT_POSITION_ANIMATION_CONFIG,
   regions: [],
 };
 
