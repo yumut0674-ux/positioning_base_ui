@@ -5,6 +5,12 @@ import { DEFAULT_MAP_VIEWPORT } from "@/src/features/map/config/mapConfig";
 import { TAG_LIVE_TIMEOUT_MS, type TagStatus, type TrackedTag } from "@/src/features/tracking/types/tracking.types";
 import type { TagDefinition } from "@/src/features/tracking/services/tagApi";
 
+interface MeasurementState {
+  readonly enabled: boolean;
+  readonly start: Point2D | null;
+  readonly end: Point2D | null;
+}
+
 interface IpsState {
   readonly viewport: ViewportState;
   readonly layers: Record<MapLayerId, boolean>;
@@ -17,6 +23,8 @@ interface IpsState {
   readonly connectionMode: "live" | "simulation" | "reconnecting";
   readonly showInspector: boolean;
   readonly showLayersPanel: boolean;
+  readonly measurement: MeasurementState;
+  readonly mapFocusRequest: number;
   setViewport: (viewport: ViewportState) => void;
   toggleLayer: (layer: MapLayerId) => void;
   upsertTag: (tag: TrackedTag) => void;
@@ -28,6 +36,10 @@ interface IpsState {
   setCursorWorld: (point: Point2D | null) => void;
   toggleInspector: () => void;
   toggleLayersPanel: () => void;
+  toggleMeasurement: () => void;
+  setMeasurementPoint: (point: Point2D) => void;
+  cancelMeasurement: () => void;
+  requestMapFocus: () => void;
 }
 
 export const useIpsStore = create<IpsState>((set) => ({
@@ -51,6 +63,8 @@ export const useIpsStore = create<IpsState>((set) => ({
   connectionMode: "live",
   showInspector: false,
   showLayersPanel: false,
+  measurement: { enabled: false, start: null, end: null },
+  mapFocusRequest: 0,
   setViewport: (viewport) => set({ viewport }),
   toggleLayer: (layer) => set((state) => ({ layers: { ...state.layers, [layer]: !state.layers[layer] } })),
   upsertTag: (tag) => set((state) => ({ tags: { ...state.tags, [tag.id]: tag } })),
@@ -72,4 +86,16 @@ export const useIpsStore = create<IpsState>((set) => ({
   setCursorWorld: (cursorWorld) => set({ cursorWorld }),
   toggleInspector: () => set((state) => ({ showInspector: !state.showInspector })),
   toggleLayersPanel: () => set((state) => ({ showLayersPanel: !state.showLayersPanel })),
+  toggleMeasurement: () => set((state) => ({
+    measurement: state.measurement.enabled
+      ? { enabled: false, start: null, end: null }
+      : { enabled: true, start: null, end: null },
+  })),
+  setMeasurementPoint: (point) => set((state) => ({
+    measurement: !state.measurement.start || state.measurement.end
+      ? { enabled: true, start: point, end: null }
+      : { enabled: true, start: state.measurement.start, end: point },
+  })),
+  cancelMeasurement: () => set({ measurement: { enabled: false, start: null, end: null } }),
+  requestMapFocus: () => set((state) => ({ mapFocusRequest: state.mapFocusRequest + 1 })),
 }));

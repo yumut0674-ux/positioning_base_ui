@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { Circle, Group, Image as KonvaImage, Layer, Line, Rect, Stage, Text } from "react-konva";
 import type Konva from "konva";
 import useImage from "use-image";
@@ -20,6 +20,7 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
   const hostRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const panOriginRef = useRef({ x: 0, y: 0 });
+  const handledFocusRequestRef = useRef(0);
   const size = useElementSize(hostRef);
   const [floorImage] = useImage(MAP_FLOOR_PLAN.imageUrl, "anonymous");
   const viewport = useIpsStore((state) => state.viewport);
@@ -31,6 +32,10 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
   const setViewport = useIpsStore((state) => state.setViewport);
   const selectTag = useIpsStore((state) => state.selectTag);
   const setCursorWorld = useIpsStore((state) => state.setCursorWorld);
+  const measurement = useIpsStore((state) => state.measurement);
+  const setMeasurementPoint = useIpsStore((state) => state.setMeasurementPoint);
+  const cancelMeasurement = useIpsStore((state) => state.cancelMeasurement);
+  const mapFocusRequest = useIpsStore((state) => state.mapFocusRequest);
   const transform = useMemo(() => new CoordinateTransformService(MAP_CALIBRATION), []);
 
   const fitToScreen = useCallback(() => {
@@ -45,6 +50,33 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
       y: (size.height - MAP_FLOOR_PLAN.canvasSize.height * scale) / 2,
     });
   }, [setViewport, size.height, size.width]);
+
+  useEffect(() => {
+    if (mapFocusRequest === 0 || mapFocusRequest === handledFocusRequestRef.current) return;
+    handledFocusRequestRef.current = mapFocusRequest;
+    const selectedTag = selectedTagId ? tagsById[selectedTagId] : undefined;
+    if (!selectedTag) {
+      fitToScreen();
+      return;
+    }
+
+    const scale = Math.min(MAP_VIEWPORT_LIMITS.maxZoom, Math.max(viewport.scale, 1.4));
+    const point = transform.worldToCanvas(selectedTag);
+    setViewport({
+      scale,
+      x: size.width / 2 - point.x * scale,
+      y: size.height / 2 - point.y * scale,
+    });
+  }, [fitToScreen, mapFocusRequest, selectedTagId, setViewport, size.height, size.width, tagsById, transform, viewport.scale]);
+
+  useEffect(() => {
+    if (!measurement.enabled) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") cancelMeasurement();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [cancelMeasurement, measurement.enabled]);
 
   const handleWheel = useCallback((event: Konva.KonvaEventObject<WheelEvent>) => {
     event.evt.preventDefault();
@@ -75,6 +107,12 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
     if (pointer) setCursorWorld(transform.screenToWorld(pointer, viewport));
   }, [setCursorWorld, transform, viewport]);
 
+  const handleMeasureClick = useCallback(() => {
+    if (!measurement.enabled) return;
+    const pointer = stageRef.current?.getPointerPosition();
+    if (pointer) setMeasurementPoint(transform.screenToWorld(pointer, viewport));
+  }, [measurement.enabled, setMeasurementPoint, transform, viewport]);
+
   const gridLines = useMemo(() => {
     const lines: React.ReactNode[] = [];
     const step = transform.metersToPixels(1);
@@ -88,6 +126,14 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
   }, [transform]);
 
   const mapGroupProps = { x: viewport.x, y: viewport.y, scaleX: viewport.scale, scaleY: viewport.scale };
+  const measurementStart = measurement.start ? transform.worldToCanvas(measurement.start) : null;
+  const measurementEnd = measurement.end ? transform.worldToCanvas(measurement.end) : null;
+  const measurementDistance = measurement.start && measurement.end
+    ? Math.hypot(measurement.end.x - measurement.start.x, measurement.end.y - measurement.start.y)
+    : null;
+  const measurementLabel = measurementStart && measurementEnd
+    ? { x: (measurementStart.x + measurementEnd.x) / 2, y: (measurementStart.y + measurementEnd.y) / 2 }
+    : null;
 
   return (
     <div ref={hostRef} className="map-viewport" data-testid="map-viewport">
@@ -98,6 +144,8 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
         onWheel={handleWheel}
         onMouseMove={updatePointer}
         onMouseLeave={() => setCursorWorld(null)}
+        onClick={handleMeasureClick}
+        onTap={handleMeasureClick}
         draggable
         x={0}
         y={0}
@@ -145,6 +193,19 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
           </Group>
         </Layer>
         <Layer listening={false} visible={layers.selection}><Group {...mapGroupProps} /></Layer>
+        <Layer listening={false}>
+          <Group {...mapGroupProps}>
+            {measurementStart && <Circle x={measurementStart.x} y={measurementStart.y} radius={6 / viewport.scale} fill="#ffffff" stroke="#f29f05" strokeWidth={2 / viewport.scale} />}
+            {measurementStart && measurementEnd && <>
+              <Line points={[measurementStart.x, measurementStart.y, measurementEnd.x, measurementEnd.y]} stroke="#f29f05" strokeWidth={2 / viewport.scale} dash={[7 / viewport.scale, 5 / viewport.scale]} />
+              <Circle x={measurementEnd.x} y={measurementEnd.y} radius={6 / viewport.scale} fill="#ffffff" stroke="#f29f05" strokeWidth={2 / viewport.scale} />
+            </>}
+          </Group>
+          {measurementLabel && measurementDistance !== null && <Group x={viewport.x + measurementLabel.x * viewport.scale} y={viewport.y + measurementLabel.y * viewport.scale - 18}>
+            <Rect x={-31} y={-11} width={62} height={22} fill="#fffdf6" stroke="#e7a536" cornerRadius={4} shadowColor="#506780" shadowBlur={8} shadowOpacity={0.12} />
+            <Text x={-27} y={-4} width={54} align="center" text={`${measurementDistance.toFixed(1)} m`} fill="#9a5b00" fontSize={10} fontStyle="bold" fontFamily="monospace" />
+          </Group>}
+        </Layer>
         <Layer listening={false}>
           <Group x={18} y={size.height - 38}>
             <Rect width={182} height={24} fill="#ffffff" opacity={0.9} cornerRadius={4} stroke="#c4d4df" />

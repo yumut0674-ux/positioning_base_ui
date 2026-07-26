@@ -1,4 +1,9 @@
-import { BarChart3, BellRing, Boxes, Building2, ChevronLeft, Crosshair, Headset, Hexagon, Map, RadioTower, Route, Settings } from "lucide-react";
+"use client";
+
+import { useEffect, useState } from "react";
+import { BarChart3, BellRing, Boxes, Building2, ChevronLeft, ChevronRight, Crosshair, Headset, Hexagon, Map, RadioTower, Route, Settings } from "lucide-react";
+
+const SIDEBAR_COLLAPSED_STORAGE_KEY = "ips-sidebar-collapsed";
 
 const NAVIGATION = [
   { label: "Canlı Harita", icon: Map, active: true },
@@ -19,8 +24,24 @@ interface AppSidebarProps {
 }
 
 export function AppSidebar({ activeView, onViewChange }: AppSidebarProps) {
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    if (window.localStorage.getItem(SIDEBAR_COLLAPSED_STORAGE_KEY) !== "true") return;
+    const restoreCollapsedState = window.setTimeout(() => setCollapsed(true), 0);
+    return () => window.clearTimeout(restoreCollapsedState);
+  }, []);
+
+  const toggleCollapsed = () => {
+    setCollapsed((current) => {
+      const next = !current;
+      window.localStorage.setItem(SIDEBAR_COLLAPSED_STORAGE_KEY, String(next));
+      return next;
+    });
+  };
+
   return (
-    <aside className="app-sidebar">
+    <aside className={`app-sidebar${collapsed ? " is-collapsed" : ""}`}>
       <nav aria-label="Primary navigation">
         <small>İZLE</small>
         {NAVIGATION.slice(0, 1).map(({ label, icon: Icon }) => <button key={label} className={activeView === "map" ? "active" : ""} onClick={() => onViewChange("map")}><Icon size={17} /><span>{label}</span></button>)}
@@ -37,7 +58,7 @@ export function AppSidebar({ activeView, onViewChange }: AppSidebarProps) {
         <button><Building2 size={17} /><span>Saha ayarları</span></button>
         <button><Settings size={17} /><span>Sistem</span></button>
         <div className="sidebar-system"><Crosshair size={15} /><div><strong>UWB MOTORU</strong><span><i /> ÇALIŞIYOR</span></div></div>
-        <button className="collapse" aria-label="Menüyü daralt"><ChevronLeft size={15} /></button>
+        <button className="collapse" aria-label={collapsed ? "Menüyü genişlet" : "Menüyü daralt"} aria-expanded={!collapsed} title={collapsed ? "Menüyü genişlet" : "Menüyü daralt"} onClick={toggleCollapsed}>{collapsed ? <ChevronRight size={15} /> : <ChevronLeft size={15} />}</button>
       </div>
     </aside>
   );

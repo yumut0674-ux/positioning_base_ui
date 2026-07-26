@@ -2,7 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter } from "react-router-dom";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { AppHeader } from "./components/AppHeader";
 import { AppSidebar, type WorkspaceView } from "./components/AppSidebar";
 import { StatusStrip } from "./components/StatusStrip";
@@ -26,8 +26,39 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
   const toggleInspector = useIpsStore((state) => state.toggleInspector);
   const showLayersPanel = useIpsStore((state) => state.showLayersPanel);
   const toggleLayersPanel = useIpsStore((state) => state.toggleLayersPanel);
+  const measurementEnabled = useIpsStore((state) => state.measurement.enabled);
+  const toggleMeasurement = useIpsStore((state) => state.toggleMeasurement);
+  const requestMapFocus = useIpsStore((state) => state.requestMapFocus);
   const tags = useIpsStore((state) => state.tags);
+  const mapFrameRef = useRef<HTMLDivElement>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [focusFeedback, setFocusFeedback] = useState(false);
+  const fullscreenSupported = typeof document === "undefined" || document.fullscreenEnabled;
   const activeTagCount = Object.values(tags).filter((tag) => tag.status === "active").length;
+
+  useEffect(() => {
+    const handleFullscreenChange = () => setIsFullscreen(document.fullscreenElement === mapFrameRef.current);
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+  }, []);
+
+  const handleFocus = useCallback(() => {
+    requestMapFocus();
+    setFocusFeedback(true);
+    window.setTimeout(() => setFocusFeedback(false), 450);
+  }, [requestMapFocus]);
+
+  const toggleFullscreen = useCallback(async () => {
+    const mapFrame = mapFrameRef.current;
+    if (!mapFrame || !document.fullscreenEnabled) return;
+    try {
+      if (document.fullscreenElement === mapFrame) await document.exitFullscreen();
+      else await mapFrame.requestFullscreen();
+    } catch {
+      setIsFullscreen(document.fullscreenElement === mapFrame);
+    }
+  }, []);
+
   return (
     <div className={`ips-shell ${activeView !== "map" ? "anchors-mode" : ""}`}>
       <AppHeader />
@@ -42,17 +73,17 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
             <TagSearchPanel />
             <div className="workspace-meta"><i /><span>CANLI KONUMLANDIRMA</span><strong>{activeTagCount} AKTİF</strong></div>
           </div>
-          <div className="map-frame">
+          <div ref={mapFrameRef} className="map-frame">
             <MapViewport positionAnimation={positionAnimation} />
             {showInspector && <CoordinateInspector />}
             {showLayersPanel && <LayerVisibilityPanel />}
             <div className="mini-toolbar" aria-label="Harita araçları">
               <button className={showInspector ? "active" : ""} title="Denetçiyi aç/kapat" onClick={toggleInspector}><Crosshair size={16} /></button>
               <button className={showLayersPanel ? "active" : ""} title="Katmanları aç/kapat" onClick={toggleLayersPanel}><Layers3 size={16} /></button>
-              <button title="Ölçüm"><Ruler size={16} /></button>
-              <button title="Odakla"><Scan size={16} /></button>
+              <button className={measurementEnabled ? "active" : ""} title="Ölçüm" aria-label="Ölçüm modunu aç veya kapat" aria-pressed={measurementEnabled} onClick={toggleMeasurement}><Ruler size={16} /></button>
+              <button className={focusFeedback ? "focus-feedback" : ""} title="Odakla" aria-label="Seçili etikete odaklan" onClick={handleFocus}><Scan size={16} /></button>
               <span />
-              <button title="Tam ekran"><Maximize2 size={16} /></button>
+              <button className={isFullscreen ? "active" : ""} title={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-label={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-pressed={isFullscreen} disabled={!fullscreenSupported} onClick={toggleFullscreen}><Maximize2 size={16} /></button>
             </div>
             <div className="map-indicator"><CircleDot size={13} /> PLAN KALİBRE EDİLDİ <span>{MAP_CALIBRATION.pixelsPerMeter} PX/M</span></div>
           </div>
