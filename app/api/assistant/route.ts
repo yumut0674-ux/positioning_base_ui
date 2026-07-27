@@ -47,7 +47,7 @@ function chatbotServiceUrl(path: string): URL {
 
 function validationError(error: z.ZodError) {
   return NextResponse.json({
-    error: "Asistan isteği doğrulanamadı.",
+    error: "Gekon AI isteği doğrulanamadı.",
     issues: error.issues.map((issue) => ({
       path: issue.path.join("."),
       message: issue.message,
@@ -57,14 +57,14 @@ function validationError(error: z.ZodError) {
 
 function upstreamUnavailable(status = 503) {
   return NextResponse.json({
-    error: "Konum asistanı şu anda çevrimdışı. Lütfen yerel asistan servisini başlatın.",
+    error: "Gekon AI bağlantısı kesildi. Lütfen yerel servisi başlatın.",
   }, { status });
 }
 
 function safeUpstreamError(status: number) {
   const responseStatus = status >= 500 ? 502 : 400;
   return NextResponse.json({
-    error: "Konum asistanı yanıtı tamamlanamadı. Lütfen biraz sonra tekrar deneyin.",
+    error: "Gekon AI yanıtı tamamlanamadı. Lütfen biraz sonra tekrar deneyin.",
   }, { status: responseStatus });
 }
 
@@ -112,7 +112,7 @@ export async function POST(request: Request) {
     const safePayload = assistantResponseSchema.safeParse(payload);
     if (!safePayload.success) {
       return NextResponse.json({
-        error: "Konum asistanı beklenmeyen bir yanıt döndürdü.",
+        error: "Gekon AI beklenmeyen bir yanıt döndürdü.",
       }, { status: 502 });
     }
 

@@ -7,11 +7,24 @@ export function useElementSize(ref: RefObject<HTMLElement | null>): Size2D {
   useEffect(() => {
     const element = ref.current;
     if (!element) return;
-    const observer = new ResizeObserver(([entry]) => {
-      if (entry) setSize({ width: entry.contentRect.width, height: entry.contentRect.height });
-    });
+    let animationFrame = 0;
+    const updateSize = () => {
+      window.cancelAnimationFrame(animationFrame);
+      animationFrame = window.requestAnimationFrame(() => {
+        const rect = element.getBoundingClientRect();
+        setSize({ width: rect.width, height: rect.height });
+      });
+    };
+    const observer = new ResizeObserver(updateSize);
     observer.observe(element);
-    return () => observer.disconnect();
+    window.addEventListener("resize", updateSize);
+    document.addEventListener("fullscreenchange", updateSize);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", updateSize);
+      document.removeEventListener("fullscreenchange", updateSize);
+      window.cancelAnimationFrame(animationFrame);
+    };
   }, [ref]);
 
   return size;

@@ -6,15 +6,34 @@
   pointer-events: none;
 }
 
+.launchCluster,
 .launchButton,
 .panel {
   pointer-events: auto;
 }
 
-.launchButton {
+.launchCluster {
   position: absolute;
   right: 0;
   bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.launchLabel {
+  white-space: nowrap;
+  padding: 8px 10px;
+  color: #25435a;
+  border: 1px solid rgba(190, 211, 224, .92);
+  border-radius: 7px;
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 12px 28px rgba(38, 73, 101, .16);
+  backdrop-filter: blur(14px);
+  font: 700 11px/1 Inter, sans-serif;
+}
+
+.launchButton {
   width: 48px;
   height: 48px;
   display: grid;
@@ -329,6 +348,11 @@
     width: calc(100vw - 28px);
     height: min(72dvh, 460px);
     min-height: min(340px, calc(100dvh - 100px));
+  }
+
+  .launchLabel {
+    padding: 7px 9px;
+    font-size: 10px;
   }
 
   .bubble,

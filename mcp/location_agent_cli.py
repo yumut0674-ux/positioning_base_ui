@@ -1,4 +1,5 @@
 r"""Terminal-only Gemini client for the UWB read-only MCP server.
+mcp\.venv\Scripts\python.exe -m uvicorn chat_api:app --app-dir mcp --host 127.0.0.1 --port 8000
 
 mcp\.venv\Scripts\python.exe mcp\location_agent_cli.py
 

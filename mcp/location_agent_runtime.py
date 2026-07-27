@@ -377,7 +377,7 @@ class LocationAgentRuntime:
 
     def _ensure_started(self) -> None:
         if not self._started or self._client is None or self._mcp_session is None:
-            raise AgentNotReadyError("Konum asistanı henüz hazır değil.")
+            raise AgentNotReadyError("Gekon AI henüz hazır değil.")
 
     def _create_chat(self) -> Any:
         self._ensure_started()

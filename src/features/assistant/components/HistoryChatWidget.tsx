@@ -164,7 +164,7 @@ export function HistoryChatWidget({
       const payload = await response.json().catch(() => ({})) as AssistantApiResponse;
 
       if (!response.ok || !payload.data) {
-        appendAssistantError(payload.error ?? "Konum asistanı şu anda yanıt veremiyor.");
+        appendAssistantError(payload.error ?? "Gekon AI şu anda yanıt veremiyor.");
         return;
       }
 
@@ -175,7 +175,7 @@ export function HistoryChatWidget({
         { id: createMessageId(), role: "assistant", content: toDisplayText(data.answer) },
       ]);
     } catch {
-      appendAssistantError("Konum asistanı şu anda çevrimdışı.");
+      appendAssistantError("Gekon AI bağlantısı kesildi.");
     } finally {
       setLoading(false);
     }
@@ -219,10 +219,10 @@ export function HistoryChatWidget({
             <div className={styles.titleBlock}>
               <span className={styles.botBadge} aria-hidden="true"><Bot size={16} /></span>
               <div>
-                <h2 id="history-chat-title">Konum Asistanı</h2>
+                <h2 id="history-chat-title">Gekon AI</h2>
                 <span className={`${styles.status} ${lastError ? styles.statusError : ""}`}>
                   <i aria-hidden="true" />
-                  {lastError ? "Bağlantı hatası" : "Çevrimiçi"}
+                  {lastError ? "Gekon AI bağlantısı kesildi" : "Gekon AI hazır"}
                 </span>
               </div>
             </div>
@@ -230,7 +230,7 @@ export function HistoryChatWidget({
               type="button"
               className={styles.iconButton}
               onClick={() => setIsOpen(false)}
-              aria-label="Konum asistanı panelini kapat"
+              aria-label="Gekon AI panelini kapat"
               title="Kapat"
             >
               <X size={16} />
@@ -260,7 +260,7 @@ export function HistoryChatWidget({
             {loading && (
               <div className={`${styles.messageRow} ${styles.assistantRow}`}>
                 <span className={styles.avatar} aria-hidden="true"><Bot size={13} /></span>
-                <p className={styles.typingBubble}><Loader2 size={14} className={styles.spin} /> Yanıt hazırlanıyor</p>
+                <p className={styles.typingBubble}><Loader2 size={14} className={styles.spin} /> Gekon AI analiz ediyor</p>
               </div>
             )}
             <div ref={messageEndRef} />
@@ -272,10 +272,10 @@ export function HistoryChatWidget({
               value={input}
               onChange={(event) => setInput(event.target.value.slice(0, 1000))}
               onKeyDown={handleComposerKeyDown}
-              placeholder="Konum geçmişini sorun"
+              placeholder="Gekon AI ile konum geçmişini analiz et"
               rows={2}
               maxLength={1000}
-              aria-label="Konum asistanına mesaj yaz"
+              aria-label="Gekon AI'a mesaj yaz"
             />
             <div className={styles.actions}>
               <button
@@ -301,16 +301,19 @@ export function HistoryChatWidget({
       )}
 
       {!isOpen && (
-        <button
-          type="button"
-          className={styles.launchButton}
-          onClick={() => setIsOpen(true)}
-          aria-label="Konum asistanını aç"
-          aria-expanded={false}
-          title="Konum Asistanı"
-        >
-          <MessageCircle size={22} />
-        </button>
+        <div className={styles.launchCluster}>
+          <span className={styles.launchLabel}>Gekon AI</span>
+          <button
+            type="button"
+            className={styles.launchButton}
+            onClick={() => setIsOpen(true)}
+            aria-label="Gekon AI'ı aç"
+            aria-expanded={false}
+            title="Gekon AI"
+          >
+            <MessageCircle size={22} />
+          </button>
+        </div>
       )}
     </div>
   );

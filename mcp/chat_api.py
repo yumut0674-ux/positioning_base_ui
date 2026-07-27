@@ -106,7 +106,7 @@ app = FastAPI(
 def _runtime() -> LocationAgentRuntime:
     runtime = getattr(app.state, "location_agent_runtime", None)
     if not isinstance(runtime, LocationAgentRuntime):
-        raise HTTPException(status_code=503, detail="Konum asistanı henüz hazır değil.")
+        raise HTTPException(status_code=503, detail="Gekon AI henüz hazır değil.")
     return runtime
 
 
