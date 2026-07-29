@@ -86,7 +86,11 @@ export async function GET() {
 
 async function save(request: Request) {
   const body = (await request.json()) as { anchors?: AnchorInput[] } | AnchorInput[] | AnchorInput;
-  const anchors = Array.isArray(body) ? body : "anchors" in body ? body.anchors : [body];
+  const anchors: AnchorInput[] = Array.isArray(body)
+    ? body
+    : "anchors" in body
+      ? body.anchors ?? []
+      : [body as AnchorInput];
   if (!anchors?.length) throw new Error("No anchors provided");
   await queryPostgres(`${schemaSql}${upsertAnchorsSql(anchors)}`);
   return getAnchors();

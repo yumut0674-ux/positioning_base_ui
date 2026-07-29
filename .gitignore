@@ -40,9 +40,6 @@ yarn-error.log*
 # typescript
 next-env.d.ts
 /dist/
-/.wrangler/
-/outputs/
-/work/
 
 # Python terminal MCP demo
 /mcp/.venv/

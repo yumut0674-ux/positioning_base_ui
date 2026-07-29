@@ -79,7 +79,11 @@ export async function GET() {
 
 async function save(request: Request) {
   const body = (await request.json()) as { tags?: TagInput[] } | TagInput[] | TagInput;
-  const tags = Array.isArray(body) ? body : "tags" in body ? body.tags : [body];
+  const tags: TagInput[] = Array.isArray(body)
+    ? body
+    : "tags" in body
+      ? body.tags ?? []
+      : [body as TagInput];
   if (!tags?.length) throw new Error("No tags provided");
   await queryPostgres(`${schemaSql}${upsertSql(tags)}`);
   trackingBuffer.invalidateRegisteredTagCache();
