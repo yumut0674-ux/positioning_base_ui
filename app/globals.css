@@ -99,6 +99,11 @@ button { color: inherit; font: inherit; }
 .ips-shell:has(.app-sidebar.is-collapsed) .status-strip > div:first-child small { display: none; }
 
 .workspace { grid-row: 2; min-width: 0; min-height: 0; padding: 18px 16px 12px 18px; display: flex; flex-direction: column; }
+.history-panel-slot, .history-panel-loading { display: flex; flex: 1; min-width: 0; min-height: 0; flex-direction: column; }
+.history-panel-slot[hidden] { display: none; }
+.history-panel-loading-frame { flex: 1; min-height: 0; display: grid; place-items: center; align-content: center; gap: 10px; color: #607084; border: 1px solid #bfd0dd; border-radius: 6px; background: rgba(249, 252, 255, .82); box-shadow: 0 20px 70px rgba(70, 91, 112, .12); font-size: 11px; }
+.history-panel-loading-frame svg { color: var(--accent); animation: history-panel-spin .8s linear infinite; }
+@keyframes history-panel-spin { to { transform: rotate(360deg); } }
 .workspace-heading { position: relative; z-index: 7; flex: 0 0 auto; margin-bottom: 24px; padding-bottom: 2px; display: grid; grid-template-columns: minmax(0, 1fr) clamp(240px, 24vw, 280px) auto; align-items: center; gap: 22px; }
 .workspace-heading-content { min-width: 0; }
 .workspace-heading span { color: #6e8198; font: 8px ui-monospace, monospace; letter-spacing: .14em; }

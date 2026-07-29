@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter } from "react-router-dom";
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppHeader } from "./components/AppHeader";
 import { AppSidebar, type WorkspaceView, useSidebarCollapse } from "./components/AppSidebar";
@@ -14,7 +15,7 @@ import { TagSearchPanel } from "@/src/features/tracking/components/TagSearchPane
 import { useRealtimeTracking } from "@/src/features/tracking/hooks/useRealtimeTracking";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { MAP_CALIBRATION, MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
-import { CircleDot, Crosshair, Layers3, Maximize2, Ruler, Scan } from "lucide-react";
+import { CircleDot, Crosshair, Layers3, Loader2, Maximize2, Ruler, Scan } from "lucide-react";
 import { AnchorManagementPanel } from "@/app/anchors/page";
 import { TagManagementPanel } from "@/app/tags/page";
 import { SupportContactPanel } from "@/src/features/support/components/SupportContactPanel";
@@ -22,7 +23,45 @@ import { RegionManagementPanel } from "@/src/features/regions/components/RegionM
 import { GekonAiWidget, type GekonAiContext } from "@/src/features/assistant/components/HistoryChatWidget";
 import { resolveLocation } from "@/src/features/map/services/LocationResolverService";
 
-function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: WorkspaceView; readonly onViewChange: (view: WorkspaceView) => void }) {
+const RouteHistoryPanel = dynamic(
+  () => import("@/src/features/history/components/RouteHistoryPanel").then((module) => module.RouteHistoryPanel),
+  { ssr: false, loading: () => <HistoryPanelLoading /> },
+);
+
+interface HistoryRequest {
+  readonly tagCode?: string;
+  readonly key: number;
+}
+
+interface LiveMapWorkspaceProps {
+  readonly activeView: WorkspaceView;
+  readonly historyOpened: boolean;
+  readonly historyRequest: HistoryRequest;
+  readonly onOpenTagHistory: (tagCode: string) => void;
+  readonly onViewChange: (view: WorkspaceView) => void;
+}
+
+function HistoryPanelLoading() {
+  return (
+    <div className="history-panel-loading" role="status" aria-live="polite">
+      <div className="workspace-heading">
+        <div><span>HAREKET ANALİZİ / {MAP_FLOOR_PLAN.level.toUpperCase()}</span><h1>Rota Geçmişi</h1></div>
+      </div>
+      <div className="history-panel-loading-frame">
+        <Loader2 size={22} aria-hidden="true" />
+        <span>Rota geçmişi hazırlanıyor…</span>
+      </div>
+    </div>
+  );
+}
+
+function LiveMapWorkspace({
+  activeView,
+  historyOpened,
+  historyRequest,
+  onOpenTagHistory,
+  onViewChange,
+}: LiveMapWorkspaceProps) {
   const { collapsed: sidebarCollapsed, toggleCollapsed: toggleSidebar } = useSidebarCollapse();
   const positionAnimation = useRealtimeTracking();
   const showInspector = useIpsStore((state) => state.showInspector);
@@ -84,7 +123,7 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
       <AppHeader sidebarCollapsed={sidebarCollapsed} onSidebarToggle={toggleSidebar} />
       <AppSidebar activeView={activeView} collapsed={sidebarCollapsed} onViewChange={onViewChange} />
       <main className="workspace">
-        {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : <>
+        {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : activeView === "history" ? null : <>
           <div className="workspace-heading">
             <div className="workspace-heading-content">
               <span>CANLI OPERASYONLAR / {MAP_FLOOR_PLAN.level.toUpperCase()}</span>
@@ -108,8 +147,13 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
             <div className="map-indicator"><CircleDot size={13} /> PLAN KALİBRE EDİLDİ <span>{MAP_CALIBRATION.pixelsPerMeter} PX/M</span></div>
           </div>
         </>}
+        {historyOpened && (
+          <div className="history-panel-slot" hidden={activeView !== "history"}>
+            <RouteHistoryPanel requestedTagCode={historyRequest.tagCode} requestKey={historyRequest.key} />
+          </div>
+        )}
       </main>
-      {activeView === "map" && <TagInformationPanel />}
+      {activeView === "map" && <TagInformationPanel onOpenHistory={onOpenTagHistory} />}
       {activeView === "map" && <GekonAiWidget context={assistantContext} />}
       <StatusStrip />
     </div>
@@ -118,13 +162,20 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
 
 export function IpsApplication() {
   const [queryClient] = useState(() => new QueryClient({ defaultOptions: { queries: { staleTime: 15_000, retry: 1 } } }));
-  const [activeView, setActiveView] = useState<Exclude<WorkspaceView, "history">>("map");
-  const changeView = (view: WorkspaceView) => {
-    if (view === "history") {
-      window.location.assign("/history");
-      return;
-    }
+  const [activeView, setActiveView] = useState<WorkspaceView>("map");
+  const [historyOpened, setHistoryOpened] = useState(false);
+  const [historyRequest, setHistoryRequest] = useState<HistoryRequest>({ key: 0 });
+
+  const changeView = useCallback((view: WorkspaceView) => {
+    if (view === "history") setHistoryOpened(true);
     setActiveView(view);
-  };
-  return <QueryClientProvider client={queryClient}><HashRouter><LiveMapWorkspace activeView={activeView} onViewChange={changeView} /></HashRouter></QueryClientProvider>;
+  }, []);
+
+  const openTagHistory = useCallback((tagCode: string) => {
+    setHistoryOpened(true);
+    setHistoryRequest((current) => ({ tagCode, key: current.key + 1 }));
+    setActiveView("history");
+  }, []);
+
+  return <QueryClientProvider client={queryClient}><HashRouter><LiveMapWorkspace activeView={activeView} historyOpened={historyOpened} historyRequest={historyRequest} onOpenTagHistory={openTagHistory} onViewChange={changeView} /></HashRouter></QueryClientProvider>;
 }
