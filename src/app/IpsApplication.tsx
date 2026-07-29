@@ -2,9 +2,9 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter } from "react-router-dom";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppHeader } from "./components/AppHeader";
-import { AppSidebar, type WorkspaceView } from "./components/AppSidebar";
+import { AppSidebar, type WorkspaceView, useSidebarCollapse } from "./components/AppSidebar";
 import { StatusStrip } from "./components/StatusStrip";
 import { MapViewport } from "@/src/features/map/components/MapViewport";
 import { CoordinateInspector } from "@/src/features/map/components/CoordinateInspector";
@@ -19,8 +19,11 @@ import { AnchorManagementPanel } from "@/app/anchors/page";
 import { TagManagementPanel } from "@/app/tags/page";
 import { SupportContactPanel } from "@/src/features/support/components/SupportContactPanel";
 import { RegionManagementPanel } from "@/src/features/regions/components/RegionManagementPanel";
+import { GekonAiWidget, type GekonAiContext } from "@/src/features/assistant/components/HistoryChatWidget";
+import { resolveLocation } from "@/src/features/map/services/LocationResolverService";
 
 function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: WorkspaceView; readonly onViewChange: (view: WorkspaceView) => void }) {
+  const { collapsed: sidebarCollapsed, toggleCollapsed: toggleSidebar } = useSidebarCollapse();
   const positionAnimation = useRealtimeTracking();
   const showInspector = useIpsStore((state) => state.showInspector);
   const toggleInspector = useIpsStore((state) => state.toggleInspector);
@@ -30,11 +33,28 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
   const toggleMeasurement = useIpsStore((state) => state.toggleMeasurement);
   const requestMapFocus = useIpsStore((state) => state.requestMapFocus);
   const tags = useIpsStore((state) => state.tags);
+  const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const mapFrameRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [focusFeedback, setFocusFeedback] = useState(false);
   const fullscreenSupported = typeof document === "undefined" || document.fullscreenEnabled;
   const activeTagCount = Object.values(tags).filter((tag) => tag.status === "active").length;
+  const selectedTag = selectedTagId ? tags[selectedTagId] : undefined;
+  const assistantContext = useMemo<GekonAiContext>(() => ({
+    mode: "live",
+    selectedTagId: selectedTag?.id,
+    tagCode: selectedTag?.id,
+    entityName: selectedTag?.name,
+    floorPlanId: MAP_FLOOR_PLAN.id,
+    floorPlanName: `${MAP_FLOOR_PLAN.name} · ${MAP_FLOOR_PLAN.level}`,
+    tagStatus: selectedTag?.status,
+    zoneName: selectedTag ? resolveLocation(selectedTag.x, selectedTag.y, MAP_FLOOR_PLAN.id) : undefined,
+    livePosition: selectedTag ? {
+      x: selectedTag.x,
+      y: selectedTag.y,
+      observedAt: new Date(selectedTag.timestamp).toISOString(),
+    } : undefined,
+  }), [selectedTag]);
 
   useEffect(() => {
     const handleFullscreenChange = () => setIsFullscreen(document.fullscreenElement === mapFrameRef.current);
@@ -61,8 +81,8 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
 
   return (
     <div className={`ips-shell ${activeView !== "map" ? "anchors-mode" : ""}`}>
-      <AppHeader />
-      <AppSidebar activeView={activeView} onViewChange={onViewChange} />
+      <AppHeader sidebarCollapsed={sidebarCollapsed} onSidebarToggle={toggleSidebar} />
+      <AppSidebar activeView={activeView} collapsed={sidebarCollapsed} onViewChange={onViewChange} />
       <main className="workspace">
         {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : <>
           <div className="workspace-heading">
@@ -90,6 +110,7 @@ function LiveMapWorkspace({ activeView, onViewChange }: { readonly activeView: W
         </>}
       </main>
       {activeView === "map" && <TagInformationPanel />}
+      {activeView === "map" && <GekonAiWidget context={assistantContext} />}
       <StatusStrip />
     </div>
   );

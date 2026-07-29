@@ -210,23 +210,38 @@ def _to_plain_answer(value: str) -> str:
 
 
 def _build_context_prompt(context: Mapping[str, Any] | None, tag_lookup_result: str | None) -> str:
+    mode = _clean_context_value((context or {}).get("mode"))
     lines = [
         "Arayüz bağlamı:",
-        "- Bu bağlam HistoryPage filtresinden gelir; haritadaki rota demo veridir.",
-        "- Cevapta doğru kaynak olarak yalnızca bağlı konum araçlarının sonuçlarını kullan.",
+        f"- Bağlam türü: {mode or 'belirtilmedi'}",
+        "- Geçmiş noktaları arayüzün gerçek location history API sonucudur; demo veri değildir.",
+        "- Canlı bağlam anlık bir UI görüntüsüdür; güncel doğrulama gerektiğinde bağlı konum araçlarını kullan.",
     ]
 
     context_labels = {
+        "selectedTagId": "Seçili tag kimliği",
         "tagCode": "Seçili tag kodu",
         "entityName": "Seçili varlık adı",
         "from": "Başlangıç zamanı",
         "to": "Bitiş zamanı",
         "floorPlanId": "Kat planı",
+        "floorPlanName": "Kat/harita adı",
+        "tagStatus": "Tag durumu",
+        "zoneName": "Bölge/oda",
     }
     for key, label in context_labels.items():
         value = _clean_context_value((context or {}).get(key))
         if value is not None:
             lines.append(f"- {label}: {value}")
+
+    for key, label in (
+        ("livePosition", "Canlı konum"),
+        ("history", "Gerçek geçmiş özeti"),
+        ("historyPoints", "Gerçek rota noktaları"),
+    ):
+        value = (context or {}).get(key)
+        if value is not None:
+            lines.append(f"- {label}: {_safe_json(value)}")
 
     if tag_lookup_result:
         lines.extend([

@@ -1,6 +1,7 @@
 import { createServer, request as httpRequest, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
 import type { ProcessedPosition } from "./types";
+import { logger } from "../logger";
 
 const STREAM_PATHS = new Set(["/api/tracking/ingest", "/api/tracking/stream"]);
 
@@ -108,7 +109,7 @@ export class ProcessedPositionServer {
       response.on("close", remove);
       response.on("error", (error) => {
         remove();
-        console.error("PROCESSED_PORT_CONNECTION_ERROR", { error: error.message, timestamp: new Date().toISOString() });
+        logger.error("region_engine.processed_connection_failed", error);
       });
       response.on("drain", () => {
         if (this.clients.has(response)) this.clients.set(response, false);
@@ -121,7 +122,7 @@ export class ProcessedPositionServer {
         const message = error.code === "EADDRINUSE"
           ? `REGION_POSITION_PORT ${this.port} kullanımda; boş bir 300x portu seçin`
           : `Processed position portu ${this.port} başlatılamadı: ${error.message}`;
-        console.error("PROCESSED_PORT_CONNECTION_ERROR", { port: this.port, error: message, timestamp: new Date().toISOString() });
+        logger.error("region_engine.processed_port_start_failed", error, { port: this.port, message });
         reject(new Error(message));
       };
       const onListening = () => {
@@ -144,9 +145,7 @@ export class ProcessedPositionServer {
             throw new Error(`Processed position publish HTTP ${response.statusCode}`);
           }
         })
-        .catch((error) => console.error("PROCESSED_PORT_CONNECTION_ERROR", {
-        port: this.port, error: error instanceof Error ? error.message : String(error), timestamp: new Date().toISOString(),
-      }));
+        .catch((error) => logger.error("region_engine.processed_publish_failed", error, { port: this.port }));
       return;
     }
     this.writeToClients(`event: position\ndata: ${JSON.stringify(position)}\n\n`);

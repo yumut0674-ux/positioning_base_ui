@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { logger } from "@/src/server/logger";
 
 export const runtime = "nodejs";
 
@@ -12,13 +13,34 @@ const isoWithTimezoneSchema = z.string().trim().refine((value) => {
 }, "ISO 8601 tarihi açık bir timezone bilgisi içermelidir");
 
 const optionalText = (max: number) => z.string().trim().min(1).max(max).optional();
+const positionSchema = z.object({
+  x: z.number().finite(),
+  y: z.number().finite(),
+  observedAt: isoWithTimezoneSchema,
+}).strict();
+const historyPointSchema = positionSchema.extend({
+  zoneName: optionalText(160),
+}).strict();
 
 const assistantContextSchema = z.object({
+  mode: z.enum(["live", "history"]).optional(),
+  selectedTagId: optionalText(100),
   tagCode: optionalText(100),
   entityName: optionalText(160),
   from: isoWithTimezoneSchema.optional(),
   to: isoWithTimezoneSchema.optional(),
   floorPlanId: optionalText(100),
+  floorPlanName: optionalText(160),
+  tagStatus: optionalText(50),
+  zoneName: optionalText(160),
+  livePosition: positionSchema.optional(),
+  history: z.object({
+    returnedCount: z.number().int().nonnegative(),
+    sourcePointCount: z.number().int().nonnegative(),
+    sampled: z.boolean(),
+    distanceMeters: z.number().finite().nonnegative(),
+  }).strict().optional(),
+  historyPoints: z.array(historyPointSchema).max(200).optional(),
 }).strict();
 
 const assistantRequestSchema = z.object({
@@ -107,17 +129,22 @@ export async function POST(request: Request) {
     });
 
     const payload = await readJson(response);
-    if (!response.ok) return safeUpstreamError(response.status);
+    if (!response.ok) {
+      logger.error("assistant.upstream_rejected", new Error(`HTTP ${response.status}`), { status: response.status });
+      return safeUpstreamError(response.status);
+    }
 
     const safePayload = assistantResponseSchema.safeParse(payload);
     if (!safePayload.success) {
+      logger.error("assistant.invalid_upstream_response", safePayload.error);
       return NextResponse.json({
         error: "Gekon AI beklenmeyen bir yanıt döndürdü.",
       }, { status: 502 });
     }
 
     return NextResponse.json(safePayload.data, { status: 200 });
-  } catch {
+  } catch (error) {
+    logger.error("assistant.request_failed", error);
     return upstreamUnavailable();
   }
 }
@@ -135,7 +162,8 @@ export async function DELETE(request: Request) {
     });
     if (!response.ok) return safeUpstreamError(response.status);
     return new NextResponse(null, { status: 204 });
-  } catch {
+  } catch (error) {
+    logger.error("assistant.session_delete_failed", error, { sessionId });
     return upstreamUnavailable();
   }
 }

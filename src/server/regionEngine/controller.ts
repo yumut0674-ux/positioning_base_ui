@@ -5,6 +5,7 @@ import { ProcessedPositionServer } from "./ProcessedPositionServer";
 import { RegionPositionEngine } from "./RegionPositionEngine";
 import { getRegionEngineRuntimeConfig } from "./runtimeConfig";
 import type { RegionEngineStatus } from "./types";
+import { logger } from "../logger";
 
 export class RegionEngineController {
   private readonly runtime = getRegionEngineRuntimeConfig();
@@ -26,10 +27,7 @@ export class RegionEngineController {
     try {
       compiled = await loadRegionsConfig();
     } catch (error) {
-      console.error("REGION_ENGINE_CONFIG_ERROR", {
-        error: error instanceof Error ? error.message : String(error),
-        timestamp: new Date().toISOString(),
-      });
+      logger.error("region_engine.config_load_failed", error);
       throw new Error(`Region config yüklenemedi: ${error instanceof Error ? error.message : String(error)}`);
     }
 

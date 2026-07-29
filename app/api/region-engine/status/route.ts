@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { regionEngineController } from "@/src/server/regionEngine/controller";
+import { logger } from "@/src/server/logger";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,6 +19,7 @@ export async function PUT(request: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "Region engine durumu değiştirilemedi";
     const status = message.includes("kullanımda") ? 409 : 503;
+    logger.error("region_engine.status_update_failed", error, { status });
     return NextResponse.json({ error: message, ...regionEngineController.status() }, { status });
   }
 }

@@ -1,5 +1,6 @@
 import { EventEmitter } from "node:events";
 import { queryPostgres } from "./postgresClient";
+import { logger } from "./logger";
 
 export type TrackingPosition = {
   readonly tagCode: string;
@@ -32,6 +33,9 @@ export class TrackingBuffer extends EventEmitter {
   private registeredTagCodes = new Set<string>();
   private registrationCheckedAt = 0;
   private registrationRefresh: Promise<void> | null = null;
+  private lastRegistryError: string | null = null;
+  private lastPersistenceError: string | null = null;
+  private lastSuccessfulFlushAt: string | null = null;
   private readonly timer: ReturnType<typeof setInterval>;
 
   public constructor() {
@@ -59,10 +63,12 @@ export class TrackingBuffer extends EventEmitter {
     this.registrationRefresh = queryPostgres("SELECT tag_code FROM tags;")
       .then((rows) => {
         this.registeredTagCodes = new Set(rows.map((row) => row.tag_code?.trim().toUpperCase()).filter((tagCode): tagCode is string => Boolean(tagCode)));
+        this.lastRegistryError = null;
       })
       .catch((error) => {
         // When the tag registry is unavailable, retain the safe behavior: do not persist unknown data.
-        console.error("Registered tag cache refresh failed", error);
+        this.lastRegistryError = error instanceof Error ? error.message : String(error);
+        logger.error("tracking.registry_refresh_failed", error);
         this.registeredTagCodes = new Set();
       })
       .finally(() => {
@@ -83,9 +89,12 @@ export class TrackingBuffer extends EventEmitter {
       await queryPostgres(`${schemaSql}
 INSERT INTO tag_location_history (tag_code, x, y, created_at)
 VALUES ${values};`);
+      this.lastPersistenceError = null;
+      this.lastSuccessfulFlushAt = new Date().toISOString();
     } catch (error) {
       this.queue.unshift(...batch);
-      console.error("Tracking history bulk insert failed", error);
+      this.lastPersistenceError = error instanceof Error ? error.message : String(error);
+      logger.error("tracking.history_flush_failed", error, { batchSize: batch.length });
     } finally {
       this.flushing = false;
     }
@@ -93,6 +102,19 @@ VALUES ${values};`);
 
   public stop(): void {
     clearInterval(this.timer);
+  }
+
+  public status() {
+    const error = this.lastPersistenceError ?? this.lastRegistryError;
+    return {
+      ok: error === null,
+      status: error ? "degraded" : "ready",
+      queueSize: this.queue.length,
+      registeredTagCount: this.registeredTagCodes.size,
+      flushing: this.flushing,
+      lastSuccessfulFlushAt: this.lastSuccessfulFlushAt,
+      error,
+    } as const;
   }
 }
 

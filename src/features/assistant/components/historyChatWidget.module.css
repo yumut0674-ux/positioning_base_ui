@@ -1,8 +1,7 @@
 .widgetRoot {
   position: fixed;
-  z-index: 40;
-  right: 28px;
-  bottom: 28px;
+  z-index: 60;
+  inset: 0;
   pointer-events: none;
 }
 
@@ -13,9 +12,9 @@
 }
 
 .launchCluster {
-  position: absolute;
-  right: 0;
-  bottom: 0;
+  position: fixed;
+  right: 24px;
+  bottom: 48px;
   display: flex;
   align-items: center;
   gap: 9px;
@@ -63,12 +62,11 @@
 }
 
 .panel {
-  position: absolute;
-  right: 0;
-  bottom: 62px;
-  width: min(390px, calc(100vw - 32px));
-  height: min(470px, calc(100dvh - 118px));
-  min-height: min(360px, calc(100dvh - 118px));
+  position: fixed;
+  top: 76px;
+  right: 16px;
+  bottom: 46px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -77,6 +75,50 @@
   background: rgba(255, 255, 255, .94);
   box-shadow: 0 22px 58px rgba(38, 73, 101, .2);
   backdrop-filter: blur(18px);
+  transition: width .16s ease, box-shadow .18s ease;
+}
+
+.panel.resizing {
+  user-select: none;
+  transition: box-shadow .18s ease;
+  box-shadow: -10px 22px 68px rgba(38, 73, 101, .25);
+}
+
+.resizeHandle {
+  position: absolute;
+  z-index: 3;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 11px;
+  cursor: ew-resize;
+  touch-action: none;
+}
+
+.resizeHandle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 4px;
+  width: 3px;
+  height: 54px;
+  border-radius: 999px;
+  background: #a9c3d2;
+  opacity: .72;
+  transform: translateY(-50%);
+  transition: background .18s ease, opacity .18s ease, box-shadow .18s ease;
+}
+
+.resizeHandle:hover::after,
+.resizeHandle:focus-visible::after,
+.panel.resizing .resizeHandle::after {
+  background: #00a896;
+  opacity: 1;
+  box-shadow: 0 0 0 4px rgba(0, 168, 150, .12);
+}
+
+.resizeHandle:focus-visible {
+  outline: none;
 }
 
 .header {
@@ -95,6 +137,10 @@
   display: flex;
   align-items: center;
   gap: 9px;
+}
+
+.titleBlock > div {
+  min-width: 0;
 }
 
 .botBadge {
@@ -161,6 +207,7 @@
 
 .messages {
   flex: 1;
+  width: 100%;
   min-height: 0;
   overflow-y: auto;
   display: grid;
@@ -257,6 +304,8 @@
 }
 
 .composer {
+  width: 100%;
+  min-width: 0;
   display: grid;
   gap: 8px;
   padding: 10px 11px 11px;
@@ -266,6 +315,7 @@
 
 .composer textarea {
   width: 100%;
+  min-width: 0;
   min-height: 58px;
   max-height: 118px;
   resize: vertical;
@@ -339,15 +389,23 @@
 }
 
 @media (max-width: 640px) {
-  .widgetRoot {
+  .launchCluster {
     right: 14px;
-    bottom: 18px;
+    bottom: 42px;
   }
 
   .panel {
-    width: calc(100vw - 28px);
-    height: min(72dvh, 460px);
+    top: auto;
+    right: 14px;
+    bottom: 72px;
+    left: 14px;
+    width: auto !important;
+    height: min(72dvh, 520px);
     min-height: min(340px, calc(100dvh - 100px));
+  }
+
+  .resizeHandle {
+    display: none;
   }
 
   .launchLabel {

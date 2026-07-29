@@ -1,11 +1,31 @@
-import { Bell, ChevronDown, CircleUserRound, Search } from "lucide-react";
+import { Bell, ChevronDown, CircleUserRound, Menu, Search } from "lucide-react";
 import { MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
 import { LogoMark } from "@/src/shared/components/LogoMark";
 
-export function AppHeader() {
+interface AppHeaderProps {
+  readonly sidebarCollapsed: boolean;
+  readonly onSidebarToggle: () => void;
+}
+
+export function AppHeader({ sidebarCollapsed, onSidebarToggle }: AppHeaderProps) {
+  const toggleLabel = sidebarCollapsed ? "Menüyü genişlet" : "Menüyü daralt";
+
   return (
     <header className="app-header">
-      <div className="brand"><LogoMark /><div><strong>GEKON</strong><span>IPS KONTROL</span></div></div>
+      <div className="brand sidebar-brand-row">
+        <LogoMark />
+        <div className="sidebar-brand-copy"><strong>GEKON</strong><span>IPS KONTROL</span></div>
+        <button
+          type="button"
+          className="sidebar-toggle"
+          aria-label={toggleLabel}
+          aria-expanded={!sidebarCollapsed}
+          title={toggleLabel}
+          onClick={onSidebarToggle}
+        >
+          <Menu size={18} />
+        </button>
+      </div>
       <div className="site-context">
         <span className="context-index">01</span>
         <div><small>AKTİF SAHA</small><strong>{MAP_FLOOR_PLAN.building}</strong></div>

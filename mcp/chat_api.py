@@ -40,16 +40,52 @@ def _validate_iso_with_timezone(value: str | None) -> str | None:
     return value
 
 
+class ContextPosition(BaseModel):
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+    x: float
+    y: float
+    observed_at: str = Field(alias="observedAt")
+    zone_name: str | None = Field(default=None, alias="zoneName", max_length=160)
+
+    @field_validator("observed_at")
+    @classmethod
+    def date_must_include_timezone(cls, value: str) -> str:
+        validated = _validate_iso_with_timezone(value)
+        assert validated is not None
+        return validated
+
+
+class HistorySummary(BaseModel):
+    model_config = ConfigDict(populate_by_name=True, extra="forbid")
+
+    returned_count: int = Field(alias="returnedCount", ge=0)
+    source_point_count: int = Field(alias="sourcePointCount", ge=0)
+    sampled: bool
+    distance_meters: float = Field(alias="distanceMeters", ge=0)
+
+
 class ChatContext(BaseModel):
     model_config = ConfigDict(populate_by_name=True, extra="forbid")
 
+    mode: str | None = Field(default=None, pattern="^(live|history)$")
+    selected_tag_id: str | None = Field(default=None, alias="selectedTagId", max_length=100)
     tag_code: str | None = Field(default=None, alias="tagCode", max_length=100)
     entity_name: str | None = Field(default=None, alias="entityName", max_length=160)
     from_time: str | None = Field(default=None, alias="from")
     to_time: str | None = Field(default=None, alias="to")
     floor_plan_id: str | None = Field(default=None, alias="floorPlanId", max_length=100)
+    floor_plan_name: str | None = Field(default=None, alias="floorPlanName", max_length=160)
+    tag_status: str | None = Field(default=None, alias="tagStatus", max_length=50)
+    zone_name: str | None = Field(default=None, alias="zoneName", max_length=160)
+    live_position: ContextPosition | None = Field(default=None, alias="livePosition")
+    history: HistorySummary | None = None
+    history_points: list[ContextPosition] | None = Field(default=None, alias="historyPoints", max_length=200)
 
-    @field_validator("tag_code", "entity_name", "floor_plan_id", mode="before")
+    @field_validator(
+        "mode", "tag_code", "entity_name", "floor_plan_id",
+        "floor_plan_name", "tag_status", "zone_name", mode="before",
+    )
     @classmethod
     def trim_optional_strings(cls, value: Any) -> str | None:
         return _trim_or_none(value)

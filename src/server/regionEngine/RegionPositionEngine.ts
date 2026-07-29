@@ -1,4 +1,5 @@
 import type { TrackingPosition } from "../trackingBuffer";
+import { logger } from "../logger";
 import { distanceFromPolygon, pointInPolygon } from "./geometry";
 import type {
   CompiledRegion, CompiledRegionsConfig, ProcessedPosition, RegionEngineStatus,
@@ -62,10 +63,8 @@ export class RegionPositionEngine {
     try {
       return this.process(raw);
     } catch (error) {
-      console.error("REGION_ENGINE_POSITION_ERROR", {
+      logger.error("region_engine.position_failed", error, {
         vehicleId: raw.tagCode,
-        timestamp: new Date(this.now()).toISOString(),
-        error: error instanceof Error ? error.message : String(error),
       });
       return undefined;
     }
@@ -240,16 +239,14 @@ export class RegionPositionEngine {
         if (now - vehicle.lastRawDataTimestamp >= this.broadcastIntervalMs) vehicle.state = "INFERRED_IN_REGION";
         this.publishCenter(vehicle, region, new Date(now).toISOString());
       } catch (error) {
-        console.error("REGION_ENGINE_SCHEDULER_ERROR", {
+        logger.error("region_engine.scheduler_failed", error, {
           vehicleId: vehicle.vehicleId,
-          timestamp: new Date(now).toISOString(),
-          error: error instanceof Error ? error.message : String(error),
         });
       }
     }
   }
 
   private log(event: string, vehicleId?: string, regionId?: string, score?: number): void {
-    console.info(event, { vehicleId, regionId, score, timestamp: new Date(this.now()).toISOString() });
+    logger.info(`region_engine.${event.toLowerCase()}`, { vehicleId, regionId, score });
   }
 }
