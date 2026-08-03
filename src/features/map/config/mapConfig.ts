@@ -10,7 +10,7 @@ export const MAP_FLOOR_PLAN: FloorPlanDefinition = {
   name: "Operasyon Salonu",
   building: "Kuzey Kampüsü",
   level: "Kat 01",
-  imageUrl: "/floor-plan.jpg",
+  imageUrl: "/mimari.png",
   canvasSize: { width: 1280, height: 720 },
   worldSize: { width: 42.67, height: 24 },
 };

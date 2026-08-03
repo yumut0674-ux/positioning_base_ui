@@ -18,6 +18,21 @@ function recorder() {
   return { positions, renderer, latest: () => positions.at(-1)! };
 }
 
+test("retains a renderer attached before the tag's first position arrives", () => {
+  const animation = controller({ interpolationDelayMs: 0 });
+  const output = recorder();
+
+  animation.attach("TAG-1", output.renderer);
+  animation.ingest("TAG-1", { x: 1, y: 2, timestamp: 1_000, receivedAt: 1_000 });
+
+  assert.deepEqual(output.latest(), { x: 1, y: 2, stale: false });
+
+  animation.ingest("TAG-1", { x: 3, y: 4, timestamp: 2_000, receivedAt: 2_000 });
+  animation.update(2_000);
+
+  assert.deepEqual(output.latest(), { x: 3, y: 4, stale: false });
+});
+
 test("interpolates from message timestamps without restarting when irregular updates arrive", () => {
   const animation = controller({ interpolationDelayMs: 1_200 });
   const output = recorder();

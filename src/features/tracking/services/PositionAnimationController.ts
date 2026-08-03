@@ -47,6 +47,7 @@ function samePosition(a: PositionSample, b: PositionSample): boolean {
 
 export class PositionAnimationController {
   private readonly states = new Map<string, InternalTagAnimationState>();
+  private readonly renderers = new Map<string, PositionRenderer>();
 
   public constructor(private config: PositionAnimationConfig) {}
 
@@ -67,12 +68,14 @@ export class PositionAnimationController {
   }
 
   public attach(tagId: string, renderer: PositionRenderer): () => void {
+    this.renderers.set(tagId, renderer);
     const state = this.states.get(tagId);
     if (state) {
       state.renderer = renderer;
       renderer.render(state.renderedX, state.renderedY, state.stale);
     }
     return () => {
+      if (this.renderers.get(tagId) === renderer) this.renderers.delete(tagId);
       const current = this.states.get(tagId);
       if (current?.renderer === renderer) current.renderer = undefined;
     };
@@ -102,6 +105,7 @@ export class PositionAnimationController {
         stale: false,
         lastReceivedAt: receivedAt,
         lastRenderTime: Number.NEGATIVE_INFINITY,
+        renderer: this.renderers.get(tagId),
       };
       this.states.set(tagId, state);
       state.renderer?.render(sample.x, sample.y, false);
