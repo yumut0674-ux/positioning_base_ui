@@ -3,6 +3,7 @@ import type { Point2D } from "@/src/shared/types/geometry";
 import type { AnchorDefinition, MapLayerId, ViewportState } from "@/src/features/map/types/map.types";
 import { TAG_LIVE_TIMEOUT_MS, type TagStatus, type TrackedTag } from "@/src/features/tracking/types/tracking.types";
 import type { TagDefinition } from "@/src/features/tracking/services/tagApi";
+import { addRecentTagId, nextTagLocationEntry, type TagLocationEntry } from "@/src/features/tracking/services/tagPanelState";
 
 interface MeasurementState {
   readonly enabled: boolean;
@@ -18,9 +19,9 @@ interface IpsState {
   readonly anchors: readonly AnchorDefinition[];
   readonly tagDefinitions: Record<string, TagDefinition>;
   readonly selectedTagId: string | null;
-  readonly cursorWorld: Point2D | null;
+  readonly recentTagIds: readonly string[];
+  readonly tagLocationEntries: Record<string, TagLocationEntry>;
   readonly connectionMode: "live" | "simulation" | "reconnecting";
-  readonly showInspector: boolean;
   readonly showLayersPanel: boolean;
   readonly measurement: MeasurementState;
   readonly mapFocusRequest: number;
@@ -32,8 +33,8 @@ interface IpsState {
   setAnchors: (anchors: readonly AnchorDefinition[]) => void;
   setTagDefinitions: (tags: readonly TagDefinition[]) => void;
   selectTag: (tagId: string | null) => void;
-  setCursorWorld: (point: Point2D | null) => void;
-  toggleInspector: () => void;
+  selectTagAndFocus: (tagId: string) => void;
+  hydrateRecentTagIds: (tagIds: readonly string[]) => void;
   toggleLayersPanel: () => void;
   toggleMeasurement: () => void;
   setMeasurementPoint: (point: Point2D) => void;
@@ -59,15 +60,21 @@ export const useIpsStore = create<IpsState>((set) => ({
   anchors: [],
   tagDefinitions: {},
   selectedTagId: "TAG-001",
-  cursorWorld: null,
+  recentTagIds: [],
+  tagLocationEntries: {},
   connectionMode: "live",
-  showInspector: false,
   showLayersPanel: false,
   measurement: { enabled: false, start: null, end: null },
   mapFocusRequest: 0,
   setViewport: (viewport) => set({ viewport }),
   toggleLayer: (layer) => set((state) => ({ layers: { ...state.layers, [layer]: !state.layers[layer] } })),
-  upsertTag: (tag) => set((state) => ({ tags: { ...state.tags, [tag.id]: tag } })),
+  upsertTag: (tag) => set((state) => ({
+    tags: { ...state.tags, [tag.id]: tag },
+    tagLocationEntries: {
+      ...state.tagLocationEntries,
+      [tag.id]: nextTagLocationEntry(state.tagLocationEntries[tag.id], tag),
+    },
+  })),
   observeTag: (tag) => set((state) => ({ observedTags: { ...state.observedTags, [tag.id]: tag } })),
   refreshTagActivity: (now = Date.now()) => set((state) => {
     let changed = false;
@@ -82,9 +89,16 @@ export const useIpsStore = create<IpsState>((set) => ({
   }),
   setAnchors: (anchors) => set({ anchors }),
   setTagDefinitions: (tags) => set({ tagDefinitions: Object.fromEntries(tags.map((tag) => [tag.id.toUpperCase(), tag])) }),
-  selectTag: (selectedTagId) => set({ selectedTagId }),
-  setCursorWorld: (cursorWorld) => set({ cursorWorld }),
-  toggleInspector: () => set((state) => ({ showInspector: !state.showInspector })),
+  selectTag: (selectedTagId) => set((state) => ({
+    selectedTagId,
+    recentTagIds: selectedTagId ? addRecentTagId(state.recentTagIds, selectedTagId) : state.recentTagIds,
+  })),
+  selectTagAndFocus: (selectedTagId) => set((state) => ({
+    selectedTagId,
+    recentTagIds: addRecentTagId(state.recentTagIds, selectedTagId),
+    mapFocusRequest: state.mapFocusRequest + 1,
+  })),
+  hydrateRecentTagIds: (recentTagIds) => set({ recentTagIds: [...new Set(recentTagIds)].slice(0, 5) }),
   toggleLayersPanel: () => set((state) => ({ showLayersPanel: !state.showLayersPanel })),
   toggleMeasurement: () => set((state) => ({
     measurement: state.measurement.enabled

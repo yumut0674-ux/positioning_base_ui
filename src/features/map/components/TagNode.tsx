@@ -15,13 +15,11 @@ interface TagNodeProps {
 
 function TagNodeComponent({ tag, transform, positionAnimation, selected, onSelect }: TagNodeProps) {
   const groupRef = useRef<Konva.Group>(null);
-  const coordinatesRef = useRef<Konva.Text>(null);
 
   useLayoutEffect(() => positionAnimation.attach(tag.id, {
     render: (x, y) => {
       const point = transform.worldToCanvas({ x, y });
       groupRef.current?.position(point);
-      coordinatesRef.current?.text(`${x.toFixed(2)}, ${y.toFixed(2)} m`);
       groupRef.current?.getLayer()?.batchDraw();
     },
   }), [positionAnimation, tag.id, transform]);
@@ -45,10 +43,9 @@ function TagNodeComponent({ tag, transform, positionAnimation, selected, onSelec
           lineCap="round"
         />
       )}
-      <Group x={12} y={-26}>
-        <Rect width={88} height={30} fill="#ffffff" opacity={0.96} cornerRadius={4} stroke="#c6d5e1" strokeWidth={1} shadowColor="#506780" shadowBlur={10} shadowOpacity={0.12} />
-        <Text x={8} y={6} width={74} text={tag.id} fill="#162133" fontSize={10} fontStyle="bold" fontFamily="Inter, sans-serif" />
-        <Text ref={coordinatesRef} x={8} y={18} width={74} text={`${tag.x.toFixed(2)}, ${tag.y.toFixed(2)} m`} fill="#66788e" fontSize={8} fontFamily="monospace" />
+      <Group x={12} y={-19}>
+        <Rect width={88} height={20} fill="#ffffff" opacity={0.96} cornerRadius={4} stroke="#c6d5e1" strokeWidth={1} shadowColor="#506780" shadowBlur={10} shadowOpacity={0.12} />
+        <Text x={8} y={5} width={74} text={tag.id} fill="#162133" fontSize={10} fontStyle="bold" fontFamily="Inter, sans-serif" />
       </Group>
     </Group>
   );

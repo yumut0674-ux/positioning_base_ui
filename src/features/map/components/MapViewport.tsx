@@ -32,8 +32,7 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
   const tags = useMemo(() => Object.values(tagsById), [tagsById]);
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const setViewport = useIpsStore((state) => state.setViewport);
-  const selectTag = useIpsStore((state) => state.selectTag);
-  const setCursorWorld = useIpsStore((state) => state.setCursorWorld);
+  const selectTagAndFocus = useIpsStore((state) => state.selectTagAndFocus);
   const measurement = useIpsStore((state) => state.measurement);
   const setMeasurementPoint = useIpsStore((state) => state.setMeasurementPoint);
   const cancelMeasurement = useIpsStore((state) => state.cancelMeasurement);
@@ -119,11 +118,6 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
     });
   }, [setViewport, size, viewport]);
 
-  const updatePointer = useCallback(() => {
-    const pointer = stageRef.current?.getPointerPosition();
-    if (pointer) setCursorWorld(transform.screenToWorld(pointer, viewport));
-  }, [setCursorWorld, transform, viewport]);
-
   const handleMeasureClick = useCallback(() => {
     if (!measurement.enabled) return;
     const pointer = stageRef.current?.getPointerPosition();
@@ -162,8 +156,6 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
         width={Math.max(1, size.width)}
         height={Math.max(1, size.height)}
         onWheel={handleWheel}
-        onMouseMove={updatePointer}
-        onMouseLeave={() => setCursorWorld(null)}
         onClick={handleMeasureClick}
         onTap={handleMeasureClick}
         draggable
@@ -207,7 +199,7 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
         <Layer listening={false} visible={layers.sensors}><Group {...mapGroupProps} /></Layer>
         <Layer visible={layers.tags}>
           <Group {...mapGroupProps}>
-            {tags.map((tag) => <TagNode key={tag.id} tag={tag} transform={transform} positionAnimation={positionAnimation} selected={tag.id === selectedTagId} onSelect={selectTag} />)}
+            {tags.map((tag) => <TagNode key={tag.id} tag={tag} transform={transform} positionAnimation={positionAnimation} selected={tag.id === selectedTagId} onSelect={selectTagAndFocus} />)}
           </Group>
         </Layer>
         <Layer listening={false} visible={layers.routes}>
@@ -229,17 +221,7 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
             <Text x={-27} y={-4} width={54} align="center" text={`${measurementDistance.toFixed(1)} m`} fill="#9a5b00" fontSize={10} fontStyle="bold" fontFamily="monospace" />
           </Group>}
         </Layer>
-        <Layer listening={false}>
-          <Group x={18} y={size.height - 38}>
-            <Rect width={182} height={24} fill="#ffffff" opacity={0.9} cornerRadius={4} stroke="#c4d4df" />
-            <Text x={10} y={7} text="DÜNYA CRS  ·  METRE" fill="#60758d" fontSize={9} fontFamily="monospace" />
-          </Group>
-        </Layer>
       </Stage>
-      <div className="canvas-actions" aria-label="Harita kontrolleri">
-        <button onClick={fitToScreen} title="Görünümü başlangıç yerleşimine sıfırla">SIFIRLA</button>
-        <button onClick={fitToScreen} title="Haritayı alana sığdır">SIĞDIR</button>
-      </div>
       <div className="zoom-readout">{Math.round(viewport.scale * 100)}%</div>
     </div>
   );

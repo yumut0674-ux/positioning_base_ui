@@ -1,0 +1,48 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { TagInformationPanelContent } from "../src/features/tracking/components/TagInformationPanel";
+import { resolveLocation } from "../src/features/map/services/LocationResolverService";
+import { MAP_FLOOR_PLAN } from "../src/features/map/config/mapConfig";
+
+function renderSelectedTag(x: number, y: number) {
+  const tag = {
+    id: "TAG-TEST",
+    name: "Test Sedyesi",
+    color: "#00a896",
+    status: "active" as const,
+    timestamp: Date.now(),
+    x,
+    y,
+  };
+  return renderToStaticMarkup(createElement(TagInformationPanelContent, {
+    selectedTag: tag,
+    locationAddress: resolveLocation(x, y, MAP_FLOOR_PLAN.id),
+    locationDuration: "Bu alanda 18 dk 42 sn",
+    tags: [tag],
+    recentTagIds: [tag.id],
+    onSelectTag: () => {},
+    onOpenHistory: () => {},
+  }));
+}
+
+test("selected tag panel presents a clinical location instead of X/Y coordinates", () => {
+  const html = renderSelectedTag(9, 17);
+
+  assert.match(html, /KONUM ADRESİ/);
+  assert.match(html, /Kat 01 · Ortopedi Poliklinikleri/);
+  assert.match(html, /Konum adresi: Kat 01 · Ortopedi Poliklinikleri/);
+  assert.match(html, /Taglar/);
+  assert.match(html, /Son görüntülenenler/i);
+  assert.match(html, /Bu alanda 18 dk 42 sn/);
+  assert.doesNotMatch(html, /X KONUMU|Y KONUMU|metre/);
+  assert.doesNotMatch(html, /Son hareketlilik|SON 30 SN|Son hareket sinyali/);
+});
+
+test("selected tag panel identifies a location outside configured areas", () => {
+  const html = renderSelectedTag(0, 0);
+
+  assert.match(html, /Tanımlı alan dışında/);
+  assert.doesNotMatch(html, /X KONUMU|Y KONUMU|metre/);
+});

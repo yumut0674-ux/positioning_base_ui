@@ -8,14 +8,12 @@ import { AppHeader } from "./components/AppHeader";
 import { AppSidebar, type WorkspaceView, useSidebarCollapse } from "./components/AppSidebar";
 import { StatusStrip } from "./components/StatusStrip";
 import { MapViewport } from "@/src/features/map/components/MapViewport";
-import { CoordinateInspector } from "@/src/features/map/components/CoordinateInspector";
 import { LayerVisibilityPanel } from "@/src/features/layers/components/LayerVisibilityPanel";
 import { TagInformationPanel } from "@/src/features/tracking/components/TagInformationPanel";
-import { TagSearchPanel } from "@/src/features/tracking/components/TagSearchPanel";
 import { useRealtimeTracking } from "@/src/features/tracking/hooks/useRealtimeTracking";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
-import { MAP_CALIBRATION, MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
-import { CircleDot, Crosshair, Layers3, Loader2, Maximize2, Ruler, Scan } from "lucide-react";
+import { MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
+import { Layers3, Loader2, Maximize2, Ruler, Scan } from "lucide-react";
 import { AnchorManagementPanel } from "@/app/anchors/page";
 import { TagManagementPanel } from "@/app/tags/page";
 import { SupportContactPanel } from "@/src/features/support/components/SupportContactPanel";
@@ -64,8 +62,6 @@ function LiveMapWorkspace({
 }: LiveMapWorkspaceProps) {
   const { collapsed: sidebarCollapsed, toggleCollapsed: toggleSidebar } = useSidebarCollapse();
   const positionAnimation = useRealtimeTracking();
-  const showInspector = useIpsStore((state) => state.showInspector);
-  const toggleInspector = useIpsStore((state) => state.toggleInspector);
   const showLayersPanel = useIpsStore((state) => state.showLayersPanel);
   const toggleLayersPanel = useIpsStore((state) => state.toggleLayersPanel);
   const measurementEnabled = useIpsStore((state) => state.measurement.enabled);
@@ -77,7 +73,6 @@ function LiveMapWorkspace({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [focusFeedback, setFocusFeedback] = useState(false);
   const fullscreenSupported = typeof document === "undefined" || document.fullscreenEnabled;
-  const activeTagCount = Object.values(tags).filter((tag) => tag.status === "active").length;
   const selectedTag = selectedTagId ? tags[selectedTagId] : undefined;
   const assistantContext = useMemo<GekonAiContext>(() => ({
     mode: "live",
@@ -124,27 +119,22 @@ function LiveMapWorkspace({
       <AppSidebar activeView={activeView} collapsed={sidebarCollapsed} onViewChange={onViewChange} />
       <main className="workspace">
         {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : activeView === "history" ? null : <>
-          <div className="workspace-heading">
+          <div className="workspace-heading live-map-heading">
             <div className="workspace-heading-content">
               <span>CANLI OPERASYONLAR / {MAP_FLOOR_PLAN.level.toUpperCase()}</span>
               <h1>{MAP_FLOOR_PLAN.name}</h1>
             </div>
-            <TagSearchPanel />
-            <div className="workspace-meta"><i /><span>CANLI KONUMLANDIRMA</span><strong>{activeTagCount} AKTİF</strong></div>
           </div>
           <div ref={mapFrameRef} className="map-frame">
             <MapViewport positionAnimation={positionAnimation} />
-            {showInspector && <CoordinateInspector />}
             {showLayersPanel && <LayerVisibilityPanel />}
             <div className="mini-toolbar" aria-label="Harita araçları">
-              <button className={showInspector ? "active" : ""} title="Denetçiyi aç/kapat" onClick={toggleInspector}><Crosshair size={16} /></button>
               <button className={showLayersPanel ? "active" : ""} title="Katmanları aç/kapat" onClick={toggleLayersPanel}><Layers3 size={16} /></button>
               <button className={measurementEnabled ? "active" : ""} title="Ölçüm" aria-label="Ölçüm modunu aç veya kapat" aria-pressed={measurementEnabled} onClick={toggleMeasurement}><Ruler size={16} /></button>
               <button className={focusFeedback ? "focus-feedback" : ""} title="Odakla" aria-label="Seçili etikete odaklan" onClick={handleFocus}><Scan size={16} /></button>
               <span />
               <button className={isFullscreen ? "active" : ""} title={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-label={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-pressed={isFullscreen} disabled={!fullscreenSupported} onClick={toggleFullscreen}><Maximize2 size={16} /></button>
             </div>
-            <div className="map-indicator"><CircleDot size={13} /> PLAN KALİBRE EDİLDİ <span>{MAP_CALIBRATION.pixelsPerMeter} PX/M</span></div>
           </div>
         </>}
         {historyOpened && (
