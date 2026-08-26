@@ -69,3 +69,21 @@ test("tag selection records the visit and creates one map focus request", () => 
     });
   }
 });
+
+test("quick tag selection updates details without requesting a map focus", () => {
+  const original = useIpsStore.getState();
+  useIpsStore.setState({ selectedTagId: null, recentTagIds: [], mapFocusRequest: 20 });
+  try {
+    useIpsStore.getState().selectTag("TAG-028");
+    const state = useIpsStore.getState();
+    assert.equal(state.selectedTagId, "TAG-028");
+    assert.deepEqual(state.recentTagIds, ["TAG-028"]);
+    assert.equal(state.mapFocusRequest, 20);
+  } finally {
+    useIpsStore.setState({
+      selectedTagId: original.selectedTagId,
+      recentTagIds: original.recentTagIds,
+      mapFocusRequest: original.mapFocusRequest,
+    });
+  }
+});

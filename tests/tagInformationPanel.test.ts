@@ -46,3 +46,30 @@ test("selected tag panel identifies a location outside configured areas", () => 
   assert.match(html, /Tanımlı alan dışında/);
   assert.doesNotMatch(html, /X KONUMU|Y KONUMU|metre/);
 });
+
+test("mobile tag panel includes the map reveal action without technical coordinates", () => {
+  const tag = {
+    id: "TAG-MOBILE",
+    name: "Mobil Test Tag",
+    color: "#00a896",
+    status: "active" as const,
+    timestamp: Date.now(),
+    x: 9,
+    y: 17,
+  };
+  const html = renderToStaticMarkup(createElement(TagInformationPanelContent, {
+    selectedTag: tag,
+    locationAddress: resolveLocation(tag.x, tag.y, MAP_FLOOR_PLAN.id),
+    locationDuration: "Bu alanda 2 dk 10 sn",
+    tags: [tag],
+    recentTagIds: [],
+    onSelectTag: () => {},
+    onOpenHistory: () => {},
+    variant: "mobile",
+    onShowMap: () => {},
+  }));
+
+  assert.match(html, /Haritada göster/);
+  assert.match(html, /Rota geçmişini aç/);
+  assert.doesNotMatch(html, /X KONUMU|Y KONUMU|metre/);
+});

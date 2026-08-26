@@ -2,7 +2,7 @@
 
 import { Box, MapPin, Route, Search } from "lucide-react";
 import { motion } from "framer-motion";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
 import { resolveLocation } from "@/src/features/map/services/LocationResolverService";
@@ -11,6 +11,8 @@ import type { TrackedTag } from "@/src/features/tracking/types/tracking.types";
 
 interface TagInformationPanelProps {
   readonly onOpenHistory: (tagCode: string) => void;
+  readonly variant?: "desktop" | "mobile";
+  readonly onShowMap?: () => void;
 }
 
 interface TagInformationPanelContentProps extends TagInformationPanelProps {
@@ -33,6 +35,9 @@ function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag }: {
   readonly selectedTagId?: string;
   readonly onSelectTag: (tagId: string) => void;
 }) {
+  const instanceId = useId();
+  const titleId = `${instanceId}-title`;
+  const recentTitleId = `${instanceId}-recent`;
   const [query, setQuery] = useState("");
   const normalizedQuery = query.trim().toLocaleLowerCase("tr-TR");
   const tagsById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags]);
@@ -40,10 +45,10 @@ function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag }: {
   const visibleTags = useMemo(() => tags.filter((tag) => !normalizedQuery || matchesQuery(tag, normalizedQuery)), [normalizedQuery, tags]);
 
   return (
-    <section className="tag-switcher" aria-labelledby="tag-switcher-title">
-      <div className="tag-switcher-heading"><div><small>HIZLI GEÇİŞ</small><h2 id="tag-switcher-title">Taglar</h2></div><span>{tags.length}</span></div>
+    <section className="tag-switcher" aria-labelledby={titleId}>
+      <div className="tag-switcher-heading"><div><small>HIZLI GEÇİŞ</small><h2 id={titleId}>Taglar</h2></div><span>{tags.length}</span></div>
       <label className="tag-switcher-search"><Search size={14} aria-hidden="true" /><span className="sr-only">Tag ara</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tag adı veya ID ara" /></label>
-      {!normalizedQuery && recentTags.length > 0 && <section className="recent-tags" aria-labelledby="recent-tags-title"><small id="recent-tags-title">SON GÖRÜNTÜLENENLER</small><div>{recentTags.map((tag) => <button key={tag.id} type="button" onClick={() => onSelectTag(tag.id)} aria-label={`${tag.name} (${tag.id}) etiketini seç`}>{tag.name}</button>)}</div></section>}
+      {!normalizedQuery && recentTags.length > 0 && <section className="recent-tags" aria-labelledby={recentTitleId}><small id={recentTitleId}>SON GÖRÜNTÜLENENLER</small><div>{recentTags.map((tag) => <button key={tag.id} type="button" onClick={() => onSelectTag(tag.id)} aria-label={`${tag.name} (${tag.id}) etiketini seç`}>{tag.name}</button>)}</div></section>}
       <div className="tag-switcher-list" role="listbox" aria-label="Tag listesi">
         {visibleTags.map((tag) => {
           const isSelected = tag.id === selectedTagId;
@@ -60,12 +65,12 @@ function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag }: {
   );
 }
 
-export function TagInformationPanelContent({ selectedTag, locationAddress, locationDuration, tags, recentTagIds, onSelectTag, onOpenHistory }: TagInformationPanelContentProps) {
+export function TagInformationPanelContent({ selectedTag, locationAddress, locationDuration, tags, recentTagIds, onSelectTag, onOpenHistory, variant = "desktop", onShowMap }: TagInformationPanelContentProps) {
   const panelLabel = selectedTag && locationAddress
     ? `Tag geçiş ve detay paneli. Seçili varlık: ${selectedTag.name}. Konum adresi: ${locationAddress}`
     : "Tag geçiş ve detay paneli";
   return (
-    <motion.aside className="tag-panel" aria-label={panelLabel} initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }}>
+    <motion.aside className={`tag-panel tag-panel--${variant}`} aria-label={panelLabel} initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }}>
       <TagQuickList tags={tags} recentTagIds={recentTagIds} selectedTagId={selectedTag?.id} onSelectTag={onSelectTag} />
       {selectedTag && locationAddress ? <section className="tag-details" aria-labelledby="selected-tag-title">
         <div className="tag-panel-header">
@@ -79,27 +84,31 @@ export function TagInformationPanelContent({ selectedTag, locationAddress, locat
           <strong>{locationAddress}</strong>
           <span className="tag-location-duration"><small>BU ALANDA</small><strong>{locationDuration}</strong></span>
         </div>
-        <button className="route-button" type="button" onClick={() => onOpenHistory(selectedTag.id)}><Route size={15} /> Rota geçmişini aç <span>↗</span></button>
+        <div className="tag-detail-actions">
+          {variant === "mobile" && onShowMap && <button className="show-map-button" type="button" onClick={onShowMap}><MapPin size={15} /> Haritada göster</button>}
+          <button className="route-button" type="button" onClick={() => onOpenHistory(selectedTag.id)}><Route size={15} /> Rota geçmişini aç <span>↗</span></button>
+        </div>
       </section> : <section className="tag-details tag-details-empty" aria-live="polite"><strong>Bir tag seçin</strong><span>Listeden bir tag seçerek konum ve rota detaylarını görüntüleyin.</span></section>}
     </motion.aside>
   );
 }
 
-function useRecentTagStorage(recentTagIds: readonly string[]) {
+function useRecentTagStorage(recentTagIds: readonly string[], enabled: boolean) {
   const hydrateRecentTagIds = useIpsStore((state) => state.hydrateRecentTagIds);
   const hydratedRef = useRef(false);
   useEffect(() => {
+    if (!enabled) return;
     const storedTagIds = readRecentTagIds(window.localStorage);
     const timer = window.setTimeout(() => {
       hydratedRef.current = true;
       hydrateRecentTagIds(storedTagIds);
     }, 0);
     return () => window.clearTimeout(timer);
-  }, [hydrateRecentTagIds]);
+  }, [enabled, hydrateRecentTagIds]);
   useEffect(() => {
-    if (!hydratedRef.current) return;
+    if (!enabled || !hydratedRef.current) return;
     persistRecentTagIds(window.localStorage, recentTagIds);
-  }, [recentTagIds]);
+  }, [enabled, recentTagIds]);
 }
 
 function useLocationDuration(entry: TagLocationEntry | undefined, locationAddress: string | undefined): string {
@@ -114,21 +123,21 @@ function useLocationDuration(entry: TagLocationEntry | undefined, locationAddres
     : "Konum süresi hesaplanıyor";
 }
 
-export function TagInformationPanel({ onOpenHistory }: TagInformationPanelProps) {
+export function TagInformationPanel({ onOpenHistory, variant = "desktop", onShowMap }: TagInformationPanelProps) {
   const tagsById = useIpsStore((state) => state.tags);
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const recentTagIds = useIpsStore((state) => state.recentTagIds);
   const locationEntry = useIpsStore((state) => selectedTagId ? state.tagLocationEntries[selectedTagId] : undefined);
-  const selectTagAndFocus = useIpsStore((state) => state.selectTagAndFocus);
-  useRecentTagStorage(recentTagIds);
+  const selectTag = useIpsStore((state) => state.selectTag);
+  useRecentTagStorage(recentTagIds, variant === "desktop");
 
   const selectedTag = selectedTagId ? tagsById[selectedTagId] : undefined;
   const locationAddress = selectedTag ? resolveLocation(selectedTag.x, selectedTag.y, MAP_FLOOR_PLAN.id) : undefined;
   const locationDuration = useLocationDuration(locationEntry, locationAddress);
   const tags = useMemo(() => Object.values(tagsById).sort((left, right) => left.name.localeCompare(right.name, "tr")), [tagsById]);
   const handleSelectTag = useCallback((tagId: string) => {
-    selectTagAndFocus(tagId);
-  }, [selectTagAndFocus]);
+    selectTag(tagId);
+  }, [selectTag]);
 
-  return <TagInformationPanelContent selectedTag={selectedTag} locationAddress={locationAddress} locationDuration={locationDuration} tags={tags} recentTagIds={recentTagIds} onSelectTag={handleSelectTag} onOpenHistory={onOpenHistory} />;
+  return <TagInformationPanelContent selectedTag={selectedTag} locationAddress={locationAddress} locationDuration={locationDuration} tags={tags} recentTagIds={recentTagIds} onSelectTag={handleSelectTag} onOpenHistory={onOpenHistory} variant={variant} onShowMap={onShowMap} />;
 }

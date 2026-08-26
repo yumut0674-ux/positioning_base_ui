@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { BarChart3, BellRing, Boxes, Building2, Crosshair, Headset, Hexagon, Map, RadioTower, Route, Settings } from "lucide-react";
+import { BarChart3, BellRing, Boxes, Building2, Crosshair, Headset, Hexagon, Map, RadioTower, Route, Settings, X } from "lucide-react";
 
 const SIDEBAR_COLLAPSED_STORAGE_KEY = "ips-sidebar-collapsed";
 
@@ -21,6 +21,8 @@ export type WorkspaceView = "map" | "tags" | "anchors" | "regions" | "history" |
 interface AppSidebarProps {
   readonly activeView: WorkspaceView;
   readonly collapsed: boolean;
+  readonly mobileOpen: boolean;
+  readonly onMobileClose: () => void;
   readonly onViewChange: (view: WorkspaceView) => void;
 }
 
@@ -47,9 +49,13 @@ export function useSidebarCollapse() {
   return { collapsed, toggleCollapsed };
 }
 
-export function AppSidebar({ activeView, collapsed, onViewChange }: AppSidebarProps) {
+export function AppSidebar({ activeView, collapsed, mobileOpen, onMobileClose, onViewChange }: AppSidebarProps) {
   return (
-    <aside className={`app-sidebar${collapsed ? " is-collapsed" : ""}`}>
+    <aside className={`app-sidebar${collapsed ? " is-collapsed" : ""}${mobileOpen ? " is-mobile-open" : ""}`}>
+      <div className="mobile-sidebar-heading">
+        <span>MENÜ</span>
+        <button type="button" className="mobile-sidebar-close" onClick={onMobileClose} aria-label="Menüyü kapat" title="Menüyü kapat"><X size={18} /></button>
+      </div>
       <nav aria-label="Primary navigation">
         <small>İZLE</small>
         {NAVIGATION.slice(0, 1).map(({ label, icon: Icon }) => <button key={label} className={activeView === "map" ? "active" : ""} onClick={() => onViewChange("map")}><Icon size={17} /><span>{label}</span></button>)}

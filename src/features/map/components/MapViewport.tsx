@@ -28,7 +28,6 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
   const viewport = useIpsStore((state) => state.viewport);
   const layers = useIpsStore((state) => state.layers);
   const tagsById = useIpsStore((state) => state.tags);
-  const anchors = useIpsStore((state) => state.anchors);
   const tags = useMemo(() => Object.values(tagsById), [tagsById]);
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const setViewport = useIpsStore((state) => state.setViewport);
@@ -186,14 +185,6 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
           <Group {...mapGroupProps}>
             <Line points={[0, MAP_FLOOR_PLAN.canvasSize.height, transform.metersToPixels(5), MAP_FLOOR_PLAN.canvasSize.height]} stroke="#00a896" strokeWidth={2} />
             <Text x={8} y={MAP_FLOOR_PLAN.canvasSize.height - 30} text="5 m" fill="#087f73" fontSize={12} fontFamily="monospace" />
-          </Group>
-        </Layer>
-        <Layer listening={false} visible={layers.anchors}>
-          <Group {...mapGroupProps}>
-            {anchors.map((anchor) => {
-              const point = transform.worldToCanvas(anchor);
-              return <Group key={anchor.id} x={point.x} y={point.y}><Circle radius={9} fill="#ffffff" stroke="#3578e5" strokeWidth={2} /><Circle radius={2.5} fill="#3578e5" /><Text x={12} y={-6} text={anchor.id} fill="#395d8a" fontSize={9} fontFamily="monospace" /></Group>;
-            })}
           </Group>
         </Layer>
         <Layer listening={false} visible={layers.sensors}><Group {...mapGroupProps} /></Layer>

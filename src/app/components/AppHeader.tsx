@@ -4,11 +4,12 @@ import { LogoMark } from "@/src/shared/components/LogoMark";
 
 interface AppHeaderProps {
   readonly sidebarCollapsed: boolean;
+  readonly mobileMenuOpen: boolean;
   readonly onSidebarToggle: () => void;
 }
 
-export function AppHeader({ sidebarCollapsed, onSidebarToggle }: AppHeaderProps) {
-  const toggleLabel = sidebarCollapsed ? "Menüyü genişlet" : "Menüyü daralt";
+export function AppHeader({ sidebarCollapsed, mobileMenuOpen, onSidebarToggle }: AppHeaderProps) {
+  const toggleLabel = mobileMenuOpen ? "Menüyü kapat" : sidebarCollapsed ? "Menüyü genişlet" : "Menüyü daralt";
 
   return (
     <header className="app-header">
@@ -19,7 +20,7 @@ export function AppHeader({ sidebarCollapsed, onSidebarToggle }: AppHeaderProps)
           type="button"
           className="sidebar-toggle"
           aria-label={toggleLabel}
-          aria-expanded={!sidebarCollapsed}
+          aria-expanded={mobileMenuOpen || !sidebarCollapsed}
           title={toggleLabel}
           onClick={onSidebarToggle}
         >

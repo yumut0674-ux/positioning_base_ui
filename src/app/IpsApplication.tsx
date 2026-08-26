@@ -72,6 +72,7 @@ function LiveMapWorkspace({
   const mapFrameRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [focusFeedback, setFocusFeedback] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const fullscreenSupported = typeof document === "undefined" || document.fullscreenEnabled;
   const selectedTag = selectedTagId ? tags[selectedTagId] : undefined;
   const assistantContext = useMemo<GekonAiContext>(() => ({
@@ -96,10 +97,47 @@ function LiveMapWorkspace({
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMobileMenuOpen(false);
+    };
+    const mediaQuery = window.matchMedia("(max-width: 680px)");
+    const closeOutsideMobile = () => {
+      if (!mediaQuery.matches) setMobileMenuOpen(false);
+    };
+    document.body.classList.add("mobile-menu-open");
+    window.addEventListener("keydown", handleKeyDown);
+    mediaQuery.addEventListener("change", closeOutsideMobile);
+    return () => {
+      document.body.classList.remove("mobile-menu-open");
+      window.removeEventListener("keydown", handleKeyDown);
+      mediaQuery.removeEventListener("change", closeOutsideMobile);
+    };
+  }, [mobileMenuOpen]);
+
+  const handleSidebarToggle = useCallback(() => {
+    if (window.matchMedia("(max-width: 680px)").matches) {
+      setMobileMenuOpen((open) => !open);
+      return;
+    }
+    toggleSidebar();
+  }, [toggleSidebar]);
+
+  const handleSidebarViewChange = useCallback((view: WorkspaceView) => {
+    setMobileMenuOpen(false);
+    onViewChange(view);
+  }, [onViewChange]);
+
   const handleFocus = useCallback(() => {
     requestMapFocus();
     setFocusFeedback(true);
     window.setTimeout(() => setFocusFeedback(false), 450);
+  }, [requestMapFocus]);
+
+  const handleShowMap = useCallback(() => {
+    requestMapFocus();
+    mapFrameRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   }, [requestMapFocus]);
 
   const toggleFullscreen = useCallback(async () => {
@@ -115,8 +153,9 @@ function LiveMapWorkspace({
 
   return (
     <div className={`ips-shell ${activeView !== "map" ? "anchors-mode" : ""}`}>
-      <AppHeader sidebarCollapsed={sidebarCollapsed} onSidebarToggle={toggleSidebar} />
-      <AppSidebar activeView={activeView} collapsed={sidebarCollapsed} onViewChange={onViewChange} />
+      <AppHeader sidebarCollapsed={sidebarCollapsed} mobileMenuOpen={mobileMenuOpen} onSidebarToggle={handleSidebarToggle} />
+      {mobileMenuOpen && <button type="button" className="mobile-sidebar-backdrop" aria-label="Menüyü kapat" onClick={() => setMobileMenuOpen(false)} />}
+      <AppSidebar activeView={activeView} collapsed={sidebarCollapsed} mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} onViewChange={handleSidebarViewChange} />
       <main className="workspace">
         {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : activeView === "history" ? null : <>
           <div className="workspace-heading live-map-heading">
@@ -125,17 +164,22 @@ function LiveMapWorkspace({
               <h1>{MAP_FLOOR_PLAN.name}</h1>
             </div>
           </div>
-          <div ref={mapFrameRef} className="map-frame">
-            <MapViewport positionAnimation={positionAnimation} />
-            {showLayersPanel && <LayerVisibilityPanel />}
-            <div className="mini-toolbar" aria-label="Harita araçları">
-              <button className={showLayersPanel ? "active" : ""} title="Katmanları aç/kapat" onClick={toggleLayersPanel}><Layers3 size={16} /></button>
-              <button className={measurementEnabled ? "active" : ""} title="Ölçüm" aria-label="Ölçüm modunu aç veya kapat" aria-pressed={measurementEnabled} onClick={toggleMeasurement}><Ruler size={16} /></button>
-              <button className={focusFeedback ? "focus-feedback" : ""} title="Odakla" aria-label="Seçili etikete odaklan" onClick={handleFocus}><Scan size={16} /></button>
-              <span />
-              <button className={isFullscreen ? "active" : ""} title={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-label={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-pressed={isFullscreen} disabled={!fullscreenSupported} onClick={toggleFullscreen}><Maximize2 size={16} /></button>
+          <TagInformationPanel variant="mobile" onOpenHistory={onOpenTagHistory} onShowMap={handleShowMap} />
+          <section className="mobile-map-section" aria-labelledby="mobile-map-title">
+            <div className="mobile-map-section-heading"><div><small>CANLI GÖRÜNÜM</small><h2 id="mobile-map-title">Harita</h2></div><span>Haritayı görüntüle</span></div>
+            <div ref={mapFrameRef} className="map-frame">
+              <MapViewport positionAnimation={positionAnimation} />
+              {showLayersPanel && <LayerVisibilityPanel />}
+              <div className="mini-toolbar" aria-label="Harita araçları">
+                <button className={showLayersPanel ? "active" : ""} title="Katmanları aç/kapat" onClick={toggleLayersPanel}><Layers3 size={16} /></button>
+                <button className={measurementEnabled ? "active" : ""} title="Ölçüm" aria-label="Ölçüm modunu aç veya kapat" aria-pressed={measurementEnabled} onClick={toggleMeasurement}><Ruler size={16} /></button>
+                <button className={focusFeedback ? "focus-feedback" : ""} title="Odakla" aria-label="Seçili etikete odaklan" onClick={handleFocus}><Scan size={16} /></button>
+                <span />
+                <button className={isFullscreen ? "active" : ""} title={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-label={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-pressed={isFullscreen} disabled={!fullscreenSupported} onClick={toggleFullscreen}><Maximize2 size={16} /></button>
+              </div>
             </div>
-          </div>
+            <div className="mobile-map-status" role="status"><i /> Kritik durum: canlı tag takibi etkin</div>
+          </section>
         </>}
         {historyOpened && (
           <div className="history-panel-slot" hidden={activeView !== "history"}>
@@ -143,7 +187,7 @@ function LiveMapWorkspace({
           </div>
         )}
       </main>
-      {activeView === "map" && <TagInformationPanel onOpenHistory={onOpenTagHistory} />}
+      {activeView === "map" && <TagInformationPanel variant="desktop" onOpenHistory={onOpenTagHistory} />}
       {activeView === "map" && <GekonAiWidget context={assistantContext} />}
       <StatusStrip />
     </div>

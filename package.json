@@ -9,6 +9,7 @@
     "dev": "vinext dev --hostname 0.0.0.0",
     "build": "vinext build",
     "start": "vinext start",
+    "postinstall": "node scripts/patch-vinext-windows-static-assets.mjs",
     "start:share": "node scripts/start-share.mjs",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "test:mcp": "node --import tsx --test tests/mcp/all.test.ts",
