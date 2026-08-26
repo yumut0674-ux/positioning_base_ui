@@ -7,7 +7,7 @@ import useImage from "use-image";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { useElementSize } from "@/src/shared/hooks/useElementSize";
 import {
-  DEFAULT_MAP_VIEWPORT,
+  getFittedMapViewport,
   MAP_CALIBRATION,
   MAP_FLOOR_PLAN,
   MAP_VIEWPORT_LIMITS,
@@ -21,6 +21,8 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
   const stageRef = useRef<Konva.Stage>(null);
   const panOriginRef = useRef({ x: 0, y: 0 });
   const handledFocusRequestRef = useRef(0);
+  const hasUserAdjustedViewRef = useRef(false);
+  const lastAutoFitSizeRef = useRef<{ width: number; height: number } | null>(null);
   const size = useElementSize(hostRef);
   const [floorImage] = useImage(MAP_FLOOR_PLAN.imageUrl, "anonymous");
   const viewport = useIpsStore((state) => state.viewport);
@@ -39,20 +41,28 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
   const transform = useMemo(() => new CoordinateTransformService(MAP_CALIBRATION), []);
 
   const fitToScreen = useCallback(() => {
-    const padding = MAP_VIEWPORT_LIMITS.fitPadding;
-    const scale = Math.min(
-      (size.width - padding * 2) / MAP_FLOOR_PLAN.canvasSize.width,
-      (size.height - padding * 2) / MAP_FLOOR_PLAN.canvasSize.height,
-    );
-    setViewport({
-      scale,
-      x: (size.width - MAP_FLOOR_PLAN.canvasSize.width * scale) / 2,
-      y: (size.height - MAP_FLOOR_PLAN.canvasSize.height * scale) / 2,
-    });
-  }, [setViewport, size.height, size.width]);
+    const fittedViewport = getFittedMapViewport(size);
+    if (!fittedViewport) return false;
+    setViewport(fittedViewport);
+    return true;
+  }, [setViewport, size]);
+
+  useEffect(() => {
+    if (hasUserAdjustedViewRef.current) return;
+    if (lastAutoFitSizeRef.current?.width === size.width && lastAutoFitSizeRef.current?.height === size.height) return;
+
+    // Sidebar and window transitions can emit several intermediate dimensions.
+    // Fit once the panel has settled, but never overwrite a pan or zoom.
+    const timer = window.setTimeout(() => {
+      if (hasUserAdjustedViewRef.current || !fitToScreen()) return;
+      lastAutoFitSizeRef.current = { width: size.width, height: size.height };
+    }, 180);
+    return () => window.clearTimeout(timer);
+  }, [fitToScreen, size.height, size.width]);
 
   useEffect(() => {
     if (mapFocusRequest === 0 || mapFocusRequest === handledFocusRequestRef.current) return;
+    if (size.width <= 0 || size.height <= 0) return;
     handledFocusRequestRef.current = mapFocusRequest;
     const selectedTag = selectedTagId ? tagsById[selectedTagId] : undefined;
     if (!selectedTag) {
@@ -62,6 +72,7 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
 
     const scale = Math.min(MAP_VIEWPORT_LIMITS.maxZoom, Math.max(viewport.scale, 1.4));
     const point = transform.worldToCanvas(selectedTag);
+    hasUserAdjustedViewRef.current = true;
     setViewport({
       scale,
       x: size.width / 2 - point.x * scale,
@@ -84,10 +95,16 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
     const pointer = stage?.getPointerPosition();
     if (!pointer) return;
     const direction = event.evt.deltaY > 0 ? -1 : 1;
+    hasUserAdjustedViewRef.current = true;
+    // On a narrow screen the fitted plan can legitimately be below the normal
+    // zoom floor. Keep that scale reachable so the first wheel gesture never
+    // makes an otherwise contained plan jump outside the panel.
+    const fittedScale = getFittedMapViewport(size)?.scale ?? MAP_VIEWPORT_LIMITS.minZoom;
+    const minimumScale = Math.min(MAP_VIEWPORT_LIMITS.minZoom, fittedScale);
     const nextScale = Math.min(
       MAP_VIEWPORT_LIMITS.maxZoom,
       Math.max(
-        MAP_VIEWPORT_LIMITS.minZoom,
+        minimumScale,
         viewport.scale * Math.pow(MAP_VIEWPORT_LIMITS.wheelZoomFactor, direction),
       ),
     );
@@ -100,7 +117,7 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
       x: pointer.x - mapPoint.x * nextScale,
       y: pointer.y - mapPoint.y * nextScale,
     });
-  }, [setViewport, viewport]);
+  }, [setViewport, size, viewport]);
 
   const updatePointer = useCallback(() => {
     const pointer = stageRef.current?.getPointerPosition();
@@ -139,8 +156,11 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
     <div ref={hostRef} className="map-viewport" data-testid="map-viewport">
       <Stage
         ref={stageRef}
-        width={size.width}
-        height={size.height}
+        // Konva creates an internal canvas for every layer. It cannot draw to
+        // a zero-sized canvas while ResizeObserver is waiting for the first
+        // measurement, so retain a harmless 1px backing canvas until then.
+        width={Math.max(1, size.width)}
+        height={Math.max(1, size.height)}
         onWheel={handleWheel}
         onMouseMove={updatePointer}
         onMouseLeave={() => setCursorWorld(null)}
@@ -149,7 +169,10 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
         draggable
         x={0}
         y={0}
-        onDragStart={() => { panOriginRef.current = { x: viewport.x, y: viewport.y }; }}
+        onDragStart={() => {
+          hasUserAdjustedViewRef.current = true;
+          panOriginRef.current = { x: viewport.x, y: viewport.y };
+        }}
         onDragEnd={(event) => {
           setViewport({
             ...viewport,
@@ -214,7 +237,7 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
         </Layer>
       </Stage>
       <div className="canvas-actions" aria-label="Harita kontrolleri">
-        <button onClick={() => setViewport(DEFAULT_MAP_VIEWPORT)} title="Görünümü sıfırla">SIFIRLA</button>
+        <button onClick={fitToScreen} title="Görünümü başlangıç yerleşimine sıfırla">SIFIRLA</button>
         <button onClick={fitToScreen} title="Haritayı alana sığdır">SIĞDIR</button>
       </div>
       <div className="zoom-readout">{Math.round(viewport.scale * 100)}%</div>

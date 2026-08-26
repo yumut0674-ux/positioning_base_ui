@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import type { Point2D } from "@/src/shared/types/geometry";
 import type { AnchorDefinition, MapLayerId, ViewportState } from "@/src/features/map/types/map.types";
-import { DEFAULT_MAP_VIEWPORT } from "@/src/features/map/config/mapConfig";
 import { TAG_LIVE_TIMEOUT_MS, type TagStatus, type TrackedTag } from "@/src/features/tracking/types/tracking.types";
 import type { TagDefinition } from "@/src/features/tracking/services/tagApi";
 
@@ -43,7 +42,8 @@ interface IpsState {
 }
 
 export const useIpsStore = create<IpsState>((set) => ({
-  viewport: DEFAULT_MAP_VIEWPORT,
+  // MapViewport replaces this neutral value once its host has real dimensions.
+  viewport: { x: 0, y: 0, scale: 1 },
   layers: {
     grid: true,
     floorPlan: true,

@@ -2,7 +2,8 @@ import { useEffect, useState, type RefObject } from "react";
 import type { Size2D } from "../types/geometry";
 
 export function useElementSize(ref: RefObject<HTMLElement | null>): Size2D {
-  const [size, setSize] = useState<Size2D>({ width: 1, height: 1 });
+  // Consumers can distinguish an unmeasured element from a genuinely tiny one.
+  const [size, setSize] = useState<Size2D>({ width: 0, height: 0 });
 
   useEffect(() => {
     const element = ref.current;

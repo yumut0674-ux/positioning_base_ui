@@ -25,12 +25,15 @@ interface AppSidebarProps {
 }
 
 export function useSidebarCollapse() {
-  const [collapsed, setCollapsed] = useState(false);
+  // A compact sidebar leaves the map with its maximum usable area on a first visit.
+  const [collapsed, setCollapsed] = useState(true);
 
   useEffect(() => {
-    if (window.localStorage.getItem(SIDEBAR_COLLAPSED_STORAGE_KEY) !== "true") return;
-    const restoreCollapsedState = window.setTimeout(() => setCollapsed(true), 0);
-    return () => window.clearTimeout(restoreCollapsedState);
+    // Older sessions already persist both "true" and "false" values.  Only an
+    // explicit preference to expand the menu should override the compact default.
+    if (window.localStorage.getItem(SIDEBAR_COLLAPSED_STORAGE_KEY) !== "false") return;
+    const restoreExpandedState = window.setTimeout(() => setCollapsed(false), 0);
+    return () => window.clearTimeout(restoreExpandedState);
   }, []);
 
   const toggleCollapsed = useCallback(() => {
