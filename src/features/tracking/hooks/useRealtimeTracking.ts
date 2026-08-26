@@ -31,11 +31,10 @@ export function useRealtimeTracking(): PositionAnimationController {
   const setTagDefinitions = useIpsStore((state) => state.setTagDefinitions);
   const [engineStatus, setEngineStatus] = useState<RegionEngineStatusResponse | null>(null);
   const engineEnabled = engineStatus?.enabled ?? false;
-  const processedPort = engineStatus?.processedPort ?? null;
   const rawGateway = useMemo(() => new SseTrackingGateway("/api/tracking/ingest"), []);
   const processedGateway = useMemo(
-    () => engineEnabled && processedPort !== null ? new SseTrackingGateway(processedStreamUrl(processedPort)) : null,
-    [engineEnabled, processedPort],
+    () => engineEnabled ? new SseTrackingGateway(processedStreamUrl()) : null,
+    [engineEnabled],
   );
   const filter = useMemo(() => new ExponentialMovingAverageFilter(), []);
   const displayNames = useRef(new Map<string, string>());

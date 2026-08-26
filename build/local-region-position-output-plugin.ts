@@ -27,6 +27,7 @@ export function localRegionPositionOutput(): Plugin {
       output = new ProcessedPositionServer(
         runtime.processedPort,
         runtime.allowedOrigin,
+        runtime.processedHost,
         false,
         () => requestEngineTick(runtime.rawPort),
         runtime.broadcastIntervalMs,

@@ -40,6 +40,6 @@ export async function reloadRegionEngineConfig(config: RegionsConfig): Promise<v
   }
 }
 
-export function processedStreamUrl(port: number): string {
-  return `${window.location.protocol}//${window.location.hostname}:${port}/api/tracking/ingest`;
+export function processedStreamUrl(): string {
+  return "/api/tracking/processed";
 }

@@ -48,6 +48,7 @@ export class ProcessedPositionServer {
   public constructor(
     public readonly port: number,
     private readonly allowedOrigin: string,
+    public readonly host = "127.0.0.1",
     private readonly preferExternal = false,
     private readonly schedulerTick?: () => void,
     private readonly schedulerIntervalMs = 1_000,
@@ -131,7 +132,7 @@ export class ProcessedPositionServer {
       };
       server.once("error", onError);
       server.once("listening", onListening);
-      server.listen(this.port, "0.0.0.0");
+      server.listen(this.port, this.host);
     });
     this.server = server;
   }
@@ -173,6 +174,11 @@ export class ProcessedPositionServer {
   public get boundPort(): number {
     const address = this.server?.address();
     return address && typeof address === "object" ? (address as AddressInfo).port : this.port;
+  }
+
+  public get boundHost(): string {
+    const address = this.server?.address();
+    return address && typeof address === "object" ? (address as AddressInfo).address : this.host;
   }
 
   private writeToClients(message: string): void {

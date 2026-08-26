@@ -7,12 +7,12 @@ import type {
 
 export const MAP_FLOOR_PLAN: FloorPlanDefinition = {
   id: "hq-l1",
-  name: "Operasyon Salonu",
-  building: "Kuzey Kampüsü",
+  name: "Ortopedi",
+  building: "Neü Tıp Fakültesi",
   level: "Kat 01",
   imageUrl: "/mimari.png",
-  canvasSize: { width: 1280, height: 720 },
-  worldSize: { width: 42.67, height: 24 },
+  canvasSize: { width: 1348, height: 1212 },
+  worldSize: { width: 44.93333333333333, height: 40.4 },
 };
 
 export const MAP_CALIBRATION: MapCalibration = {

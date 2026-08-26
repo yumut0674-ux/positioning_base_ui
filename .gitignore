@@ -41,6 +41,12 @@ yarn-error.log*
 next-env.d.ts
 /dist/
 
+# Cloudflare Tunnel local credentials and machine-specific config
+/.cloudflared/
+/deploy/cloudflared/*.json
+/deploy/cloudflared/config.yml
+/deploy/cloudflared/*.log
+
 # Python terminal MCP demo
 /mcp/.venv/
 /mcp/__pycache__/

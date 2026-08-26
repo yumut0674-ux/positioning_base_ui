@@ -1,8 +1,11 @@
+import { createInterface } from "node:readline/promises";
+import { stdin as input, stdout as output } from "node:process";
 import { pathToFileURL } from "node:url";
 
 const DEFAULT_MIN_INTERVAL_MS = 1_000;
 const DEFAULT_MAX_INTERVAL_MS = 1_000;
-const defaultEndpoint = process.env.TRACKING_INGEST_URL ?? "http://localhost:3000/api/tracking/ingest";
+const LOCAL_INGEST_ENDPOINT = "http://127.0.0.1:3000/api/tracking/ingest";
+const PUBLIC_INGEST_ENDPOINT = "https://neu-demo.gekon.com.tr/api/tracking/ingest";
 
 const tags = [
   { tagId: "TAG-001", x: 8.8, y: 7.8, phase: 0 },
@@ -30,8 +33,19 @@ export function readSimulatorIntervals(environment = process.env) {
   return { minMs, maxMs };
 }
 
+export function resolveSimulationEndpoint(selection, environment = process.env) {
+  const normalizedSelection = selection.trim().toLowerCase();
+  if (normalizedSelection === "1" || normalizedSelection === "local") {
+    return environment.LOCAL_TRACKING_INGEST_URL?.trim() || LOCAL_INGEST_ENDPOINT;
+  }
+  if (normalizedSelection === "2" || normalizedSelection === "public") {
+    return environment.PUBLIC_TRACKING_INGEST_URL?.trim() || PUBLIC_INGEST_ENDPOINT;
+  }
+  throw new Error("Geçerli bir seçenek girin: 1 (Local) veya 2 (Public)");
+}
+
 export function createTagSimulator({
-  endpoint = defaultEndpoint,
+  endpoint = LOCAL_INGEST_ENDPOINT,
   minDelayMs = DEFAULT_MIN_INTERVAL_MS,
   maxDelayMs = DEFAULT_MAX_INTERVAL_MS,
   fetchImplementation = fetch,
@@ -108,10 +122,24 @@ export function createTagSimulator({
   return { start, stop, sendNextTagUpdates, scheduleNextUpdate };
 }
 
-function run() {
+async function selectEndpoint() {
+  const prompt = createInterface({ input, output });
+  try {
+    console.log("\nKonum verileri nereye gönderilsin?");
+    console.log(`  1) Local  — ${LOCAL_INGEST_ENDPOINT}`);
+    console.log(`  2) Public — ${PUBLIC_INGEST_ENDPOINT}`);
+    const selection = await prompt.question("Seçiminiz (1/2): ");
+    return resolveSimulationEndpoint(selection);
+  } finally {
+    prompt.close();
+  }
+}
+
+async function run() {
   const { minMs, maxMs } = readSimulatorIntervals();
+  const endpoint = await selectEndpoint();
   const simulator = createTagSimulator({
-    endpoint: defaultEndpoint,
+    endpoint,
     minDelayMs: minMs,
     maxDelayMs: maxMs,
   });
@@ -127,4 +155,9 @@ function run() {
 }
 
 const isMain = process.argv[1] && pathToFileURL(process.argv[1]).href === import.meta.url;
-if (isMain) run();
+if (isMain) {
+  void run().catch((error) => {
+    console.error(error instanceof Error ? error.message : String(error));
+    process.exitCode = 1;
+  });
+}

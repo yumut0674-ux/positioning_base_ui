@@ -20,7 +20,6 @@ async function databaseHealth() {
       ok: false,
       status: "unavailable",
       latencyMs: Date.now() - startedAt,
-      error: error instanceof Error ? error.message : String(error),
     } as const;
   }
 }
@@ -49,23 +48,48 @@ async function assistantHealth() {
       ok: false,
       status: error instanceof DOMException && error.name === "AbortError" ? "timeout" : "unavailable",
       latencyMs: Date.now() - startedAt,
-      error: error instanceof Error ? error.message : String(error),
     } as const;
   } finally {
     clearTimeout(timeout);
   }
 }
 
-export async function GET() {
-  const [database, assistantService] = await Promise.all([databaseHealth(), assistantHealth()]);
-  const trackingIngest = trackingBuffer.status();
-  const engine = regionEngineController.status();
+type HealthComponent = Readonly<{ ok: boolean; status: string; [key: string]: unknown }>;
+
+export interface HealthDependencies {
+  readonly checkDatabase: () => Promise<HealthComponent>;
+  readonly checkAssistant: () => Promise<HealthComponent>;
+  readonly trackingStatus: () => HealthComponent;
+  readonly engineStatus: () => ReturnType<typeof regionEngineController.status>;
+  readonly now: () => Date;
+}
+
+function publicComponent(component: HealthComponent): HealthComponent {
+  const privateKeys = new Set(["error", "message", "stack", "host", "url"]);
+  return Object.fromEntries(
+    Object.entries(component).filter(([key]) => !privateKeys.has(key)),
+  ) as HealthComponent;
+}
+
+export async function createHealthResponse(
+  dependencies: Partial<HealthDependencies> = {},
+): Promise<NextResponse> {
+  const [databaseResult, assistantResult] = await Promise.all([
+    (dependencies.checkDatabase ?? databaseHealth)(),
+    (dependencies.checkAssistant ?? assistantHealth)(),
+  ]);
+  const database = publicComponent(databaseResult);
+  const assistantService = publicComponent(assistantResult);
+  const trackingIngest = publicComponent(
+    (dependencies.trackingStatus ?? (() => trackingBuffer.status()))() as HealthComponent,
+  );
+  const engine = (dependencies.engineStatus ?? (() => regionEngineController.status()))();
   const regionEngine = {
     ok: true,
     status: engine.enabled ? "enabled" : "disabled",
     ...engine,
   } as const;
-  const ok = database.ok && trackingIngest.ok && regionEngine.ok && assistantService.ok;
+  const ok = database.ok && trackingIngest.ok && regionEngine.ok;
 
   return NextResponse.json({
     ok,
@@ -73,9 +97,13 @@ export async function GET() {
     trackingIngest,
     regionEngine,
     assistantService,
-    timestamp: new Date().toISOString(),
+    timestamp: (dependencies.now ?? (() => new Date()))().toISOString(),
   }, {
     status: ok ? 200 : 503,
     headers: { "Cache-Control": "no-store" },
   });
+}
+
+export async function GET(): Promise<NextResponse> {
+  return createHealthResponse();
 }

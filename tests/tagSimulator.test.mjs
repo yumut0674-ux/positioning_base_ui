@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   createTagSimulator,
   getRandomDelay,
+  resolveSimulationEndpoint,
   readSimulatorIntervals,
 } from "../test_api/simulate_tags.js";
 
@@ -31,6 +32,15 @@ test("interval environment validation falls back for non-numeric values and reje
 test("default simulator cadence is fixed at one update per second", () => {
   assert.deepEqual(readSimulatorIntervals({}), { minMs: 1_000, maxMs: 1_000 });
   assert.equal(getRandomDelay(1_000, 1_000), 1_000);
+});
+
+test("simulation endpoint selection distinguishes local and public destinations", () => {
+  assert.equal(resolveSimulationEndpoint("1"), "http://127.0.0.1:3000/api/tracking/ingest");
+  assert.equal(resolveSimulationEndpoint("public"), "https://neu-demo.gekon.com.tr/api/tracking/ingest");
+  assert.equal(resolveSimulationEndpoint("2", {
+    PUBLIC_TRACKING_INGEST_URL: "https://staging.example.com/api/tracking/ingest",
+  }), "https://staging.example.com/api/tracking/ingest");
+  assert.throws(() => resolveSimulationEndpoint("3"), /Geçerli bir seçenek/);
 });
 
 test("next timer is created only after the whole send completes and never accumulates", async () => {

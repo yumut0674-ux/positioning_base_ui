@@ -6,6 +6,7 @@ import { ProcessedPositionServer } from "../src/server/regionEngine/ProcessedPos
 test("processed server publishes backward-compatible position events over SSE", async () => {
   const output = new ProcessedPositionServer(0, "*");
   await output.start();
+  assert.equal(output.boundHost, "127.0.0.1");
   const abort = new AbortController();
   try {
     const response = await fetch(`http://127.0.0.1:${output.boundPort}/api/tracking/ingest`, { signal: abort.signal });
@@ -34,7 +35,7 @@ test("processed server publishes backward-compatible position events over SSE", 
 
 test("processed port reports a clear error when the configured port is occupied", async () => {
   const blocker = createServer();
-  await new Promise<void>((resolve) => blocker.listen(0, "0.0.0.0", resolve));
+  await new Promise<void>((resolve) => blocker.listen(0, "127.0.0.1", resolve));
   const address = blocker.address();
   assert.ok(address && typeof address === "object");
   const output = new ProcessedPositionServer(address.port, "*");

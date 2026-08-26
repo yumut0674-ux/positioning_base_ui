@@ -19,6 +19,7 @@ başlatma ve hata giderme adımlarını tek yerden takip edebilmesi için yazıl
 - [Region Position Engine](#region-position-engine)
 - [REST API özeti](#rest-api-özeti)
 - [MCP ve rota geçmişi asistanı](#mcp-ve-rota-geçmişi-asistanı)
+- [Domain üzerinden geçici paylaşım](#domain-üzerinden-geçici-paylaşım)
 - [Yedekleme ve geri dönüş](#yedekleme-ve-geri-dönüş)
 - [Servis başlatma örnekleri](#servis-başlatma-örnekleri)
 - [Test ve doğrulama](#test-ve-doğrulama)
@@ -39,7 +40,8 @@ UWB kaynakları / simülatör
 Region engine açıkken:
 raw position event
   -> RegionPositionEngine
-  -> processed SSE: REGION_POSITION_PORT /api/tracking/ingest
+  -> loopback processed SSE: REGION_POSITION_PORT /api/tracking/stream
+  -> same-origin proxy: /api/tracking/processed
 
 Operasyon UI
   -> /api/tags, /api/anchors, /api/regions, /api/location/*
@@ -119,15 +121,16 @@ veya `POST /api/tags` ile ekleyin.
 |---|---:|---|
 | `PORT` | `3000` | Vinext/Next uygulama portu. |
 | `RAW_POSITION_PORT` | `PORT` veya `3000` | Raw ingest ve raw SSE portu. `PORT` değişirse bunu da aynı değere çekin. |
+| `REGION_POSITION_HOST` | `127.0.0.1` | Processed SSE listener bind adresi. Bilinçli bir gerekçe yoksa değiştirmeyin. |
 | `REGION_POSITION_PORT` | `3001` | Processed SSE listener portu. `RAW_POSITION_PORT` ile aynı olamaz. |
 | `REGION_BROADCAST_INTERVAL_MS` | `1000` | Region içinde kalan araçlar için inferred publish aralığı. 100 ile 60000 ms arasında olmalı. |
-| `REGION_POSITION_ALLOWED_ORIGIN` | `*` | Processed SSE CORS origin'i. Prod ortamda UI origin'i ile sınırlandırın. |
-| `POSTGRES_HOST` | `localhost` | PostgreSQL host. |
+| `REGION_POSITION_ALLOWED_ORIGIN` | `http://127.0.0.1:3000` | Loopback processed SSE CORS origin'i; tarayıcı normalde same-origin proxy kullanır. |
+| `POSTGRES_HOST` | `127.0.0.1` | PostgreSQL host. Demo paylaşımında loopback kalmalı. |
 | `POSTGRES_PORT` | `5432` | PostgreSQL port. |
 | `POSTGRES_DB` | `uwb_db` | Uygulama veritabanı. |
 | `POSTGRES_USER` | `uwb_user` | Uygulama kullanıcısı. |
-| `POSTGRES_PASSWORD` | `uwb_local_123456` | Uygulama kullanıcısı parolası. Prod ortamda değiştirin. |
-| `CHATBOT_SERVICE_URL` | `http://127.0.0.1:8000` | `/api/assistant` proxy'sinin çağırdığı yerel FastAPI servis kökü. |
+| `POSTGRES_PASSWORD` | `CHANGE_ME` | Yalnızca yerel `.env.local` içinde gerçek parola ile değiştirilecek placeholder. |
+| `CHATBOT_SERVICE_URL` | boş | Opsiyonel `/api/assistant` proxy hedefi; etkinse `http://127.0.0.1:8000` kullanın. |
 | `UWB_LOCATION_API_BASE_URL` | `http://127.0.0.1:3000` | MCP ve asistanın okuyacağı uygulama REST API kökü. |
 | `UWB_LOCATION_API_TOKEN` | boş | Opsiyonel Bearer token. API tarafında doğrulama eklenirse kullanılır. |
 | `UWB_LOCATION_API_TIMEOUT_MS` | `5000` | MCP HTTP timeout değeri. 100 ile 60000 ms arasında olmalı. |
@@ -148,6 +151,7 @@ veya `POST /api/tags` ile ekleyin.
 ```dotenv
 PORT=3000
 RAW_POSITION_PORT=3000
+REGION_POSITION_HOST=127.0.0.1
 REGION_POSITION_PORT=3001
 REGION_BROADCAST_INTERVAL_MS=1000
 REGION_POSITION_ALLOWED_ORIGIN=http://127.0.0.1:3000
@@ -156,9 +160,9 @@ POSTGRES_HOST=127.0.0.1
 POSTGRES_PORT=5432
 POSTGRES_DB=uwb_db
 POSTGRES_USER=uwb_user
-POSTGRES_PASSWORD=change-this-password
+POSTGRES_PASSWORD=CHANGE_ME
 
-CHATBOT_SERVICE_URL=http://127.0.0.1:8000
+CHATBOT_SERVICE_URL=
 UWB_LOCATION_API_BASE_URL=http://127.0.0.1:3000
 ```
 
@@ -225,15 +229,15 @@ dosyalarındadır.
 | Port | Servis | Varsayılan erişim | Not |
 |---:|---|---|---|
 | `3000` | Vinext/Next uygulama, REST API, raw ingest, raw SSE | `http://127.0.0.1:3000` | `PORT` ve `RAW_POSITION_PORT` aynı tutulmalı. |
-| `3001` | Processed region SSE | `http://127.0.0.1:3001/api/tracking/ingest` | Region engine processed akışı. |
-| `5432` | PostgreSQL | sadece uygulama ağı | Genel internete açmayın. |
+| `3001` | Processed region SSE | yalnızca `127.0.0.1` | Tarayıcı `/api/tracking/processed` proxy yolunu kullanır. |
+| `5432` | PostgreSQL | yalnızca `127.0.0.1` | Genel internete açmayın. |
 | `8000` | Opsiyonel FastAPI chatbot service | `http://127.0.0.1:8000` | Sadece local loopback önerilir. |
 
 Firewall önerisi:
 
 - UWB kaynakları yalnızca `3000/api/tracking/ingest` yoluna erişebilmelidir.
 - Tarayıcı kullanıcıları `3000` portuna erişmelidir.
-- `3001` gerekiyorsa sadece UI origin'i veya iç ağ istemcilerine açılmalıdır.
+- `3001` dışarı açılmamalıdır; ana uygulama bu akışı server-side proxy eder.
 - `5432` ve `8000` genel ağa açılmamalıdır.
 
 ## Tracking ingest sözleşmesi
@@ -362,8 +366,11 @@ Status cevabı:
 Processed SSE adresi:
 
 ```text
-http://127.0.0.1:3001/api/tracking/ingest
+/api/tracking/processed
 ```
+
+Tarayıcı bu same-origin yolu kullanır. Uygulama sunucusu akışı loopback üzerindeki
+`http://127.0.0.1:3001/api/tracking/stream` upstream'inden kesintisiz aktarır.
 
 Processed event ek alanları:
 
@@ -434,7 +441,7 @@ Kurallar:
 Local geliştirme farkı:
 
 - Vite middleware `REGION_POSITION_PORT` için processed SSE listener'ı dev server
-  açılışında başlatır.
+  açılışında `REGION_POSITION_HOST` üzerinde başlatır.
 - Port doluysa `npm run dev` erken hata verir.
 - `/api/regions` local dev'de `config/regions.json` dosyasını günceller.
 
@@ -443,6 +450,9 @@ Normal Node runtime farkı:
 - Processed listener region engine enable edildiğinde açılır.
 - Port doluysa enable isteği HTTP 409 döner.
 - Engine kapatıldığında listener ve memory state temizlenir.
+
+Her iki çalışma biçiminde de varsayılan host `127.0.0.1` olduğu için processed
+port yerel ağ arayüzlerinde dinlemez.
 
 ## REST API özeti
 
@@ -513,6 +523,21 @@ mcp\.venv\Scripts\python.exe -m uvicorn chat_api:app --app-dir mcp --host 127.0.
 Asistan servisini prod ortamda genel ağa açmayın. `/api/assistant` proxy'si
 uygulama içinden bu servise gider; provider anahtarları tarayıcıya gönderilmez.
 
+## Domain üzerinden geçici paylaşım
+
+Uygulamayı kendi Windows bilgisayarınızda çalıştırırken Cloudflare Tunnel ve
+Cloudflare Access arkasından belirli e-postalara geçici olarak açabilirsiniz.
+Tunnel yalnızca `127.0.0.1:3000` hedefine bağlanır; `3001`, `5432` ve `8000`
+internete açılmaz. Build sonrasında güvenli loopback listener için:
+
+```powershell
+npm.cmd run start:share
+```
+
+Named Tunnel, DNS, Windows service, tüm hostname'i kapsayan Access allowlist/OTP
+politikası, durdurma ve güvenlik kontrolleri için [ayrıntılı Türkçe rehberi](docs/demo-sharing.md)
+izleyin. Repoya gerçek domain, e-posta, tunnel token veya credential JSON eklemeyin.
+
 ## Yedekleme ve geri dönüş
 
 Yedek almadan önce:
@@ -579,6 +604,7 @@ npm install
 npm run build
 $env:PORT="3000"
 $env:RAW_POSITION_PORT="3000"
+$env:REGION_POSITION_HOST="127.0.0.1"
 $env:REGION_POSITION_PORT="3001"
 npm run start
 ```
@@ -609,6 +635,7 @@ WantedBy=multi-user.target
 ```dotenv
 PORT=3000
 RAW_POSITION_PORT=3000
+REGION_POSITION_HOST=127.0.0.1
 REGION_POSITION_PORT=3001
 REGION_POSITION_ALLOWED_ORIGIN=https://ips.example.internal
 POSTGRES_HOST=127.0.0.1
@@ -662,11 +689,11 @@ Invoke-RestMethod `
   -Body '{"enabled":true}'
 ```
 
-Processed port health testi, local dev output server açıksa veya engine enable
+Processed SSE proxy testi, local dev output server açıksa veya engine enable
 edildiyse:
 
 ```powershell
-Invoke-RestMethod "http://127.0.0.1:3001/__region-position-output/health"
+Invoke-WebRequest "http://127.0.0.1:3000/api/tracking/processed" -UseBasicParsing
 ```
 
 History API örneği:
@@ -732,8 +759,8 @@ Invoke-RestMethod "http://127.0.0.1:3000/api/location/entities/search?q=TAG-001&
 - Raw ingest akışının gerçekten event aldığını doğrulayın.
 - İlgili region'da `roomCenter` tanımlı olmalıdır.
 - Entry confirmation sayısı kadar ardışık içeride ölçüm gelmelidir.
-- Tarayıcının `REGION_POSITION_PORT` portuna erişebildiğini ve CORS origin'in
-  doğru olduğunu kontrol edin.
+- Tarayıcı network panelinde `/api/tracking/processed` bağlantısını kontrol edin;
+  tarayıcı doğrudan `3001` portuna bağlanmamalıdır.
 
 ### Asistan "çevrimdışı" görünüyor
 
@@ -756,5 +783,5 @@ Invoke-RestMethod "http://127.0.0.1:3000/api/location/entities/search?q=TAG-001&
 - Raw konumlar veritabanında değiştirilmez; oda merkezine sabitleme yalnızca
   processed SSE event'lerinde görülür.
 - Reverse proxy arkasında SSE için response buffering kapalı olmalıdır.
-- Prod CORS için `REGION_POSITION_ALLOWED_ORIGIN=*` yerine gerçek UI origin'i
-  kullanılmalıdır.
+- `REGION_POSITION_HOST=127.0.0.1` varsayılanını koruyun; processed SSE dışarı
+  açılmamalıdır.

@@ -9,7 +9,12 @@ import { logger } from "../logger";
 
 export class RegionEngineController {
   private readonly runtime = getRegionEngineRuntimeConfig();
-  private readonly output = new ProcessedPositionServer(this.runtime.processedPort, this.runtime.allowedOrigin, true);
+  private readonly output = new ProcessedPositionServer(
+    this.runtime.processedPort,
+    this.runtime.allowedOrigin,
+    this.runtime.processedHost,
+    true,
+  );
   private readonly engine = new RegionPositionEngine(
     (position) => this.output.publish(position),
     this.runtime.broadcastIntervalMs,
