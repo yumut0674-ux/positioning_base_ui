@@ -111,8 +111,9 @@ button { color: inherit; font: inherit; }
 .mobile-map-section-heading, .mobile-map-status { display: none; }
 .map-frame:fullscreen { position: fixed; inset: 0; width: 100vw; height: 100vh; min-width: 100vw; min-height: 100vh; max-width: none; max-height: none; flex: none; border: 0; border-radius: 0; }
 .map-frame::before { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2; background: linear-gradient(135deg, rgba(0, 168, 150, .05), transparent 24%, transparent 72%, rgba(53, 120, 229, .06)); }
-.map-viewport { position: absolute; inset: 0; cursor: grab; }
-.map-viewport:active { cursor: grabbing; }
+.map-viewport { position: absolute; inset: 0; cursor: default; touch-action: pan-y; }
+.map-viewport[data-can-pan="true"] { cursor: grab; }
+.map-viewport[data-can-pan="true"]:active { cursor: grabbing; }
 .zoom-readout { position: absolute; right: 14px; bottom: 24px; z-index: 4; color: #52677e; font: 9px ui-monospace, monospace; background: rgba(255, 255, 255, .9); border: 1px solid #c4d4df; padding: 6px 8px; border-radius: 4px; box-shadow: 0 8px 20px rgba(53, 75, 100, .1); }
 
 .floating-panel { position: absolute; z-index: 5; background: rgba(255, 255, 255, .9); border: 1px solid #c2d4e0; box-shadow: 0 12px 34px rgba(53, 75, 100, .14); backdrop-filter: blur(12px); border-radius: 6px; }

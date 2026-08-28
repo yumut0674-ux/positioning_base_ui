@@ -7,7 +7,9 @@ import useImage from "use-image";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { useElementSize } from "@/src/shared/hooks/useElementSize";
 import {
+  constrainMapViewport,
   getFittedMapViewport,
+  isAtFittedScale,
   MAP_CALIBRATION,
   MAP_FLOOR_PLAN,
   MAP_VIEWPORT_LIMITS,
@@ -20,7 +22,9 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
   const hostRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const panOriginRef = useRef({ x: 0, y: 0 });
+  const pinchRef = useRef<{ readonly distance: number; readonly center: { readonly x: number; readonly y: number }; readonly viewport: typeof viewport } | null>(null);
   const handledFocusRequestRef = useRef(0);
+  const handledFitRequestRef = useRef(0);
   const hasUserAdjustedViewRef = useRef(false);
   const lastAutoFitSizeRef = useRef<{ width: number; height: number } | null>(null);
   const size = useElementSize(hostRef);
@@ -36,11 +40,18 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
   const setMeasurementPoint = useIpsStore((state) => state.setMeasurementPoint);
   const cancelMeasurement = useIpsStore((state) => state.cancelMeasurement);
   const mapFocusRequest = useIpsStore((state) => state.mapFocusRequest);
+  const mapFitRequest = useIpsStore((state) => state.mapFitRequest);
   const transform = useMemo(() => new CoordinateTransformService(MAP_CALIBRATION), []);
+  const fittedViewport = useMemo(() => getFittedMapViewport(size), [size]);
+  const canPan = Boolean(fittedViewport && !measurement.enabled && !isAtFittedScale(viewport, fittedViewport));
+
+  const constrainViewport = useCallback((nextViewport: typeof viewport) => constrainMapViewport(nextViewport, size), [size]);
 
   const fitToScreen = useCallback(() => {
     const fittedViewport = getFittedMapViewport(size);
     if (!fittedViewport) return false;
+    hasUserAdjustedViewRef.current = false;
+    pinchRef.current = null;
     setViewport(fittedViewport);
     return true;
   }, [setViewport, size]);
@@ -71,12 +82,18 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
     const scale = Math.min(MAP_VIEWPORT_LIMITS.maxZoom, Math.max(viewport.scale, 1.4));
     const point = transform.worldToCanvas(selectedTag);
     hasUserAdjustedViewRef.current = true;
-    setViewport({
+    setViewport(constrainViewport({
       scale,
       x: size.width / 2 - point.x * scale,
       y: size.height / 2 - point.y * scale,
-    });
-  }, [fitToScreen, mapFocusRequest, selectedTagId, setViewport, size.height, size.width, tagsById, transform, viewport.scale]);
+    }));
+  }, [constrainViewport, fitToScreen, mapFocusRequest, selectedTagId, setViewport, size.height, size.width, tagsById, transform, viewport.scale]);
+
+  useEffect(() => {
+    if (mapFitRequest === 0 || mapFitRequest === handledFitRequestRef.current) return;
+    handledFitRequestRef.current = mapFitRequest;
+    fitToScreen();
+  }, [fitToScreen, mapFitRequest]);
 
   useEffect(() => {
     if (!measurement.enabled) return;
@@ -97,7 +114,7 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
     // On a narrow screen the fitted plan can legitimately be below the normal
     // zoom floor. Keep that scale reachable so the first wheel gesture never
     // makes an otherwise contained plan jump outside the panel.
-    const fittedScale = getFittedMapViewport(size)?.scale ?? MAP_VIEWPORT_LIMITS.minZoom;
+    const fittedScale = fittedViewport?.scale ?? MAP_VIEWPORT_LIMITS.minZoom;
     const minimumScale = Math.min(MAP_VIEWPORT_LIMITS.minZoom, fittedScale);
     const nextScale = Math.min(
       MAP_VIEWPORT_LIMITS.maxZoom,
@@ -106,16 +123,70 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
         viewport.scale * Math.pow(MAP_VIEWPORT_LIMITS.wheelZoomFactor, direction),
       ),
     );
+    if (fittedViewport && nextScale <= fittedViewport.scale + 0.001) {
+      fitToScreen();
+      return;
+    }
     const mapPoint = {
       x: (pointer.x - viewport.x) / viewport.scale,
       y: (pointer.y - viewport.y) / viewport.scale,
     };
-    setViewport({
+    setViewport(constrainViewport({
       scale: nextScale,
       x: pointer.x - mapPoint.x * nextScale,
       y: pointer.y - mapPoint.y * nextScale,
-    });
-  }, [setViewport, size, viewport]);
+    }));
+  }, [constrainViewport, fitToScreen, fittedViewport, setViewport, viewport]);
+
+  const createPinch = useCallback((event: TouchEvent) => {
+    const stage = stageRef.current;
+    if (!stage || event.touches.length !== 2) return null;
+    const [firstTouch, secondTouch] = [event.touches[0], event.touches[1]];
+    const bounds = stage.container().getBoundingClientRect();
+    const center = {
+      x: (firstTouch.clientX + secondTouch.clientX) / 2 - bounds.left,
+      y: (firstTouch.clientY + secondTouch.clientY) / 2 - bounds.top,
+    };
+    return {
+      center,
+      distance: Math.hypot(firstTouch.clientX - secondTouch.clientX, firstTouch.clientY - secondTouch.clientY),
+      viewport,
+    };
+  }, [viewport]);
+
+  const handleTouchStart = useCallback((event: Konva.KonvaEventObject<TouchEvent>) => {
+    if (event.evt.touches.length === 2 && !measurement.enabled) pinchRef.current = createPinch(event.evt);
+  }, [createPinch, measurement.enabled]);
+
+  const handleTouchMove = useCallback((event: Konva.KonvaEventObject<TouchEvent>) => {
+    if (measurement.enabled || event.evt.touches.length !== 2) return;
+    const pinch = pinchRef.current ?? createPinch(event.evt);
+    if (!pinch || pinch.distance === 0) return;
+    pinchRef.current = pinch;
+    event.evt.preventDefault();
+    const nextScale = Math.min(MAP_VIEWPORT_LIMITS.maxZoom, Math.max(
+      Math.min(MAP_VIEWPORT_LIMITS.minZoom, fittedViewport?.scale ?? MAP_VIEWPORT_LIMITS.minZoom),
+      pinch.viewport.scale * (createPinch(event.evt)?.distance ?? pinch.distance) / pinch.distance,
+    ));
+    if (fittedViewport && nextScale <= fittedViewport.scale + 0.001) {
+      fitToScreen();
+      return;
+    }
+    const mapPoint = {
+      x: (pinch.center.x - pinch.viewport.x) / pinch.viewport.scale,
+      y: (pinch.center.y - pinch.viewport.y) / pinch.viewport.scale,
+    };
+    hasUserAdjustedViewRef.current = true;
+    setViewport(constrainViewport({
+      scale: nextScale,
+      x: pinch.center.x - mapPoint.x * nextScale,
+      y: pinch.center.y - mapPoint.y * nextScale,
+    }));
+  }, [constrainViewport, createPinch, fitToScreen, fittedViewport, measurement.enabled, setViewport]);
+
+  const handleTouchEnd = useCallback(() => {
+    pinchRef.current = null;
+  }, []);
 
   const handleMeasureClick = useCallback(() => {
     if (!measurement.enabled) return;
@@ -146,7 +217,7 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
     : null;
 
   return (
-    <div ref={hostRef} className="map-viewport" data-testid="map-viewport">
+    <div ref={hostRef} className="map-viewport" data-testid="map-viewport" data-can-pan={canPan}>
       <Stage
         ref={stageRef}
         // Konva creates an internal canvas for every layer. It cannot draw to
@@ -157,19 +228,32 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
         onWheel={handleWheel}
         onClick={handleMeasureClick}
         onTap={handleMeasureClick}
-        draggable
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
+        preventDefault={false}
+        draggable={canPan}
         x={0}
         y={0}
+        dragBoundFunc={(position) => {
+          const constrained = constrainViewport({
+            ...viewport,
+            x: viewport.x + position.x,
+            y: viewport.y + position.y,
+          });
+          return { x: constrained.x - viewport.x, y: constrained.y - viewport.y };
+        }}
         onDragStart={() => {
           hasUserAdjustedViewRef.current = true;
           panOriginRef.current = { x: viewport.x, y: viewport.y };
         }}
         onDragEnd={(event) => {
-          setViewport({
+          setViewport(constrainViewport({
             ...viewport,
             x: panOriginRef.current.x + event.target.x(),
             y: panOriginRef.current.y + event.target.y(),
-          });
+          }));
           event.target.position({ x: 0, y: 0 });
         }}
       >

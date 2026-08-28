@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getFittedMapViewport, MAP_FLOOR_PLAN } from "../src/features/map/config/mapConfig";
+import { constrainMapViewport, getFittedMapViewport, isAtFittedScale, MAP_FLOOR_PLAN } from "../src/features/map/config/mapConfig";
 
 test("fits and centers the complete floor plan in a desktop map panel", () => {
   const panel = { width: 1_200, height: 800 };
@@ -28,4 +28,31 @@ test("keeps the plan contained on narrow panels and ignores unmeasured panels", 
   assert.ok(viewport.y + MAP_FLOOR_PLAN.canvasSize.height * viewport.scale <= panel.height);
   assert.equal(getFittedMapViewport({ width: 0, height: 500 }), null);
   assert.equal(getFittedMapViewport({ width: 500, height: 0 }), null);
+});
+
+test("locks panning at the fitted scale and constrains a zoomed plan to the map panel", () => {
+  const panel = { width: 1_200, height: 800 };
+  const fitted = getFittedMapViewport(panel);
+  assert.ok(fitted);
+  assert.equal(isAtFittedScale(fitted, fitted), true);
+  assert.equal(isAtFittedScale({ ...fitted, scale: fitted.scale + 0.01 }, fitted), false);
+
+  const zoomed = { scale: fitted.scale * 2, x: 9_999, y: -9_999 };
+  const constrained = constrainMapViewport(zoomed, panel);
+  const planWidth = MAP_FLOOR_PLAN.canvasSize.width * constrained.scale;
+  const planHeight = MAP_FLOOR_PLAN.canvasSize.height * constrained.scale;
+
+  assert.equal(constrained.x, 0);
+  assert.equal(constrained.y, panel.height - planHeight);
+  assert.ok(constrained.x + planWidth >= panel.width);
+  assert.ok(constrained.y <= 0);
+});
+
+test("centers axes that remain smaller than the panel while zoomed", () => {
+  const panel = { width: 2_000, height: 300 };
+  const constrained = constrainMapViewport({ scale: 0.4, x: -500, y: 500 }, panel);
+  const planWidth = MAP_FLOOR_PLAN.canvasSize.width * constrained.scale;
+
+  assert.equal(constrained.x, (panel.width - planWidth) / 2);
+  assert.equal(constrained.y, 0);
 });

@@ -63,6 +63,27 @@ export function getFittedMapViewport(panelSize: Size2D): ViewportState | null {
   };
 }
 
+/** Keeps a zoomed floor plan within the visible map panel. Smaller dimensions
+ * stay centered; larger dimensions may pan only until the panel remains covered. */
+export function constrainMapViewport(viewport: ViewportState, panelSize: Size2D): ViewportState {
+  const planWidth = MAP_FLOOR_PLAN.canvasSize.width * viewport.scale;
+  const planHeight = MAP_FLOOR_PLAN.canvasSize.height * viewport.scale;
+  const constrainAxis = (position: number, planLength: number, panelLength: number) => {
+    if (planLength <= panelLength) return (panelLength - planLength) / 2;
+    return Math.min(0, Math.max(panelLength - planLength, position));
+  };
+
+  return {
+    ...viewport,
+    x: constrainAxis(viewport.x, planWidth, panelSize.width),
+    y: constrainAxis(viewport.y, planHeight, panelSize.height),
+  };
+}
+
+export function isAtFittedScale(viewport: ViewportState, fittedViewport: ViewportState): boolean {
+  return viewport.scale <= fittedViewport.scale + 0.001;
+}
+
 export const DEFAULT_ANCHORS = [
   { id: "A-01", x: 2.7, y: 21.4 },
   { id: "A-02", x: 20.8, y: 21.4 },

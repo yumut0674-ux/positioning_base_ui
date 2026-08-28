@@ -13,7 +13,7 @@ import { TagInformationPanel } from "@/src/features/tracking/components/TagInfor
 import { useRealtimeTracking } from "@/src/features/tracking/hooks/useRealtimeTracking";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
-import { Layers3, Loader2, Maximize2, Ruler, Scan } from "lucide-react";
+import { Layers3, Loader2, LocateFixed, Maximize2, Ruler, Scan } from "lucide-react";
 import { AnchorManagementPanel } from "@/app/anchors/page";
 import { TagManagementPanel } from "@/app/tags/page";
 import { SupportContactPanel } from "@/src/features/support/components/SupportContactPanel";
@@ -67,6 +67,7 @@ function LiveMapWorkspace({
   const measurementEnabled = useIpsStore((state) => state.measurement.enabled);
   const toggleMeasurement = useIpsStore((state) => state.toggleMeasurement);
   const requestMapFocus = useIpsStore((state) => state.requestMapFocus);
+  const requestMapFit = useIpsStore((state) => state.requestMapFit);
   const tags = useIpsStore((state) => state.tags);
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const mapFrameRef = useRef<HTMLDivElement>(null);
@@ -135,6 +136,10 @@ function LiveMapWorkspace({
     window.setTimeout(() => setFocusFeedback(false), 450);
   }, [requestMapFocus]);
 
+  const handleFitMap = useCallback(() => {
+    requestMapFit();
+  }, [requestMapFit]);
+
   const handleShowMap = useCallback(() => {
     requestMapFocus();
     mapFrameRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -174,6 +179,7 @@ function LiveMapWorkspace({
                 <button className={showLayersPanel ? "active" : ""} title="Katmanları aç/kapat" onClick={toggleLayersPanel}><Layers3 size={16} /></button>
                 <button className={measurementEnabled ? "active" : ""} title="Ölçüm" aria-label="Ölçüm modunu aç veya kapat" aria-pressed={measurementEnabled} onClick={toggleMeasurement}><Ruler size={16} /></button>
                 <button className={focusFeedback ? "focus-feedback" : ""} title="Odakla" aria-label="Seçili etikete odaklan" onClick={handleFocus}><Scan size={16} /></button>
+                <button title="Haritayı sığdır" aria-label="Haritayı sığdır" onClick={handleFitMap}><LocateFixed size={16} /></button>
                 <span />
                 <button className={isFullscreen ? "active" : ""} title={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-label={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-pressed={isFullscreen} disabled={!fullscreenSupported} onClick={toggleFullscreen}><Maximize2 size={16} /></button>
               </div>

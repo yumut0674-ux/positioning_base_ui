@@ -25,6 +25,7 @@ interface IpsState {
   readonly showLayersPanel: boolean;
   readonly measurement: MeasurementState;
   readonly mapFocusRequest: number;
+  readonly mapFitRequest: number;
   setViewport: (viewport: ViewportState) => void;
   toggleLayer: (layer: MapLayerId) => void;
   upsertTag: (tag: TrackedTag) => void;
@@ -40,6 +41,7 @@ interface IpsState {
   setMeasurementPoint: (point: Point2D) => void;
   cancelMeasurement: () => void;
   requestMapFocus: () => void;
+  requestMapFit: () => void;
 }
 
 export const useIpsStore = create<IpsState>((set) => ({
@@ -66,6 +68,7 @@ export const useIpsStore = create<IpsState>((set) => ({
   showLayersPanel: false,
   measurement: { enabled: false, start: null, end: null },
   mapFocusRequest: 0,
+  mapFitRequest: 0,
   setViewport: (viewport) => set({ viewport }),
   toggleLayer: (layer) => set((state) => ({ layers: { ...state.layers, [layer]: !state.layers[layer] } })),
   upsertTag: (tag) => set((state) => ({
@@ -112,4 +115,5 @@ export const useIpsStore = create<IpsState>((set) => ({
   })),
   cancelMeasurement: () => set({ measurement: { enabled: false, start: null, end: null } }),
   requestMapFocus: () => set((state) => ({ mapFocusRequest: state.mapFocusRequest + 1 })),
+  requestMapFit: () => set((state) => ({ mapFitRequest: state.mapFitRequest + 1 })),
 }));
