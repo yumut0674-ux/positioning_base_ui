@@ -1,5 +1,6 @@
 import { MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
 import { resolveLocation } from "@/src/features/map/services/LocationResolverService";
+import type { RegionsConfig } from "@/src/features/regions/types/region.types";
 import type { TrackedTag } from "../types/tracking.types";
 
 export const RECENT_TAG_IDS_STORAGE_KEY = "gekon-ips.recent-tag-ids";
@@ -36,8 +37,9 @@ export function persistRecentTagIds(storage: Pick<Storage, "setItem">, recentTag
 export function nextTagLocationEntry(
   currentEntry: TagLocationEntry | undefined,
   tag: TrackedTag,
+  regionsConfig?: RegionsConfig | null,
 ): TagLocationEntry {
-  const locationLabel = resolveLocation(tag.x, tag.y, MAP_FLOOR_PLAN.id);
+  const locationLabel = resolveLocation(tag.x, tag.y, MAP_FLOOR_PLAN.id, regionsConfig);
   if (currentEntry?.locationLabel === locationLabel) return currentEntry;
   return {
     locationLabel,

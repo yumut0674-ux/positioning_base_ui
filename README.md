@@ -50,6 +50,7 @@ Operasyon UI
 Opsiyonel asistan:
 History chat UI
   -> POST /api/assistant
+  -> cookie-bound session namespace + deterministic safety policy
   -> local FastAPI chatbot service
   -> stdio MCP server
   -> /api/location/*
@@ -65,6 +66,7 @@ Temel özellikler:
 - Raw konumu bozmadan processed region-center akışı.
 - Konum geçmişi için REST ve salt-okunur MCP tool'ları.
 - Opsiyonel Gemini destekli yerel rota geçmişi asistanı.
+- Sentetik veriyle AI güvenlik regresyon paketi (`tests/ai-evaluation`).
 
 ## Hızlı başlangıç
 

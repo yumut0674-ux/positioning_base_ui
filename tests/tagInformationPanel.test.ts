@@ -5,6 +5,20 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { TagInformationPanelContent } from "../src/features/tracking/components/TagInformationPanel";
 import { resolveLocation } from "../src/features/map/services/LocationResolverService";
 import { MAP_FLOOR_PLAN } from "../src/features/map/config/mapConfig";
+import { DEFAULT_REGIONS_CONFIG } from "../src/features/regions/config/defaultRegionsConfig";
+
+const point = (x: number, y: number) => ({ pixel: { x, y }, world: { x, y } });
+const regionsConfig = {
+  ...DEFAULT_REGIONS_CONFIG,
+  regions: [{
+    id: "test-room",
+    name: "Test Odası",
+    color: "#00a896",
+    polygon: [point(5, 14), point(14, 14), point(14, 21), point(5, 21)],
+    roomCenter: point(9, 17),
+    entrances: [],
+  }],
+};
 
 function renderSelectedTag(x: number, y: number) {
   const tag = {
@@ -18,7 +32,7 @@ function renderSelectedTag(x: number, y: number) {
   };
   return renderToStaticMarkup(createElement(TagInformationPanelContent, {
     selectedTag: tag,
-    locationAddress: resolveLocation(x, y, MAP_FLOOR_PLAN.id),
+    locationAddress: resolveLocation(x, y, MAP_FLOOR_PLAN.id, regionsConfig),
     locationDuration: "Bu alanda 18 dk 42 sn",
     tags: [tag],
     recentTagIds: [tag.id],
@@ -27,12 +41,12 @@ function renderSelectedTag(x: number, y: number) {
   }));
 }
 
-test("selected tracking-label panel presents a clinical location instead of X/Y coordinates", () => {
+test("selected tracking-label panel presents a defined region instead of X/Y coordinates", () => {
   const html = renderSelectedTag(9, 17);
 
   assert.match(html, /KONUM ADRESİ/);
-  assert.match(html, /Kat 01 · Ortopedi Poliklinikleri/);
-  assert.match(html, /Konum adresi: Kat 01 · Ortopedi Poliklinikleri/);
+  assert.match(html, /Test Odası/);
+  assert.match(html, /Konum adresi: Test Odası/);
   assert.match(html, /Takip Etiketleri/);
   assert.match(html, /Son görüntülenenler/i);
   assert.match(html, /Bu alanda 18 dk 42 sn/);
@@ -59,7 +73,7 @@ test("mobile tracking-label panel includes the map reveal action without technic
   };
   const html = renderToStaticMarkup(createElement(TagInformationPanelContent, {
     selectedTag: tag,
-    locationAddress: resolveLocation(tag.x, tag.y, MAP_FLOOR_PLAN.id),
+    locationAddress: resolveLocation(tag.x, tag.y, MAP_FLOOR_PLAN.id, regionsConfig),
     locationDuration: "Bu alanda 2 dk 10 sn",
     tags: [tag],
     recentTagIds: [],

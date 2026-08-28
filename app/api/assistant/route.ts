@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { logger } from "@/src/server/logger";
 
@@ -6,6 +7,8 @@ export const runtime = "nodejs";
 
 const DEFAULT_CHATBOT_SERVICE_URL = "http://127.0.0.1:8000";
 const CHATBOT_TIMEOUT_MS = 25_000;
+const CLIENT_COOKIE = "gekon_assistant_client";
+const CLIENT_COOKIE_MAX_AGE_SECONDS = 30 * 60;
 
 const isoWithTimezoneSchema = z.string().trim().refine((value) => {
   const hasTimezone = /(Z|[+-]\d{2}:\d{2})$/i.test(value);
@@ -45,7 +48,8 @@ const assistantContextSchema = z.object({
 
 const assistantRequestSchema = z.object({
   message: z.string().trim().min(1).max(1000),
-  sessionId: z.string().trim().min(1).max(100).optional(),
+  // This is a browser-local handle, never the ID sent to the Python runtime.
+  sessionId: z.string().trim().min(1).max(64).optional(),
   context: assistantContextSchema.optional(),
 }).strict();
 
@@ -65,6 +69,31 @@ function chatbotServiceUrl(path: string): URL {
   base.pathname = `${base.pathname.replace(/\/$/, "")}${path}`;
   base.search = "";
   return base;
+}
+
+type ClientNamespace = { readonly id: string; readonly setCookie?: string };
+
+function clientNamespace(request: Request): ClientNamespace {
+  const cookie = request.headers.get("cookie") ?? "";
+  const found = cookie.match(new RegExp(`(?:^|;\\s*)${CLIENT_COOKIE}=([a-f0-9-]{36})(?:;|$)`, "i"));
+  if (found?.[1]) return { id: found[1] };
+  const id = randomUUID();
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  return {
+    id,
+    setCookie: `${CLIENT_COOKIE}=${id}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${CLIENT_COOKIE_MAX_AGE_SECONDS}${secure}`,
+  };
+}
+
+function withClientCookie(response: NextResponse, namespace: ClientNamespace): NextResponse {
+  if (namespace.setCookie) response.headers.set("Set-Cookie", namespace.setCookie);
+  return response;
+}
+
+function minimizedContext(context: z.infer<typeof assistantRequestSchema>["context"]): Pick<z.infer<typeof assistantContextSchema>, "mode"> | undefined {
+  // Until the app has a verified identity/role integration, do not send tag,
+  // entity, map, coordinate or history data to an external model provider.
+  return context?.mode ? { mode: context.mode } : undefined;
 }
 
 function validationError(error: z.ZodError) {
@@ -118,6 +147,10 @@ export async function POST(request: Request) {
   const parsed = assistantRequestSchema.safeParse(rawBody);
   if (!parsed.success) return validationError(parsed.error);
 
+  const namespace = clientNamespace(request);
+  const publicSessionId = parsed.data.sessionId ?? randomUUID();
+  const internalSessionId = `${namespace.id}:${publicSessionId}`;
+
   try {
     const response = await fetchWithTimeout(chatbotServiceUrl("/chat"), {
       method: "POST",
@@ -125,7 +158,11 @@ export async function POST(request: Request) {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(parsed.data),
+      body: JSON.stringify({
+        message: parsed.data.message,
+        sessionId: internalSessionId,
+        context: minimizedContext(parsed.data.context),
+      }),
     });
 
     const payload = await readJson(response);
@@ -142,7 +179,10 @@ export async function POST(request: Request) {
       }, { status: 502 });
     }
 
-    return NextResponse.json(safePayload.data, { status: 200 });
+    return withClientCookie(NextResponse.json({
+      ...safePayload.data,
+      data: { ...safePayload.data.data, sessionId: publicSessionId },
+    }, { status: 200 }), namespace);
   } catch (error) {
     logger.error("assistant.request_failed", error);
     return upstreamUnavailable();
@@ -155,13 +195,18 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ error: "Oturum kimliği gerekli." }, { status: 400 });
   }
 
+  if (sessionId.length > 64) {
+    return NextResponse.json({ error: "Oturum kimliği geçersiz." }, { status: 400 });
+  }
+  const namespace = clientNamespace(request);
+  const internalSessionId = `${namespace.id}:${sessionId}`;
   try {
-    const response = await fetchWithTimeout(chatbotServiceUrl(`/chat/${encodeURIComponent(sessionId)}`), {
+    const response = await fetchWithTimeout(chatbotServiceUrl(`/chat/${encodeURIComponent(internalSessionId)}`), {
       method: "DELETE",
       headers: { Accept: "application/json" },
     });
     if (!response.ok) return safeUpstreamError(response.status);
-    return new NextResponse(null, { status: 204 });
+    return withClientCookie(new NextResponse(null, { status: 204 }), namespace);
   } catch (error) {
     logger.error("assistant.session_delete_failed", error, { sessionId });
     return upstreamUnavailable();

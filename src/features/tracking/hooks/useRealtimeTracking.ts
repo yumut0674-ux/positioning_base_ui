@@ -15,6 +15,7 @@ import {
 } from "../config/positionAnimationConfig";
 import { PositionAnimationController } from "../services/PositionAnimationController";
 import type { RegionsConfig } from "@/src/features/regions/types/region.types";
+import { REGIONS_CONFIG_UPDATED_EVENT } from "@/src/features/regions/services/regionsConfig";
 
 const TAG_COLORS = ["#5de4c7", "#f6c760", "#7aa2f7", "#dc7b8b", "#b892ff"];
 
@@ -29,6 +30,7 @@ export function useRealtimeTracking(): PositionAnimationController {
   const refreshTagActivity = useIpsStore((state) => state.refreshTagActivity);
   const setAnchors = useIpsStore((state) => state.setAnchors);
   const setTagDefinitions = useIpsStore((state) => state.setTagDefinitions);
+  const setRegionsConfig = useIpsStore((state) => state.setRegionsConfig);
   const [engineStatus, setEngineStatus] = useState<RegionEngineStatusResponse | null>(null);
   const engineEnabled = engineStatus?.enabled ?? false;
   const rawGateway = useMemo(() => new SseTrackingGateway("/api/tracking/ingest"), []);
@@ -62,18 +64,26 @@ export function useRealtimeTracking(): PositionAnimationController {
         return response.json() as Promise<{ config: RegionsConfig }>;
       })
       .then((payload) => {
-        if (active) applyConfig(payload.config.positionAnimation);
+        if (!active) return;
+        setRegionsConfig(payload.config);
+        applyConfig(payload.config.positionAnimation);
       })
       .catch(() => undefined);
     const onConfigChanged = (event: Event) => {
       applyConfig((event as CustomEvent<RegionsConfig["positionAnimation"]>).detail);
     };
     window.addEventListener(POSITION_ANIMATION_CONFIG_CHANGED_EVENT, onConfigChanged);
+    const onRegionsConfigUpdated = (event: Event) => {
+      const config = (event as CustomEvent<RegionsConfig>).detail;
+      if (config) setRegionsConfig(config);
+    };
+    window.addEventListener(REGIONS_CONFIG_UPDATED_EVENT, onRegionsConfigUpdated);
     return () => {
       active = false;
       window.removeEventListener(POSITION_ANIMATION_CONFIG_CHANGED_EVENT, onConfigChanged);
+      window.removeEventListener(REGIONS_CONFIG_UPDATED_EVENT, onRegionsConfigUpdated);
     };
-  }, [positionAnimation]);
+  }, [positionAnimation, setRegionsConfig]);
 
   useEffect(() => {
     if (!animationEnabled) return;

@@ -50,3 +50,8 @@ next-env.d.ts
 # Python terminal MCP demo
 /mcp/.venv/
 /mcp/__pycache__/
+
+# Local AI evaluation responses can contain sensitive patterns even when fixtures are synthetic.
+/tests/ai-evaluation/reports/*.json
+/tests/ai-evaluation/reports/*.md
+!/tests/ai-evaluation/reports/.gitkeep

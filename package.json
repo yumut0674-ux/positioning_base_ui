@@ -16,6 +16,8 @@
     "test:tracking": "node --import tsx --test tests/trackingIngest.test.ts tests/regionPositionEngine.test.ts tests/processedPositionServer.test.ts tests/regionEngineApi.test.ts tests/positionAnimationController.test.ts tests/demoSharing.test.ts tests/tagSimulator.test.mjs",
     "test:maps": "node --import tsx --test tests/mapCatalog.test.ts tests/mapSelection.test.ts tests/mapViewportConfig.test.ts",
     "test:mcp:integration": "node --import tsx --test tests/mcp/integration.test.ts",
+    "test:ai": "node --import tsx tests/ai-evaluation/runner/run-evaluation.ts",
+    "test:ai:offline": "node --import tsx tests/ai-evaluation/runner/run-evaluation.ts --offline",
     "mcp:start": "node --import tsx mcp/server.ts",
     "typecheck": "tsc --noEmit",
     "typecheck:mcp": "tsc -p tsconfig.mcp.json",

@@ -120,7 +120,24 @@ verilebilir. `/clear` konuşma hafızasını, `/exit` ise programı kapatır.
 
 Rota Geçmişi sayfasındaki chat paneli tarayıcıdan doğrudan Gemini'ye veya konum
 araçlarına bağlanmaz. Tarayıcı `POST /api/assistant` proxy endpointine gider;
-proxy de yalnızca yerelde çalışan asistan servisine istek yapar.
+proxy de yalnızca yerelde çalışan asistan servisine istek yapar. Proxy, her
+tarayıcı için HttpOnly bir ad alanı üretir; istemcinin verdiği oturum kimliği
+tek başına başka bir konuşmaya erişim için yeterli değildir.
+
+Mevcut uygulamada doğrulanmış kullanıcı/rol aktarımı bulunmadığı için web
+istekleri varsayılan olarak `unauthenticated` kabul edilir. Bu durumda kişi,
+tag veya konum geçmişi istekleri modele ya da MCP araçlarına gönderilmez; genel
+UWB kullanım soruları cevaplanabilir. UI bağlamındaki tag, varlık, koordinat ve
+rota bilgisi de modele iletilmez. Hasta veya personel verisiyle çalışan bir
+kurulum, üretime alınmadan önce güvenilir sunucu tarafı kimlik doğrulama,
+rol/birim kapsamı ve retrieval filtresi eklemelidir; istemci mesajındaki
+“adminim” ifadesi yetki kanıtı değildir.
+
+`assistant_policy.py` modelden önce prompt injection, gizli yapılandırma,
+klinik çıkarım ve yetkisiz veri erişimi isteklerini deterministik engeller.
+Model yanıtı gönderilmeden önce sentetik canary, kişisel veri, secret ve stack
+trace örüntüleri için tekrar denetlenir. Bu kontroller savunmada ek katmandır;
+KVKK veya hastane politikası yerine geçmez.
 
 İki terminalle yerel çalıştırma:
 

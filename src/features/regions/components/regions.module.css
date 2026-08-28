@@ -121,3 +121,41 @@
   .headerActions button { padding: 0 7px; }
   .headerActions button:not(.primary) { font-size: 0; }
 }
+
+@media (max-width: 680px) {
+  .panel { min-height: auto; }
+  .header { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 0 1px 12px; }
+  .header > div:first-child > span { font-size: 7px; letter-spacing: .11em; }
+  .header h1 { margin-top: 4px; font-size: 15px; }
+  .systemMap { display: none; }
+  .engineToggle { grid-column: 1 / -1; min-width: 0; min-height: 40px; grid-template-columns: 20px minmax(0, 1fr) auto; padding: 7px 9px; }
+  .engineToggle svg { grid-row: auto; }
+  .engineToggle span { font-size: 7px; }
+  .engineToggle strong { margin: 0; font-size: 8px; white-space: nowrap; }
+  .headerActions { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 0; }
+  .headerActions button { min-height: 38px; padding: 0 5px; font-size: 8px; white-space: nowrap; }
+  .headerActions button:not(.primary) { font-size: 8px; }
+  .headerActions button svg { flex: 0 0 auto; }
+  .editor { display: flex; flex-direction: column; min-height: 0; overflow: visible; border-radius: 6px; }
+  .zonePanel, .properties { width: 100%; min-height: auto; border: 0; }
+  .zonePanel { border-bottom: 1px solid #cbd9e3; }
+  .panelTitle { min-height: 46px; padding: 0 11px; }
+  .zoneList { flex: 0 0 auto; display: flex; gap: 6px; overflow-x: auto; overflow-y: hidden; padding: 8px; }
+  .zoneList > button { flex: 0 0 min(210px, 68vw); min-height: 54px; margin: 0; }
+  .zoneList .empty { min-width: 100%; }
+  .mapInfo { display: none; }
+  .map { order: 2; width: 100%; height: min(62dvh, 500px); min-height: 330px; touch-action: none; }
+  .tools { top: 8px; left: 8px; right: 8px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 4px; }
+  .tools button { min-height: 42px; padding: 0; }
+  .tools button span { display: none; }
+  .tools .finishTool { grid-column: span 2; }
+  .mapControls { top: auto; right: 8px; bottom: 8px; }
+  .mapControls button { min-height: 38px; padding: 0 10px; }
+  .mapStatus { right: 8px; bottom: 54px; left: 8px; max-width: none; padding: 8px 9px; font-size: 8px; }
+  .properties { order: 3; overflow: visible; padding-bottom: 13px; }
+  .properties > .panelTitle { border-top: 1px solid #cbd9e3; }
+  .pointList { max-height: 220px; }
+  .properties > label, .fieldRow, .metrics, .coordinateSection, .pointListSection, .pointEditor, .selectHint, .deletePoint, .deleteZone, .errors { margin-right: 11px; margin-left: 11px; }
+  .coordinateGrid { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .deleteZone { margin-top: 12px; }
+}

@@ -10,6 +10,7 @@ import { Circle, Group, Image as KonvaImage, Layer, Line, Rect, Stage, Text } fr
 import type Konva from "konva";
 import useImage from "use-image";
 import { HistoryChatWidget } from "@/src/features/assistant/components/HistoryChatWidget";
+import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { MAP_CALIBRATION, MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
 import { CoordinateTransformService } from "@/src/features/map/services/CoordinateTransformService";
 import { buildLocationTimeline, type HistoricalPosition, type LocationStay } from "@/src/features/map/services/RouteTimelineService";
@@ -200,7 +201,8 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
   const selectedEntity = entities.find((entity) => entity.entityId === selectedEntityId) ?? null;
   const assistantFrom = useMemo(() => toIstanbulIsoString(startDate), [startDate]);
   const assistantTo = useMemo(() => toIstanbulIsoString(endDate), [endDate]);
-  const timeline = useMemo(() => buildLocationTimeline(positions, MAP_FLOOR_PLAN.id), [positions]);
+  const regionsConfig = useIpsStore((state) => state.regionsConfig);
+  const timeline = useMemo(() => buildLocationTimeline(positions, MAP_FLOOR_PLAN.id, regionsConfig), [positions, regionsConfig]);
   const pointValues = useMemo(() => positions.flatMap((position) => worldToCanvas(position)), [positions]);
   const distance = useMemo(() => routeDistance(positions), [positions]);
   const selectedStay = timeline.find((stay) => stay.id === selectedStayId) ?? null;

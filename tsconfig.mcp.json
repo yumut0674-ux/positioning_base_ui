@@ -10,7 +10,7 @@
     "mcp/**/*.ts",
     "src/server/location/**/*.ts",
     "src/server/postgresClient.ts",
-    "src/features/map/config/locationZones.ts",
+    "src/features/regions/types/region.types.ts",
     "src/features/map/services/LocationResolverService.ts",
     "app/api/location/**/*.ts"
   ],

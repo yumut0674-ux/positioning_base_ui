@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import type { LocationZone } from "../../src/features/map/config/locationZones";
-import { LOCATION_ZONES } from "../../src/features/map/config/locationZones";
 import { resolveLocation } from "../../src/features/map/services/LocationResolverService";
+import { DEFAULT_REGIONS_CONFIG } from "../../src/features/regions/config/defaultRegionsConfig";
+import type { RegionsConfig } from "../../src/features/regions/types/region.types";
 import type { EntityRepository } from "../../src/server/location/entityRepository";
 import { LocationError } from "../../src/server/location/locationErrors";
 import { LocationService } from "../../src/server/location/locationService";
@@ -161,27 +161,20 @@ test("konum yoksa boş timeline ve no_data döner", async () => {
   assert.equal(result.meta.dataStatus, "no_data");
 });
 
-test("polygon ve rectangle zone modelleri birlikte çalışır", () => {
-  const zones: readonly LocationZone[] = [
-    {
-      id: "room-34", label: "Oda 34", floorPlanId: "test-floor", priority: 1,
-      polygon: [{ x: 0, y: 0 }, { x: 4, y: 0 }, { x: 4, y: 4 }, { x: 0, y: 4 }],
-    },
-    { id: "room-65", label: "Oda 65", floorPlanId: "test-floor", priority: 2, minX: 5, maxX: 9, minY: 0, maxY: 4 },
-  ];
-  assert.equal(resolveLocation(2, 2, "test-floor", zones), "Oda 34");
-  assert.equal(resolveLocation(6, 2, "test-floor", zones), "Oda 65");
-  assert.equal(resolveLocation(20, 20, "test-floor", zones), "Tanımlı alan dışında");
-});
-
-test("ortopedi kat planı klinik fonksiyonlarına göre konum çözer", () => {
-  assert.equal(resolveLocation(31, 16, "hq-l1", LOCATION_ZONES), "Kat 01 · Ameliyathane ve Steril Alan");
-  assert.equal(resolveLocation(25, 17, "hq-l1", LOCATION_ZONES), "Kat 01 · Acil Ortopedi ve Travma");
-  assert.equal(resolveLocation(17, 17, "hq-l1", LOCATION_ZONES), "Kat 01 · Görüntüleme ve Konsültasyon");
-  assert.equal(resolveLocation(9, 17, "hq-l1", LOCATION_ZONES), "Kat 01 · Ortopedi Poliklinikleri");
-  assert.equal(resolveLocation(22, 13, "hq-l1", LOCATION_ZONES), "Kat 01 · Ana Hasta Transfer Koridoru");
-  assert.equal(resolveLocation(12, 8, "hq-l1", LOCATION_ZONES), "Kat 01 · Fizik Tedavi ve Rehabilitasyon");
-  assert.equal(resolveLocation(28, 8, "hq-l1", LOCATION_ZONES), "Kat 01 · Ortopedi Yatan Hasta Servisi");
+test("konum sadece bölgeler panelinde tanımlanmış çokgenlerden çözülür", () => {
+  const point = (x: number, y: number) => ({ pixel: { x, y }, world: { x, y } });
+  const config: RegionsConfig = {
+    ...DEFAULT_REGIONS_CONFIG,
+    map: { ...DEFAULT_REGIONS_CONFIG.map, mapId: "test-floor" },
+    regions: [
+      { id: "room-34", name: "Oda 34", color: "#00a896", polygon: [point(0, 0), point(4, 0), point(4, 4), point(0, 4)], roomCenter: point(2, 2), entrances: [] },
+      { id: "room-65", name: "Oda 65", color: "#00a896", polygon: [point(5, 0), point(9, 0), point(9, 4), point(5, 4)], roomCenter: point(7, 2), entrances: [] },
+    ],
+  };
+  assert.equal(resolveLocation(2, 2, "test-floor", config), "Oda 34");
+  assert.equal(resolveLocation(6, 2, "test-floor", config), "Oda 65");
+  assert.equal(resolveLocation(20, 20, "test-floor", config), "Tanımlı alan dışında");
+  assert.equal(resolveLocation(2, 2, "another-floor", config), "Tanımlı alan dışında");
 });
 
 test("PostgreSQL timestamp İstanbul ISO 8601 biçimine normalize edilir", () => {

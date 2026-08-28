@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 from datetime import datetime
+import os
 from typing import Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from location_agent_runtime import (
@@ -138,6 +139,24 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+EVALUATION_ROLES = {
+    "unauthenticated", "readonly", "clinical_staff", "technical_staff", "unit_manager", "system_admin",
+}
+
+
+def _evaluation_role(x_ai_evaluation_role: str | None) -> str:
+    """Accept synthetic roles only in an explicitly isolated test process.
+
+    Production callers cannot elevate by sending a header.  A future real
+    identity integration must pass a verified server-side principal instead.
+    """
+    if os.getenv("ASSISTANT_EVALUATION_MODE") != "1":
+        return "unauthenticated"
+    role = (x_ai_evaluation_role or "unauthenticated").strip()
+    if role not in EVALUATION_ROLES:
+        raise HTTPException(status_code=400, detail="Geçersiz değerlendirme rolü.")
+    return role
+
 
 def _runtime() -> LocationAgentRuntime:
     runtime = getattr(app.state, "location_agent_runtime", None)
@@ -156,13 +175,14 @@ async def health() -> dict[str, Any]:
 
 
 @app.post("/chat")
-async def chat(request: ChatRequest) -> dict[str, Any]:
+async def chat(request: ChatRequest, x_ai_evaluation_role: str | None = Header(default=None)) -> dict[str, Any]:
     context = request.context.model_dump(by_alias=True, exclude_none=True) if request.context else None
     try:
         result = await _runtime().answer(
             request.message,
             session_id=request.session_id,
             context=context,
+            role=_evaluation_role(x_ai_evaluation_role),
         )
     except AgentProviderError as error:
         raise HTTPException(status_code=502, detail=error.public_message) from error

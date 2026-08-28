@@ -1,9 +1,11 @@
-import {
-  LOCATION_ZONE_FALLBACK_LABEL,
-  LOCATION_ZONES,
-  type LocationZone,
-  type LocationZonePoint,
-} from "@/src/features/map/config/locationZones";
+import type { RegionsConfig } from "@/src/features/regions/types/region.types";
+
+export const LOCATION_ZONE_FALLBACK_LABEL = "Tanımlı alan dışında";
+
+interface LocationZonePoint {
+  readonly x: number;
+  readonly y: number;
+}
 
 function isPointOnSegment(point: LocationZonePoint, start: LocationZonePoint, end: LocationZonePoint): boolean {
   const cross = (point.y - start.y) * (end.x - start.x) - (point.x - start.x) * (end.y - start.y);
@@ -28,21 +30,18 @@ function isInsidePolygon(x: number, y: number, polygon: readonly LocationZonePoi
   return inside;
 }
 
-function contains(zone: LocationZone, x: number, y: number): boolean {
-  if ("polygon" in zone) return isInsidePolygon(x, y, zone.polygon);
-  return x >= zone.minX && x <= zone.maxX && y >= zone.minY && y <= zone.maxY;
-}
-
 export function resolveLocation(
   x: number,
   y: number,
   floorPlanId: string,
-  zones: readonly LocationZone[] = LOCATION_ZONES,
+  config: RegionsConfig | null | undefined = null,
 ): string {
-  const matchingZone = zones
-    .filter((zone) => zone.floorPlanId === floorPlanId)
-    .sort((left, right) => left.priority - right.priority)
-    .find((zone) => contains(zone, x, y));
+  if (!config || config.map.mapId !== floorPlanId) return LOCATION_ZONE_FALLBACK_LABEL;
+  const matchingZone = config.regions.find((region) => isInsidePolygon(
+    x,
+    y,
+    region.polygon.map((point) => point.world),
+  ));
 
-  return matchingZone?.label ?? LOCATION_ZONE_FALLBACK_LABEL;
+  return matchingZone?.name ?? LOCATION_ZONE_FALLBACK_LABEL;
 }

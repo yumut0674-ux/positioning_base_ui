@@ -258,14 +258,18 @@ button { color: inherit; font: inherit; }
   html, body { height: auto; min-height: 100%; overflow-x: hidden; overflow-y: auto; }
   body.mobile-menu-open { overflow: hidden; }
   .ips-shell { display: block; width: 100%; height: auto; min-height: 100dvh; }
-  .app-header { position: sticky; top: 0; height: 56px; z-index: 20; }
-  .brand { width: 172px; flex-basis: 172px; padding-inline: 14px; border: 0; }
-  .site-context { margin-left: 4px; }
+  .app-header { position: sticky; top: 0; height: 52px; z-index: 20; }
+  .brand { width: 138px; flex-basis: 138px; gap: 8px; padding-inline: 10px; border: 0; }
+  .brand strong { font-size: 13px; }
+  .brand span { display: none; }
+  .logo-mark { width: 24px; height: 24px; transform: scale(.86) rotate(30deg); }
+  .sidebar-brand-row .sidebar-toggle { width: 30px; height: 30px; flex-basis: 30px; }
+  .site-context { margin-left: 0; }
   .context-index, .map-selector-trigger small, .header-actions > button:first-child { display: none; }
   .map-selector-trigger { padding: 0 6px; gap: 4px; }
   .map-selector-trigger > svg { display: block; flex: 0 0 auto; }
-  .map-selector-context strong { max-width: min(35vw, 145px); font-size: 9px; }
-  .map-selector-menu { position: fixed; top: 62px; right: 8px; left: 8px; width: auto; max-height: calc(100dvh - 76px); }
+  .map-selector-context strong { max-width: min(52vw, 192px); font-size: 9px; }
+  .map-selector-menu { position: fixed; top: 58px; right: 8px; left: 8px; width: auto; max-height: calc(100dvh - 70px); }
   .operator { display: none; }
   .mobile-sidebar-backdrop { position: fixed; z-index: 40; inset: 0; display: block; width: 100%; height: 100%; border: 0; background: rgba(15, 27, 45, .36); cursor: default; }
   .app-sidebar { position: fixed; z-index: 41; inset: 0 auto 0 0; display: flex; width: min(300px, calc(100vw - 44px)); min-height: 100dvh; overflow-y: auto; border-right: 1px solid var(--line); box-shadow: 18px 0 42px rgba(21, 42, 63, .2); transform: translateX(-105%); transition: transform .22s ease, visibility .22s ease; visibility: hidden; pointer-events: none; }

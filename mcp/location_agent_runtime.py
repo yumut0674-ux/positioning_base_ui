@@ -17,6 +17,7 @@ from typing import Any, Mapping
 from uuid import uuid4
 
 from dotenv import load_dotenv
+from assistant_policy import OUTPUT_SAFETY_MESSAGE, decide_request, safe_answer
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -55,6 +56,7 @@ class AgentSession:
     chat: Any
     lock: asyncio.Lock
     last_access: float
+    role: str
 
 
 class AgentUserFacingError(RuntimeError):
@@ -355,6 +357,7 @@ class LocationAgentRuntime:
                 chat=self._create_chat(),
                 lock=asyncio.Lock(),
                 last_access=time.monotonic(),
+                role="unauthenticated",
             )
             return session_id
 
@@ -368,6 +371,7 @@ class LocationAgentRuntime:
         *,
         session_id: str | None = None,
         context: Mapping[str, Any] | None = None,
+        role: str = "unauthenticated",
     ) -> AgentAnswer:
         self._ensure_started()
         cleaned_message = message.strip()
@@ -376,9 +380,14 @@ class LocationAgentRuntime:
         if len(cleaned_message) > 1000:
             raise AgentUserFacingError("Mesaj en fazla 1000 karakter olabilir.")
 
-        resolved_session_id, session = await self._get_or_create_session(session_id)
+        decision = decide_request(cleaned_message, role)
+        if not decision.allow_model:
+            # Do not create a chat or expose an MCP tool for rejected input.
+            return AgentAnswer(session_id=session_id or str(uuid4()), answer=decision.response or OUTPUT_SAFETY_MESSAGE)
+
+        resolved_session_id, session = await self._get_or_create_session(session_id, role=role)
         async with session.lock:
-            tag_lookup_result = await self._verify_context_tag(context)
+            tag_lookup_result = await self._verify_context_tag(context) if decision.allow_tools else None
             prompt = "\n\n".join([
                 _build_context_prompt(context, tag_lookup_result),
                 "Kullanıcı sorusu:",
@@ -392,6 +401,11 @@ class LocationAgentRuntime:
             answer = _to_plain_answer(getattr(response, "text", None) or "")
             if not answer:
                 answer = "Gemini yanıt üretemedi. Lütfen sorunuzu biraz daha netleştirerek tekrar deneyin."
+            answer, output_reason = safe_answer(answer)
+            if output_reason:
+                # Keep the reason in server-side structured logs only; never echo
+                # the matched content to the user.
+                print(json.dumps({"event": "assistant.output_blocked", "reason": output_reason}), file=sys.stderr)
             session.last_access = time.monotonic()
             return AgentAnswer(session_id=resolved_session_id, answer=answer)
 
@@ -399,7 +413,7 @@ class LocationAgentRuntime:
         if not self._started or self._client is None or self._mcp_session is None:
             raise AgentNotReadyError("Gekon AI henüz hazır değil.")
 
-    def _create_chat(self) -> Any:
+    def _create_chat(self, *, allow_tools: bool = False) -> Any:
         self._ensure_started()
         assert self._client is not None
         assert self._mcp_session is not None
@@ -408,22 +422,25 @@ class LocationAgentRuntime:
             config=types.GenerateContentConfig(
                 system_instruction=build_agent_instructions(),
                 temperature=0,
-                tools=[self._mcp_session],
+                tools=[self._mcp_session] if allow_tools else [],
             ),
         )
 
-    async def _get_or_create_session(self, session_id: str | None) -> tuple[str, AgentSession]:
+    async def _get_or_create_session(self, session_id: str | None, *, role: str) -> tuple[str, AgentSession]:
         async with self._sessions_lock:
             self._cleanup_expired_sessions_locked()
             if session_id and session_id in self._sessions:
-                return session_id, self._sessions[session_id]
+                existing = self._sessions[session_id]
+                if existing.role == role:
+                    return session_id, existing
 
             self._evict_capacity_locked(reserve_slots=1)
             resolved_session_id = session_id or str(uuid4())
             session = AgentSession(
-                chat=self._create_chat(),
+                chat=self._create_chat(allow_tools=role in {"clinical_staff", "technical_staff", "unit_manager", "system_admin"}),
                 lock=asyncio.Lock(),
                 last_access=time.monotonic(),
+                role=role,
             )
             self._sessions[resolved_session_id] = session
             return resolved_session_id, session

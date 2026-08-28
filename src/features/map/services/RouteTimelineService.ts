@@ -1,4 +1,5 @@
 import { resolveLocation } from "@/src/features/map/services/LocationResolverService";
+import type { RegionsConfig } from "@/src/features/regions/types/region.types";
 
 export interface HistoricalPosition {
   readonly tagId: string;
@@ -29,16 +30,16 @@ function timestampOf(position: HistoricalPosition): number {
   return new Date(position.timestamp).getTime();
 }
 
-function resolveStableLocations(positions: readonly HistoricalPosition[], floorPlanId: string): readonly ResolvedPosition[] {
+function resolveStableLocations(positions: readonly HistoricalPosition[], floorPlanId: string, regionsConfig?: RegionsConfig | null): readonly ResolvedPosition[] {
   if (positions.length === 0) return [];
 
   const resolved: ResolvedPosition[] = [];
-  let currentLabel = resolveLocation(positions[0].x, positions[0].y, floorPlanId);
+  let currentLabel = resolveLocation(positions[0].x, positions[0].y, floorPlanId, regionsConfig);
   let candidateLabel: string | null = null;
   let candidateIndexes: number[] = [];
 
   positions.forEach((position, index) => {
-    const rawLabel = resolveLocation(position.x, position.y, floorPlanId);
+    const rawLabel = resolveLocation(position.x, position.y, floorPlanId, regionsConfig);
     const previousPosition = positions[index - 1];
     const hasDataGap = previousPosition && timestampOf(position) - timestampOf(previousPosition) > DATA_GAP_MS;
 
@@ -80,9 +81,9 @@ function resolveStableLocations(positions: readonly HistoricalPosition[], floorP
   return resolved;
 }
 
-export function buildLocationTimeline(positions: readonly HistoricalPosition[], floorPlanId: string): readonly LocationStay[] {
+export function buildLocationTimeline(positions: readonly HistoricalPosition[], floorPlanId: string, regionsConfig?: RegionsConfig | null): readonly LocationStay[] {
   const chronologicalPositions = [...positions].sort((left, right) => timestampOf(left) - timestampOf(right));
-  const resolved = resolveStableLocations(chronologicalPositions, floorPlanId);
+  const resolved = resolveStableLocations(chronologicalPositions, floorPlanId, regionsConfig);
   if (resolved.length === 0) return [];
 
   const stays: LocationStay[] = [];

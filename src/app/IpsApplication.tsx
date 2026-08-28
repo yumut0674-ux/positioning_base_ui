@@ -92,6 +92,7 @@ function LiveMapWorkspace({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const fullscreenSupported = typeof document === "undefined" || document.fullscreenEnabled;
   const selectedTag = selectedTagId ? tags[selectedTagId] : undefined;
+  const regionsConfig = useIpsStore((state) => state.regionsConfig);
   const assistantContext = useMemo<GekonAiContext>(() => ({
     mode: "live",
     selectedTagId: selectedTag?.id,
@@ -100,13 +101,13 @@ function LiveMapWorkspace({
     floorPlanId: activeMapDetails?.id ?? MAP_FLOOR_PLAN.id,
     floorPlanName: activeMap?.displayName ?? `${MAP_FLOOR_PLAN.name} · ${MAP_FLOOR_PLAN.level}`,
     tagStatus: selectedTag?.status,
-    zoneName: selectedTag ? resolveLocation(selectedTag.x, selectedTag.y, MAP_FLOOR_PLAN.id) : undefined,
+    zoneName: selectedTag ? resolveLocation(selectedTag.x, selectedTag.y, MAP_FLOOR_PLAN.id, regionsConfig) : undefined,
     livePosition: selectedTag ? {
       x: selectedTag.x,
       y: selectedTag.y,
       observedAt: new Date(selectedTag.timestamp).toISOString(),
     } : undefined,
-  }), [activeMap?.displayName, activeMapDetails?.id, selectedTag]);
+  }), [activeMap?.displayName, activeMapDetails?.id, regionsConfig, selectedTag]);
 
   useEffect(() => {
     if (!catalog) return;
@@ -215,7 +216,7 @@ function LiveMapWorkspace({
               <h1>{activeMap?.unitName ?? "Harita yükleniyor"}</h1>
             </div>
           </div>
-          <TagInformationPanel variant="mobile" onOpenHistory={handleOpenTagHistory} onShowMap={handleShowMap} liveTrackingMapId={catalog?.liveTrackingMapId} />
+          <TagInformationPanel variant="mobile" onOpenHistory={handleOpenTagHistory} onShowMap={handleShowMap} />
           <section className="mobile-map-section" aria-labelledby="mobile-map-title">
             <div className="mobile-map-section-heading"><div><small>CANLI GÖRÜNÜM</small><h2 id="mobile-map-title">Harita</h2></div><span>Haritayı görüntüle</span></div>
             <div ref={mapFrameRef} className="map-frame">
@@ -244,7 +245,7 @@ function LiveMapWorkspace({
           </div>
         )}
       </main>
-      {activeView === "map" && <TagInformationPanel variant="desktop" onOpenHistory={handleOpenTagHistory} liveTrackingMapId={catalog?.liveTrackingMapId} />}
+      {activeView === "map" && <TagInformationPanel variant="desktop" onOpenHistory={handleOpenTagHistory} />}
       {activeView === "map" && liveTrackingVisible && <GekonAiWidget context={assistantContext} />}
       <StatusStrip />
     </div>

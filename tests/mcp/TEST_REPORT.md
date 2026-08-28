@@ -91,7 +91,7 @@ Otomatik HTTP entegrasyon testi çalışan ayrı uygulama süreci olmadığı i�
 
 `tracked_entities`/`tag_assignments` migration'ı güvenli otomatik uygulama yetkisi olmadığı için çalıştırılmadı. Legacy fallback tarihsel yeniden atamayı gerçek veride garanti etmez. History UI hâlâ demo veri kullanır.
 
-Floor plan ve mevcut zone konfigürasyonu Oda 34/Oda 65 gibi numaralı odaların kalibre edilmiş sınırlarını içermiyor. Resolver artık polygon ve rectangle destekler; fakat gerçek oda polygonları sağlanana kadar oda numarası uydurulmaz ve bu koordinatlar `Tanımlı alan dışında` kalır.
+Konum adları yalnızca kaydedilmiş bölgeler paneli konfigürasyonundaki çokgenlerden çözülür. Tanımlı bir çokgenin dışında kalan koordinatlar `Tanımlı alan dışında` kalır; oda numarası veya alan adı uydurulmaz.
 
 Mevcut proje testi iki nedenle başarısızdır: `codex-preview=development` meta etiketi bulunmuyor ve `app/_sites-preview/SkeletonPreview.tsx` mevcut değil. Bunlar MCP değişikliklerinden bağımsızdır.
 
@@ -101,5 +101,5 @@ Mevcut proje testi iki nedenle başarısızdır: `codex-preview=development` met
 2. Ürün–tag atama verisini doldurun ve çakışma kontrollerini operasyonel veriyle doğrulayın.
 3. Çalışan REST sunucusunda `UWB_MCP_INTEGRATION=1` ile otomatik entegrasyon testini çalıştırın.
 4. `app/history/page.tsx` demo verisini yeni history endpointine bağlayın.
-5. Kalibre edilmiş oda polygonlarını `locationZones.ts` içine ekleyin.
+5. Kalibre edilmiş oda polygonlarını Bölgeler panelinden tanımlayıp kaydedin.
 6. Mevcut proje typecheck ve rendered HTML test borçlarını ayrı değişiklikte giderin.

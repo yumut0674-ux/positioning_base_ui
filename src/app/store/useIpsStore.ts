@@ -3,6 +3,7 @@ import type { Point2D } from "@/src/shared/types/geometry";
 import type { AnchorDefinition, MapLayerId, ViewportState } from "@/src/features/map/types/map.types";
 import { TAG_LIVE_TIMEOUT_MS, type TagStatus, type TrackedTag } from "@/src/features/tracking/types/tracking.types";
 import type { TagDefinition } from "@/src/features/tracking/services/tagApi";
+import type { RegionsConfig } from "@/src/features/regions/types/region.types";
 import { addRecentTagId, nextTagLocationEntry, type TagLocationEntry } from "@/src/features/tracking/services/tagPanelState";
 import { MAP_TAG_FOCUS_SCALE } from "@/src/features/map/config/mapConfig";
 
@@ -25,6 +26,7 @@ interface IpsState {
   readonly selectedTagId: string | null;
   readonly recentTagIds: readonly string[];
   readonly tagLocationEntries: Record<string, TagLocationEntry>;
+  readonly regionsConfig: RegionsConfig | null;
   readonly connectionMode: "live" | "simulation" | "reconnecting";
   readonly showLayersPanel: boolean;
   readonly measurement: MeasurementState;
@@ -41,6 +43,7 @@ interface IpsState {
   refreshTagActivity: (now?: number) => void;
   setAnchors: (anchors: readonly AnchorDefinition[]) => void;
   setTagDefinitions: (tags: readonly TagDefinition[]) => void;
+  setRegionsConfig: (config: RegionsConfig) => void;
   selectTag: (tagId: string | null) => void;
   selectTagAndFocus: (tagId: string) => void;
   hydrateRecentTagIds: (tagIds: readonly string[]) => void;
@@ -75,6 +78,7 @@ export const useIpsStore = create<IpsState>((set) => ({
   selectedTagId: "TAG-001",
   recentTagIds: [],
   tagLocationEntries: {},
+  regionsConfig: null,
   connectionMode: "live",
   showLayersPanel: false,
   measurement: { enabled: false, start: null, end: null },
@@ -108,7 +112,7 @@ export const useIpsStore = create<IpsState>((set) => ({
     tags: { ...state.tags, [tag.id]: tag },
     tagLocationEntries: {
       ...state.tagLocationEntries,
-      [tag.id]: nextTagLocationEntry(state.tagLocationEntries[tag.id], tag),
+      [tag.id]: nextTagLocationEntry(state.tagLocationEntries[tag.id], tag, state.regionsConfig),
     },
   })),
   observeTag: (tag) => set((state) => ({ observedTags: { ...state.observedTags, [tag.id]: tag } })),
@@ -125,6 +129,13 @@ export const useIpsStore = create<IpsState>((set) => ({
   }),
   setAnchors: (anchors) => set({ anchors }),
   setTagDefinitions: (tags) => set({ tagDefinitions: Object.fromEntries(tags.map((tag) => [tag.id.toUpperCase(), tag])) }),
+  setRegionsConfig: (regionsConfig) => set((state) => ({
+    regionsConfig,
+    tagLocationEntries: Object.fromEntries(Object.entries(state.tags).map(([tagId, tag]) => [
+      tagId,
+      nextTagLocationEntry(state.tagLocationEntries[tagId], tag, regionsConfig),
+    ])),
+  })),
   selectTag: (selectedTagId) => set((state) => ({
     selectedTagId,
     recentTagIds: selectedTagId ? addRecentTagId(state.recentTagIds, selectedTagId) : state.recentTagIds,

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  createTagMovement,
   createTagSimulator,
   getRandomDelay,
   resolveSimulationEndpoint,
@@ -41,6 +42,37 @@ test("simulation endpoint selection distinguishes local and public destinations"
     PUBLIC_TRACKING_INGEST_URL: "https://staging.example.com/api/tracking/ingest",
   }), "https://staging.example.com/api/tracking/ingest");
   assert.throws(() => resolveSimulationEndpoint("3"), /Geçerli bir seçenek/);
+});
+
+test("tags follow the corridor, visit a room centre, then stay there for 2–20 seconds", () => {
+  let currentTime = new Date("2026-08-28T08:00:00.000Z");
+  const movement = createTagMovement({
+    tag: { tagId: "TAG-TEST", position: { x: 1.75, y: 10 }, direction: 1 },
+    roomCenters: [{ x: 2, y: 20 }],
+    random: () => 0,
+    now: () => currentTime,
+  });
+
+  assert.deepEqual(movement.next(), { x: 1.75, y: 10 });
+  currentTime = new Date("2026-08-28T08:00:10.000Z");
+  const enRoute = movement.next();
+  assert.equal(enRoute.x, 1.75);
+  assert.ok(enRoute.y > 10 && enRoute.y < 20);
+
+  currentTime = new Date("2026-08-28T08:00:12.000Z");
+  assert.deepEqual(movement.next(), { x: 1.75, y: 20 });
+  currentTime = new Date("2026-08-28T08:00:13.000Z");
+  assert.deepEqual(movement.next(), { x: 2, y: 20 });
+  const waitingState = movement.getState();
+  assert.equal(waitingState.isWaitingInRoom, true);
+  assert.equal(waitingState.roomWaitUntil - currentTime.getTime(), 2_000);
+
+  currentTime = new Date("2026-08-28T08:00:14.999Z");
+  assert.deepEqual(movement.next(), { x: 2, y: 20 });
+  currentTime = new Date("2026-08-28T08:00:15.000Z");
+  const returning = movement.next();
+  assert.equal(returning.y, 20);
+  assert.ok(returning.x < 2 && returning.x > 1.75);
 });
 
 test("next timer is created only after the whole send completes and never accumulates", async () => {

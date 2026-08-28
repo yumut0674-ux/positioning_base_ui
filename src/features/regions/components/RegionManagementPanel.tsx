@@ -12,6 +12,8 @@ import { MAP_FLOOR_PLAN, MAP_VIEWPORT_LIMITS } from "@/src/features/map/config/m
 import { useElementSize } from "@/src/shared/hooks/useElementSize";
 import { DEFAULT_REGIONS_CONFIG } from "../config/defaultRegionsConfig";
 import { createAffineTransform, createInverseAffineTransform, withWorldCoordinates } from "../services/affineTransform";
+import { hasExceededDragThreshold, type RegionPointerGesture } from "../services/regionGesture";
+import { notifyRegionsConfigUpdated } from "../services/regionsConfig";
 import type { CoordinatePair, RegionDefinition, RegionEditorTool, RegionsConfig } from "../types/region.types";
 import { POSITION_ANIMATION_CONFIG_CHANGED_EVENT } from "@/src/features/tracking/config/positionAnimationConfig";
 import {
@@ -57,6 +59,8 @@ export function RegionManagementPanel() {
   const hostRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const pointerGestureRef = useRef<RegionPointerGesture | null>(null);
+  const hasMobileInitialFitRef = useRef(false);
   const size = useElementSize(hostRef);
   const [floorImage] = useImage(MAP_FLOOR_PLAN.imageUrl, "anonymous");
   const [config, setConfig] = useState<RegionsConfig>(DEFAULT_REGIONS_CONFIG);
@@ -145,17 +149,24 @@ export function RegionManagementPanel() {
   }, []);
 
   const fitToScreen = useCallback(() => {
+    if (size.width <= 0 || size.height <= 0) return;
     const padding = 38;
-    const scale = Math.min(
+    const scale = Math.max(0.1, Math.min(
       (size.width - padding * 2) / MAP_FLOOR_PLAN.canvasSize.width,
       (size.height - padding * 2) / MAP_FLOOR_PLAN.canvasSize.height,
-    );
+    ));
     setViewport({
-      scale: Math.max(MAP_VIEWPORT_LIMITS.minZoom, scale),
+      scale,
       x: (size.width - MAP_FLOOR_PLAN.canvasSize.width * scale) / 2,
       y: (size.height - MAP_FLOOR_PLAN.canvasSize.height * scale) / 2,
     });
   }, [size.height, size.width]);
+
+  useEffect(() => {
+    if (hasMobileInitialFitRef.current || size.width <= 0 || size.height <= 0 || !window.matchMedia("(max-width: 680px)").matches) return;
+    hasMobileInitialFitRef.current = true;
+    fitToScreen();
+  }, [fitToScreen, size.height, size.width]);
 
   const pointerToPixel = useCallback(() => {
     const pointer = stageRef.current?.getPointerPosition();
@@ -182,8 +193,8 @@ export function RegionManagementPanel() {
     setStatus("Çokgen köşelerini harita üzerinde işaretleyin");
   };
 
-  const handleMapClick = (event: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
-    if (event.target !== event.target.getStage() || tool === "select" || !selectedRegion) return;
+  const addPointAtPointer = () => {
+    if (tool === "select" || !selectedRegion) return;
     const point = pointerToPixel();
     if (!point) return;
     if (tool === "polygon") {
@@ -199,6 +210,29 @@ export function RegionManagementPanel() {
       }));
       setStatus("Giriş eklendi; başka bir giriş ekleyebilirsiniz");
     }
+  };
+
+  const handlePointerDown = (event: Konva.KonvaEventObject<PointerEvent>) => {
+    if (event.target !== event.target.getStage()) {
+      pointerGestureRef.current = null;
+      return;
+    }
+    const pointer = stageRef.current?.getPointerPosition();
+    pointerGestureRef.current = pointer ? { start: pointer, moved: false } : null;
+  };
+
+  const handlePointerMove = () => {
+    const gesture = pointerGestureRef.current;
+    const pointer = stageRef.current?.getPointerPosition();
+    if (!gesture || !pointer || gesture.moved || !hasExceededDragThreshold(gesture.start, pointer)) return;
+    pointerGestureRef.current = { ...gesture, moved: true };
+  };
+
+  const handlePointerUp = (event: Konva.KonvaEventObject<PointerEvent>) => {
+    const gesture = pointerGestureRef.current;
+    pointerGestureRef.current = null;
+    if (!gesture || gesture.moved || event.target !== event.target.getStage()) return;
+    addPointAtPointer();
   };
 
   const updateCoordinate = (type: NonNullable<SelectedPoint>["type"], index: number, point: CoordinatePair) => {
@@ -267,6 +301,7 @@ export function RegionManagementPanel() {
         POSITION_ANIMATION_CONFIG_CHANGED_EVENT,
         { detail: (payload.config ?? normalized).positionAnimation },
       ));
+      notifyRegionsConfigUpdated(payload.config ?? normalized);
       setStatus("Oda/bölge ayarları kaydedildi");
     } catch (error) {
       setErrors([error instanceof Error ? error.message : "Config dosyasına yazılamadı"]);
@@ -294,7 +329,11 @@ export function RegionManagementPanel() {
     const pointer = stageRef.current?.getPointerPosition();
     if (!pointer) return;
     const direction = event.evt.deltaY > 0 ? -1 : 1;
-    const scale = Math.min(MAP_VIEWPORT_LIMITS.maxZoom, Math.max(MAP_VIEWPORT_LIMITS.minZoom, viewport.scale * Math.pow(1.08, direction)));
+    const minimumScale = Math.min(MAP_VIEWPORT_LIMITS.minZoom, Math.max(0.1, Math.min(
+      (size.width - 76) / MAP_FLOOR_PLAN.canvasSize.width,
+      (size.height - 76) / MAP_FLOOR_PLAN.canvasSize.height,
+    )));
+    const scale = Math.min(MAP_VIEWPORT_LIMITS.maxZoom, Math.max(minimumScale, viewport.scale * Math.pow(1.08, direction)));
     const mapPoint = { x: (pointer.x - viewport.x) / viewport.scale, y: (pointer.y - viewport.y) / viewport.scale };
     setViewport({ scale, x: pointer.x - mapPoint.x * scale, y: pointer.y - mapPoint.y * scale });
   };
@@ -355,10 +394,12 @@ export function RegionManagementPanel() {
             ref={stageRef}
             width={size.width}
             height={size.height}
-            draggable={tool === "select"}
+            draggable
             onWheel={handleWheel}
-            onClick={handleMapClick}
-            onTap={handleMapClick}
+            onPointerDown={handlePointerDown}
+            onPointerMove={handlePointerMove}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={() => { pointerGestureRef.current = null; }}
             onDragEnd={(event) => {
               if (event.target !== event.target.getStage()) return;
               setViewport((current) => ({ ...current, x: current.x + event.target.x(), y: current.y + event.target.y() }));

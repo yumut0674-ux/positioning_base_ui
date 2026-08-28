@@ -9,6 +9,16 @@ import {
   readRecentTagIds,
 } from "../src/features/tracking/services/tagPanelState";
 import { useIpsStore } from "../src/app/store/useIpsStore";
+import { DEFAULT_REGIONS_CONFIG } from "../src/features/regions/config/defaultRegionsConfig";
+
+const point = (x: number, y: number) => ({ pixel: { x, y }, world: { x, y } });
+const regionsConfig = {
+  ...DEFAULT_REGIONS_CONFIG,
+  regions: [
+    { id: "first", name: "Birinci Alan", color: "#00a896", polygon: [point(5, 14), point(14, 14), point(14, 21), point(5, 21)], roomCenter: point(9, 17), entrances: [] },
+    { id: "second", name: "İkinci Alan", color: "#00a896", polygon: [point(28, 14), point(37, 14), point(37, 20), point(28, 20)], roomCenter: point(31, 16), entrances: [] },
+  ],
+};
 
 function tag(overrides: Partial<{ id: string; x: number; y: number; timestamp: number }> = {}) {
   return {
@@ -41,9 +51,9 @@ test("recent tags serialize and restore through browser storage", () => {
 });
 
 test("location entry time is retained in the same area and reset after an area change", () => {
-  const first = nextTagLocationEntry(undefined, tag({ x: 9, y: 17, timestamp: 1_000 }));
-  const sameArea = nextTagLocationEntry(first, tag({ x: 10, y: 18, timestamp: 9_000 }));
-  const differentArea = nextTagLocationEntry(sameArea, tag({ x: 31, y: 16, timestamp: 12_000 }));
+  const first = nextTagLocationEntry(undefined, tag({ x: 9, y: 17, timestamp: 1_000 }), regionsConfig);
+  const sameArea = nextTagLocationEntry(first, tag({ x: 10, y: 18, timestamp: 9_000 }), regionsConfig);
+  const differentArea = nextTagLocationEntry(sameArea, tag({ x: 31, y: 16, timestamp: 12_000 }), regionsConfig);
 
   assert.equal(sameArea.enteredAt, 1_000);
   assert.equal(differentArea.enteredAt, 12_000);
@@ -70,9 +80,16 @@ test("tag selection records the visit and creates one map focus request", () => 
   }
 });
 
-test("quick tag selection updates details without requesting a map focus", () => {
+test("quick tag selection updates details without requesting a map focus on the live map", () => {
   const original = useIpsStore.getState();
-  useIpsStore.setState({ selectedTagId: null, recentTagIds: [], mapFocusRequest: 20 });
+  useIpsStore.setState({
+    activeMapId: "kat1-ortopedi",
+    readyMapId: "kat1-ortopedi",
+    selectedTagId: null,
+    recentTagIds: [],
+    mapFocusRequest: 20,
+    mapFocusScale: null,
+  });
   try {
     useIpsStore.getState().selectTag("TAG-028");
     const state = useIpsStore.getState();
@@ -84,6 +101,9 @@ test("quick tag selection updates details without requesting a map focus", () =>
       selectedTagId: original.selectedTagId,
       recentTagIds: original.recentTagIds,
       mapFocusRequest: original.mapFocusRequest,
+      activeMapId: original.activeMapId,
+      readyMapId: original.readyMapId,
+      mapFocusScale: original.mapFocusScale,
     });
   }
 });
