@@ -27,27 +27,27 @@ function renderSelectedTag(x: number, y: number) {
   }));
 }
 
-test("selected tag panel presents a clinical location instead of X/Y coordinates", () => {
+test("selected tracking-label panel presents a clinical location instead of X/Y coordinates", () => {
   const html = renderSelectedTag(9, 17);
 
   assert.match(html, /KONUM ADRESİ/);
   assert.match(html, /Kat 01 · Ortopedi Poliklinikleri/);
   assert.match(html, /Konum adresi: Kat 01 · Ortopedi Poliklinikleri/);
-  assert.match(html, /Taglar/);
+  assert.match(html, /Takip Etiketleri/);
   assert.match(html, /Son görüntülenenler/i);
   assert.match(html, /Bu alanda 18 dk 42 sn/);
   assert.doesNotMatch(html, /X KONUMU|Y KONUMU|metre/);
   assert.doesNotMatch(html, /Son hareketlilik|SON 30 SN|Son hareket sinyali/);
 });
 
-test("selected tag panel identifies a location outside configured areas", () => {
+test("selected tracking-label panel identifies a location outside configured areas", () => {
   const html = renderSelectedTag(0, 0);
 
   assert.match(html, /Tanımlı alan dışında/);
   assert.doesNotMatch(html, /X KONUMU|Y KONUMU|metre/);
 });
 
-test("mobile tag panel includes the map reveal action without technical coordinates", () => {
+test("mobile tracking-label panel includes the map reveal action without technical coordinates", () => {
   const tag = {
     id: "TAG-MOBILE",
     name: "Mobil Test Tag",

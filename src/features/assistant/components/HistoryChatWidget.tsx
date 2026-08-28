@@ -359,7 +359,7 @@ export function GekonAiWidget({ context: suppliedContext, draftText, draftReques
                 <Bot size={18} />
                 <p>{historyMode
                   ? "Seçili varlığın gerçek rota geçmişi ve tarih aralığı hakkında soru sorun."
-                  : "Seçili tag’in canlı konumu, durumu ve bulunduğu alan hakkında soru sorun."}</p>
+                  : "Seçili takip etiketinin canlı konumu, durumu ve bulunduğu alan hakkında soru sorun."}</p>
               </div>
             )}
             {messages.map((message) => (

@@ -25,8 +25,8 @@ interface TagInformationPanelContentProps extends TagInformationPanelProps {
 }
 
 function matchesQuery(tag: TrackedTag, query: string): boolean {
-  return tag.name.toLocaleLowerCase("tr-TR").includes(query)
-    || tag.id.toLocaleLowerCase("tr-TR").includes(query);
+  return tag.name.toLocaleLowerCase("tr-TR").startsWith(query)
+    || tag.id.toLocaleLowerCase("tr-TR").startsWith(query);
 }
 
 function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag }: {
@@ -43,13 +43,14 @@ function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag }: {
   const tagsById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags]);
   const recentTags = useMemo(() => recentTagIds.map((tagId) => tagsById.get(tagId)).filter((tag): tag is TrackedTag => Boolean(tag)), [recentTagIds, tagsById]);
   const visibleTags = useMemo(() => tags.filter((tag) => !normalizedQuery || matchesQuery(tag, normalizedQuery)), [normalizedQuery, tags]);
+  const emptyStateMessage = normalizedQuery ? `“${query.trim()}” için sonuç bulunamadı.` : "Canlı takip etiketi bekleniyor.";
 
   return (
     <section className="tag-switcher" aria-labelledby={titleId}>
-      <div className="tag-switcher-heading"><div><small>HIZLI GEÇİŞ</small><h2 id={titleId}>Taglar</h2></div><span>{tags.length}</span></div>
-      <label className="tag-switcher-search"><Search size={14} aria-hidden="true" /><span className="sr-only">Tag ara</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Tag adı veya ID ara" /></label>
+      <div className="tag-switcher-heading"><div><small>HIZLI GEÇİŞ</small><h2 id={titleId}>Takip Etiketleri</h2></div><span>{tags.length}</span></div>
+      <label className="tag-switcher-search"><Search size={14} aria-hidden="true" /><span className="sr-only">Takip etiketi ara</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Takip etiketi adı veya kodu ara" /></label>
       {!normalizedQuery && recentTags.length > 0 && <section className="recent-tags" aria-labelledby={recentTitleId}><small id={recentTitleId}>SON GÖRÜNTÜLENENLER</small><div>{recentTags.map((tag) => <button key={tag.id} type="button" onClick={() => onSelectTag(tag.id)} aria-label={`${tag.name} (${tag.id}) etiketini seç`}>{tag.name}</button>)}</div></section>}
-      <div className="tag-switcher-list" role="listbox" aria-label="Tag listesi">
+      <div className="tag-switcher-list" role="listbox" aria-label="Takip etiketi listesi">
         {visibleTags.map((tag) => {
           const isSelected = tag.id === selectedTagId;
           const isActive = tag.status === "active";
@@ -59,7 +60,7 @@ function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag }: {
             <span className="tag-switcher-meta"><em>{isActive ? "CANLI" : "PASİF"}</em><small>{resolveLocation(tag.x, tag.y, MAP_FLOOR_PLAN.id)}</small></span>
           </button>;
         })}
-        {visibleTags.length === 0 && <p className="tag-switcher-empty">{tags.length === 0 ? "Canlı tag bekleniyor." : "Eşleşen tag bulunamadı."}</p>}
+        {visibleTags.length === 0 && <p className="tag-switcher-empty">{emptyStateMessage}</p>}
       </div>
     </section>
   );
@@ -67,8 +68,8 @@ function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag }: {
 
 export function TagInformationPanelContent({ selectedTag, locationAddress, locationDuration, tags, recentTagIds, onSelectTag, onOpenHistory, variant = "desktop", onShowMap }: TagInformationPanelContentProps) {
   const panelLabel = selectedTag && locationAddress
-    ? `Tag geçiş ve detay paneli. Seçili varlık: ${selectedTag.name}. Konum adresi: ${locationAddress}`
-    : "Tag geçiş ve detay paneli";
+    ? `Takip etiketi geçiş ve detay paneli. Seçili varlık: ${selectedTag.name}. Konum adresi: ${locationAddress}`
+    : "Takip etiketi geçiş ve detay paneli";
   return (
     <motion.aside className={`tag-panel tag-panel--${variant}`} aria-label={panelLabel} initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }}>
       <TagQuickList tags={tags} recentTagIds={recentTagIds} selectedTagId={selectedTag?.id} onSelectTag={onSelectTag} />
@@ -88,7 +89,7 @@ export function TagInformationPanelContent({ selectedTag, locationAddress, locat
           {variant === "mobile" && onShowMap && <button className="show-map-button" type="button" onClick={onShowMap}><MapPin size={15} /> Haritada göster</button>}
           <button className="route-button" type="button" onClick={() => onOpenHistory(selectedTag.id)}><Route size={15} /> Rota geçmişini aç <span>↗</span></button>
         </div>
-      </section> : <section className="tag-details tag-details-empty" aria-live="polite"><strong>Bir tag seçin</strong><span>Listeden bir tag seçerek konum ve rota detaylarını görüntüleyin.</span></section>}
+      </section> : <section className="tag-details tag-details-empty" aria-live="polite"><strong>Bir takip etiketi seçin</strong><span>Listeden bir takip etiketi seçerek konum ve rota detaylarını görüntüleyin.</span></section>}
     </motion.aside>
   );
 }

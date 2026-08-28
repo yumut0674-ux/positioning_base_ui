@@ -4,7 +4,7 @@ import type { MapLayerId } from "@/src/features/map/types/map.types";
 
 const LAYER_LABELS: Array<[MapLayerId, string]> = [
   ["floorPlan", "Kat planı"], ["grid", "Metrik ızgara"],
-  ["tags", "Canlı Tag'ler"], ["routes", "Rota izi"], ["sensors", "Sensörler"],
+  ["tags", "Canlı takip etiketleri"], ["routes", "Rota izi"], ["sensors", "Sensörler"],
 ];
 
 export function LayerVisibilityPanel() {

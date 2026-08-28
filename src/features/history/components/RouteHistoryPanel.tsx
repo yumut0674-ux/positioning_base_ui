@@ -68,8 +68,8 @@ function stateMessage(state: HistoryLoadState, customMessage: string | null): st
   if (customMessage) return customMessage;
   if (state === "idle") return "Varlık ve tarih aralığını seçip gerçek geçmiş verisini sorgulayın.";
   if (state === "no_data") return "Seçilen tarih aralığında konum kaydı bulunamadı.";
-  if (state === "unregistered") return "Aranan tag veya varlık kayıtlı değil. Kayıtsız tag verileri geçmişe yazılmaz.";
-  if (state === "unassigned") return "Bu varlığa seçilen tarih aralığında tag ataması yapılmamış.";
+  if (state === "unregistered") return "Aranan takip etiketi veya varlık kayıtlı değil. Kayıtsız takip etiketi verileri geçmişe yazılmaz.";
+  if (state === "unassigned") return "Bu varlığa seçilen tarih aralığında takip etiketi ataması yapılmamış.";
   if (state === "database_error") return "Geçmiş veritabanına bağlanılamıyor. Bağlantı ve migration durumunu kontrol edin.";
   if (state === "error") return "Geçmiş verisi alınamadı. Lütfen tekrar deneyin.";
   return "";
@@ -215,7 +215,7 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
     if (historyState === "loading") return;
     if (!selectedEntityId) {
       setHistoryState("unregistered");
-      setHistoryMessage("Önce kayıtlı bir tag veya varlık seçin.");
+      setHistoryMessage("Önce kayıtlı bir takip etiketi veya varlık seçin.");
       return;
     }
 
@@ -346,8 +346,8 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
           <div className={styles.panelHeader}><span className={styles.iconFrame}><History size={18} /></span><div><small>HAREKET ANALİZİ</small><h2>Rota Geçmişi</h2></div></div>
           <p className={styles.intro}>Kayıtlı varlığı ve tarih aralığını seçerek veritabanındaki gerçek hareket akışını inceleyin.</p>
           <div className={styles.fields}>
-            <label><span><Search size={13} /> VARLIK / TAG ARA</span><input value={entityQuery} onChange={(event) => setEntityQuery(event.target.value)} placeholder="Tag kodu veya varlık adı" /></label>
-            <label><span><MapPinned size={13} /> İZLENEN VARLIK</span><div className={styles.selectWrap}><select value={selectedEntityId ?? ""} onChange={(event) => { setSelectedEntityId(event.target.value ? Number(event.target.value) : null); setPositions([]); setHistoryData(null); setHistoryState("idle"); setHistoryMessage(null); }} disabled={entitySearchLoading || entities.length === 0}><option value="">{entitySearchLoading ? "Varlıklar aranıyor…" : entities.length ? "Varlık seçin" : "Eşleşen kayıt yok"}</option>{entities.map((entity) => <option key={entity.entityId} value={entity.entityId}>{entity.name} · {entity.tagCode ?? "tag atanmamış"}</option>)}</select><ChevronDown size={14} /></div></label>
+            <label><span><Search size={13} /> CİHAZ / TAKİP ETİKETİ ARA</span><input value={entityQuery} onChange={(event) => setEntityQuery(event.target.value)} placeholder="Takip etiketi kodu veya varlık adı" /></label>
+            <label><span><MapPinned size={13} /> İZLENEN VARLIK</span><div className={styles.selectWrap}><select value={selectedEntityId ?? ""} onChange={(event) => { setSelectedEntityId(event.target.value ? Number(event.target.value) : null); setPositions([]); setHistoryData(null); setHistoryState("idle"); setHistoryMessage(null); }} disabled={entitySearchLoading || entities.length === 0}><option value="">{entitySearchLoading ? "Varlıklar aranıyor…" : entities.length ? "Varlık seçin" : "Eşleşen kayıt yok"}</option>{entities.map((entity) => <option key={entity.entityId} value={entity.entityId}>{entity.name} · {entity.tagCode ?? "takip etiketi atanmamış"}</option>)}</select><ChevronDown size={14} /></div></label>
             <div className={styles.dateGrid}><label><span><CalendarRange size={13} /> BAŞLANGIÇ</span><input type="datetime-local" value={startDate} onChange={(event) => setStartDate(event.target.value)} /></label><label><span><Clock3 size={13} /> BİTİŞ</span><input type="datetime-local" value={endDate} min={startDate} onChange={(event) => setEndDate(event.target.value)} /></label></div>
           </div>
           {entitySearchError && <div className={`${styles.statusCard} ${styles.statusError}`}><AlertTriangle size={15} /><span>{entitySearchError}</span></div>}

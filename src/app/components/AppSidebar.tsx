@@ -1,22 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { BarChart3, BellRing, Boxes, Building2, Crosshair, Headset, Hexagon, Map, RadioTower, Route, Settings, X } from "lucide-react";
+import { BarChart3, Boxes, Building2, Crosshair, Headset, Hexagon, Map, RadioTower, Route, Settings, X } from "lucide-react";
 
 const SIDEBAR_COLLAPSED_STORAGE_KEY = "ips-sidebar-collapsed";
 
-const NAVIGATION = [
-  { label: "Canlı Harita", icon: Map, active: true },
-  { label: "İzlenen Varlıklar", icon: Boxes },
-  { label: "Anchors", icon: RadioTower, badge: "06" },
-  { label: "Bölgeler", icon: Hexagon },
-  { label: "Rota Geçmişi", icon: Route },
-  { label: "Destek ve İletişim", icon: Headset },
-  { label: "Alarmlar", icon: BellRing, badge: "02", alert: true },
-  { label: "Analizler", icon: BarChart3 },
+export type WorkspaceView = "map" | "tags" | "anchors" | "regions" | "history" | "support";
+
+const NAVIGATION: ReadonlyArray<{ readonly label: string; readonly view: WorkspaceView; readonly icon: typeof Map }> = [
+  { label: "Canlı Harita", view: "map", icon: Map },
+  { label: "İzlenen Varlıklar", view: "tags", icon: Boxes },
+  { label: "Referans İstasyonları", view: "anchors", icon: RadioTower },
+  { label: "Oda/Bölge", view: "regions", icon: Hexagon },
+  { label: "Rota Geçmişi", view: "history", icon: Route },
+  { label: "Destek ve İletişim", view: "support", icon: Headset },
 ];
 
-export type WorkspaceView = "map" | "tags" | "anchors" | "regions" | "history" | "support";
+const REVIEW_NAVIGATION = [{ label: "Analizler", icon: BarChart3 }];
 
 interface AppSidebarProps {
   readonly activeView: WorkspaceView;
@@ -58,15 +58,11 @@ export function AppSidebar({ activeView, collapsed, mobileOpen, onMobileClose, o
       </div>
       <nav aria-label="Primary navigation">
         <small>İZLE</small>
-        {NAVIGATION.slice(0, 1).map(({ label, icon: Icon }) => <button key={label} className={activeView === "map" ? "active" : ""} onClick={() => onViewChange("map")}><Icon size={17} /><span>{label}</span></button>)}
+        {NAVIGATION.slice(0, 1).map(({ label, view, icon: Icon }) => <button key={view} className={activeView === view ? "active" : ""} onClick={() => onViewChange(view)} aria-label={label} title={label}><Icon size={17} /><span>{label}</span></button>)}
         <small>YÖNET</small>
-        {NAVIGATION.slice(1, 7).map(({ label, icon: Icon, badge, alert }) => {
-          const view = label === "İzlenen Varlıklar" ? "tags" : label === "Anchors" ? "anchors" : label === "Bölgeler" ? "regions" : label === "Rota Geçmişi" ? "history" : label === "Destek ve İletişim" ? "support" : null;
-          const onClick = view ? () => onViewChange(view) : undefined;
-          return <button key={label} className={view === activeView ? "active" : ""} onClick={onClick}><Icon size={17} /><span>{label}</span>{badge && <em className={alert ? "alert" : ""}>{badge}</em>}</button>;
-        })}
+        {NAVIGATION.slice(1).map(({ label, view, icon: Icon }) => <button key={view} className={activeView === view ? "active" : ""} onClick={() => onViewChange(view)} aria-label={label} title={label}><Icon size={17} /><span>{label}</span></button>)}
         <small>İNCELE</small>
-        {NAVIGATION.slice(7).map(({ label, icon: Icon }) => <button key={label}><Icon size={17} /><span>{label}</span></button>)}
+        {REVIEW_NAVIGATION.map(({ label, icon: Icon }) => <button key={label} aria-label={label} title={label}><Icon size={17} /><span>{label}</span></button>)}
       </nav>
       <div className="sidebar-footer">
         <button><Building2 size={17} /><span>Saha ayarları</span></button>

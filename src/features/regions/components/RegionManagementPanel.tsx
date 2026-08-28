@@ -25,7 +25,7 @@ type Viewport = { readonly x: number; readonly y: number; readonly scale: number
 
 const INITIAL_VIEWPORT: Viewport = { x: 28, y: 24, scale: 0.7 };
 const TOOL_LABELS: Record<RegionEditorTool, string> = {
-  select: "Seç ve taşı", polygon: "Polygon çiz", center: "Oda merkezi", entrance: "Giriş ekle",
+  select: "Seç ve taşı", polygon: "Çokgen çiz", center: "Oda merkezi", entrance: "Giriş ekle",
 };
 
 function configWithSystemMap(config: RegionsConfig): RegionsConfig {
@@ -37,7 +37,7 @@ function validateConfig(config: RegionsConfig): string[] {
   if (config.map.calibration.points.length < 3) errors.push("Sistem haritası için en az üç kalibrasyon noktası gerekli.");
   for (const region of config.regions) {
     if (!region.name.trim()) errors.push(`${region.id}: Oda adı boş olamaz.`);
-    if (region.polygon.length < 3) errors.push(`${region.name || region.id}: Polygon en az 3 noktadan oluşmalı.`);
+    if (region.polygon.length < 3) errors.push(`${region.name || region.id}: Çokgen en az 3 noktadan oluşmalı.`);
     if (!region.roomCenter) errors.push(`${region.name || region.id}: Oda merkezi eklenmeli.`);
   }
   return errors;
@@ -97,14 +97,14 @@ export function RegionManagementPanel() {
         const normalized = configWithSystemMap(source);
         setConfig(normalized);
         setSelectedRegionId(normalized.regions[0]?.id ?? null);
-        setStatus("Kaydedilmiş bölgeler yüklendi");
+        setStatus("Kaydedilmiş oda/bölge ayarları yüklendi");
       } catch {
         if (!stored) return;
         try {
           const normalized = configWithSystemMap(JSON.parse(stored) as RegionsConfig);
           setConfig(normalized);
           setSelectedRegionId(normalized.regions[0]?.id ?? null);
-          setStatus("Yerel bölgeler yüklendi");
+          setStatus("Yerel oda/bölge ayarları yüklendi");
         } catch {
           setStatus("Config okunamadı; varsayılan config kullanılıyor");
         }
@@ -127,8 +127,8 @@ export function RegionManagementPanel() {
       const next = await updateRegionEngineStatus(!engineStatus.enabled);
       setEngineStatus(next);
       setStatus(next.enabled
-        ? `Oda Tespit Modu aktif · processed SSE :${next.processedPort}`
-        : `Oda Tespit Modu kapalı · raw akış :${next.rawPort}`);
+        ? `Oda Tespit Motoru aktif · canlı konum akışı :${next.processedPort}`
+        : `Oda Tespit Motoru kapalı · ham akış :${next.rawPort}`);
       window.dispatchEvent(new CustomEvent(REGION_ENGINE_STATUS_CHANGED_EVENT, { detail: next }));
     } catch (error) {
       const message = error instanceof Error ? error.message : "Oda tespit modu değiştirilemedi";
@@ -169,7 +169,7 @@ export function RegionManagementPanel() {
     const number = config.regions.length + 1;
     const region: RegionDefinition = {
       id: `zone-${crypto.randomUUID().slice(0, 8)}`,
-      name: `Yeni Bölge ${number}`,
+      name: `Yeni Oda/Bölge ${number}`,
       color: "#00a896",
       polygon: [],
       roomCenter: null,
@@ -179,7 +179,7 @@ export function RegionManagementPanel() {
     setSelectedRegionId(region.id);
     setSelectedPoint(null);
     setTool("polygon");
-    setStatus("Polygon köşelerini harita üzerinde işaretleyin");
+    setStatus("Çokgen köşelerini harita üzerinde işaretleyin");
   };
 
   const handleMapClick = (event: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
@@ -245,7 +245,7 @@ export function RegionManagementPanel() {
     setConfig((current) => ({ ...current, regions: remaining }));
     setSelectedRegionId(remaining[0]?.id ?? null);
     setSelectedPoint(null);
-    setStatus("Bölge silindi");
+    setStatus("Oda/bölge silindi");
   };
 
   const saveConfig = async () => {
@@ -267,7 +267,7 @@ export function RegionManagementPanel() {
         POSITION_ANIMATION_CONFIG_CHANGED_EVENT,
         { detail: (payload.config ?? normalized).positionAnimation },
       ));
-      setStatus("Bölgeler config/regions.json dosyasına kaydedildi");
+      setStatus("Oda/bölge ayarları kaydedildi");
     } catch (error) {
       setErrors([error instanceof Error ? error.message : "Config dosyasına yazılamadı"]);
       setStatus("Tarayıcıya kaydedildi; config dosyasına yazılamadı");
@@ -318,7 +318,7 @@ export function RegionManagementPanel() {
   return (
     <section className={styles.panel}>
       <header className={styles.header}>
-        <div><span>BÖLGE YÖNETİMİ / {MAP_FLOOR_PLAN.level.toUpperCase()}</span><h1>Bölgeler Paneli</h1></div>
+        <div><span>ODA/BÖLGE YÖNETİMİ / {MAP_FLOOR_PLAN.level.toUpperCase()}</span><h1>Oda/Bölge Paneli</h1></div>
         <div className={styles.systemMap}><Check size={14} /><span>SİSTEM HARİTASI</span><strong>{MAP_FLOOR_PLAN.name}</strong></div>
         <button
           type="button"
@@ -329,7 +329,7 @@ export function RegionManagementPanel() {
           onClick={() => void toggleRegionEngine()}
         >
           <Power size={14} />
-          <span>ODA TESPİT MODU</span>
+          <span>ODA TESPİT MOTORU</span>
           <strong>{engineUpdating ? "GÜNCELLENİYOR" : engineStatus?.enabled ? `AKTİF · :${engineStatus.processedPort}` : "KAPALI"}</strong>
         </button>
         <div className={styles.headerActions}>
@@ -342,9 +342,9 @@ export function RegionManagementPanel() {
 
       <div className={styles.editor}>
         <aside className={styles.zonePanel}>
-          <div className={styles.panelTitle}><div><span>ZONE LİSTESİ</span><strong>{config.regions.length} bölge</strong></div><button onClick={addRegion} title="Yeni bölge"><Plus size={15} /></button></div>
+          <div className={styles.panelTitle}><div><span>ODA/BÖLGE LİSTESİ</span><strong>{config.regions.length} oda/bölge</strong></div><button onClick={addRegion} title="Yeni oda/bölge"><Plus size={15} /></button></div>
           <div className={styles.zoneList}>
-            {config.regions.length === 0 && <div className={styles.empty}><Hexagon size={24} /><strong>Henüz bölge yok</strong><span>Yeni bölge ekleyerek başlayın.</span></div>}
+            {config.regions.length === 0 && <div className={styles.empty}><Hexagon size={24} /><strong>Henüz oda/bölge yok</strong><span>Yeni oda/bölge ekleyerek başlayın.</span></div>}
             {config.regions.map((region) => <button key={region.id} className={region.id === selectedRegionId ? styles.selectedZone : ""} onClick={() => { setSelectedRegionId(region.id); setSelectedPoint(null); setTool("select"); }}><i style={{ background: region.color }} /><div><strong>{region.name}</strong><span>{region.polygon.length} köşe · {region.entrances.length} giriş</span></div></button>)}
           </div>
           <div className={styles.mapInfo}><span>HARİTA KAYNAĞI</span><strong>{MAP_FLOOR_PLAN.id}</strong><small>{MAP_FLOOR_PLAN.canvasSize.width} × {MAP_FLOOR_PLAN.canvasSize.height} px</small><p>Harita sistem ayarlarından alınır ve bu ekrandan değiştirilemez.</p></div>
@@ -385,15 +385,15 @@ export function RegionManagementPanel() {
               const Icon = value === "select" ? MousePointer2 : value === "polygon" ? Hexagon : value === "center" ? Crosshair : DoorOpen;
               return <button key={value} className={tool === value ? styles.activeTool : ""} disabled={!selectedRegion && value !== "select"} onClick={() => { setTool(value); setSelectedPoint(null); }} title={TOOL_LABELS[value]}><Icon size={16} /><span>{TOOL_LABELS[value]}</span></button>;
             })}
-            {tool === "polygon" && <button className={styles.finishTool} disabled={(selectedRegion?.polygon.length ?? 0) < 3} onClick={() => { setTool("select"); setStatus("Polygon tamamlandı"); }}><Check size={16} /><span>Tamamla</span></button>}
+            {tool === "polygon" && <button className={styles.finishTool} disabled={(selectedRegion?.polygon.length ?? 0) < 3} onClick={() => { setTool("select"); setStatus("Çokgen tamamlandı"); }}><Check size={16} /><span>Tamamla</span></button>}
           </div>
           <div className={styles.mapControls}><button onClick={fitToScreen}>SIĞDIR</button><span>{Math.round(viewport.scale * 100)}%</span></div>
           <div className={styles.mapStatus}>{status}</div>
         </div>
 
         <aside className={styles.properties}>
-          <div className={styles.panelTitle}><div><span>ÖZELLİKLER</span><strong>{selectedRegion ? "Seçili bölge" : "Bölge seçilmedi"}</strong></div></div>
-          {!selectedRegion ? <div className={styles.empty}><MousePointer2 size={24} /><strong>Bir bölge seçin</strong><span>Özellikleri burada düzenleyebilirsiniz.</span></div> : <>
+          <div className={styles.panelTitle}><div><span>ÖZELLİKLER</span><strong>{selectedRegion ? "Seçili oda/bölge" : "Oda/bölge seçilmedi"}</strong></div></div>
+          {!selectedRegion ? <div className={styles.empty}><MousePointer2 size={24} /><strong>Bir oda/bölge seçin</strong><span>Özellikleri burada düzenleyebilirsiniz.</span></div> : <>
             <section className={styles.pointListSection}>
               <div className={styles.pointListTitle}><span>NOKTA KOORDİNATLARI</span><strong>{coordinateItems.length} nokta</strong></div>
               {coordinateItems.length === 0 ? <div className={styles.pointPrompt}><Crosshair size={18} /><span>Polygon, merkez veya giriş eklediğinizde koordinatlar burada görünecek.</span></div> : <div className={styles.pointList}>
@@ -416,13 +416,13 @@ export function RegionManagementPanel() {
               </div>
               <small>Bir değer değiştiğinde karşılığı sistem kalibrasyonuna göre otomatik hesaplanır.</small>
             </section> : coordinateItems.length > 0 && <div className={styles.selectHint}><MousePointer2 size={14} /> İnce ayar için listeden veya haritadan bir nokta seçin.</div>}
-            <label><span>Bölge adı</span><input value={selectedRegion.name} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, name: event.target.value }))} /></label>
+            <label><span>Oda/bölge adı</span><input value={selectedRegion.name} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, name: event.target.value }))} /></label>
             <div className={styles.fieldRow}><label><span>Kimlik</span><input value={selectedRegion.id} readOnly /></label><label className={styles.colorField}><span>Renk</span><input type="color" value={selectedRegion.color} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, color: event.target.value }))} /></label></div>
-            <div className={styles.metrics}><div><span>POLYGON</span><strong>{selectedRegion.polygon.length}</strong><small>köşe</small></div><div><span>GİRİŞLER</span><strong>{selectedRegion.entrances.length}</strong><small>nokta</small></div></div>
+            <div className={styles.metrics}><div><span>ÇOKGEN</span><strong>{selectedRegion.polygon.length}</strong><small>köşe</small></div><div><span>GİRİŞLER</span><strong>{selectedRegion.entrances.length}</strong><small>nokta</small></div></div>
             <section className={styles.coordinateSection}><h2>Gerçek dünya koordinatları</h2>{selectedRegion.roomCenter ? <p>Merkez: <code>{selectedRegion.roomCenter.world.x.toFixed(2)}, {selectedRegion.roomCenter.world.y.toFixed(2)} m</code></p> : <p>Oda merkezi tanımlanmadı.</p>}<small>Haritadaki bir noktayı seçerek koordinatlarını ince ayarlayabilirsiniz.</small></section>
             {selectedPoint && <button className={styles.deletePoint} onClick={deleteSelectedPoint}><X size={14} /> Seçili noktayı sil</button>}
             {errors.length > 0 && <div className={styles.errors}>{errors.map((error) => <p key={error}>{error}</p>)}</div>}
-            <button className={styles.deleteZone} onClick={deleteRegion}><Trash2 size={14} /> Bölgeyi sil</button>
+            <button className={styles.deleteZone} onClick={deleteRegion}><Trash2 size={14} /> Oda/bölgeyi sil</button>
           </>}
         </aside>
       </div>

@@ -65,7 +65,7 @@ export function AnchorManagementPanel({ embedded = false }: { readonly embedded?
     else setIsLoading(true);
     setError("");
     try { setAnchors(await fetchAnchors()); }
-    catch (cause) { setError(cause instanceof Error ? cause.message : "Anchor listesi alınamadı."); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : "Referans istasyonu listesi alınamadı."); }
     finally {
       if (showSpinner) setIsRefreshing(false);
       else setIsLoading(false);
@@ -75,7 +75,7 @@ export function AnchorManagementPanel({ embedded = false }: { readonly embedded?
   useEffect(() => {
     void fetchAnchors()
       .then(setAnchors)
-      .catch((cause: unknown) => setError(cause instanceof Error ? cause.message : "Anchor listesi alınamadı."))
+      .catch((cause: unknown) => setError(cause instanceof Error ? cause.message : "Referans istasyonu listesi alınamadı."))
       .finally(() => setIsLoading(false));
   }, []);
 
@@ -97,14 +97,14 @@ export function AnchorManagementPanel({ embedded = false }: { readonly embedded?
   async function submitForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!form.id.trim() || !Number.isFinite(form.x) || !Number.isFinite(form.y)) {
-      setError("Anchor ID, X ve Y alanlarını geçerli şekilde doldurun.");
+      setError("Referans istasyonu kodu, X ve Y alanlarını geçerli şekilde doldurun.");
       return;
     }
     setIsSaving(true); setError("");
     try {
       setAnchors(await saveAnchor({ ...form, id: form.id.trim() }, isNew));
       setIsFormOpen(false);
-    } catch (cause) { setError(cause instanceof Error ? cause.message : "Anchor kaydedilemedi."); }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Referans istasyonu kaydedilemedi."); }
     finally { setIsSaving(false); }
   }
 
@@ -112,7 +112,7 @@ export function AnchorManagementPanel({ embedded = false }: { readonly embedded?
     if (!deleteTarget) return;
     setIsDeleting(true); setError("");
     try { setAnchors(await deleteAnchor(deleteTarget.id)); setDeleteTarget(null); }
-    catch (cause) { setError(cause instanceof Error ? cause.message : "Anchor silinemedi."); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : "Referans istasyonu silinemedi."); }
     finally { setIsDeleting(false); }
   }
 
@@ -130,19 +130,19 @@ export function AnchorManagementPanel({ embedded = false }: { readonly embedded?
         <header className={styles.header}>
           <div>
             <div className={styles.eyebrow}><RadioTower size={14} /> UWB ALTYAPI YÖNETİMİ</div>
-            <h1>Anchor Yönetimi</h1>
+            <h1>Referans İstasyonu Yönetimi</h1>
             <p>Konum altyapınızı, koordinatları ve sağlık geçmişini tek ekrandan yönetin.</p>
           </div>
           <div className={styles.headerActions}>
             <button className={styles.ghostButton} type="button" onClick={() => void reload(true)} disabled={isRefreshing}>
               <RefreshCw size={16} className={isRefreshing ? styles.spin : ""} /> Yenile
             </button>
-            <button className={styles.primaryButton} type="button" onClick={openNewForm}><Plus size={17} /> Yeni Anchor Ekle</button>
+            <button className={styles.primaryButton} type="button" onClick={openNewForm}><Plus size={17} /> Yeni Referans İstasyonu Ekle</button>
           </div>
         </header>
 
-        <section className={styles.metrics} aria-label="Anchor özeti">
-          <div className={styles.metric}><span className={styles.metricIcon}><RadioTower size={19} /></span><div><small>TOPLAM ANCHOR</small><strong>{summary.total}</strong><em>Sistemde tanımlı</em></div></div>
+        <section className={styles.metrics} aria-label="Referans istasyonu özeti">
+          <div className={styles.metric}><span className={styles.metricIcon}><RadioTower size={19} /></span><div><small>TOPLAM İSTASYON</small><strong>{summary.total}</strong><em>Sistemde tanımlı</em></div></div>
           <div className={styles.metric}><span className={`${styles.metricIcon} ${styles.goodIcon}`}><Wifi size={19} /></span><div><small>ÇEVRİMİÇİ</small><strong>{summary.online}</strong><em>Sağlıklı bağlantı</em></div></div>
           <div className={styles.metric}><span className={`${styles.metricIcon} ${styles.offlineIcon}`}><WifiOff size={19} /></span><div><small>ÇEVRİMDIŞI</small><strong>{summary.offline}</strong><em>Kontrol gerekli</em></div></div>
           <div className={styles.metric}><span className={`${styles.metricIcon} ${styles.warnIcon}`}><TriangleAlert size={19} /></span><div><small>DİKKAT GEREKTİREN</small><strong>{summary.attention}</strong><em>Hata veya düşük pil</em></div></div>
@@ -150,40 +150,40 @@ export function AnchorManagementPanel({ embedded = false }: { readonly embedded?
 
         <section className={styles.tableCard}>
           <div className={styles.toolbar}>
-            <div className={styles.search}><Search size={17} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Anchor ID, isim veya konum ara…" aria-label="Anchor ara" /></div>
+            <div className={styles.search}><Search size={17} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Referans istasyonu kodu, isim veya konum ara…" aria-label="Referans istasyonu ara" /></div>
             <label className={styles.filter}><span>Durum</span><select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}><option value="all">Tümü</option>{STATUS_OPTIONS.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label>
           </div>
           {error && <div className={styles.error}><TriangleAlert size={16} /> {error}</div>}
           <div className={styles.tableWrap}>
             <table>
-              <thead><tr><th>Anchor</th><th>Kat & Konum</th><th>Koordinatlar</th><th>Durum</th><th aria-label="İşlemler" /></tr></thead>
+              <thead><tr><th>Referans İstasyonu</th><th>Kat & Konum</th><th>Koordinatlar</th><th>Durum</th><th aria-label="İşlemler" /></tr></thead>
               <tbody>
-                {isLoading && <tr><td colSpan={5}><div className={styles.empty}><Loader2 className={styles.spin} size={21} /> Anchor kayıtları yükleniyor…</div></td></tr>}
+                {isLoading && <tr><td colSpan={5}><div className={styles.empty}><Loader2 className={styles.spin} size={21} /> Referans istasyonu kayıtları yükleniyor…</div></td></tr>}
                 {!isLoading && filteredAnchors.map((anchor, index) => (
                   <motion.tr key={anchor.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(index * 0.035, 0.22) }}>
-                    <td><div className={styles.anchorIdentity}><span><RadioTower size={16} /></span><div><code>{anchor.id}</code><strong>{anchor.name || "İsimsiz Anchor"}</strong></div></div></td>
+                    <td><div className={styles.anchorIdentity}><span><RadioTower size={16} /></span><div><code>{anchor.id}</code><strong>{anchor.name || "İsimsiz referans istasyonu"}</strong></div></div></td>
                     <td><div className={styles.location}><MapPin size={15} /><div><strong>{anchor.floorLevel === null || anchor.floorLevel === undefined ? "Kat belirtilmedi" : `${anchor.floorLevel}. kat`}</strong><span>{anchor.locationDesc || "Konum açıklaması yok"}</span></div></div></td>
                     <td><div className={styles.coordinates}><span>X <b>{anchor.x.toFixed(2)}</b></span><span>Y <b>{anchor.y.toFixed(2)}</b></span><span>Z <b>{anchor.z == null ? "—" : anchor.z.toFixed(2)}</b></span></div></td>
                     <td><StatusBadge status={anchor.status} /></td>
                     <td><div className={styles.rowActions}><button type="button" onClick={() => void openLogs(anchor)} title="Sağlık loglarını görüntüle"><Activity size={16} /></button><button type="button" onClick={() => openEditForm(anchor)} title="Düzenle"><Pencil size={16} /></button><button type="button" className={styles.deleteButton} onClick={() => setDeleteTarget(anchor)} title="Sil"><Trash2 size={16} /></button></div></td>
                   </motion.tr>
                 ))}
-                {!isLoading && filteredAnchors.length === 0 && <tr><td colSpan={5}><div className={styles.empty}><Search size={22} /> Eşleşen anchor bulunamadı.</div></td></tr>}
+                {!isLoading && filteredAnchors.length === 0 && <tr><td colSpan={5}><div className={styles.empty}><Search size={22} /> Eşleşen referans istasyonu bulunamadı.</div></td></tr>}
               </tbody>
             </table>
           </div>
-          <footer className={styles.tableFooter}><span><Layers3 size={14} /> {filteredAnchors.length} / {anchors.length} anchor gösteriliyor</span><span>Son kontrol: sayfa yüklenirken veya manuel yenilemede</span></footer>
+          <footer className={styles.tableFooter}><span><Layers3 size={14} /> {filteredAnchors.length} / {anchors.length} referans istasyonu gösteriliyor</span><span>Son kontrol: sayfa yüklenirken veya manuel yenilemede</span></footer>
         </section>
       </section>
 
       <AnimatePresence>
         {isFormOpen && <><motion.button type="button" aria-label="Formu kapat" className={styles.backdrop} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsFormOpen(false)} /><motion.aside className={styles.drawer} initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", stiffness: 310, damping: 31 }}>
-          <div className={styles.drawerHeader}><div><span>{isNew ? "YENİ KAYIT" : "ANCHOR DÜZENLE"}</span><h2>{isNew ? "Yeni Anchor Ekle" : form.id}</h2></div><button type="button" onClick={() => setIsFormOpen(false)} aria-label="Kapat"><X size={20} /></button></div>
+          <div className={styles.drawerHeader}><div><span>{isNew ? "YENİ KAYIT" : "REFERANS İSTASYONUNU DÜZENLE"}</span><h2>{isNew ? "Yeni Referans İstasyonu Ekle" : form.id}</h2></div><button type="button" onClick={() => setIsFormOpen(false)} aria-label="Kapat"><X size={20} /></button></div>
           <form className={styles.form} onSubmit={submitForm}>
-            <section><h3><RadioTower size={16} /> Temel Bilgiler</h3><div className={styles.fieldGrid}><label className={styles.field}><span>Anchor ID *</span><input value={form.id} disabled={!isNew} onChange={(event) => setForm({ ...form, id: event.target.value })} placeholder="Örn. A-07" required />{!isNew && <small>Kimlik değiştirilemez; yeni anchor oluşturun.</small>}</label><label className={styles.field}><span>Anchor adı</span><input value={form.name ?? ""} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="Örn. Depo kuzey" /></label><label className={styles.field}><span>Durum</span><select value={form.status ?? "active"} onChange={(event) => setForm({ ...form, status: event.target.value })}>{STATUS_OPTIONS.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label></div></section>
+            <section><h3><RadioTower size={16} /> Temel Bilgiler</h3><div className={styles.fieldGrid}><label className={styles.field}><span>Referans istasyonu kodu *</span><input value={form.id} disabled={!isNew} onChange={(event) => setForm({ ...form, id: event.target.value })} placeholder="Örn. A-07" required />{!isNew && <small>Kimlik değiştirilemez; yeni referans istasyonu oluşturun.</small>}</label><label className={styles.field}><span>Referans istasyonu adı</span><input value={form.name ?? ""} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="Örn. Depo kuzey" /></label><label className={styles.field}><span>Durum</span><select value={form.status ?? "active"} onChange={(event) => setForm({ ...form, status: event.target.value })}>{STATUS_OPTIONS.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label></div></section>
             <section><h3><MapPin size={16} /> Konum</h3><div className={styles.fieldGrid}><label className={styles.field}><span>X koordinatı *</span><input type="number" step="any" value={form.x} onChange={(event) => setForm({ ...form, x: Number(event.target.value) })} required /></label><label className={styles.field}><span>Y koordinatı *</span><input type="number" step="any" value={form.y} onChange={(event) => setForm({ ...form, y: Number(event.target.value) })} required /></label><label className={styles.field}><span>Z koordinatı</span><input type="number" step="any" value={form.z ?? ""} onChange={(event) => setForm({ ...form, z: numberValue(event.target.value) })} /></label><label className={styles.field}><span>Kat</span><input type="number" step="1" value={form.floorLevel ?? ""} onChange={(event) => setForm({ ...form, floorLevel: numberValue(event.target.value) })} /></label><label className={`${styles.field} ${styles.fullField}`}><span>Konum açıklaması</span><input value={form.locationDesc ?? ""} onChange={(event) => setForm({ ...form, locationDesc: event.target.value })} placeholder="Örn. A Blok giriş kapısı üzeri" /></label></div></section>
             <section><h3><FileText size={16} /> Notlar</h3><label className={styles.field}><span>Operasyon notu</span><textarea value={form.note ?? ""} onChange={(event) => setForm({ ...form, note: event.target.value })} placeholder="Bakım, montaj veya erişim notları…" rows={5} /></label></section>
-            <div className={styles.formFooter}><button type="button" className={styles.ghostButton} onClick={() => setIsFormOpen(false)}>Vazgeç</button><button className={styles.primaryButton} disabled={isSaving}>{isSaving ? <Loader2 size={16} className={styles.spin} /> : <ShieldCheck size={16} />}{isSaving ? "Kaydediliyor" : "Anchor Kaydet"}</button></div>
+            <div className={styles.formFooter}><button type="button" className={styles.ghostButton} onClick={() => setIsFormOpen(false)}>Vazgeç</button><button className={styles.primaryButton} disabled={isSaving}>{isSaving ? <Loader2 size={16} className={styles.spin} /> : <ShieldCheck size={16} />}{isSaving ? "Kaydediliyor" : "Referans İstasyonunu Kaydet"}</button></div>
           </form>
         </motion.aside></>}
       </AnimatePresence>
@@ -197,7 +197,7 @@ export function AnchorManagementPanel({ embedded = false }: { readonly embedded?
       </AnimatePresence>
 
       <AnimatePresence>
-        {deleteTarget && <><motion.button type="button" aria-label="Silme penceresini kapat" className={styles.backdrop} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDeleteTarget(null)} /><motion.section className={styles.deleteModal} role="dialog" aria-modal="true" aria-labelledby="delete-title" initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 12 }}><span className={styles.dangerIcon}><TriangleAlert size={25} /></span><h2 id="delete-title">{deleteTarget.id} silinsin mi?</h2><p>Anchor ve ona bağlı tüm sağlık logları kalıcı olarak silinecek. Bu işlem geri alınamaz.</p><div><button type="button" className={styles.ghostButton} onClick={() => setDeleteTarget(null)}>Vazgeç</button><button type="button" className={styles.dangerButton} disabled={isDeleting} onClick={() => void confirmDelete()}>{isDeleting ? <Loader2 size={16} className={styles.spin} /> : <Trash2 size={16} />} Kalıcı Olarak Sil</button></div></motion.section></>}
+        {deleteTarget && <><motion.button type="button" aria-label="Silme penceresini kapat" className={styles.backdrop} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDeleteTarget(null)} /><motion.section className={styles.deleteModal} role="dialog" aria-modal="true" aria-labelledby="delete-title" initial={{ opacity: 0, scale: 0.96, y: 12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 12 }}><span className={styles.dangerIcon}><TriangleAlert size={25} /></span><h2 id="delete-title">{deleteTarget.id} silinsin mi?</h2><p>Referans istasyonu ve ona bağlı tüm sağlık kayıtları kalıcı olarak silinecek. Bu işlem geri alınamaz.</p><div><button type="button" className={styles.ghostButton} onClick={() => setDeleteTarget(null)}>Vazgeç</button><button type="button" className={styles.dangerButton} disabled={isDeleting} onClick={() => void confirmDelete()}>{isDeleting ? <Loader2 size={16} className={styles.spin} /> : <Trash2 size={16} />} Kalıcı Olarak Sil</button></div></motion.section></>}
       </AnimatePresence>
     </main>
   );

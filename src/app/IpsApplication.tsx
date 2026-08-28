@@ -178,7 +178,7 @@ function LiveMapWorkspace({
                 <button className={isFullscreen ? "active" : ""} title={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-label={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-pressed={isFullscreen} disabled={!fullscreenSupported} onClick={toggleFullscreen}><Maximize2 size={16} /></button>
               </div>
             </div>
-            <div className="mobile-map-status" role="status"><i /> Kritik durum: canlı tag takibi etkin</div>
+            <div className="mobile-map-status" role="status"><i /> Kritik durum: canlı takip etiketi takibi etkin</div>
           </section>
         </>}
         {historyOpened && (

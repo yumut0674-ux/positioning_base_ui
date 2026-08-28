@@ -1,4 +1,4 @@
-import { Bell, ChevronDown, CircleUserRound, Menu, Search } from "lucide-react";
+import { ChevronDown, CircleUserRound, Menu, Search } from "lucide-react";
 import { MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
 import { LogoMark } from "@/src/shared/components/LogoMark";
 
@@ -37,7 +37,6 @@ export function AppHeader({ sidebarCollapsed, mobileMenuOpen, onSidebarToggle }:
       </div>
       <div className="header-actions">
         <button aria-label="Ara"><Search size={17} /></button>
-        <button aria-label="Bildirimler" className="notification"><Bell size={17} /><i /></button>
         <div className="operator"><CircleUserRound size={24} /><div><strong>Umut Başev</strong><small>KONTROL OPERATÖRÜ</small></div></div>
       </div>
     </header>
