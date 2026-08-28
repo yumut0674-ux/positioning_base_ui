@@ -4,6 +4,7 @@ import type { AnchorDefinition, MapLayerId, ViewportState } from "@/src/features
 import { TAG_LIVE_TIMEOUT_MS, type TagStatus, type TrackedTag } from "@/src/features/tracking/types/tracking.types";
 import type { TagDefinition } from "@/src/features/tracking/services/tagApi";
 import { addRecentTagId, nextTagLocationEntry, type TagLocationEntry } from "@/src/features/tracking/services/tagPanelState";
+import { MAP_TAG_FOCUS_SCALE } from "@/src/features/map/config/mapConfig";
 
 interface MeasurementState {
   readonly enabled: boolean;
@@ -12,6 +13,9 @@ interface MeasurementState {
 }
 
 interface IpsState {
+  readonly activeMapId: string | null;
+  readonly readyMapId: string | null;
+  readonly pendingTagFocusId: string | null;
   readonly viewport: ViewportState;
   readonly layers: Record<MapLayerId, boolean>;
   readonly tags: Record<string, TrackedTag>;
@@ -25,7 +29,11 @@ interface IpsState {
   readonly showLayersPanel: boolean;
   readonly measurement: MeasurementState;
   readonly mapFocusRequest: number;
+  readonly mapFocusScale: number | null;
   readonly mapFitRequest: number;
+  setActiveMapId: (mapId: string) => void;
+  markMapReady: (mapId: string) => void;
+  selectTagOnMap: (tagId: string, mapId: string) => void;
   setViewport: (viewport: ViewportState) => void;
   toggleLayer: (layer: MapLayerId) => void;
   upsertTag: (tag: TrackedTag) => void;
@@ -45,6 +53,9 @@ interface IpsState {
 }
 
 export const useIpsStore = create<IpsState>((set) => ({
+  activeMapId: null,
+  readyMapId: null,
+  pendingTagFocusId: null,
   // MapViewport replaces this neutral value once its host has real dimensions.
   viewport: { x: 0, y: 0, scale: 1 },
   layers: {
@@ -68,7 +79,29 @@ export const useIpsStore = create<IpsState>((set) => ({
   showLayersPanel: false,
   measurement: { enabled: false, start: null, end: null },
   mapFocusRequest: 0,
+  mapFocusScale: null,
   mapFitRequest: 0,
+  setActiveMapId: (activeMapId) => set((state) => state.activeMapId === activeMapId
+    ? state
+    : { activeMapId, readyMapId: null, pendingTagFocusId: null, mapFocusScale: null }),
+  markMapReady: (mapId) => set((state) => {
+    if (state.activeMapId !== mapId) return state;
+    if (!state.pendingTagFocusId) return state.readyMapId === mapId ? state : { readyMapId: mapId };
+    return {
+      readyMapId: mapId,
+      pendingTagFocusId: null,
+      mapFocusRequest: state.mapFocusRequest + 1,
+    };
+  }),
+  selectTagOnMap: (selectedTagId, activeMapId) => set((state) => ({
+    activeMapId,
+    readyMapId: state.activeMapId === activeMapId ? state.readyMapId : null,
+    selectedTagId,
+    recentTagIds: addRecentTagId(state.recentTagIds, selectedTagId),
+    pendingTagFocusId: state.readyMapId === activeMapId ? null : selectedTagId,
+    mapFocusRequest: state.readyMapId === activeMapId ? state.mapFocusRequest + 1 : state.mapFocusRequest,
+    mapFocusScale: MAP_TAG_FOCUS_SCALE,
+  })),
   setViewport: (viewport) => set({ viewport }),
   toggleLayer: (layer) => set((state) => ({ layers: { ...state.layers, [layer]: !state.layers[layer] } })),
   upsertTag: (tag) => set((state) => ({
@@ -100,6 +133,7 @@ export const useIpsStore = create<IpsState>((set) => ({
     selectedTagId,
     recentTagIds: addRecentTagId(state.recentTagIds, selectedTagId),
     mapFocusRequest: state.mapFocusRequest + 1,
+    mapFocusScale: null,
   })),
   hydrateRecentTagIds: (recentTagIds) => set({ recentTagIds: [...new Set(recentTagIds)].slice(0, 5) }),
   toggleLayersPanel: () => set((state) => ({ showLayersPanel: !state.showLayersPanel })),
@@ -114,6 +148,6 @@ export const useIpsStore = create<IpsState>((set) => ({
       : { enabled: true, start: state.measurement.start, end: point },
   })),
   cancelMeasurement: () => set({ measurement: { enabled: false, start: null, end: null } }),
-  requestMapFocus: () => set((state) => ({ mapFocusRequest: state.mapFocusRequest + 1 })),
+  requestMapFocus: () => set((state) => ({ mapFocusRequest: state.mapFocusRequest + 1, mapFocusScale: null })),
   requestMapFit: () => set((state) => ({ mapFitRequest: state.mapFitRequest + 1 })),
 }));

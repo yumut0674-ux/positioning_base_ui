@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "defaultMapId": "kat1-ortopedi",
+  "liveTrackingMapId": "kat1-ortopedi",
+  "maps": [
+    {
+      "id": "kat1-ortopedi",
+      "buildingId": "ana-bina",
+      "buildingName": "Neü Tıp Fakültesi",
+      "floorId": "kat-1",
+      "floorLevel": 1,
+      "floorLabel": "Kat 1",
+      "unitId": "ortopedi",
+      "unitName": "Ortopedi",
+      "displayName": "Kat 1 · Ortopedi",
+      "status": "active",
+      "liveTrackingEnabled": true,
+      "sortOrder": 10,
+      "configPath": "kat1-ortopedi/map.json"
+    },
+    {
+      "id": "kat1-ornek-birim",
+      "buildingId": "ana-bina",
+      "buildingName": "Neü Tıp Fakültesi",
+      "floorId": "kat-1",
+      "floorLevel": 1,
+      "floorLabel": "Kat 1",
+      "unitId": "ornek-birim",
+      "unitName": "Örnek Birim",
+      "displayName": "Kat 1 · Örnek Birim",
+      "status": "planned",
+      "liveTrackingEnabled": false,
+      "sortOrder": 20,
+      "configPath": null
+    },
+    {
+      "id": "kat2-ornek-birim",
+      "buildingId": "ana-bina",
+      "buildingName": "Neü Tıp Fakültesi",
+      "floorId": "kat-2",
+      "floorLevel": 2,
+      "floorLabel": "Kat 2",
+      "unitId": "ornek-birim",
+      "unitName": "Örnek Birim",
+      "displayName": "Kat 2 · Örnek Birim",
+      "status": "planned",
+      "liveTrackingEnabled": false,
+      "sortOrder": 30,
+      "configPath": null
+    }
+  ]
+}

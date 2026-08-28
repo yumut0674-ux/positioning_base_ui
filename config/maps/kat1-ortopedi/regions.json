@@ -1,0 +1,125 @@
+{
+  "engine": {
+    "entryConfirmationCount": 2,
+    "exitConfirmationCount": 2,
+    "exitMarginMeters": 0.5
+  },
+  "map": {
+    "source": "system",
+    "mapId": "kat1-ortopedi",
+    "image": "/maps/kat1-ortopedi/floor-plan.png",
+    "widthPx": 1348,
+    "heightPx": 1212,
+    "calibration": {
+      "type": "affine",
+      "points": [
+        {
+          "id": "origin",
+          "pixel": {
+            "x": 0,
+            "y": 1212
+          },
+          "world": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "id": "x-axis",
+          "pixel": {
+            "x": 1348,
+            "y": 1212
+          },
+          "world": {
+            "x": 44.93333333333333,
+            "y": 0
+          }
+        },
+        {
+          "id": "y-axis",
+          "pixel": {
+            "x": 0,
+            "y": 0
+          },
+          "world": {
+            "x": 0,
+            "y": 40.4
+          }
+        }
+      ]
+    }
+  },
+  "positionAnimation": {
+    "enabled": true,
+    "mode": "buffered_interpolation",
+    "interpolationDelayMs": 1200,
+    "maximumBufferSize": 10,
+    "maximumSegmentDurationMs": 2500,
+    "maximumExtrapolationMs": 250,
+    "stalePositionTimeoutMs": 4000,
+    "teleportDistanceMeters": 6,
+    "teleportAnimationDurationMs": 300,
+    "regionTransitionDurationMs": 500,
+    "easing": "linear"
+  },
+  "regions": [
+    {
+      "id": "zone-91d9e84c",
+      "name": "oda 3",
+      "color": "#379087",
+      "polygon": [
+        {
+          "pixel": {
+            "x": 110.97,
+            "y": 534.54
+          },
+          "world": {
+            "x": 3.699,
+            "y": 22.582
+          }
+        },
+        {
+          "pixel": {
+            "x": 112.39,
+            "y": 616.8
+          },
+          "world": {
+            "x": 3.746,
+            "y": 19.84
+          }
+        },
+        {
+          "pixel": {
+            "x": 204.81,
+            "y": 624.16
+          },
+          "world": {
+            "x": 6.827,
+            "y": 19.595
+          }
+        },
+        {
+          "pixel": {
+            "x": 201.75,
+            "y": 535.74
+          },
+          "world": {
+            "x": 6.725,
+            "y": 22.542
+          }
+        }
+      ],
+      "roomCenter": {
+        "pixel": {
+          "x": 555.34,
+          "y": 673.88
+        },
+        "world": {
+          "x": 18.513,
+          "y": 17.937
+        }
+      },
+      "entrances": []
+    }
+  ]
+}

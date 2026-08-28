@@ -7,11 +7,11 @@ import type {
 import type { Size2D } from "@/src/shared/types/geometry";
 
 export const MAP_FLOOR_PLAN: FloorPlanDefinition = {
-  id: "hq-l1",
+  id: "kat1-ortopedi",
   name: "Ortopedi",
   building: "Neü Tıp Fakültesi",
-  level: "Kat 01",
-  imageUrl: "/mimari.png",
+  level: "Kat 1",
+  imageUrl: "/maps/kat1-ortopedi/floor-plan.png",
   canvasSize: { width: 1348, height: 1212 },
   worldSize: { width: 44.93333333333333, height: 40.4 },
 };
@@ -31,13 +31,18 @@ export const MAP_VIEWPORT_LIMITS = {
   fitPadding: 64,
 } as const;
 
+export const MAP_TAG_FOCUS_SCALE = 0.5;
+
 /**
  * Returns a centered viewport that contains the complete floor plan inside a
  * measured map panel. The same calculation is used for first render and the
  * user-facing fit/reset controls, so there is no screen-size-specific default
  * map position to drift from.
  */
-export function getFittedMapViewport(panelSize: Size2D): ViewportState | null {
+export function getFittedMapViewport(
+  panelSize: Size2D,
+  mapSize: Size2D = MAP_FLOOR_PLAN.canvasSize,
+): ViewportState | null {
   if (panelSize.width <= 0 || panelSize.height <= 0) return null;
 
   // Keep the desired breathing room where possible, while still supporting
@@ -52,22 +57,26 @@ export function getFittedMapViewport(panelSize: Size2D): ViewportState | null {
   if (availableWidth <= 0 || availableHeight <= 0) return null;
 
   const scale = Math.min(
-    availableWidth / MAP_FLOOR_PLAN.canvasSize.width,
-    availableHeight / MAP_FLOOR_PLAN.canvasSize.height,
+    availableWidth / mapSize.width,
+    availableHeight / mapSize.height,
   );
 
   return {
     scale,
-    x: (panelSize.width - MAP_FLOOR_PLAN.canvasSize.width * scale) / 2,
-    y: (panelSize.height - MAP_FLOOR_PLAN.canvasSize.height * scale) / 2,
+    x: (panelSize.width - mapSize.width * scale) / 2,
+    y: (panelSize.height - mapSize.height * scale) / 2,
   };
 }
 
 /** Keeps a zoomed floor plan within the visible map panel. Smaller dimensions
  * stay centered; larger dimensions may pan only until the panel remains covered. */
-export function constrainMapViewport(viewport: ViewportState, panelSize: Size2D): ViewportState {
-  const planWidth = MAP_FLOOR_PLAN.canvasSize.width * viewport.scale;
-  const planHeight = MAP_FLOOR_PLAN.canvasSize.height * viewport.scale;
+export function constrainMapViewport(
+  viewport: ViewportState,
+  panelSize: Size2D,
+  mapSize: Size2D = MAP_FLOOR_PLAN.canvasSize,
+): ViewportState {
+  const planWidth = mapSize.width * viewport.scale;
+  const planHeight = mapSize.height * viewport.scale;
   const constrainAxis = (position: number, planLength: number, panelLength: number) => {
     if (planLength <= panelLength) return (panelLength - planLength) / 2;
     return Math.min(0, Math.max(panelLength - planLength, position));

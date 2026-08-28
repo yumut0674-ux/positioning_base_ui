@@ -6,8 +6,8 @@
   },
   "map": {
     "source": "system",
-    "mapId": "hq-l1",
-    "image": "/mimari.png",
+    "mapId": "kat1-ortopedi",
+    "image": "/maps/kat1-ortopedi/floor-plan.png",
     "widthPx": 1348,
     "heightPx": 1212,
     "calibration": {

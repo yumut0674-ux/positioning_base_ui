@@ -1,0 +1,22 @@
+{
+  "id": "kat1-ortopedi",
+  "image": {
+    "url": "/maps/kat1-ortopedi/floor-plan.png",
+    "width": 1348,
+    "height": 1212
+  },
+  "world": {
+    "widthMeters": 44.93333333333333,
+    "heightMeters": 40.4
+  },
+  "calibration": {
+    "worldOrigin": { "x": 0, "y": 0 },
+    "canvasOrigin": { "x": 0, "y": 1212 },
+    "pixelsPerMeter": 30,
+    "invertYAxis": true,
+    "rotationDegrees": 0
+  },
+  "updatedAt": "2026-08-28T00:00:00.000Z",
+  "status": "active",
+  "liveTrackingEnabled": true
+}

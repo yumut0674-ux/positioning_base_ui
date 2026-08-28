@@ -13,6 +13,7 @@ interface TagInformationPanelProps {
   readonly onOpenHistory: (tagCode: string) => void;
   readonly variant?: "desktop" | "mobile";
   readonly onShowMap?: () => void;
+  readonly liveTrackingMapId?: string;
 }
 
 interface TagInformationPanelContentProps extends TagInformationPanelProps {
@@ -124,12 +125,13 @@ function useLocationDuration(entry: TagLocationEntry | undefined, locationAddres
     : "Konum süresi hesaplanıyor";
 }
 
-export function TagInformationPanel({ onOpenHistory, variant = "desktop", onShowMap }: TagInformationPanelProps) {
+export function TagInformationPanel({ onOpenHistory, variant = "desktop", onShowMap, liveTrackingMapId }: TagInformationPanelProps) {
   const tagsById = useIpsStore((state) => state.tags);
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const recentTagIds = useIpsStore((state) => state.recentTagIds);
   const locationEntry = useIpsStore((state) => selectedTagId ? state.tagLocationEntries[selectedTagId] : undefined);
   const selectTag = useIpsStore((state) => state.selectTag);
+  const selectTagOnMap = useIpsStore((state) => state.selectTagOnMap);
   useRecentTagStorage(recentTagIds, variant === "desktop");
 
   const selectedTag = selectedTagId ? tagsById[selectedTagId] : undefined;
@@ -137,8 +139,9 @@ export function TagInformationPanel({ onOpenHistory, variant = "desktop", onShow
   const locationDuration = useLocationDuration(locationEntry, locationAddress);
   const tags = useMemo(() => Object.values(tagsById).sort((left, right) => left.name.localeCompare(right.name, "tr")), [tagsById]);
   const handleSelectTag = useCallback((tagId: string) => {
-    selectTag(tagId);
-  }, [selectTag]);
+    if (liveTrackingMapId) selectTagOnMap(tagId, liveTrackingMapId);
+    else selectTag(tagId);
+  }, [liveTrackingMapId, selectTag, selectTagOnMap]);
 
   return <TagInformationPanelContent selectedTag={selectedTag} locationAddress={locationAddress} locationDuration={locationDuration} tags={tags} recentTagIds={recentTagIds} onSelectTag={handleSelectTag} onOpenHistory={onOpenHistory} variant={variant} onShowMap={onShowMap} />;
 }

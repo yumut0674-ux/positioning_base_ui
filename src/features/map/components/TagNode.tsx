@@ -30,7 +30,7 @@ function TagNodeComponent({ tag, transform, positionAnimation, selected, onSelec
       onClick={() => onSelect(tag.id)}
       onTap={() => onSelect(tag.id)}
     >
-      {selected && <Circle radius={20} stroke={tag.color} strokeWidth={1} opacity={0.42} dash={[4, 3]} />}
+      {selected && <Circle radius={20} stroke="#00a896" strokeWidth={1.5} opacity={0.72} dash={[4, 3]} />}
       <Circle radius={13} fill={tag.color} opacity={0.13} />
       <Circle radius={6.5} fill={tag.color} shadowColor={tag.color} shadowBlur={12} />
       <Circle radius={2.3} fill="#ffffff" />
@@ -44,8 +44,19 @@ function TagNodeComponent({ tag, transform, positionAnimation, selected, onSelec
         />
       )}
       <Group x={12} y={-19}>
-        <Rect width={88} height={20} fill="#ffffff" opacity={0.96} cornerRadius={4} stroke="#c6d5e1" strokeWidth={1} shadowColor="#506780" shadowBlur={10} shadowOpacity={0.12} />
-        <Text x={8} y={5} width={74} text={tag.id} fill="#162133" fontSize={10} fontStyle="bold" fontFamily="Inter, sans-serif" />
+        <Rect
+          width={88}
+          height={20}
+          fill={selected ? "#dff7f3" : "#ffffff"}
+          opacity={0.98}
+          cornerRadius={4}
+          stroke={selected ? "#00a896" : "#c6d5e1"}
+          strokeWidth={selected ? 2 : 1}
+          shadowColor={selected ? "#00a896" : "#506780"}
+          shadowBlur={selected ? 14 : 10}
+          shadowOpacity={selected ? 0.28 : 0.12}
+        />
+        <Text x={8} y={5} width={74} text={tag.id} fill={selected ? "#076b62" : "#162133"} fontSize={10} fontStyle="bold" fontFamily="Inter, sans-serif" />
       </Group>
     </Group>
   );

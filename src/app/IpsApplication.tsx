@@ -1,6 +1,6 @@
 "use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, useQuery } from "@tanstack/react-query";
 import { HashRouter } from "react-router-dom";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -20,6 +20,8 @@ import { SupportContactPanel } from "@/src/features/support/components/SupportCo
 import { RegionManagementPanel } from "@/src/features/regions/components/RegionManagementPanel";
 import { GekonAiWidget, type GekonAiContext } from "@/src/features/assistant/components/HistoryChatWidget";
 import { resolveLocation } from "@/src/features/map/services/LocationResolverService";
+import { fetchMapCatalog, fetchMapDetails } from "@/src/features/map/services/mapApi";
+import { isSelectableMap, persistActiveMapId, readStoredMapId, resolveInitialMapId, shouldShowLiveTracking } from "@/src/features/map/services/mapSelection";
 
 const RouteHistoryPanel = dynamic(
   () => import("@/src/features/history/components/RouteHistoryPanel").then((module) => module.RouteHistoryPanel),
@@ -70,6 +72,20 @@ function LiveMapWorkspace({
   const requestMapFit = useIpsStore((state) => state.requestMapFit);
   const tags = useIpsStore((state) => state.tags);
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
+  const activeMapId = useIpsStore((state) => state.activeMapId);
+  const setActiveMapId = useIpsStore((state) => state.setActiveMapId);
+  const selectTagOnMap = useIpsStore((state) => state.selectTagOnMap);
+  const catalogQuery = useQuery({ queryKey: ["map-catalog"], queryFn: ({ signal }) => fetchMapCatalog(signal) });
+  const catalog = catalogQuery.data;
+  const activeMap = catalog?.maps.find((entry) => entry.id === activeMapId);
+  const mapQuery = useQuery({
+    queryKey: ["map-details", activeMapId],
+    queryFn: ({ signal }) => fetchMapDetails(activeMapId!, signal),
+    enabled: Boolean(activeMapId && activeMap?.configPath && isSelectableMap(activeMap)),
+  });
+  const activeMapDetails = mapQuery.data;
+  const liveTrackingVisible = Boolean(catalog && shouldShowLiveTracking(catalog, activeMapDetails));
+  const visibleTags = useMemo(() => liveTrackingVisible ? Object.values(tags) : [], [liveTrackingVisible, tags]);
   const mapFrameRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [focusFeedback, setFocusFeedback] = useState(false);
@@ -81,8 +97,8 @@ function LiveMapWorkspace({
     selectedTagId: selectedTag?.id,
     tagCode: selectedTag?.id,
     entityName: selectedTag?.name,
-    floorPlanId: MAP_FLOOR_PLAN.id,
-    floorPlanName: `${MAP_FLOOR_PLAN.name} · ${MAP_FLOOR_PLAN.level}`,
+    floorPlanId: activeMapDetails?.id ?? MAP_FLOOR_PLAN.id,
+    floorPlanName: activeMap?.displayName ?? `${MAP_FLOOR_PLAN.name} · ${MAP_FLOOR_PLAN.level}`,
     tagStatus: selectedTag?.status,
     zoneName: selectedTag ? resolveLocation(selectedTag.x, selectedTag.y, MAP_FLOOR_PLAN.id) : undefined,
     livePosition: selectedTag ? {
@@ -90,7 +106,23 @@ function LiveMapWorkspace({
       y: selectedTag.y,
       observedAt: new Date(selectedTag.timestamp).toISOString(),
     } : undefined,
-  }), [selectedTag]);
+  }), [activeMap?.displayName, activeMapDetails?.id, selectedTag]);
+
+  useEffect(() => {
+    if (!catalog) return;
+    const currentMapId = useIpsStore.getState().activeMapId;
+    const currentEntry = catalog.maps.find((entry) => entry.id === currentMapId);
+    const nextMapId = currentEntry && isSelectableMap(currentEntry)
+      ? currentEntry.id
+      : resolveInitialMapId(catalog, readStoredMapId(window.localStorage));
+    setActiveMapId(nextMapId);
+  }, [catalog, setActiveMapId]);
+
+  useEffect(() => {
+    if (!catalog || !activeMapId) return;
+    const entry = catalog.maps.find((candidate) => candidate.id === activeMapId);
+    if (entry && isSelectableMap(entry)) persistActiveMapId(window.localStorage, activeMapId);
+  }, [activeMapId, catalog]);
 
   useEffect(() => {
     const handleFullscreenChange = () => setIsFullscreen(document.fullscreenElement === mapFrameRef.current);
@@ -127,8 +159,11 @@ function LiveMapWorkspace({
 
   const handleSidebarViewChange = useCallback((view: WorkspaceView) => {
     setMobileMenuOpen(false);
+    if (catalog && activeMapId !== catalog.liveTrackingMapId && ["anchors", "regions", "history"].includes(view)) {
+      setActiveMapId(catalog.liveTrackingMapId);
+    }
     onViewChange(view);
-  }, [onViewChange]);
+  }, [activeMapId, catalog, onViewChange, setActiveMapId]);
 
   const handleFocus = useCallback(() => {
     requestMapFocus();
@@ -141,9 +176,20 @@ function LiveMapWorkspace({
   }, [requestMapFit]);
 
   const handleShowMap = useCallback(() => {
-    requestMapFocus();
+    if (catalog?.liveTrackingMapId && selectedTagId) selectTagOnMap(selectedTagId, catalog.liveTrackingMapId);
+    else requestMapFocus();
     mapFrameRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [requestMapFocus]);
+  }, [catalog, requestMapFocus, selectTagOnMap, selectedTagId]);
+
+  const handleMapSelect = useCallback((mapId: string) => {
+    const entry = catalog?.maps.find((candidate) => candidate.id === mapId);
+    if (entry && isSelectableMap(entry)) setActiveMapId(entry.id);
+  }, [catalog?.maps, setActiveMapId]);
+
+  const handleOpenTagHistory = useCallback((tagCode: string) => {
+    if (catalog && activeMapId !== catalog.liveTrackingMapId) setActiveMapId(catalog.liveTrackingMapId);
+    onOpenTagHistory(tagCode);
+  }, [activeMapId, catalog, onOpenTagHistory, setActiveMapId]);
 
   const toggleFullscreen = useCallback(async () => {
     const mapFrame = mapFrameRef.current;
@@ -158,22 +204,27 @@ function LiveMapWorkspace({
 
   return (
     <div className={`ips-shell ${activeView !== "map" ? "anchors-mode" : ""}`}>
-      <AppHeader sidebarCollapsed={sidebarCollapsed} mobileMenuOpen={mobileMenuOpen} onSidebarToggle={handleSidebarToggle} />
+      <AppHeader sidebarCollapsed={sidebarCollapsed} mobileMenuOpen={mobileMenuOpen} onSidebarToggle={handleSidebarToggle} catalog={catalog} activeMapId={activeMapId} onMapSelect={handleMapSelect} />
       {mobileMenuOpen && <button type="button" className="mobile-sidebar-backdrop" aria-label="Menüyü kapat" onClick={() => setMobileMenuOpen(false)} />}
       <AppSidebar activeView={activeView} collapsed={sidebarCollapsed} mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} onViewChange={handleSidebarViewChange} />
       <main className="workspace">
         {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : activeView === "history" ? null : <>
           <div className="workspace-heading live-map-heading">
             <div className="workspace-heading-content">
-              <span>CANLI OPERASYONLAR / {MAP_FLOOR_PLAN.level.toUpperCase()}</span>
-              <h1>{MAP_FLOOR_PLAN.name}</h1>
+              <span>{liveTrackingVisible ? "CANLI OPERASYONLAR" : "HARİTA GÖRÜNÜMÜ"} / {(activeMap?.floorLabel ?? "HARİTA").toUpperCase()}</span>
+              <h1>{activeMap?.unitName ?? "Harita yükleniyor"}</h1>
             </div>
           </div>
-          <TagInformationPanel variant="mobile" onOpenHistory={onOpenTagHistory} onShowMap={handleShowMap} />
+          <TagInformationPanel variant="mobile" onOpenHistory={handleOpenTagHistory} onShowMap={handleShowMap} liveTrackingMapId={catalog?.liveTrackingMapId} />
           <section className="mobile-map-section" aria-labelledby="mobile-map-title">
             <div className="mobile-map-section-heading"><div><small>CANLI GÖRÜNÜM</small><h2 id="mobile-map-title">Harita</h2></div><span>Haritayı görüntüle</span></div>
             <div ref={mapFrameRef} className="map-frame">
-              <MapViewport positionAnimation={positionAnimation} />
+              {catalogQuery.isPending && <div className="map-state-overlay" role="status">Harita kataloğu yükleniyor…</div>}
+              {catalogQuery.isError && <div className="map-state-overlay is-error" role="alert">{catalogQuery.error.message}</div>}
+              {!catalogQuery.isPending && !catalogQuery.isError && activeMap && !isSelectableMap(activeMap) && <div className="map-state-overlay is-notice" role="status">Bu harita henüz planlanıyor.</div>}
+              {activeMap && isSelectableMap(activeMap) && mapQuery.isPending && <div className="map-state-overlay" role="status">Harita yapılandırması yükleniyor…</div>}
+              {mapQuery.isError && <div className="map-state-overlay is-error" role="alert">{mapQuery.error.message}</div>}
+              {activeMapDetails && <MapViewport key={activeMapDetails.id} map={activeMapDetails} tags={visibleTags} liveTrackingVisible={liveTrackingVisible} positionAnimation={positionAnimation} />}
               {showLayersPanel && <LayerVisibilityPanel />}
               <div className="mini-toolbar" aria-label="Harita araçları">
                 <button className={showLayersPanel ? "active" : ""} title="Katmanları aç/kapat" onClick={toggleLayersPanel}><Layers3 size={16} /></button>
@@ -184,7 +235,7 @@ function LiveMapWorkspace({
                 <button className={isFullscreen ? "active" : ""} title={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-label={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-pressed={isFullscreen} disabled={!fullscreenSupported} onClick={toggleFullscreen}><Maximize2 size={16} /></button>
               </div>
             </div>
-            <div className="mobile-map-status" role="status"><i /> Kritik durum: canlı takip etiketi takibi etkin</div>
+            <div className="mobile-map-status" role="status"><i /> {liveTrackingVisible ? "Canlı takip etiketi takibi etkin" : "Bu haritada canlı konum kaynağı bulunmuyor"}</div>
           </section>
         </>}
         {historyOpened && (
@@ -193,8 +244,8 @@ function LiveMapWorkspace({
           </div>
         )}
       </main>
-      {activeView === "map" && <TagInformationPanel variant="desktop" onOpenHistory={onOpenTagHistory} />}
-      {activeView === "map" && <GekonAiWidget context={assistantContext} />}
+      {activeView === "map" && <TagInformationPanel variant="desktop" onOpenHistory={handleOpenTagHistory} liveTrackingMapId={catalog?.liveTrackingMapId} />}
+      {activeView === "map" && liveTrackingVisible && <GekonAiWidget context={assistantContext} />}
       <StatusStrip />
     </div>
   );

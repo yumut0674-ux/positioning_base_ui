@@ -10,15 +10,22 @@ import {
   constrainMapViewport,
   getFittedMapViewport,
   isAtFittedScale,
-  MAP_CALIBRATION,
-  MAP_FLOOR_PLAN,
   MAP_VIEWPORT_LIMITS,
 } from "../config/mapConfig";
 import { CoordinateTransformService } from "../services/CoordinateTransformService";
 import { TagNode } from "./TagNode";
 import type { PositionAnimationController } from "@/src/features/tracking/services/PositionAnimationController";
+import type { TrackedTag } from "@/src/features/tracking/types/tracking.types";
+import type { MapDetails } from "@/src/server/maps/map.types";
 
-export function MapViewport({ positionAnimation }: { readonly positionAnimation: PositionAnimationController }) {
+interface MapViewportProps {
+  readonly map: MapDetails;
+  readonly tags: readonly TrackedTag[];
+  readonly liveTrackingVisible: boolean;
+  readonly positionAnimation: PositionAnimationController;
+}
+
+export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation }: MapViewportProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const panOriginRef = useRef({ x: 0, y: 0 });
@@ -28,11 +35,10 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
   const hasUserAdjustedViewRef = useRef(false);
   const lastAutoFitSizeRef = useRef<{ width: number; height: number } | null>(null);
   const size = useElementSize(hostRef);
-  const [floorImage] = useImage(MAP_FLOOR_PLAN.imageUrl, "anonymous");
+  const [floorImage, imageStatus] = useImage(map.image.url, "anonymous");
   const viewport = useIpsStore((state) => state.viewport);
   const layers = useIpsStore((state) => state.layers);
-  const tagsById = useIpsStore((state) => state.tags);
-  const tags = useMemo(() => Object.values(tagsById), [tagsById]);
+  const tagsById = useMemo(() => Object.fromEntries(tags.map((tag) => [tag.id, tag])), [tags]);
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const setViewport = useIpsStore((state) => state.setViewport);
   const selectTagAndFocus = useIpsStore((state) => state.selectTagAndFocus);
@@ -40,21 +46,35 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
   const setMeasurementPoint = useIpsStore((state) => state.setMeasurementPoint);
   const cancelMeasurement = useIpsStore((state) => state.cancelMeasurement);
   const mapFocusRequest = useIpsStore((state) => state.mapFocusRequest);
+  const mapFocusScale = useIpsStore((state) => state.mapFocusScale);
   const mapFitRequest = useIpsStore((state) => state.mapFitRequest);
-  const transform = useMemo(() => new CoordinateTransformService(MAP_CALIBRATION), []);
-  const fittedViewport = useMemo(() => getFittedMapViewport(size), [size]);
+  const markMapReady = useIpsStore((state) => state.markMapReady);
+  const mapSize = useMemo(() => ({ width: map.image.width, height: map.image.height }), [map.image.height, map.image.width]);
+  const transform = useMemo(() => new CoordinateTransformService(map.calibration), [map.calibration]);
+  const fittedViewport = useMemo(() => getFittedMapViewport(size, mapSize), [mapSize, size]);
   const canPan = Boolean(fittedViewport && !measurement.enabled && !isAtFittedScale(viewport, fittedViewport));
 
-  const constrainViewport = useCallback((nextViewport: typeof viewport) => constrainMapViewport(nextViewport, size), [size]);
+  const constrainViewport = useCallback((nextViewport: typeof viewport) => constrainMapViewport(nextViewport, size, mapSize), [mapSize, size]);
 
   const fitToScreen = useCallback(() => {
-    const fittedViewport = getFittedMapViewport(size);
+    const fittedViewport = getFittedMapViewport(size, mapSize);
     if (!fittedViewport) return false;
     hasUserAdjustedViewRef.current = false;
     pinchRef.current = null;
     setViewport(fittedViewport);
     return true;
-  }, [setViewport, size]);
+  }, [mapSize, setViewport, size]);
+
+  useEffect(() => {
+    hasUserAdjustedViewRef.current = false;
+    lastAutoFitSizeRef.current = null;
+    pinchRef.current = null;
+    cancelMeasurement();
+  }, [cancelMeasurement, map.id]);
+
+  useEffect(() => {
+    if (imageStatus === "loaded") markMapReady(map.id);
+  }, [imageStatus, map.id, markMapReady]);
 
   useEffect(() => {
     if (hasUserAdjustedViewRef.current) return;
@@ -79,7 +99,7 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
       return;
     }
 
-    const scale = Math.min(MAP_VIEWPORT_LIMITS.maxZoom, Math.max(viewport.scale, 1.4));
+    const scale = mapFocusScale ?? Math.min(MAP_VIEWPORT_LIMITS.maxZoom, Math.max(viewport.scale, 1.4));
     const point = transform.worldToCanvas(selectedTag);
     hasUserAdjustedViewRef.current = true;
     setViewport(constrainViewport({
@@ -87,7 +107,7 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
       x: size.width / 2 - point.x * scale,
       y: size.height / 2 - point.y * scale,
     }));
-  }, [constrainViewport, fitToScreen, mapFocusRequest, selectedTagId, setViewport, size.height, size.width, tagsById, transform, viewport.scale]);
+  }, [constrainViewport, fitToScreen, mapFocusRequest, mapFocusScale, selectedTagId, setViewport, size.height, size.width, tagsById, transform, viewport.scale]);
 
   useEffect(() => {
     if (mapFitRequest === 0 || mapFitRequest === handledFitRequestRef.current) return;
@@ -197,14 +217,14 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
   const gridLines = useMemo(() => {
     const lines: React.ReactNode[] = [];
     const step = transform.metersToPixels(1);
-    for (let x = 0; x <= MAP_FLOOR_PLAN.canvasSize.width; x += step) {
-      lines.push(<Line key={`x-${x}`} points={[x, 0, x, MAP_FLOOR_PLAN.canvasSize.height]} stroke="#8ab4c8" strokeWidth={x % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.34} />);
+    for (let x = 0; x <= map.image.width; x += step) {
+      lines.push(<Line key={`x-${x}`} points={[x, 0, x, map.image.height]} stroke="#8ab4c8" strokeWidth={x % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.34} />);
     }
-    for (let y = 0; y <= MAP_FLOOR_PLAN.canvasSize.height; y += step) {
-      lines.push(<Line key={`y-${y}`} points={[0, y, MAP_FLOOR_PLAN.canvasSize.width, y]} stroke="#8ab4c8" strokeWidth={y % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.34} />);
+    for (let y = 0; y <= map.image.height; y += step) {
+      lines.push(<Line key={`y-${y}`} points={[0, y, map.image.width, y]} stroke="#8ab4c8" strokeWidth={y % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.34} />);
     }
     return lines;
-  }, [transform]);
+  }, [map.image.height, map.image.width, transform]);
 
   const mapGroupProps = { x: viewport.x, y: viewport.y, scaleX: viewport.scale, scaleY: viewport.scale };
   const measurementStart = measurement.start ? transform.worldToCanvas(measurement.start) : null;
@@ -257,32 +277,26 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
           event.target.position({ x: 0, y: 0 });
         }}
       >
-        <Layer listening={false} visible={layers.grid}><Group {...mapGroupProps}>{gridLines}</Group></Layer>
-        <Layer listening={false} visible={layers.floorPlan}>
-          <Group {...mapGroupProps}>
-            <Rect width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} fill="#eef5f7" />
-            {floorImage && <KonvaImage image={floorImage} width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} opacity={0.9} />}
-            <Rect width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} fill="#d8f5f0" opacity={0.08} />
+        <Layer listening={false}>
+          <Group {...mapGroupProps} visible={layers.grid}>{gridLines}</Group>
+          <Group {...mapGroupProps} visible={layers.floorPlan}>
+            <Rect width={map.image.width} height={map.image.height} fill="#eef5f7" />
+            {floorImage && <KonvaImage image={floorImage} width={map.image.width} height={map.image.height} opacity={0.9} />}
+            <Rect width={map.image.width} height={map.image.height} fill="#d8f5f0" opacity={0.08} />
+          </Group>
+          <Group {...mapGroupProps} visible={layers.references}>
+            <Line points={[0, map.image.height, transform.metersToPixels(5), map.image.height]} stroke="#00a896" strokeWidth={2} />
+            <Text x={8} y={map.image.height - 30} text="5 m" fill="#087f73" fontSize={12} fontFamily="monospace" />
           </Group>
         </Layer>
-        <Layer listening={false} visible={layers.references}>
-          <Group {...mapGroupProps}>
-            <Line points={[0, MAP_FLOOR_PLAN.canvasSize.height, transform.metersToPixels(5), MAP_FLOOR_PLAN.canvasSize.height]} stroke="#00a896" strokeWidth={2} />
-            <Text x={8} y={MAP_FLOOR_PLAN.canvasSize.height - 30} text="5 m" fill="#087f73" fontSize={12} fontFamily="monospace" />
-          </Group>
-        </Layer>
-        <Layer listening={false} visible={layers.sensors}><Group {...mapGroupProps} /></Layer>
-        <Layer visible={layers.tags}>
-          <Group {...mapGroupProps}>
+        <Layer visible={layers.tags || layers.routes}>
+          <Group {...mapGroupProps} visible={layers.tags}>
             {tags.map((tag) => <TagNode key={tag.id} tag={tag} transform={transform} positionAnimation={positionAnimation} selected={tag.id === selectedTagId} onSelect={selectTagAndFocus} />)}
           </Group>
-        </Layer>
-        <Layer listening={false} visible={layers.routes}>
-          <Group {...mapGroupProps}>
-            <Line points={[260, 486, 334, 473, 407, 498, 471, 478]} stroke="#00a896" strokeWidth={1.5} opacity={0.46} dash={[5, 8]} tension={0.35} />
+          <Group {...mapGroupProps} visible={layers.routes} listening={false}>
+            {liveTrackingVisible && <Line points={[260, 486, 334, 473, 407, 498, 471, 478]} stroke="#00a896" strokeWidth={1.5} opacity={0.46} dash={[5, 8]} tension={0.35} />}
           </Group>
         </Layer>
-        <Layer listening={false} visible={layers.selection}><Group {...mapGroupProps} /></Layer>
         <Layer listening={false}>
           <Group {...mapGroupProps}>
             {measurementStart && <Circle x={measurementStart.x} y={measurementStart.y} radius={6 / viewport.scale} fill="#ffffff" stroke="#f29f05" strokeWidth={2 / viewport.scale} />}
@@ -297,6 +311,9 @@ export function MapViewport({ positionAnimation }: { readonly positionAnimation:
           </Group>}
         </Layer>
       </Stage>
+      {imageStatus === "loading" && <div className="map-state-overlay" role="status">Harita görseli yükleniyor…</div>}
+      {imageStatus === "failed" && <div className="map-state-overlay is-error" role="alert">Harita görseli yüklenemedi.</div>}
+      {imageStatus === "loaded" && !liveTrackingVisible && <div className="map-state-overlay is-notice" role="status">Bu harita için canlı konum kaynağı henüz yapılandırılmadı.</div>}
       <div className="zoom-readout">{Math.round(viewport.scale * 100)}%</div>
     </div>
   );
