@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type WheelEvent as ReactWheelEvent } from "react";
 import { Circle, Group, Image as KonvaImage, Layer, Line, Rect, Stage, Text } from "react-konva";
 import type Konva from "konva";
 import useImage from "use-image";
@@ -13,7 +13,7 @@ import {
   MAP_VIEWPORT_LIMITS,
 } from "../config/mapConfig";
 import { CoordinateTransformService } from "../services/CoordinateTransformService";
-import { TagNode } from "./TagNode";
+import { TagOverlay } from "./TagOverlay";
 import type { PositionAnimationController } from "@/src/features/tracking/services/PositionAnimationController";
 import type { TrackedTag } from "@/src/features/tracking/types/tracking.types";
 import type { MapDetails } from "@/src/server/maps/map.types";
@@ -34,6 +34,7 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
   const handledFitRequestRef = useRef(0);
   const hasUserAdjustedViewRef = useRef(false);
   const lastAutoFitSizeRef = useRef<{ width: number; height: number } | null>(null);
+  const [dragOffset, setDragOffset] = useState({ mapId: map.id, x: 0, y: 0 });
   const size = useElementSize(hostRef);
   const [floorImage, imageStatus] = useImage(map.image.url, "anonymous");
   const viewport = useIpsStore((state) => state.viewport);
@@ -53,6 +54,12 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
   const transform = useMemo(() => new CoordinateTransformService(map.calibration), [map.calibration]);
   const fittedViewport = useMemo(() => getFittedMapViewport(size, mapSize), [mapSize, size]);
   const canPan = Boolean(fittedViewport && !measurement.enabled && !isAtFittedScale(viewport, fittedViewport));
+  const activeDragOffset = dragOffset.mapId === map.id ? dragOffset : { x: 0, y: 0 };
+  const tagViewport = useMemo(() => ({
+    ...viewport,
+    x: viewport.x + activeDragOffset.x,
+    y: viewport.y + activeDragOffset.y,
+  }), [activeDragOffset.x, activeDragOffset.y, viewport]);
 
   const constrainViewport = useCallback((nextViewport: typeof viewport) => constrainMapViewport(nextViewport, size, mapSize), [mapSize, size]);
 
@@ -124,12 +131,12 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [cancelMeasurement, measurement.enabled]);
 
-  const handleWheel = useCallback((event: Konva.KonvaEventObject<WheelEvent>) => {
-    event.evt.preventDefault();
-    const stage = stageRef.current;
-    const pointer = stage?.getPointerPosition();
-    if (!pointer) return;
-    const direction = event.evt.deltaY > 0 ? -1 : 1;
+  const handleWheel = useCallback((event: ReactWheelEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const bounds = hostRef.current?.getBoundingClientRect();
+    if (!bounds) return;
+    const pointer = { x: event.clientX - bounds.left, y: event.clientY - bounds.top };
+    const direction = event.deltaY > 0 ? -1 : 1;
     hasUserAdjustedViewRef.current = true;
     // On a narrow screen the fitted plan can legitimately be below the normal
     // zoom floor. Keep that scale reachable so the first wheel gesture never
@@ -237,7 +244,7 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
     : null;
 
   return (
-    <div ref={hostRef} className="map-viewport" data-testid="map-viewport" data-can-pan={canPan}>
+    <div ref={hostRef} className="map-viewport" data-testid="map-viewport" data-can-pan={canPan} onWheel={handleWheel}>
       <Stage
         ref={stageRef}
         // Konva creates an internal canvas for every layer. It cannot draw to
@@ -245,7 +252,6 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
         // measurement, so retain a harmless 1px backing canvas until then.
         width={Math.max(1, size.width)}
         height={Math.max(1, size.height)}
-        onWheel={handleWheel}
         onClick={handleMeasureClick}
         onTap={handleMeasureClick}
         onTouchStart={handleTouchStart}
@@ -267,14 +273,20 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
         onDragStart={() => {
           hasUserAdjustedViewRef.current = true;
           panOriginRef.current = { x: viewport.x, y: viewport.y };
+          setDragOffset({ mapId: map.id, x: 0, y: 0 });
+        }}
+        onDragMove={(event) => {
+          setDragOffset({ mapId: map.id, x: event.target.x(), y: event.target.y() });
         }}
         onDragEnd={(event) => {
+          const offset = { x: event.target.x(), y: event.target.y() };
           setViewport(constrainViewport({
             ...viewport,
-            x: panOriginRef.current.x + event.target.x(),
-            y: panOriginRef.current.y + event.target.y(),
+            x: panOriginRef.current.x + offset.x,
+            y: panOriginRef.current.y + offset.y,
           }));
           event.target.position({ x: 0, y: 0 });
+          setDragOffset({ mapId: map.id, x: 0, y: 0 });
         }}
       >
         <Layer listening={false}>
@@ -289,10 +301,7 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
             <Text x={8} y={map.image.height - 30} text="5 m" fill="#087f73" fontSize={12} fontFamily="monospace" />
           </Group>
         </Layer>
-        <Layer visible={layers.tags || layers.routes}>
-          <Group {...mapGroupProps} visible={layers.tags}>
-            {tags.map((tag) => <TagNode key={tag.id} tag={tag} transform={transform} positionAnimation={positionAnimation} selected={tag.id === selectedTagId} onSelect={selectTagAndFocus} />)}
-          </Group>
+        <Layer visible={layers.routes}>
           <Group {...mapGroupProps} visible={layers.routes} listening={false}>
             {liveTrackingVisible && <Line points={[260, 486, 334, 473, 407, 498, 471, 478]} stroke="#00a896" strokeWidth={1.5} opacity={0.46} dash={[5, 8]} tension={0.35} />}
           </Group>
@@ -311,6 +320,17 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
           </Group>}
         </Layer>
       </Stage>
+      <TagOverlay
+        width={map.image.width}
+        height={map.image.height}
+        viewport={tagViewport}
+        tags={tags}
+        transform={transform}
+        positionAnimation={positionAnimation}
+        selectedTagId={selectedTagId}
+        visible={layers.tags}
+        onSelect={selectTagAndFocus}
+      />
       {imageStatus === "loading" && <div className="map-state-overlay" role="status">Harita görseli yükleniyor…</div>}
       {imageStatus === "failed" && <div className="map-state-overlay is-error" role="alert">Harita görseli yüklenemedi.</div>}
       {imageStatus === "loaded" && !liveTrackingVisible && <div className="map-state-overlay is-notice" role="status">Bu harita için canlı konum kaynağı henüz yapılandırılmadı.</div>}

@@ -1,0 +1,148 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.overlay[hidden] {
+  display: none;
+}
+
+.world {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.position {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 1;
+  will-change: transform;
+}
+
+.selectedPosition {
+  z-index: 2;
+}
+
+.button {
+  position: absolute;
+  top: -24px;
+  left: -20px;
+  width: 124px;
+  height: 52px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: visible;
+  background: transparent;
+  color: #00a896;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  pointer-events: auto;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.selection,
+.halo,
+.marker,
+.core,
+.direction,
+.label {
+  position: absolute;
+  display: block;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.selection {
+  top: 4px;
+  left: 0;
+  width: 40px;
+  height: 40px;
+  border: 1.5px dashed #00a896;
+  border-radius: 50%;
+  opacity: 0;
+}
+
+.selected .selection,
+.button:focus-visible .selection {
+  opacity: .72;
+}
+
+.halo {
+  top: 11px;
+  left: 7px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: .13;
+}
+
+.marker {
+  top: 17.5px;
+  left: 13.5px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 12px currentColor;
+}
+
+.core {
+  top: 21.7px;
+  left: 17.7px;
+  width: 4.6px;
+  height: 4.6px;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.direction {
+  top: 7px;
+  left: 19.25px;
+  width: 1.5px;
+  height: 8px;
+  border-radius: 999px;
+  background: currentColor;
+  transform-origin: 50% 17px;
+}
+
+.label {
+  top: 5px;
+  left: 32px;
+  width: 88px;
+  height: 20px;
+  padding: 4px 8px 0;
+  overflow: hidden;
+  border: 1px solid #c6d5e1;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, .98);
+  box-shadow: 0 0 10px rgba(80, 103, 128, .12);
+  color: #162133;
+  font: 700 10px/14px Inter, sans-serif;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.selected .label {
+  border: 2px solid #00a896;
+  padding: 3px 7px 0;
+  background: #dff7f3;
+  box-shadow: 0 0 14px rgba(0, 168, 150, .28);
+  color: #076b62;
+}
+
+.button:focus-visible {
+  outline: none;
+}
