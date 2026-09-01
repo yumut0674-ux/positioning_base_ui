@@ -75,15 +75,17 @@ test("tags follow the corridor, visit a room centre, then stay there for 2–20 
   assert.ok(returning.x < 2 && returning.x > 1.75);
 });
 
-test("next timer is created only after the whole send completes and never accumulates", async () => {
+test("a new position tick aborts unfinished response waits instead of skipping the send", () => {
   const pendingFetches = [];
   const timers = [];
   const cleared = [];
+  const requestSignals = [];
   let activeFetches = 0;
   let maximumActiveFetches = 0;
-  const fetchImplementation = () => {
+  const fetchImplementation = (_, options) => {
     activeFetches += 1;
     maximumActiveFetches = Math.max(maximumActiveFetches, activeFetches);
+    requestSignals.push(options.signal);
     return new Promise((resolve) => pendingFetches.push(() => {
       activeFetches -= 1;
       resolve({ ok: true });
@@ -104,16 +106,48 @@ test("next timer is created only after the whole send completes and never accumu
 
   simulator.start();
   assert.equal(pendingFetches.length, 4);
-  assert.equal(timers.length, 0);
-  pendingFetches.splice(0).forEach((resolve) => resolve());
-  await new Promise((resolve) => setImmediate(resolve));
   assert.equal(timers.length, 1);
   assert.equal(timers[0].delay, 777);
-  assert.equal(maximumActiveFetches, 4);
 
   timers[0].callback();
-  assert.equal(pendingFetches.length, 4);
-  assert.equal(timers.length, 1);
+  assert.equal(pendingFetches.length, 8);
+  assert.equal(timers.length, 2);
+  assert.equal(timers[1].delay, 777);
+  assert.equal(maximumActiveFetches, 8);
+  assert.ok(requestSignals.slice(0, 4).every((signal) => signal.aborted));
+  assert.ok(requestSignals.slice(4).every((signal) => !signal.aborted));
+
   simulator.stop();
-  assert.equal(cleared.length, 0);
+  assert.deepEqual(cleared, [2]);
+  assert.equal(requestSignals.length, 8);
+  assert.ok(requestSignals.every((signal) => signal.aborted));
+});
+
+test("stalled HTTP responses never suppress later one-second position ticks", () => {
+  const timers = [];
+  const requests = [];
+  const errors = [];
+  const simulator = createTagSimulator({
+    fetchImplementation: (_, options) => {
+      requests.push(options);
+      return new Promise(() => {});
+    },
+    randomDelay: () => 1_000,
+    setTimeoutImplementation: (callback, delay) => {
+      timers.push({ callback, delay });
+      return timers.length;
+    },
+    clearTimeoutImplementation() {},
+    logger: { log() {}, error(message) { errors.push(message); } },
+  });
+
+  simulator.start();
+  for (let index = 0; index < 5; index += 1) timers[index].callback();
+
+  assert.equal(requests.length, 24);
+  assert.equal(errors.length, 0);
+  assert.ok(requests.slice(0, -4).every(({ signal }) => signal.aborted));
+  assert.ok(requests.slice(-4).every(({ signal }) => !signal.aborted));
+  simulator.stop();
+  assert.ok(requests.every(({ signal }) => signal.aborted));
 });

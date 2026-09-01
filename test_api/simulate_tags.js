@@ -279,7 +279,7 @@ export function createTagSimulator({
 } = {}) {
   let timer = null;
   let stopped = true;
-  let activeRequest = null;
+  const activeRequests = new Set();
   const movements = tags.map((tag) => createTagMovement({ tag, roomCenters, random, now }));
 
   async function sendNextTagUpdates() {
@@ -296,33 +296,38 @@ export function createTagSimulator({
       };
     });
 
-    activeRequest = new AbortController();
+    const requestController = new AbortController();
+    activeRequests.add(requestController);
     try {
       const responses = await Promise.all(positions.map((position) => fetchImplementation(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(position),
-        signal: activeRequest.signal,
+        signal: requestController.signal,
       })));
       const failedResponse = responses.find((response) => !response.ok);
       if (failedResponse) throw new Error(await failedResponse.text());
     } catch (error) {
-      if (!stopped || error?.name !== "AbortError") {
+      if (error?.name !== "AbortError") {
         logger.error("Konum gönderilemedi:", error instanceof Error ? error.message : String(error));
       }
     } finally {
-      activeRequest = null;
+      activeRequests.delete(requestController);
     }
   }
 
-  async function scheduleNextUpdate() {
+  function scheduleNextUpdate() {
     if (stopped) return;
-    await sendNextTagUpdates();
-    if (stopped) return;
+    // The simulator clock is independent from HTTP acknowledgements. If the
+    // previous request reached the server but its response is still pending,
+    // stop waiting for that response and publish the newest positions now.
+    for (const request of activeRequests) request.abort();
+    activeRequests.clear();
+    void sendNextTagUpdates();
     const delay = randomDelay(minDelayMs, maxDelayMs);
     timer = setTimeoutImplementation(() => {
       timer = null;
-      void scheduleNextUpdate();
+      scheduleNextUpdate();
     }, delay);
   }
 
@@ -334,7 +339,7 @@ export function createTagSimulator({
     logger.log(minDelayMs === maxDelayMs
       ? `Tag simulation interval: fixed ${minDelayMs} ms`
       : `Tag simulation interval: random ${minDelayMs}–${maxDelayMs} ms`);
-    void scheduleNextUpdate();
+    scheduleNextUpdate();
   }
 
   function stop() {
@@ -342,7 +347,8 @@ export function createTagSimulator({
     stopped = true;
     if (timer !== null) clearTimeoutImplementation(timer);
     timer = null;
-    activeRequest?.abort();
+    for (const request of activeRequests) request.abort();
+    activeRequests.clear();
   }
 
   return { start, stop, sendNextTagUpdates, scheduleNextUpdate };

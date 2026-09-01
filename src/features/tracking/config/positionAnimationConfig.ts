@@ -3,7 +3,7 @@ import type { PositionAnimationConfig } from "../types/tracking.types";
 export const DEFAULT_POSITION_ANIMATION_CONFIG: PositionAnimationConfig = {
   enabled: true,
   mode: "buffered_interpolation",
-  interpolationDelayMs: 1_200,
+  interpolationDelayMs: 3_000, // Konumları 3 sn geriden oynatarak mobil ağ gecikmesi ve paket dalgalanmalarını yumuşatır.
   maximumBufferSize: 10,
   maximumSegmentDurationMs: 2_500,
   maximumExtrapolationMs: 250,

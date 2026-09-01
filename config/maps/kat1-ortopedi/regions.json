@@ -52,7 +52,7 @@
   "positionAnimation": {
     "enabled": true,
     "mode": "buffered_interpolation",
-    "interpolationDelayMs": 1200,
+    "interpolationDelayMs": 3000,
     "maximumBufferSize": 10,
     "maximumSegmentDurationMs": 2500,
     "maximumExtrapolationMs": 250,
