@@ -13,6 +13,7 @@ type IngestBody = {
   readonly x?: unknown;
   readonly y?: unknown;
   readonly timestamp?: unknown;
+  readonly quality?: unknown;
 };
 
 function isIsoDateTime(value: string): boolean {
@@ -44,7 +45,7 @@ export function parsePositionPayload(value: unknown): TrackingPosition {
 
   const input = value as IngestBody;
   const unexpectedFields = Object.keys(input).filter(
-    (field) => !EXPECTED_FIELDS.includes(field as (typeof EXPECTED_FIELDS)[number]),
+    (field) => field !== "quality" && !EXPECTED_FIELDS.includes(field as (typeof EXPECTED_FIELDS)[number]),
   );
   if (unexpectedFields.length > 0) {
     throw new Error(`Beklenmeyen alanlar: ${unexpectedFields.join(", ")}`);
@@ -65,11 +66,17 @@ export function parsePositionPayload(value: unknown): TrackingPosition {
   }
 
   return {
+    ...(input.quality === undefined ? {} : { quality: validateQuality(input.quality) }),
     tagCode: input.tag_id.trim().toUpperCase(),
     x: input.x,
     y: input.y,
     timestamp: input.timestamp,
   };
+}
+
+function validateQuality(value: unknown): number {
+  if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 1) throw new Error("quality 0-1 aralığında olmalıdır");
+  return value;
 }
 
 export async function POST(request: Request) {

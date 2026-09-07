@@ -1,0 +1,181 @@
+{
+  "map": {
+    "source": "system",
+    "mapId": "simulation-reference",
+    "image": "/test.png",
+    "widthPx": 120,
+    "heightPx": 80,
+    "calibration": {
+      "type": "affine",
+      "points": []
+    }
+  },
+  "engine": {
+    "evidenceDurationMs": 1500,
+    "expectedIntervalMs": 1000
+  },
+  "regions": [
+    {
+      "id": "A",
+      "name": "Oda A",
+      "kind": "room",
+      "color": "#00a896",
+      "coverage": "regular",
+      "polygon": [
+        {
+          "pixel": {
+            "x": 0,
+            "y": 0
+          },
+          "world": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "pixel": {
+            "x": 6,
+            "y": 0
+          },
+          "world": {
+            "x": 6,
+            "y": 0
+          }
+        },
+        {
+          "pixel": {
+            "x": 6,
+            "y": 6
+          },
+          "world": {
+            "x": 6,
+            "y": 6
+          }
+        },
+        {
+          "pixel": {
+            "x": 0,
+            "y": 6
+          },
+          "world": {
+            "x": 0,
+            "y": 6
+          }
+        }
+      ],
+      "roomCenter": {
+        "pixel": {
+          "x": 3,
+          "y": 3
+        },
+        "world": {
+          "x": 3,
+          "y": 3
+        }
+      },
+      "entrances": [
+        {
+          "pixel": {
+            "x": 3,
+            "y": 0
+          },
+          "world": {
+            "x": 3,
+            "y": 0
+          },
+          "id": "door-0",
+          "label": "Kapı",
+          "widthMeters": 1.4,
+          "inwardNormal": {
+            "x": 0,
+            "y": 1
+          },
+          "connectsTo": "corridor",
+          "approachDepthMeters": 2,
+          "crossingDepthMeters": 0.15
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "name": "Oda B",
+      "kind": "room",
+      "color": "#00a896",
+      "coverage": "regular",
+      "polygon": [
+        {
+          "pixel": {
+            "x": 6,
+            "y": 0
+          },
+          "world": {
+            "x": 6,
+            "y": 0
+          }
+        },
+        {
+          "pixel": {
+            "x": 12,
+            "y": 0
+          },
+          "world": {
+            "x": 12,
+            "y": 0
+          }
+        },
+        {
+          "pixel": {
+            "x": 12,
+            "y": 6
+          },
+          "world": {
+            "x": 12,
+            "y": 6
+          }
+        },
+        {
+          "pixel": {
+            "x": 6,
+            "y": 6
+          },
+          "world": {
+            "x": 6,
+            "y": 6
+          }
+        }
+      ],
+      "roomCenter": {
+        "pixel": {
+          "x": 9,
+          "y": 3
+        },
+        "world": {
+          "x": 9,
+          "y": 3
+        }
+      },
+      "entrances": [
+        {
+          "pixel": {
+            "x": 9,
+            "y": 0
+          },
+          "world": {
+            "x": 9,
+            "y": 0
+          },
+          "id": "door-1",
+          "label": "Kapı",
+          "widthMeters": 1.4,
+          "inwardNormal": {
+            "x": 0,
+            "y": 1
+          },
+          "connectsTo": "corridor",
+          "approachDepthMeters": 2,
+          "crossingDepthMeters": 0.15
+        }
+      ]
+    }
+  ]
+}

@@ -24,6 +24,9 @@ export class SocketTrackingGateway implements TrackingGateway {
 }
 
 type SsePositionPayload = {
+  readonly publishedAt?: string;
+  readonly receivedAt?: string;
+  readonly synthetic?: boolean;
   readonly tagCode: string;
   readonly x: number;
   readonly y: number;
@@ -48,6 +51,9 @@ export class SseTrackingGateway implements TrackingGateway {
         const parsedTimestamp = typeof payload.timestamp === "string" ? Date.parse(payload.timestamp) : Number.NaN;
         const timestamp = Number.isFinite(parsedTimestamp) ? parsedTimestamp : receivedAt;
         onPosition({
+          publishedAt: payload.publishedAt,
+          receivedAt: payload.receivedAt,
+          synthetic: payload.synthetic,
           id: payload.tagCode,
           x: payload.x,
           y: payload.y,

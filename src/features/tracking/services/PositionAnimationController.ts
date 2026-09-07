@@ -25,6 +25,7 @@ interface InternalTagAnimationState extends TagAnimationState {
 }
 
 export interface IncomingAnimationPosition {
+  readonly measurementTimestamp?: number;
   readonly x: number;
   readonly y: number;
   readonly timestamp?: number;
@@ -102,17 +103,26 @@ export class PositionAnimationController {
         renderedX: sample.x,
         renderedY: sample.y,
         lastRenderedAt: receivedAt,
-        stale: false,
-        lastReceivedAt: receivedAt,
+        stale: receivedAt - (incoming.measurementTimestamp ?? receivedAt) > this.config.stalePositionTimeoutMs,
+        lastReceivedAt: incoming.measurementTimestamp ?? receivedAt,
         lastRenderTime: Number.NEGATIVE_INFINITY,
         renderer: this.renderers.get(tagId),
       };
       this.states.set(tagId, state);
-      state.renderer?.render(sample.x, sample.y, false);
+      state.renderer?.render(sample.x, sample.y, state.stale);
       return;
     }
 
     const latest = state.samples.at(-1);
+    if (latest && sample.timestamp < latest.timestamp && (sample.positionSource === "REGION_CENTER" || latest.positionSource === "REGION_CENTER")) return;
+    // Room coordinates are display anchors. Snap without inventing a wall-crossing route.
+    if (sample.positionSource === "REGION_CENTER" || latest?.positionSource === "REGION_CENTER") {
+      state.lastReceivedAt = incoming.measurementTimestamp ?? receivedAt;
+      state.samples = [sample]; state.transition = undefined;
+      state.stale = receivedAt - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
+      this.apply(state, sample.x, sample.y, receivedAt);
+      return;
+    }
     if (state.samples.some((item) => item.timestamp === sample.timestamp && samePosition(item, sample))) return;
     if (sample.timestamp <= state.lastRenderTime) return;
 
@@ -123,21 +133,6 @@ export class PositionAnimationController {
       state.samples = [sample];
       state.transition = undefined;
       this.apply(state, sample.x, sample.y, receivedAt);
-      return;
-    }
-
-    if (sample.positionSource === "REGION_CENTER") {
-      const sameCenter = latest?.positionSource === "REGION_CENTER"
-        && latest.regionId === sample.regionId
-        && samePosition(latest, sample);
-      state.samples = [sample];
-      if (!sameCenter) this.startTransition(state, sample, receivedAt, this.config.regionTransitionDurationMs);
-      return;
-    }
-
-    if (latest?.positionSource === "REGION_CENTER") {
-      state.samples = [sample];
-      this.startTransition(state, sample, receivedAt, this.config.regionTransitionDurationMs);
       return;
     }
 

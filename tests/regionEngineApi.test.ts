@@ -14,9 +14,9 @@ test("region engine status GET exposes the expected backward-compatible shape", 
   const response = GET();
   assert.equal(response.status, 200);
   const status = await response.json() as Record<string, unknown>;
-  assert.deepEqual(Object.keys(status).sort(), [
+  for (const field of [
     "activeVehicleCount", "configLoaded", "enabled", "processedPort", "rawPort", "vehiclesInRegions",
-  ]);
+  ]) assert.ok(field in status);
 });
 
 test("status PUT validates input and repeated disable requests are idempotent", async () => {

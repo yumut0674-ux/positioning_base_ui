@@ -22,6 +22,7 @@ import {
 } from "../services/regionEngineApi";
 import styles from "./regions.module.css";
 
+import { RegionInferenceEditor } from "./RegionInferenceEditor";
 type SelectedPoint = { readonly type: "polygon" | "center" | "entrance"; readonly index: number } | null;
 type Viewport = { readonly x: number; readonly y: number; readonly scale: number };
 
@@ -40,7 +41,7 @@ function validateConfig(config: RegionsConfig): string[] {
   for (const region of config.regions) {
     if (!region.name.trim()) errors.push(`${region.id}: Oda adı boş olamaz.`);
     if (region.polygon.length < 3) errors.push(`${region.name || region.id}: Çokgen en az 3 noktadan oluşmalı.`);
-    if (!region.roomCenter) errors.push(`${region.name || region.id}: Oda merkezi eklenmeli.`);
+    if (!region.roomCenter && region.kind !== "corridor" && !/^corridor/.test(region.id)) errors.push(`${region.name || region.id}: Oda merkezi eklenmeli.`);
   }
   return errors;
 }
@@ -356,6 +357,8 @@ export function RegionManagementPanel() {
 
   return (
     <section className={styles.panel}>
+      {engineStatus?.warnings?.length ? <details><summary>Harita çıkarım sınırlamaları ({engineStatus.warnings.length})</summary>{engineStatus.warnings.map(w => <p key={w}>{w}</p>)}</details> : null}
+      <label>Motor çalışma modu (kaydedildiğinde uygulanır)<select value={config.engine?.mode ?? "inference"} onChange={e => setConfig(current => ({ ...current, engine: { ...current.engine, mode: e.target.value as "inference" | "shadow" | "legacy" } }))}><option value="inference">Yeni oda çıkarımı</option><option value="shadow">Gölge karşılaştırma · eski motor yayınlar</option><option value="legacy">Eski motora geri dönüş</option></select></label>
       <header className={styles.header}>
         <div><span>ODA/BÖLGE YÖNETİMİ / {MAP_FLOOR_PLAN.level.toUpperCase()}</span><h1>Oda/Bölge Paneli</h1></div>
         <div className={styles.systemMap}><Check size={14} /><span>SİSTEM HARİTASI</span><strong>{MAP_FLOOR_PLAN.name}</strong></div>
@@ -459,6 +462,7 @@ export function RegionManagementPanel() {
             </section> : coordinateItems.length > 0 && <div className={styles.selectHint}><MousePointer2 size={14} /> İnce ayar için listeden veya haritadan bir nokta seçin.</div>}
             <label><span>Oda/bölge adı</span><input value={selectedRegion.name} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, name: event.target.value }))} /></label>
             <div className={styles.fieldRow}><label><span>Kimlik</span><input value={selectedRegion.id} readOnly /></label><label className={styles.colorField}><span>Renk</span><input type="color" value={selectedRegion.color} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, color: event.target.value }))} /></label></div>
+            <RegionInferenceEditor key={`${selectedRegion.id}-${JSON.stringify(selectedRegion.entrances)}`} region={selectedRegion} onChange={region => updateRegion(region.id, () => region)} />
             <div className={styles.metrics}><div><span>ÇOKGEN</span><strong>{selectedRegion.polygon.length}</strong><small>köşe</small></div><div><span>GİRİŞLER</span><strong>{selectedRegion.entrances.length}</strong><small>nokta</small></div></div>
             <section className={styles.coordinateSection}><h2>Gerçek dünya koordinatları</h2>{selectedRegion.roomCenter ? <p>Merkez: <code>{selectedRegion.roomCenter.world.x.toFixed(2)}, {selectedRegion.roomCenter.world.y.toFixed(2)} m</code></p> : <p>Oda merkezi tanımlanmadı.</p>}<small>Haritadaki bir noktayı seçerek koordinatlarını ince ayarlayabilirsiniz.</small></section>
             {selectedPoint && <button className={styles.deletePoint} onClick={deleteSelectedPoint}><X size={14} /> Seçili noktayı sil</button>}

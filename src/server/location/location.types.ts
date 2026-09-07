@@ -62,6 +62,7 @@ export interface TagAssignment {
 }
 
 export interface PositionRecord {
+  readonly decision?: import("../regionEngine/types").ProcessedPosition;
   readonly tagCode: string;
   readonly x: number;
   readonly y: number;
@@ -70,6 +71,11 @@ export interface PositionRecord {
 }
 
 export interface ResolvedPosition {
+  readonly roomDecision?: import("../regionEngine/types").ProcessedPosition["regionInference"];
+  readonly rawPosition?: { readonly x: number; readonly y: number; readonly timestamp: string };
+  readonly publishedAt?: string;
+  readonly engineVersion?: string;
+  readonly configVersion?: string;
   readonly x: number;
   readonly y: number;
   readonly zoneName: string;
@@ -103,7 +109,7 @@ export interface LocationAtTimeData {
 
 export type HistoryFormat = "zone_timeline" | "route_points";
 
-export interface RoutePoint {
+export interface RoutePoint extends ResolvedPosition {
   readonly x: number;
   readonly y: number;
   readonly observedAt: string;
@@ -113,6 +119,8 @@ export interface RoutePoint {
 }
 
 export interface ZoneTimelineEntry {
+  /** Legacy time field names denote decision intervals, not exact physical crossing times. */
+  readonly timeMeaning?: "decision_effective_at";
   readonly zoneName: string;
   readonly enteredAt: string;
   readonly exitedAt: string;
@@ -126,6 +134,7 @@ export interface DataGap {
 }
 
 export interface RoutePointsHistoryData {
+  readonly zoneTimeline?: readonly ZoneTimelineEntry[];
   readonly entityId: number;
   readonly entityName: string;
   readonly from: string;

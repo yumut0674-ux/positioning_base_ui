@@ -202,7 +202,10 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
   const assistantFrom = useMemo(() => toIstanbulIsoString(startDate), [startDate]);
   const assistantTo = useMemo(() => toIstanbulIsoString(endDate), [endDate]);
   const regionsConfig = useIpsStore((state) => state.regionsConfig);
-  const timeline = useMemo(() => buildLocationTimeline(positions, MAP_FLOOR_PLAN.id, regionsConfig), [positions, regionsConfig]);
+  const timeline = useMemo(() => historyData?.zoneTimeline
+    ? historyData.zoneTimeline.map((entry, i): LocationStay => ({ id: `decision-${i}`, locationLabel: entry.zoneName, startedAt: entry.enteredAt, endedAt: entry.exitedAt, durationMs: entry.durationSeconds * 1000,
+      positions: positions.filter(p => Date.parse(p.timestamp) >= Date.parse(entry.enteredAt) && Date.parse(p.timestamp) <= Date.parse(entry.exitedAt)), isDataGap: entry.zoneName === "Belirsiz" }))
+    : buildLocationTimeline(positions, MAP_FLOOR_PLAN.id, regionsConfig), [positions, regionsConfig, historyData]);
   const pointValues = useMemo(() => positions.flatMap((position) => worldToCanvas(position)), [positions]);
   const distance = useMemo(() => routeDistance(positions), [positions]);
   const selectedStay = timeline.find((stay) => stay.id === selectedStayId) ?? null;
@@ -313,7 +316,7 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
     setViewport({ scale: nextScale, x: pointer.x - focusX * nextScale, y: pointer.y - focusY * nextScale });
   };
 
-  const routePointsForAssistant = historyData?.points.map((point) => ({
+  const routePointsForAssistant = historyData?.zoneTimeline ? undefined : historyData?.points.map((point) => ({
     x: point.x,
     y: point.y,
     observedAt: point.observedAt,
@@ -323,7 +326,7 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
   return <div className={styles.panelRoot}>
       <div className="workspace-heading">
         <div><span>HAREKET ANALİZİ / {MAP_FLOOR_PLAN.level.toUpperCase()}</span><h1>Rota Geçmişi</h1></div>
-        <div className="workspace-meta"><i /><span>GERÇEK KONUM VERİSİ</span><strong>{selectedEntity?.tagCode ?? selectedEntity?.entityCode ?? "—"}</strong></div>
+        <div className="workspace-meta"><i /><span>{historyData?.zoneTimeline ? "ODA KARAR GEÇMİŞİ" : "GERÇEK KONUM VERİSİ"}</span><strong>{selectedEntity?.tagCode ?? selectedEntity?.entityCode ?? "—"}</strong></div>
       </div>
       <section className={styles.mapFrame}>
         <div ref={hostRef} className={styles.mapCanvas}>
@@ -331,9 +334,9 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
             <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}><Rect width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} fill="#e7f0f4" />{floorImage && <KonvaImage image={floorImage} width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} opacity={.68} />}<Rect width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} fill="#d8f5f0" opacity={.1} /></Group></Layer>
             <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}>{Array.from({ length: Math.ceil(MAP_FLOOR_PLAN.canvasSize.width / HISTORY_GRID_STEP) + 1 }, (_, index) => <Line key={`vertical-${index}`} points={[index * HISTORY_GRID_STEP, 0, index * HISTORY_GRID_STEP, MAP_FLOOR_PLAN.canvasSize.height]} stroke="#6f9db1" strokeWidth={.4} opacity={.16} />)}{Array.from({ length: Math.ceil(MAP_FLOOR_PLAN.canvasSize.height / HISTORY_GRID_STEP) + 1 }, (_, index) => <Line key={`horizontal-${index}`} points={[0, index * HISTORY_GRID_STEP, MAP_FLOOR_PLAN.canvasSize.width, index * HISTORY_GRID_STEP]} stroke="#6f9db1" strokeWidth={.4} opacity={.16} />)}</Group></Layer>
             <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}>
-              {pointValues.length >= 4 && <><Line points={pointValues} stroke="#00a896" strokeWidth={12} opacity={selectedStay ? .06 : .15} tension={.32} lineCap="round" lineJoin="round" /><Line points={pointValues} stroke="#3578e5" strokeWidth={3.5} opacity={selectedStay ? .2 : .95} tension={.32} lineCap="round" lineJoin="round" shadowColor="#00a896" shadowBlur={12} shadowOpacity={selectedStay ? .12 : .48} /></>}
+              {!historyData?.zoneTimeline && pointValues.length >= 4 && <><Line points={pointValues} stroke="#00a896" strokeWidth={12} opacity={selectedStay ? .06 : .15} tension={.32} lineCap="round" lineJoin="round" /><Line points={pointValues} stroke="#3578e5" strokeWidth={3.5} opacity={selectedStay ? .2 : .95} tension={.32} lineCap="round" lineJoin="round" shadowColor="#00a896" shadowBlur={12} shadowOpacity={selectedStay ? .12 : .48} /></>}
               {positions.map((position, index) => { const [x, y] = worldToCanvas(position); return <Circle key={`${position.timestamp}-${position.x}`} x={x} y={y} radius={index % 3 === 0 ? 3.5 : 2.2} fill="#ffffff" stroke="#00a896" strokeWidth={1.3} opacity={selectedStay ? .3 : .95} />; })}
-              {selectedStay && selectedPointValues.length > 2 && <Line points={selectedPointValues} stroke="#00a896" strokeWidth={5} opacity={1} tension={.32} lineCap="round" lineJoin="round" shadowColor="#00a896" shadowBlur={15} shadowOpacity={.5} />}
+              {!historyData?.zoneTimeline && selectedStay && selectedPointValues.length > 2 && <Line points={selectedPointValues} stroke="#00a896" strokeWidth={5} opacity={1} tension={.32} lineCap="round" lineJoin="round" shadowColor="#00a896" shadowBlur={15} shadowOpacity={.5} />}
               {selectedStay?.positions.map((position, index) => { const [x, y] = worldToCanvas(position); return <Circle key={`selected-${position.timestamp}`} x={x} y={y} radius={index === 0 || index === selectedStay.positions.length - 1 ? 6 : 3.2} fill={index === 0 ? "#13a875" : index === selectedStay.positions.length - 1 ? "#3578e5" : "#ffffff"} stroke="#ffffff" strokeWidth={2} />; })}
               {startPoint && <Group x={startPoint[0]} y={startPoint[1]}><Circle radius={14} fill="#21d497" opacity={.19} /><Circle radius={7} fill="#13a875" stroke="#ffffff" strokeWidth={2} /><Text x={15} y={-5} text="BAŞLANGIÇ" fill="#087f73" fontSize={10} fontStyle="bold" fontFamily="Inter, sans-serif" /></Group>}
               {endPoint && <Group x={endPoint[0]} y={endPoint[1]}><Circle radius={16} fill="#f35166" opacity={.19} /><Circle radius={8} fill="#e65353" stroke="#ffffff" strokeWidth={2} /><Text x={16} y={-5} text="BİTİŞ" fill="#bd3e4b" fontSize={10} fontStyle="bold" fontFamily="Inter, sans-serif" /></Group>}
@@ -361,7 +364,7 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
           {historyWarnings.length > 0 && <div className={styles.warningList}>{historyWarnings.map((warning) => <p key={warning}>{warning}</p>)}</div>}
           {historyData?.sampled && <div className={styles.sampledNotice}>Çok yoğun veri: {historyData.sourcePointCount} kayıttan {historyData.returnedCount} rota noktası örneklendi.</div>}
 
-          {historyState === "success" && <motion.section className={styles.summary} key={positions[0]?.timestamp} initial={{ opacity: .4, y: 5 }} animate={{ opacity: 1, y: 0 }}><div className={styles.summaryTitle}><Route size={14} /><span>ROTA ÖZETİ</span><i>GERÇEK VERİ</i></div><div className={styles.stats}><div><small>BULUNAN NOKTA</small><strong>{positions.length}</strong><em>{historyData?.sourcePointCount ?? positions.length} kaynak kayıt</em></div><div><small>TOPLAM MESAFE</small><strong>{distance.toFixed(1)}<b>m</b></strong><em>gerçek rota</em></div><div><small>ZİYARET EDİLEN BÖLGE</small><strong>{visitedLocationCount}</strong><em>benzersiz alan</em></div><div><small>TOPLAM TAKİP</small><strong>{formatDuration(totalDuration)}</strong><em>veri aralığı</em></div></div></motion.section>}
+          {historyState === "success" && <motion.section className={styles.summary} key={positions[0]?.timestamp} initial={{ opacity: .4, y: 5 }} animate={{ opacity: 1, y: 0 }}><div className={styles.summaryTitle}><Route size={14} /><span>ROTA ÖZETİ</span><i>GERÇEK VERİ</i></div><div className={styles.stats}><div><small>BULUNAN NOKTA</small><strong>{positions.length}</strong><em>{historyData?.sourcePointCount ?? positions.length} kaynak kayıt</em></div><div><small>TOPLAM MESAFE</small><strong>{historyData?.zoneTimeline ? "—" : distance.toFixed(1)}{!historyData?.zoneTimeline && <b>m</b>}</strong><em>{historyData?.zoneTimeline ? "Geçiş rotası bilinmiyor" : "ham koordinat toplamı"}</em></div><div><small>ZİYARET EDİLEN BÖLGE</small><strong>{visitedLocationCount}</strong><em>benzersiz alan</em></div><div><small>TOPLAM TAKİP</small><strong>{formatDuration(totalDuration)}</strong><em>veri aralığı</em></div></div></motion.section>}
 
           {historyState === "success" && <section className={styles.timeline} aria-label="Konum zaman çizelgesi"><div className={styles.timelineHeader}><div className={styles.timelineTitle}><MapPin size={14} /><span>KONUM ZAMAN ÇİZELGESİ</span></div><span className={styles.timelineCount}>{visitedLocationCount} BÖLGE</span></div>{selectedStay && <button type="button" className={styles.showAll} onClick={() => { setSelectedStayId(null); fitMap(); }}>Tüm rotayı göster</button>}<div className={styles.timelineList}>{timeline.map((stay) => <button key={stay.id} type="button" className={`${styles.timelineRow} ${selectedStayId === stay.id ? styles.selectedTimelineRow : ""} ${stay.isDataGap ? styles.gapTimelineRow : ""}`} onClick={() => chooseStay(stay)}><span className={styles.timelineMarker} aria-hidden="true" /><span className={styles.timelineContent}><span className={styles.timelineTime}>{formatTime(stay.startedAt)} — {formatTime(stay.endedAt)} <b>· {formatDuration(stay.durationMs)}</b></span><strong>{stay.locationLabel}</strong>{!stay.isDataGap && longestStay?.id === stay.id && <em>EN UZUN KALIŞ</em>}</span></button>)}</div>{longestStay && <p className={styles.longestSummary}>En uzun kalış: <strong>{longestStay.locationLabel}</strong> · {formatDuration(longestStay.durationMs)}</p>}</section>}
           <div className={styles.legend}><span><i className={styles.startDot} /> Başlangıç</span><span><i className={styles.routeDot} /> Rota</span><span><i className={styles.endDot} /> Bitiş</span></div>
@@ -375,7 +378,7 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
       floorPlanId={MAP_FLOOR_PLAN.id}
       draftText={selectedEntity?.name}
       draftRequestId={assistantDraftRequestId}
-      history={historyData ? {
+      history={historyData && !historyData.zoneTimeline ? {
         returnedCount: historyData.returnedCount,
         sourcePointCount: historyData.sourcePointCount,
         sampled: historyData.sampled,

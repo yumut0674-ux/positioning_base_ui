@@ -55,3 +55,7 @@ next-env.d.ts
 /tests/ai-evaluation/reports/*.json
 /tests/ai-evaluation/reports/*.md
 !/tests/ai-evaluation/reports/.gitkeep
+
+# Reproducible room inference diagnostics (reports/config stay reviewable)
+/.room-*.log
+/test_api/results/**/room-traces.json

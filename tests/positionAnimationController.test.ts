@@ -85,7 +85,7 @@ test("extrapolation is velocity based, capped, and then holds the last projected
   assert.equal(output.latest().x, 1.5);
 });
 
-test("REGION_CENTER uses one controlled transition, ignores repeats, and never extrapolates", () => {
+test("REGION_CENTER snaps to its exact centre, ignores repeats, and never extrapolates", () => {
   const animation = controller({
     interpolationDelayMs: 0,
     regionTransitionDurationMs: 500,
@@ -99,21 +99,21 @@ test("REGION_CENTER uses one controlled transition, ignores repeats, and never e
     positionSource: "REGION_CENTER", regionId: "room-a",
   });
   animation.update(2_250);
-  assert.equal(output.latest().x, 5);
+  assert.equal(output.latest().x, 10);
 
   animation.ingest("TAG-1", {
     x: 10, y: 0, timestamp: 2_250, receivedAt: 2_250,
     positionSource: "REGION_CENTER", regionId: "room-a",
   });
   animation.update(2_375);
-  assert.equal(output.latest().x, 7.5);
+  assert.equal(output.latest().x, 10);
   animation.update(2_500);
   assert.equal(output.latest().x, 10);
   animation.update(5_000);
   assert.equal(output.latest().x, 10);
 });
 
-test("RAW after REGION_CENTER transitions back once, then resumes buffered movement", () => {
+test("RAW after REGION_CENTER changes without a wall-crossing route, then resumes buffered movement", () => {
   const animation = controller({ interpolationDelayMs: 0, regionTransitionDurationMs: 500 });
   const output = recorder();
   animation.ingest("TAG-1", {
@@ -123,7 +123,7 @@ test("RAW after REGION_CENTER transitions back once, then resumes buffered movem
   animation.attach("TAG-1", output.renderer);
   animation.ingest("TAG-1", { x: 6, y: 5, timestamp: 2_000, receivedAt: 2_000, positionSource: "RAW" });
   animation.update(2_250);
-  assert.equal(output.latest().x, 5.5);
+  assert.equal(output.latest().x, 6);
   animation.update(2_500);
   assert.equal(output.latest().x, 6);
 
@@ -197,4 +197,13 @@ test("buffer size is bounded", () => {
     });
   }
   assert.equal(animation.getState("TAG-1")?.samples.length, 3);
+});
+
+test("synthetic centre heartbeats neither reset measurement age nor move a pinned tag", () => {
+  const animation = controller({ stalePositionTimeoutMs: 1000 });
+  animation.ingest("T", { x: 3, y: 3, timestamp: 1000, receivedAt: 1000, measurementTimestamp: 1000, positionSource: "REGION_CENTER", regionId: "A" });
+  animation.ingest("T", { x: 3, y: 3, timestamp: 1000, receivedAt: 3000, measurementTimestamp: 1000, positionSource: "REGION_CENTER", regionId: "A" });
+  assert.equal(animation.getState("T")?.stale, true);
+  assert.deepEqual([animation.getState("T")?.renderedX, animation.getState("T")?.renderedY], [3, 3]);
+  assert.equal(animation.getState("T")?.samples.length, 1);
 });

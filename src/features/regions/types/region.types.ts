@@ -12,9 +12,20 @@ export interface CalibrationPoint extends CoordinatePair {
 export interface RegionEntrance extends CoordinatePair {
   readonly id: string;
   readonly label: string;
+  /** World metres. Normal points into this room; missing geometry disables crossing inference. */
+  readonly widthMeters?: number;
+  readonly inwardNormal?: { readonly x: number; readonly y: number };
+  readonly connectsTo?: string;
+  readonly approachDepthMeters?: number;
+  readonly crossingDepthMeters?: number;
 }
 
 export interface RegionDefinition {
+  readonly kind?: "room" | "corridor";
+  readonly coverage?: "silent" | "intermittent" | "regular";
+  readonly expectedIntervalMs?: number;
+  readonly wallBandMeters?: number;
+  readonly sharedWallBandMeters?: number;
   readonly id: string;
   readonly name: string;
   readonly color: string;
@@ -25,6 +36,16 @@ export interface RegionDefinition {
 
 export interface RegionsConfig {
   readonly engine?: {
+    readonly mode?: "inference" | "shadow" | "legacy";
+    readonly evidenceDurationMs?: number;
+    readonly evidenceWindowMs?: number;
+    readonly maxEvidenceGapMs?: number;
+    readonly expectedIntervalMs?: number;
+    readonly maxSpeedMetersPerSecond?: number;
+    readonly lostAfterMs?: number;
+    readonly relocationAfterMs?: number;
+    readonly maxTags?: number;
+    readonly historySize?: number;
     readonly entryConfirmationCount?: number;
     readonly exitConfirmationCount?: number;
     readonly exitMarginMeters?: number;

@@ -380,3 +380,13 @@ Base proje basarili sayilirsa:
 - Harita, zone, alarm ve rapor altyapisi tekrar kullanilir.
 - Demo verisi ile gercek cihaz verisi ayni API'dan akar.
 - Veriler tarayici depolamasinda degil veritabaninda kalir.
+
+## 2026-09-07 — Uygulanan oda çıkarım mimarisi ve saha kapısı
+
+Uygulandı: süre/pencere/kapı geometri/hız/kalite temelli RegionPositionEngine; ayrı ham ve görüntüleme konumu; doğrulanmış/tahmini/aday/çıkış/belirsiz durumları; gerçek ölçüm-alınma-yayın zamanı ayrımı; merkezde sabit gösterim ve belirsizlik paneli; PostgreSQL ayrı karar olayları ve sürüm ilişkilendirmesi; LocationService/MCP/geçmişte ortak karar kullanımı; sınırlı tamponlar; eski motorla gölge karşılaştırma ve geri dönüş; fiziksel gerçek rota ile bozuk ölçümleri ayıran 13 deterministik senaryo.
+
+Mimari akış: ingest → TrackingBuffer (ham kayıt) → RegionPositionEngine → görüntüleme yayını + RoomDecisionRepository → LocationService / geçmiş / MCP. Sentetik merkezler ham tabloya dönmez. Arayüz aday oda için merkez seçmez; aktif oda merkezi animasyonla tekrar yürütülmez. Tarihsel geçiş zamanı fiziksel kesin zaman değil karar aralığı olarak işaretlenir.
+
+Yerel migration uygulandı. Doğrulama komutları, harita eksikleri, geri dönüş modu ve senaryo metrikleri [oda çıkarımı dokümanında](docs/room-inference.md); [temel senaryo raporu](test_api/results/room-metrics.md) ve [stres raporu](test_api/results/stress/room-metrics.md) tekrar üretilebilir.
+
+Kalan saha doğrulaması: oda 3 / Oda 4 kapılarının açıklık, normal ve bağlantılarını ölçüp kaydetmek; alternatif kat config'inin poligon dışı merkezini düzeltmek; odaların kapsama ve beklenen sıklığını ölçmek; dar oda ve ortak duvar bantlarını kalibre etmek; paket kaybında kaçan kapı çıkışının gecikme bedeli için kabul sınırı belirlemek; gölge akışı gerçek kayıtlarla değerlendirmek. Mevcut sayısal eşikler deneysel başlangıç değerleridir, üretimde doğrulanmış eşikler değildir. Stres normal geçişinde yeni motorun gecikme bedeli eskiden yüksek çıkmıştır; kabul kapısı bu bulgu çözülmeden kapatılmamalıdır.

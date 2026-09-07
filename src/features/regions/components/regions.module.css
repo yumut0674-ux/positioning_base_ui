@@ -64,6 +64,18 @@
 .properties input:read-only { color: #74879a; background: #f0f5f8; }
 .fieldRow { display: grid; grid-template-columns: minmax(0,1fr) 60px; gap: 8px; margin-top: 12px; }
 .colorField input { padding: 3px; cursor: pointer; }
+.inferenceEditor { margin: 14px 13px 0; padding: 11px; border: 1px solid #c9dbe3; border-radius: 5px; background: #f7fbff; }
+.inferenceEditor h3 { margin: 0 0 10px; color: #455e76; font-size: 10px; font-weight: 650; }
+.inferenceFields { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 8px; }
+.inferenceFields label { min-width: 0; }
+.inferenceFields label > span { display: block; margin-bottom: 5px; color: #647a90; font-size: 8px; }
+.inferenceFields input, .inferenceFields select { width: 100%; min-width: 0; height: 32px; padding: 0 8px; border: 1px solid #c9d9e5; border-radius: 5px; outline: none; background: #fff; color: #26394f; font-size: 9px; }
+.inferenceFields input:focus, .inferenceFields select:focus { border-color: rgba(0,168,150,.55); box-shadow: 0 0 0 3px rgba(0,168,150,.08); }
+.entranceDetails { margin-top: 11px; color: #647a90; font-size: 8px; line-height: 1.45; }
+.entranceDetails summary { color: #36536a; cursor: pointer; font-size: 9px; font-weight: 600; }
+.entranceDetails p { margin: 9px 0; }
+.entranceDetails textarea { box-sizing: border-box; width: 100%; padding: 8px; border: 1px solid #c9d9e5; border-radius: 5px; color: #26394f; font: 8px ui-monospace, monospace; resize: vertical; }
+.entranceDetails button { min-height: 30px; margin-top: 8px; padding: 0 9px; border: 1px solid #a9d9d2; border-radius: 5px; background: #e8f8f5; color: #087f73; font-size: 8px; cursor: pointer; }
 .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 14px; }
 .metrics > div { padding: 10px; border: 1px solid #d0dee8; border-radius: 5px; background: #f5faff; }
 .metrics span { display: block; color: #788ca0; font: 7px ui-monospace, monospace; }
@@ -156,6 +168,7 @@
   .properties > .panelTitle { border-top: 1px solid #cbd9e3; }
   .pointList { max-height: 220px; }
   .properties > label, .fieldRow, .metrics, .coordinateSection, .pointListSection, .pointEditor, .selectHint, .deletePoint, .deleteZone, .errors { margin-right: 11px; margin-left: 11px; }
+  .inferenceEditor { margin-right: 11px; margin-left: 11px; }
   .coordinateGrid { grid-template-columns: 1fr 1fr; gap: 6px; }
   .deleteZone { margin-top: 12px; }
 }

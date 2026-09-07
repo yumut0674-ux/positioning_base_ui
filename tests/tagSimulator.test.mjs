@@ -4,9 +4,17 @@ import {
   createTagMovement,
   createTagSimulator,
   getRandomDelay,
+  readLiveSimulationOptions,
   resolveSimulationEndpoint,
   readSimulatorIntervals,
 } from "../test_api/simulate_tags.js";
+
+test("live room simulation CLI options are deterministic and validated", () => {
+  assert.deepEqual(readLiveSimulationOptions(["--scenario", "all", "--seed", "42"]), { scenario: "all", seed: 42 });
+  assert.deepEqual(readLiveSimulationOptions([]), { scenario: "all", seed: 42 });
+  assert.throws(() => readLiveSimulationOptions(["--scenario", "unknown"]), /Geçersiz canlı senaryo/);
+  assert.throws(() => readLiveSimulationOptions(["--seed", "4.2"]), /Geçersiz seed/);
+});
 
 test("random simulator delays stay within inclusive limits", () => {
   for (let index = 0; index < 5_000; index += 1) {
@@ -48,7 +56,7 @@ test("tags follow the corridor, visit a room centre, then stay there for 2–20 
   let currentTime = new Date("2026-08-28T08:00:00.000Z");
   const movement = createTagMovement({
     tag: { tagId: "TAG-TEST", position: { x: 1.75, y: 10 }, direction: 1 },
-    roomCenters: [{ x: 2, y: 20 }],
+    roomCenters: [{ x: 2, y: 20, portalPath: [{x:1.75,y:20},{x:1.9,y:20},{x:2,y:20}] }],
     random: () => 0,
     now: () => currentTime,
   });
@@ -150,4 +158,10 @@ test("stalled HTTP responses never suppress later one-second position ticks", ()
   assert.ok(requests.slice(-4).every(({ signal }) => !signal.aborted));
   simulator.stop();
   assert.ok(requests.every(({ signal }) => signal.aborted));
+});
+
+test("old centre-only room definitions cannot create a wall shortcut", () => {
+  let currentTime = new Date("2026-09-01T00:00:00Z");
+  const movement = createTagMovement({ tag: { tagId: "T", position: { x: 1.75, y: 10 }, direction: 1 }, roomCenters: [{x:7,y:20}], random:()=>0, now:()=>currentTime });
+  for(let i=0;i<60;i++){currentTime=new Date(currentTime.getTime()+1000);movement.next();assert.equal(movement.getState().activeRoom,null);}
 });

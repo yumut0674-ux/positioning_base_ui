@@ -14,6 +14,7 @@ import {
   resolvePositionAnimationConfig,
 } from "../config/positionAnimationConfig";
 import { PositionAnimationController } from "../services/PositionAnimationController";
+import { TAG_LIVE_TIMEOUT_MS } from "../types/tracking.types";
 import type { RegionsConfig } from "@/src/features/regions/types/region.types";
 import { REGIONS_CONFIG_UPDATED_EVENT } from "@/src/features/regions/services/regionsConfig";
 
@@ -151,6 +152,7 @@ export function useRealtimeTracking(): PositionAnimationController {
   useEffect(() => rawGateway.connect((incoming) => {
     const tagId = incoming.id.toUpperCase();
     const currentObserved = useIpsStore.getState().observedTags[tagId];
+    if (currentObserved && incoming.timestamp <= currentObserved.timestamp) return;
     const observed = {
       id: tagId,
       name: displayNames.current.get(tagId) || tagId,
@@ -167,7 +169,7 @@ export function useRealtimeTracking(): PositionAnimationController {
     if (engineEnabled) return;
     const current = useIpsStore.getState().tags[tagId];
     if (!current) {
-      positionAnimation.ingest(tagId, { ...incoming, positionSource: "RAW" });
+      positionAnimation.ingest(tagId, { ...incoming, receivedAt: Date.now(), positionSource: "RAW" });
       return upsertTag(observed);
     }
     const position = filter.next(current, incoming);
@@ -181,11 +183,13 @@ export function useRealtimeTracking(): PositionAnimationController {
       const tagId = incoming.id.toUpperCase();
       const name = displayNames.current.get(tagId) || tagId;
       const current = useIpsStore.getState().tags[tagId];
+      if (incoming.publishedAt && current?.publishedAt && Date.parse(incoming.publishedAt) < Date.parse(current.publishedAt)) return;
+      const measuredAt = incoming.lastRawDataTimestamp ? Date.parse(incoming.lastRawDataTimestamp) : incoming.timestamp;
       const next = {
         id: tagId,
         name,
         color: current?.color ?? colorForTag(tagId),
-        status: "active" as const,
+        status: Date.now() - measuredAt <= TAG_LIVE_TIMEOUT_MS ? "active" as const : "offline" as const,
         timestamp: incoming.timestamp,
         x: incoming.x,
         y: incoming.y,
@@ -197,8 +201,9 @@ export function useRealtimeTracking(): PositionAnimationController {
         timestamp: incoming.timestamp,
         positionSource: incoming.positionSource ?? "RAW",
         regionId: incoming.regionInference?.regionId,
+        measurementTimestamp: incoming.lastRawDataTimestamp ? Date.parse(incoming.lastRawDataTimestamp) : incoming.timestamp,
       });
-      upsertTag({ ...next, ...position });
+      upsertTag({ ...next, ...position, timestamp: incoming.lastRawDataTimestamp ? Date.parse(incoming.lastRawDataTimestamp) : incoming.timestamp });
     });
   }, [filter, positionAnimation, processedGateway, upsertTag]);
 

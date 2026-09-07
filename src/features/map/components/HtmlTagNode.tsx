@@ -15,7 +15,9 @@ interface HtmlTagNodeProps {
 
 function HtmlTagNodeComponent({ tag, transform, positionAnimation, selected, onSelect }: HtmlTagNodeProps) {
   const positionRef = useRef<HTMLDivElement>(null);
-  const colorStyle = { color: tag.color } satisfies CSSProperties;
+  const uncertain = tag.regionInference?.measurementKind === "uncertain";
+  const estimated = tag.regionInference?.measurementKind === "estimated";
+  const colorStyle = { color: tag.color, opacity: uncertain ? 0.5 : estimated ? 0.75 : 1 } satisfies CSSProperties;
 
   useLayoutEffect(() => positionAnimation.attach(tag.id, {
     render: (x, y) => renderHtmlTagPosition(positionRef.current, transform, x, y),
@@ -47,7 +49,7 @@ function HtmlTagNodeComponent({ tag, transform, positionAnimation, selected, onS
             aria-hidden="true"
           />
         )}
-        <span className={styles.label}>{tag.id}</span>
+        <span className={styles.label}>{tag.id}{uncertain ? " · Belirsiz" : estimated ? " · Tahmin" : ""}</span>
       </button>
     </div>
   );
@@ -58,6 +60,7 @@ function sameVisualTag(previous: HtmlTagNodeProps, next: HtmlTagNodeProps): bool
     && previous.tag.name === next.tag.name
     && previous.tag.color === next.tag.color
     && previous.tag.direction === next.tag.direction
+    && previous.tag.regionInference?.measurementKind === next.tag.regionInference?.measurementKind
     && previous.transform === next.transform
     && previous.positionAnimation === next.positionAnimation
     && previous.selected === next.selected

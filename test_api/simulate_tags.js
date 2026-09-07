@@ -3,6 +3,7 @@ import path from "node:path";
 import { createInterface } from "node:readline/promises";
 import { stdin as input, stdout as output } from "node:process";
 import { pathToFileURL } from "node:url";
+import { seededRandom } from "./room_scenarios.js";
 
 const DEFAULT_MIN_INTERVAL_MS = 1_000;
 const DEFAULT_MAX_INTERVAL_MS = 1_000;
@@ -133,7 +134,99 @@ export async function loadRoomCenters(configPath = REGIONS_CONFIG_PATH) {
 }
 
 function roomEntrancePoint(roomCenter) {
-  return nearestCorridorPoint(roomCenter);
+  return nearestCorridorPoint(roomCenter.portalPath[0]);
+}
+
+function insideConfiguredPolygon(p, region) {
+  const poly=region.polygon.map(p=>p.world); let yes=false;
+  for(let i=0,j=poly.length-1;i<poly.length;j=i++) {const a=poly[i],b=poly[j];if((a.y>p.y)!==(b.y>p.y)&&p.x<(b.x-a.x)*(p.y-a.y)/(b.y-a.y)+a.x) yes=!yes;}
+  return yes;
+}
+
+export async function validateConfiguredCorridor(configPath=REGIONS_CONFIG_PATH) {
+  const config=JSON.parse(await readFile(configPath,"utf8"));
+  const corridors=(config.regions??[]).filter(r=>r.kind==="corridor"||/^corridor/.test(r.id));
+  for(let d=0;d<=corridorLength;d+=0.1) if(!corridors.some(r=>insideConfiguredPolygon(pointOnCorridor(d),r))) {
+    throw new Error("Eski koridor rotası kayıtlı geçilebilir koridor poligonlarıyla doğrulanamadı. Harita rotasını tanımlayın veya --scenario ile referans haritada çalışın.");
+  }
+}
+
+/** Refuse wall shortcuts. Only explicit doors plus a traversable corridor/room path are accepted. */
+export async function loadVerifiedRoomRoutes(configPath = REGIONS_CONFIG_PATH) {
+  const config = JSON.parse(await readFile(configPath, "utf8"));
+  const regions = config.regions ?? [];
+  const corridors = regions.filter(r => r.kind === "corridor" || /^corridor/.test(r.id));
+  const inside = insideConfiguredPolygon;
+  const segmentIn = (a,b,areas) => {
+    const steps=Math.max(2,Math.ceil(distanceBetween(a,b)/0.05));
+    for(let i=1;i<steps;i++) if(!areas.some(r=>inside({x:a.x+(b.x-a.x)*i/steps,y:a.y+(b.y-a.y)*i/steps},r))) return false;
+    return true;
+  };
+  return regions.filter(r=>!corridors.includes(r)&&isValidPoint(r.roomCenter?.world)).flatMap(r=>{
+    for(const door of r.entrances??[]) {
+      if(!door.widthMeters||!door.inwardNormal||door.connectsTo!=="corridor") continue;
+      const center=r.roomCenter.world, entrance=door.world, projection=nearestCorridorPoint(entrance).point;
+      if(segmentIn(projection,entrance,corridors)&&segmentIn(entrance,center,[r])) return [{...center,portalPath:[projection,entrance,center]}];
+    }
+    return [];
+  });
+}
+
+function nearestPointOnSegment(point, start, end) {
+  const dx = end.x - start.x;
+  const dy = end.y - start.y;
+  const lengthSquared = dx ** 2 + dy ** 2;
+  if (lengthSquared === 0) return copyPoint(start);
+  const ratio = clamp(((point.x - start.x) * dx + (point.y - start.y) * dy) / lengthSquared, 0, 1);
+  return { x: start.x + dx * ratio, y: start.y + dy * ratio };
+}
+
+function inferredRoomPortal(region) {
+  const center = region.roomCenter?.world;
+  const polygon = region.polygon?.map((point) => point.world);
+  if (!isValidPoint(center) || !Array.isArray(polygon) || polygon.length < 3) return null;
+  let best = null;
+  for (let index = 0; index < polygon.length; index += 1) {
+    const start = polygon[index];
+    const end = polygon[(index + 1) % polygon.length];
+    const samples = Math.max(2, Math.ceil(distanceBetween(start, end) / 0.1));
+    for (let sample = 0; sample <= samples; sample += 1) {
+      const ratio = sample / samples;
+      const boundary = { x: start.x + (end.x - start.x) * ratio, y: start.y + (end.y - start.y) * ratio };
+      const corridor = nearestCorridorPoint(boundary);
+      if (!best || corridor.distance < best.distance) best = { boundary, corridor: corridor.point, distance: corridor.distance };
+    }
+  }
+  return best ? { ...center, regionId: region.id, regionName: region.name, portalPath: [best.corridor, best.boundary, center], inferredPortal: true } : null;
+}
+
+/**
+ * Live demo keeps working before the map editor has full door metadata. An
+ * inferred portal is simulation-only and is never written into regions.json.
+ */
+export async function loadSimulationRoomRoutes(configPath = REGIONS_CONFIG_PATH) {
+  const verified = await loadVerifiedRoomRoutes(configPath);
+  if (verified.length > 0) return { routes: verified, inferred: false };
+  const config = JSON.parse(await readFile(configPath, "utf8"));
+  const routes = (config.regions ?? [])
+    .filter((region) => region.kind !== "corridor" && !/^corridor(?:-|$)/i.test(region.id ?? ""))
+    .map(inferredRoomPortal)
+    .filter(Boolean);
+  return { routes, inferred: routes.length > 0 };
+}
+
+export function readLiveSimulationOptions(argv = process.argv.slice(2)) {
+  const valueAfter = (name) => {
+    const index = argv.indexOf(`--${name}`);
+    return index >= 0 ? argv[index + 1] : undefined;
+  };
+  const scenario = valueAfter("scenario") ?? "all";
+  const allowed = new Set(["normal", "all", "entry-gap", "inside-long-gap", "neighbor-jumps"]);
+  if (!allowed.has(scenario)) throw new Error(`Geçersiz canlı senaryo: ${scenario}`);
+  const seedText = valueAfter("seed") ?? "42";
+  const seed = Number(seedText);
+  if (!Number.isInteger(seed)) throw new Error(`Geçersiz seed: ${seedText}`);
+  return { scenario, seed };
 }
 
 /**
@@ -141,7 +234,7 @@ function roomEntrancePoint(roomCenter) {
  * oda merkezine gider, 2–20 saniye bekler ve aynı koridora geri döner.
  */
 export function createTagMovement({ tag, roomCenters = [], random = Math.random, now = () => new Date() }) {
-  const availableRooms = roomCenters.filter(isValidPoint).map(copyPoint);
+  const availableRooms = roomCenters.filter(r=>isValidPoint(r)&&Array.isArray(r.portalPath)&&r.portalPath.length>=2&&r.portalPath.every(isValidPoint));
   const startedAt = now().getTime();
   const initialCorridorPoint = nearestCorridorPoint(tag.position ?? tag);
   let corridorDistance = initialCorridorPoint.routeDistance;
@@ -157,7 +250,7 @@ export function createTagMovement({ tag, roomCenters = [], random = Math.random,
 
   function scheduleRoomReturn() {
     if (!roomEntrance) return;
-    waypoints = [roomEntrance.point];
+    waypoints = activeRoom.portalPath.slice(0,-1).reverse();
     travelPurpose = "return_to_corridor";
   }
 
@@ -196,7 +289,7 @@ export function createTagMovement({ tag, roomCenters = [], random = Math.random,
     corridorDistance = roomEntrance.routeDistance;
     position = copyPoint(roomEntrance.point);
     travelPurpose = "enter_room";
-    waypoints = [activeRoom];
+    waypoints = activeRoom.portalPath.slice(1);
     return true;
   }
 
@@ -257,7 +350,8 @@ export function createTagMovement({ tag, roomCenters = [], random = Math.random,
       position: copyPoint(position),
       isWaitingInRoom: roomWaitUntil !== null,
       roomWaitUntil,
-      activeRoom: activeRoom ? copyPoint(activeRoom) : null,
+      activeRoom: activeRoom ? { ...activeRoom, portalPath: activeRoom.portalPath.map(copyPoint) } : null,
+      travelPurpose,
     };
   }
 
@@ -274,26 +368,49 @@ export function createTagSimulator({
   clearTimeoutImplementation = clearTimeout,
   randomDelay = getRandomDelay,
   random = Math.random,
+  seed,
+  scenario = "normal",
   now = () => new Date(),
   logger = console,
 } = {}) {
   let timer = null;
   let stopped = true;
   const activeRequests = new Set();
-  const movements = tags.map((tag) => createTagMovement({ tag, roomCenters, random, now }));
+  const baseSeed = Number.isInteger(seed) ? seed : Math.floor(random() * 4294967296);
+  const movements = tags.map((tag, index) => createTagMovement({ tag, roomCenters, random: seededRandom(baseSeed + index * 104729), now }));
+  const roomTicks = tags.map(() => 0);
+  const policies = scenario === "all"
+    ? ["normal", "entry-gap", "inside-long-gap", "neighbor-jumps"]
+    : tags.map(() => scenario);
+
+  function measuredPosition(index, position, state) {
+    roomTicks[index] = state.isWaitingInRoom ? roomTicks[index] + 1 : 0;
+    const policy = policies[index];
+    if (policy === "entry-gap" && (state.travelPurpose === "enter_room" || (state.isWaitingInRoom && roomTicks[index] <= 4))) return null;
+    if (policy === "inside-long-gap" && state.isWaitingInRoom && roomTicks[index] > 2) return null;
+    if (policy === "neighbor-jumps" && state.isWaitingInRoom && (roomTicks[index] === 4 || roomTicks[index] === 5)) {
+      const activeId = state.activeRoom?.regionId;
+      const neighbor = roomCenters.find((room) => room.regionId && room.regionId !== activeId);
+      if (neighbor) return { x: neighbor.x, y: neighbor.y };
+      return { x: position.x + 1.25, y: position.y };
+    }
+    return position;
+  }
 
   async function sendNextTagUpdates() {
     const currentTime = now();
     const timestamp = currentTime.toISOString();
-    const positions = movements.map((movement, index) => {
+    const positions = movements.flatMap((movement, index) => {
       const position = movement.next(currentTime);
-      return {
+      const measured = measuredPosition(index, position, movement.getState());
+      if (!measured) return [];
+      return [{
         type: "position",
         tag_id: tags[index].tagId,
-        x: Number(position.x.toFixed(2)),
-        y: Number(position.y.toFixed(2)),
+        x: Number(measured.x.toFixed(2)),
+        y: Number(measured.y.toFixed(2)),
         timestamp,
-      };
+      }];
     });
 
     const requestController = new AbortController();
@@ -336,6 +453,7 @@ export function createTagSimulator({
     stopped = false;
     logger.log(`UWB koridor rotası simülasyonu başlatıldı: ${endpoint}`);
     logger.log(`${roomCenters.length} oda merkezi ziyaret rotasına eklendi; oda içi bekleme: 2–20 sn.`);
+    logger.log(`Canlı senaryo: ${scenario}; seed: ${baseSeed}; profiller: ${policies.join(", ")}`);
     logger.log(minDelayMs === maxDelayMs
       ? `Tag simulation interval: fixed ${minDelayMs} ms`
       : `Tag simulation interval: random ${minDelayMs}–${maxDelayMs} ms`);
@@ -369,10 +487,14 @@ async function selectEndpoint() {
 
 async function run() {
   const { minMs, maxMs } = readSimulatorIntervals();
+  const { scenario, seed } = readLiveSimulationOptions();
   const endpoint = await selectEndpoint();
   let roomCenters = [];
   try {
-    roomCenters = await loadRoomCenters();
+    const loaded = await loadSimulationRoomRoutes();
+    roomCenters = loaded.routes;
+    if (loaded.inferred) console.warn("Kapı geometrisi eksik: canlı simülatör oda poligonundan geçici giriş rotası türetti. Bu rota regions.json dosyasını değiştirmez.");
+    if (!roomCenters.length) console.warn("Geçerli oda bulunamadı; etiketler yalnızca koridorda hareket edecek.");
   } catch (error) {
     console.warn("Oda merkezleri yüklenemedi; etiketler yalnızca koridorda hareket edecek.", error instanceof Error ? error.message : String(error));
   }
@@ -381,6 +503,8 @@ async function run() {
     minDelayMs: minMs,
     maxDelayMs: maxMs,
     roomCenters,
+    scenario,
+    seed,
   });
   simulator.start();
 

@@ -7,6 +7,12 @@ import type { RegionsConfig } from "@/src/features/regions/types/region.types";
 import { addRecentTagId, nextTagLocationEntry, type TagLocationEntry } from "@/src/features/tracking/services/tagPanelState";
 import { MAP_TAG_FOCUS_SCALE } from "@/src/features/map/config/mapConfig";
 
+function boundedRecord<T>(record: Record<string,T>): Record<string,T> {
+  const keys=Object.keys(record);
+  for (let i=0;i<keys.length-5000;i++) delete record[keys[i]];
+  return record;
+}
+
 interface MeasurementState {
   readonly enabled: boolean;
   readonly start: Point2D | null;
@@ -109,13 +115,13 @@ export const useIpsStore = create<IpsState>((set) => ({
   setViewport: (viewport) => set({ viewport }),
   toggleLayer: (layer) => set((state) => ({ layers: { ...state.layers, [layer]: !state.layers[layer] } })),
   upsertTag: (tag) => set((state) => ({
-    tags: { ...state.tags, [tag.id]: tag },
-    tagLocationEntries: {
+    tags: boundedRecord({ ...state.tags, [tag.id]: tag }),
+    tagLocationEntries: boundedRecord({
       ...state.tagLocationEntries,
       [tag.id]: nextTagLocationEntry(state.tagLocationEntries[tag.id], tag, state.regionsConfig),
-    },
+    }),
   })),
-  observeTag: (tag) => set((state) => ({ observedTags: { ...state.observedTags, [tag.id]: tag } })),
+  observeTag: (tag) => set((state) => ({ observedTags: boundedRecord({ ...state.observedTags, [tag.id]: tag }) })),
   refreshTagActivity: (now = Date.now()) => set((state) => {
     let changed = false;
     const refresh = (source: Record<string, TrackedTag>) => Object.fromEntries(Object.entries(source).map(([id, tag]) => {

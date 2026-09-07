@@ -4,10 +4,9 @@ import { Box, MapPin, Route, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
-import { MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
-import { resolveLocation } from "@/src/features/map/services/LocationResolverService";
 import { formatLocationDuration, persistRecentTagIds, readRecentTagIds, type TagLocationEntry } from "@/src/features/tracking/services/tagPanelState";
 import type { TrackedTag } from "@/src/features/tracking/types/tracking.types";
+import { roomDecisionLabel } from "../services/roomDecisionLabel";
 
 interface TagInformationPanelProps {
   readonly onOpenHistory: (tagCode: string) => void;
@@ -59,7 +58,7 @@ function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag, regionsC
           return <button key={tag.id} type="button" role="option" aria-selected={isSelected} className={`tag-switcher-row${isSelected ? " is-selected" : ""}`} onClick={() => onSelectTag(tag.id)}>
             <span className={`tag-switcher-status${isActive ? " is-active" : ""}`} aria-hidden="true" />
             <span className="tag-switcher-name"><strong>{tag.name}</strong><code>{tag.id}</code></span>
-            <span className="tag-switcher-meta"><em>{isActive ? "CANLI" : "PASİF"}</em><small>{resolveLocation(tag.x, tag.y, MAP_FLOOR_PLAN.id, regionsConfig)}</small></span>
+            <span className="tag-switcher-meta"><em>{isActive ? "CANLI" : "PASİF"}</em><small>{roomDecisionLabel(tag, regionsConfig)}</small></span>
           </button>;
         })}
         {visibleTags.length === 0 && <p className="tag-switcher-empty">{emptyStateMessage}</p>}
@@ -136,7 +135,7 @@ export function TagInformationPanel({ onOpenHistory, variant = "desktop", onShow
   useRecentTagStorage(recentTagIds, variant === "desktop");
 
   const selectedTag = selectedTagId ? tagsById[selectedTagId] : undefined;
-  const locationAddress = selectedTag ? resolveLocation(selectedTag.x, selectedTag.y, MAP_FLOOR_PLAN.id, regionsConfig) : undefined;
+  const locationAddress = selectedTag ? roomDecisionLabel(selectedTag, regionsConfig) : undefined;
   const locationDuration = useLocationDuration(locationEntry, locationAddress);
   const tags = useMemo(() => Object.values(tagsById).sort((left, right) => left.name.localeCompare(right.name, "tr")), [tagsById]);
   const handleSelectTag = useCallback((tagId: string) => {

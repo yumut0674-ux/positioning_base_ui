@@ -323,6 +323,19 @@ Yerel simülatör:
 node test_api\simulate_tags.js
 ```
 
+Bu komut varsayılan olarak tüm canlı oda hata profillerini seed `42` ile çalıştırır.
+
+Canlı oda hata senaryolarını sürekli olarak API'ye göndermek için:
+
+```powershell
+npm run simulate:rooms -- --scenario all --seed 42
+```
+
+Bu komut Ctrl+C ile durdurulana kadar çalışır. `all` profilinde dört tag sırasıyla
+normal hareket, kapı girişinde veri kesintisi, oda içinde uzun veri kesintisi ve
+komşu odaya kısa ölçüm sıçraması üretir. Tek davranış için `normal`, `entry-gap`,
+`inside-long-gap` veya `neighbor-jumps` seçilebilir.
+
 Gerekirse hedef endpoint:
 
 ```powershell
@@ -787,3 +800,14 @@ Invoke-RestMethod "http://127.0.0.1:3000/api/location/entities/search?q=TAG-001&
 - Reverse proxy arkasında SSE için response buffering kapalı olmalıdır.
 - `REGION_POSITION_HOST=127.0.0.1` varsayılanını koruyun; processed SSE dışarı
   açılmamalıdır.
+
+## Oda çıkarımı ve deterministik simülasyon
+
+Yeni motor, harita/kapı alanları, ölçüm–karar–görüntüleme sözleşmesi, migration ve gölge/geri dönüş kullanımı: [oda çıkarımı dokümanı](docs/room-inference.md).
+
+```powershell
+npm run evaluate:rooms -- --scenario all --seed 42
+npm run test:tracking
+```
+
+`evaluate:rooms` senaryo değerlendirmesi ağ isteği yapmadan sanal saatle çalışır; [temel metrikler](test_api/results/room-metrics.md) ve [paket kayıplı stres metrikleri](test_api/results/stress/room-metrics.md) ayrı raporlanır.
