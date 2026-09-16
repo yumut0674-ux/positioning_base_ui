@@ -1,4 +1,7 @@
 {
+  "mapDisplay": {
+    "outsideHoldMs": 2000
+  },
   "engine": {
     "entryConfirmationCount": 2,
     "exitConfirmationCount": 2,
@@ -111,12 +114,12 @@
       ],
       "roomCenter": {
         "pixel": {
-          "x": 171.29,
-          "y": 584.41
+          "x": 152.72,
+          "y": 583.7
         },
         "world": {
-          "x": 5.71,
-          "y": 20.92
+          "x": 5.091,
+          "y": 20.943
         }
       },
       "entrances": []

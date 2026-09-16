@@ -388,6 +388,18 @@ export function RegionManagementPanel() {
 
       <div className={styles.editor}>
         <aside className={styles.zonePanel}>
+          <div className={styles.displayWaitConfig}>
+            <label htmlFor="outside-hold-ms">Alan dışı gösterim bekleme süresi (ms)</label>
+            <input id="outside-hold-ms" type="number" min={0} max={3600000} step={100}
+              value={config.mapDisplay?.outsideHoldMs ?? 2000}
+              onChange={(event) => {
+                const value = Number(event.target.value);
+                if (Number.isInteger(value) && value >= 0 && value <= 3600000) {
+                  setConfig((current) => ({ ...current, mapDisplay: { outsideHoldMs: value } }));
+                }
+              }} />
+            <p>Tag bu süre boyunca son geçerli konumda tutulur, ardından haritada gizlenir.</p>
+          </div>
           <div className={styles.panelTitle}><div><span>ODA/BÖLGE LİSTESİ</span><strong>{config.regions.length} oda/bölge</strong></div><button onClick={addRegion} title="Yeni oda/bölge"><Plus size={15} /></button></div>
           <div className={styles.zoneList}>
             {config.regions.length === 0 && <div className={styles.empty}><Hexagon size={24} /><strong>Henüz oda/bölge yok</strong><span>Yeni oda/bölge ekleyerek başlayın.</span></div>}

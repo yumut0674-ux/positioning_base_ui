@@ -35,6 +35,7 @@ export interface RegionDefinition {
 }
 
 export interface RegionsConfig {
+  readonly mapDisplay?: { readonly outsideHoldMs: number };
   readonly engine?: {
     readonly evidenceDurationMs?: number;
     readonly evidenceWindowMs?: number;

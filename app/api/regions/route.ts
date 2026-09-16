@@ -6,6 +6,7 @@ import type { RegionDefinition, RegionsConfig } from "@/src/features/regions/typ
 import { compileRegionsConfig } from "@/src/server/regionEngine/configLoader";
 import { regionEngineController } from "@/src/server/regionEngine/controller";
 import { resolvePositionAnimationConfig } from "@/src/features/tracking/config/positionAnimationConfig";
+import { resolveMapDisplayConfig } from "@/src/features/tracking/config/mapDisplayConfig";
 
 export const runtime = "nodejs";
 
@@ -56,13 +57,14 @@ function cleanRegion(value: unknown): RegionDefinition {
 
 function cleanConfig(value: unknown): RegionsConfig {
   if (!value || typeof value !== "object") throw new Error("Geçersiz config");
-  const body = value as { regions?: unknown; engine?: (RegionsConfig["engine"] & { mode?: unknown }); positionAnimation?: unknown };
+  const body = value as { regions?: unknown; engine?: (RegionsConfig["engine"] & { mode?: unknown }); positionAnimation?: unknown; mapDisplay?: unknown };
   if (!Array.isArray(body.regions)) throw new Error("regions alanı bir liste olmalıdır");
   const { mode: _deprecatedMode, ...engineRules } = body.engine ?? {};
   const config: RegionsConfig = {
     ...DEFAULT_REGIONS_CONFIG,
     engine: { ...DEFAULT_REGIONS_CONFIG.engine, ...engineRules },
     positionAnimation: resolvePositionAnimationConfig(body.positionAnimation),
+    mapDisplay: resolveMapDisplayConfig(body.mapDisplay),
     regions: body.regions.map(cleanRegion),
   };
   compileRegionsConfig(config);
@@ -77,6 +79,7 @@ export async function GET() {
         ...saved,
         map: DEFAULT_REGIONS_CONFIG.map,
         positionAnimation: resolvePositionAnimationConfig(saved.positionAnimation),
+        mapDisplay: resolveMapDisplayConfig(saved.mapDisplay),
       },
     });
   } catch {

@@ -3,6 +3,7 @@ import type {
   PositionSample,
   TagAnimationState,
 } from "../types/tracking.types";
+import { inDisplayArea, segmentInDisplayArea, type DisplayPolygon } from "./displayArea";
 
 export interface PositionRenderer {
   render(x: number, y: number, stale: boolean): void;
@@ -47,10 +48,32 @@ function samePosition(a: PositionSample, b: PositionSample): boolean {
 }
 
 export class PositionAnimationController {
+  private displayArea: readonly DisplayPolygon[] | undefined;
   private readonly states = new Map<string, InternalTagAnimationState>();
   private readonly renderers = new Map<string, PositionRenderer>();
 
   public constructor(private config: PositionAnimationConfig) {}
+
+  public setDisplayArea(polygons: readonly DisplayPolygon[]): void {
+    this.displayArea = polygons;
+    this.states.clear(); // Geometry changes invalidate all queued paths.
+  }
+
+  public remove(tagId: string): void { this.states.delete(tagId); }
+
+  public clear(): void { this.states.clear(); }
+
+  public hold(tagId: string, measurementTimestamp: number, now = Date.now()): void {
+    const state = this.states.get(tagId);
+    const latest = state?.samples.at(-1);
+    if (!state || !latest) return;
+    state.samples = [latest];
+    state.transition = undefined;
+    state.lastReceivedAt = measurementTimestamp;
+    const wasStale = state.stale;
+    state.stale = now - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
+    this.apply(state, latest.x, latest.y, now, wasStale);
+  }
 
   public setConfig(config: PositionAnimationConfig, now = Date.now()): void {
     this.config = config;
@@ -84,6 +107,7 @@ export class PositionAnimationController {
 
   public ingest(tagId: string, incoming: IncomingAnimationPosition): void {
     if (!Number.isFinite(incoming.x) || !Number.isFinite(incoming.y)) return;
+    if (this.displayArea && !inDisplayArea(incoming, this.displayArea)) return;
     const receivedAt = Number.isFinite(incoming.receivedAt) ? incoming.receivedAt! : Date.now();
     const timestamp = Number.isFinite(incoming.timestamp) && incoming.timestamp! > 0
       ? incoming.timestamp!
@@ -114,6 +138,15 @@ export class PositionAnimationController {
     }
 
     const latest = state.samples.at(-1);
+    if (this.displayArea && (!segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, sample, this.displayArea)
+      || (latest && !segmentInDisplayArea(latest, sample, this.displayArea)))) {
+      state.samples = [sample];
+      state.transition = undefined;
+      state.lastReceivedAt = incoming.measurementTimestamp ?? receivedAt;
+      state.stale = receivedAt - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
+      this.apply(state, sample.x, sample.y, receivedAt);
+      return;
+    }
     if (latest && sample.timestamp < latest.timestamp && (sample.positionSource === "REGION_CENTER" || latest.positionSource === "REGION_CENTER")) return;
     // Room coordinates are display anchors. Snap without inventing a wall-crossing route.
     if (sample.positionSource === "REGION_CENTER" || latest?.positionSource === "REGION_CENTER") {
@@ -123,11 +156,16 @@ export class PositionAnimationController {
       this.apply(state, sample.x, sample.y, receivedAt);
       return;
     }
-    if (state.samples.some((item) => item.timestamp === sample.timestamp && samePosition(item, sample))) return;
+    if (state.samples.some((item) => item.timestamp === sample.timestamp && samePosition(item, sample))) {
+      const wasStale = state.stale;
+      state.stale = receivedAt - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
+      this.apply(state, state.renderedX, state.renderedY, receivedAt, wasStale);
+      return;
+    }
     if (sample.timestamp <= state.lastRenderTime) return;
 
-    state.lastReceivedAt = receivedAt;
-    state.stale = false;
+    state.lastReceivedAt = incoming.measurementTimestamp ?? receivedAt;
+    state.stale = receivedAt - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
 
     if (!this.config.enabled) {
       state.samples = [sample];
@@ -162,7 +200,9 @@ export class PositionAnimationController {
       const wasStale = state.stale;
       state.stale = now - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
 
-      if (!state.renderer && now - state.lastReceivedAt > this.config.stalePositionTimeoutMs * 2) {
+      // Guarded states are owned/pruned by MapDisplayFilter. Keep their validated
+      // position while the layer is hidden so reattaching cannot render at (0, 0).
+      if (!this.displayArea && !state.renderer && now - state.lastReceivedAt > this.config.stalePositionTimeoutMs * 2) {
         this.states.delete(tagId);
         continue;
       }
@@ -251,6 +291,15 @@ export class PositionAnimationController {
     now: number,
     previousStale = state.stale,
   ): void {
+    if (this.displayArea && (!inDisplayArea({ x, y }, this.displayArea)
+      || !segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, { x, y }, this.displayArea))) {
+      const latest = state.samples.at(-1);
+      if (!latest || !inDisplayArea(latest, this.displayArea)) return;
+      x = latest.x;
+      y = latest.y;
+      state.samples = [latest];
+      state.transition = undefined;
+    }
     const changed = x !== state.renderedX || y !== state.renderedY || previousStale !== state.stale;
     state.renderedX = x;
     state.renderedY = y;

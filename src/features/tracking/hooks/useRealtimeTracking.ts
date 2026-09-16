@@ -17,6 +17,7 @@ import { PositionAnimationController } from "../services/PositionAnimationContro
 import { TAG_LIVE_TIMEOUT_MS } from "../types/tracking.types";
 import type { RegionsConfig } from "@/src/features/regions/types/region.types";
 import { REGIONS_CONFIG_UPDATED_EVENT } from "@/src/features/regions/services/regionsConfig";
+import { useMapDisplayTracking } from "./useMapDisplayTracking";
 
 const TAG_COLORS = ["#5de4c7", "#f6c760", "#7aa2f7", "#dc7b8b", "#b892ff"];
 
@@ -47,6 +48,7 @@ export function useRealtimeTracking(): PositionAnimationController {
     [],
   );
   const [animationEnabled, setAnimationEnabled] = useState(DEFAULT_POSITION_ANIMATION_CONFIG.enabled);
+  useMapDisplayTracking(positionAnimation, engineEnabled);
 
   useEffect(() => {
     let active = true;
@@ -169,11 +171,9 @@ export function useRealtimeTracking(): PositionAnimationController {
     if (engineEnabled) return;
     const current = useIpsStore.getState().tags[tagId];
     if (!current) {
-      positionAnimation.ingest(tagId, { ...incoming, receivedAt: Date.now(), positionSource: "RAW" });
       return upsertTag(observed);
     }
     const position = filter.next(current, incoming);
-    positionAnimation.ingest(tagId, { ...position, timestamp: incoming.timestamp, positionSource: "RAW" });
     upsertTag({ ...observed, ...position });
   }), [engineEnabled, filter, observeTag, positionAnimation, rawGateway, upsertTag]);
 
@@ -195,14 +195,6 @@ export function useRealtimeTracking(): PositionAnimationController {
         y: incoming.y,
       };
       const position = current && !incoming.positionSource ? filter.next(current, incoming) : incoming;
-      positionAnimation.ingest(tagId, {
-        x: position.x,
-        y: position.y,
-        timestamp: incoming.timestamp,
-        positionSource: incoming.positionSource ?? "RAW",
-        regionId: incoming.regionInference?.regionId,
-        measurementTimestamp: incoming.lastRawDataTimestamp ? Date.parse(incoming.lastRawDataTimestamp) : incoming.timestamp,
-      });
       upsertTag({ ...next, ...position, timestamp: incoming.lastRawDataTimestamp ? Date.parse(incoming.lastRawDataTimestamp) : incoming.timestamp });
     });
   }, [filter, positionAnimation, processedGateway, upsertTag]);

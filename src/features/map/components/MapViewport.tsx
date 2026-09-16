@@ -39,7 +39,10 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
   const [floorImage, imageStatus] = useImage(map.image.url, "anonymous");
   const viewport = useIpsStore((state) => state.viewport);
   const layers = useIpsStore((state) => state.layers);
-  const tagsById = useMemo(() => Object.fromEntries(tags.map((tag) => [tag.id, tag])), [tags]);
+  const displays = useIpsStore((state) => state.mapTagDisplays);
+  const regionsConfig = useIpsStore((state) => state.regionsConfig);
+  const tagsById = useMemo(() => Object.fromEntries(tags.filter((tag) => displays[tag.id]?.visible)
+    .map((tag) => [tag.id, { ...tag, ...displays[tag.id].position }])), [tags, displays]);
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const setViewport = useIpsStore((state) => state.setViewport);
   const selectTagAndFocus = useIpsStore((state) => state.selectTagAndFocus);
@@ -332,6 +335,7 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
         onSelect={selectTagAndFocus}
       />
       {imageStatus === "loading" && <div className="map-state-overlay" role="status">Harita görseli yükleniyor…</div>}
+      {regionsConfig && (!regionsConfig.regions.length || regionsConfig.map.mapId !== map.id) && <div className="map-state-overlay is-notice" role="status">Gösterim için bölge tanımlayın</div>}
       {imageStatus === "failed" && <div className="map-state-overlay is-error" role="alert">Harita görseli yüklenemedi.</div>}
       {imageStatus === "loaded" && !liveTrackingVisible && <div className="map-state-overlay is-notice" role="status">Bu harita için canlı konum kaynağı henüz yapılandırılmadı.</div>}
       <div className="zoom-readout">{Math.round(viewport.scale * 100)}%</div>

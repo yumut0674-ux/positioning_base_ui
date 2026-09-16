@@ -1,4 +1,5 @@
 import { memo, type CSSProperties } from "react";
+import { useIpsStore } from "@/src/app/store/useIpsStore";
 import type { PositionAnimationController } from "@/src/features/tracking/services/PositionAnimationController";
 import type { TrackedTag } from "@/src/features/tracking/types/tracking.types";
 import type { ViewportState } from "../types/map.types";
@@ -30,6 +31,10 @@ function TagOverlayComponent({
   visible,
   onSelect,
 }: TagOverlayProps) {
+  const displays = useIpsStore((state) => state.mapTagDisplays);
+  const config = useIpsStore((state) => state.regionsConfig);
+  const activeMapId = useIpsStore((state) => state.activeMapId);
+  const hasArea = !!config?.regions.length && (!activeMapId || config.map.mapId === activeMapId);
   const worldStyle = {
     width,
     height,
@@ -39,7 +44,7 @@ function TagOverlayComponent({
   return (
     <div className={styles.overlay} hidden={!visible} aria-hidden={!visible} data-testid="tag-overlay">
       <div className={styles.world} style={worldStyle}>
-        {visible && tags.map((tag) => (
+        {visible && hasArea && tags.filter((tag) => displays[tag.id]?.visible).map((tag) => (
           <HtmlTagNode
             key={tag.id}
             tag={tag}

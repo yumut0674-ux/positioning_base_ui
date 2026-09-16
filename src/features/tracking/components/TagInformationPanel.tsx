@@ -7,6 +7,7 @@ import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { formatLocationDuration, persistRecentTagIds, readRecentTagIds, type TagLocationEntry } from "@/src/features/tracking/services/tagPanelState";
 import type { TrackedTag } from "@/src/features/tracking/types/tracking.types";
 import { roomDecisionLabel } from "../services/roomDecisionLabel";
+import type { MapTagDisplay } from "../services/MapDisplayFilter";
 
 interface TagInformationPanelProps {
   readonly onOpenHistory: (tagCode: string) => void;
@@ -15,6 +16,7 @@ interface TagInformationPanelProps {
 }
 
 interface TagInformationPanelContentProps extends TagInformationPanelProps {
+  readonly mapTagDisplays?: Record<string, MapTagDisplay>;
   readonly selectedTag?: TrackedTag;
   readonly locationAddress?: string;
   readonly locationDuration: string;
@@ -29,7 +31,8 @@ function matchesQuery(tag: TrackedTag, query: string): boolean {
     || tag.id.toLocaleLowerCase("tr-TR").startsWith(query);
 }
 
-function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag, regionsConfig }: {
+function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag, regionsConfig, mapTagDisplays }: {
+  readonly mapTagDisplays?: Record<string, MapTagDisplay>;
   readonly tags: readonly TrackedTag[];
   readonly recentTagIds: readonly string[];
   readonly selectedTagId?: string;
@@ -58,7 +61,7 @@ function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag, regionsC
           return <button key={tag.id} type="button" role="option" aria-selected={isSelected} className={`tag-switcher-row${isSelected ? " is-selected" : ""}`} onClick={() => onSelectTag(tag.id)}>
             <span className={`tag-switcher-status${isActive ? " is-active" : ""}`} aria-hidden="true" />
             <span className="tag-switcher-name"><strong>{tag.name}</strong><code>{tag.id}</code></span>
-            <span className="tag-switcher-meta"><em>{isActive ? "CANLI" : "PASİF"}</em><small>{roomDecisionLabel(tag, regionsConfig)}</small></span>
+            <span className="tag-switcher-meta"><em>{isActive ? "CANLI" : "PASİF"}</em><small>{roomDecisionLabel(tag, regionsConfig)}</small>{mapTagDisplays?.[tag.id]?.visible === false && <small>{mapTagDisplays[tag.id].reason === "no-regions" ? "Gösterim için bölge tanımlayın" : "Alan dışında · haritada gizli"}</small>}</span>
           </button>;
         })}
         {visibleTags.length === 0 && <p className="tag-switcher-empty">{emptyStateMessage}</p>}
@@ -67,13 +70,13 @@ function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag, regionsC
   );
 }
 
-export function TagInformationPanelContent({ selectedTag, locationAddress, locationDuration, tags, recentTagIds, onSelectTag, onOpenHistory, variant = "desktop", onShowMap, regionsConfig }: TagInformationPanelContentProps) {
+export function TagInformationPanelContent({ selectedTag, locationAddress, locationDuration, tags, recentTagIds, onSelectTag, onOpenHistory, variant = "desktop", onShowMap, regionsConfig, mapTagDisplays }: TagInformationPanelContentProps) {
   const panelLabel = selectedTag && locationAddress
     ? `Takip etiketi geçiş ve detay paneli. Seçili varlık: ${selectedTag.name}. Konum adresi: ${locationAddress}`
     : "Takip etiketi geçiş ve detay paneli";
   return (
     <motion.aside className={`tag-panel tag-panel--${variant}`} aria-label={panelLabel} initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }}>
-      <TagQuickList tags={tags} recentTagIds={recentTagIds} selectedTagId={selectedTag?.id} onSelectTag={onSelectTag} regionsConfig={regionsConfig} />
+      <TagQuickList tags={tags} recentTagIds={recentTagIds} selectedTagId={selectedTag?.id} onSelectTag={onSelectTag} regionsConfig={regionsConfig} mapTagDisplays={mapTagDisplays} />
       {selectedTag && locationAddress ? <section className="tag-details" aria-labelledby="selected-tag-title">
         <div className="tag-panel-header">
           <div className="tag-icon" style={{ color: selectedTag.color }}><Box size={19} /></div>
@@ -126,6 +129,7 @@ function useLocationDuration(entry: TagLocationEntry | undefined, locationAddres
 }
 
 export function TagInformationPanel({ onOpenHistory, variant = "desktop", onShowMap }: TagInformationPanelProps) {
+  const mapTagDisplays = useIpsStore((state) => state.mapTagDisplays);
   const tagsById = useIpsStore((state) => state.tags);
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const recentTagIds = useIpsStore((state) => state.recentTagIds);
@@ -142,5 +146,5 @@ export function TagInformationPanel({ onOpenHistory, variant = "desktop", onShow
     selectTag(tagId);
   }, [selectTag]);
 
-  return <TagInformationPanelContent selectedTag={selectedTag} locationAddress={locationAddress} locationDuration={locationDuration} tags={tags} recentTagIds={recentTagIds} onSelectTag={handleSelectTag} onOpenHistory={onOpenHistory} variant={variant} onShowMap={onShowMap} regionsConfig={regionsConfig} />;
+  return <TagInformationPanelContent selectedTag={selectedTag} locationAddress={locationAddress} locationDuration={locationDuration} tags={tags} recentTagIds={recentTagIds} onSelectTag={handleSelectTag} onOpenHistory={onOpenHistory} variant={variant} onShowMap={onShowMap} regionsConfig={regionsConfig} mapTagDisplays={mapTagDisplays} />;
 }

@@ -9,6 +9,7 @@ export const SYSTEM_MAP_CALIBRATION_POINTS: readonly CalibrationPoint[] = [
 ];
 
 export const DEFAULT_REGIONS_CONFIG: RegionsConfig = {
+  mapDisplay: { outsideHoldMs: 2_000 },
   engine: {
     entryConfirmationCount: 2,
     exitConfirmationCount: 2,

@@ -6,6 +6,7 @@ import type { TagDefinition } from "@/src/features/tracking/services/tagApi";
 import type { RegionsConfig } from "@/src/features/regions/types/region.types";
 import { addRecentTagId, nextTagLocationEntry, type TagLocationEntry } from "@/src/features/tracking/services/tagPanelState";
 import { MAP_TAG_FOCUS_SCALE } from "@/src/features/map/config/mapConfig";
+import type { MapTagDisplay } from "@/src/features/tracking/services/MapDisplayFilter";
 
 function boundedRecord<T>(record: Record<string,T>): Record<string,T> {
   const keys=Object.keys(record);
@@ -20,6 +21,7 @@ interface MeasurementState {
 }
 
 interface IpsState {
+  readonly mapTagDisplays: Record<string, MapTagDisplay>;
   readonly activeMapId: string | null;
   readonly readyMapId: string | null;
   readonly pendingTagFocusId: string | null;
@@ -62,6 +64,7 @@ interface IpsState {
 }
 
 export const useIpsStore = create<IpsState>((set) => ({
+  mapTagDisplays: {},
   activeMapId: null,
   readyMapId: null,
   pendingTagFocusId: null,
