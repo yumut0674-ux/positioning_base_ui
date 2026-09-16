@@ -36,7 +36,6 @@ export interface RegionDefinition {
 
 export interface RegionsConfig {
   readonly engine?: {
-    readonly mode?: "inference" | "shadow" | "legacy";
     readonly evidenceDurationMs?: number;
     readonly evidenceWindowMs?: number;
     readonly maxEvidenceGapMs?: number;

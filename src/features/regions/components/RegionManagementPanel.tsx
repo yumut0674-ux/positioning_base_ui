@@ -357,8 +357,12 @@ export function RegionManagementPanel() {
 
   return (
     <section className={styles.panel}>
-      {engineStatus?.warnings?.length ? <details><summary>Harita çıkarım sınırlamaları ({engineStatus.warnings.length})</summary>{engineStatus.warnings.map(w => <p key={w}>{w}</p>)}</details> : null}
-      <label>Motor çalışma modu (kaydedildiğinde uygulanır)<select value={config.engine?.mode ?? "inference"} onChange={e => setConfig(current => ({ ...current, engine: { ...current.engine, mode: e.target.value as "inference" | "shadow" | "legacy" } }))}><option value="inference">Yeni oda çıkarımı</option><option value="shadow">Gölge karşılaştırma · eski motor yayınlar</option><option value="legacy">Eski motora geri dönüş</option></select></label>
+      {engineStatus?.warnings?.length ? (
+        <details className={styles.warningDetails}>
+          <summary>Harita çıkarım sınırlamaları ({engineStatus.warnings.length})</summary>
+          <div>{engineStatus.warnings.map(w => <p key={w}>{w}</p>)}</div>
+        </details>
+      ) : null}
       <header className={styles.header}>
         <div><span>ODA/BÖLGE YÖNETİMİ / {MAP_FLOOR_PLAN.level.toUpperCase()}</span><h1>Oda/Bölge Paneli</h1></div>
         <div className={styles.systemMap}><Check size={14} /><span>SİSTEM HARİTASI</span><strong>{MAP_FLOOR_PLAN.name}</strong></div>

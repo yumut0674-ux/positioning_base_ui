@@ -56,11 +56,12 @@ function cleanRegion(value: unknown): RegionDefinition {
 
 function cleanConfig(value: unknown): RegionsConfig {
   if (!value || typeof value !== "object") throw new Error("Geçersiz config");
-  const body = value as { regions?: unknown; engine?: RegionsConfig["engine"]; positionAnimation?: unknown };
+  const body = value as { regions?: unknown; engine?: (RegionsConfig["engine"] & { mode?: unknown }); positionAnimation?: unknown };
   if (!Array.isArray(body.regions)) throw new Error("regions alanı bir liste olmalıdır");
+  const { mode: _deprecatedMode, ...engineRules } = body.engine ?? {};
   const config: RegionsConfig = {
     ...DEFAULT_REGIONS_CONFIG,
-    engine: { ...DEFAULT_REGIONS_CONFIG.engine, ...body.engine },
+    engine: { ...DEFAULT_REGIONS_CONFIG.engine, ...engineRules },
     positionAnimation: resolvePositionAnimationConfig(body.positionAnimation),
     regions: body.regions.map(cleanRegion),
   };

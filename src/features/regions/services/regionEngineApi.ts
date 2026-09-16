@@ -1,7 +1,6 @@
 import type { RegionsConfig } from "../types/region.types";
 
 export interface RegionEngineStatusResponse {
-  readonly mode?: "inference" | "shadow" | "legacy";
   readonly warnings?: readonly string[];
   readonly enabled: boolean;
   readonly rawPort: number;

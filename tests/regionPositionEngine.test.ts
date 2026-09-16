@@ -99,7 +99,10 @@ test("coverage profiles affect dropout timing without raising entry confidence",
 });
 test("missing doors and narrow rooms report limitations without fabricated geometry",()=>{
   const s=setup();const c=compileRegionsConfig({...s.config,regions:s.config.regions.map(r=>({...r,entrances:[],wallBandMeters:4}))});
-  assert.ok(c.warnings!.some(w=>w.includes("kapı yok")));assert.ok(c.warnings!.some(w=>w.includes("dar oda")));
+  assert.ok(c.warnings!.some(w=>w.startsWith("Oda A: kapı yok")));assert.ok(c.warnings!.some(w=>w.includes("dar oda")));
+  assert.ok(c.warnings!.every(w=>!w.startsWith("A:")&&!w.startsWith("B:")));
+  const corridor={...s.config.regions[0],id:"corridor-main",name:"Koridor",kind:"corridor" as const,roomCenter:null,entrances:[]};
+  assert.deepEqual(compileRegionsConfig({...s.config,regions:[corridor]}).warnings,[]);
   assert.equal(c.regions[0].entrances.length,0);
   assert.throws(()=>compileRegionsConfig({...s.config,engine:{expectedIntervalMs:-1}}));
 });

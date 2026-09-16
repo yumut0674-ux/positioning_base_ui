@@ -21,7 +21,6 @@ export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConf
   const regions: CompiledRegion[] = [];
   const ids = new Set<string>();
   const warnings: string[] = [];
-  if (config.engine?.mode && !["inference","shadow","legacy"].includes(config.engine.mode)) throw new Error("engine.mode geçersiz");
   if ((config.engine?.evidenceDurationMs??1500)*2 > (config.engine?.evidenceWindowMs??12000)) throw new Error("Yeniden konumlanma kanıt süresi kanıt penceresini aşamaz");
   if (config.engine?.historySize !== undefined && config.engine.historySize < Math.max(2,config.engine?.entryConfirmationCount??2,config.engine?.exitConfirmationCount??2)) throw new Error("Geçmiş tamponu asgari kanıt sayısından küçük olamaz");
   for (const field of ["maxTags","historySize"] as const) if (config.engine?.[field] !== undefined && !Number.isInteger(config.engine[field])) throw new Error(`${field}: tam sayı gerekli`);
@@ -33,6 +32,7 @@ export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConf
   for (const source of config.regions) {
     if (!source.id?.trim() || ids.has(source.id)) throw new Error(`Geçersiz veya tekrar eden region id: ${source.id || "(boş)"}`);
     ids.add(source.id);
+    const regionLabel = source.name?.trim() || source.id;
     if (source.kind && !["room","corridor"].includes(source.kind)) throw new Error(`${source.id}: alan türü geçersiz`);
     if (!Array.isArray(source.polygon) || source.polygon.length < 3) throw new Error(`${source.id}: polygon en az 3 nokta içermeli`);
     const polygon: { x: number; y: number }[] = source.polygon.map((pair: CoordinatePair) => pair.world);
@@ -42,10 +42,10 @@ export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConf
     const area = Math.abs(polygon.reduce((sum,p,i)=>{const q=polygon[(i+1)%polygon.length];return sum+p.x*q.y-q.x*p.y;},0))/2;
     if (area < 0.0001) throw new Error(`${source.id}: polygon alanı geçersiz`);
     if (source.kind === "corridor" || (!source.kind && (/^corridor(?:-|$)/i.test(source.id) || /^koridor$/i.test(source.name)))) {
-      warnings.push(`${source.id}: koridor hareketli izlenir, merkezine sabitlenmez`); continue;
+      continue;
     }
     // Center-less regions remain editable, but are deliberately excluded from inference.
-    if (!source.roomCenter) { warnings.push(`${source.id}: merkez yok; oda çıkarımından çıkarıldı`); continue; }
+    if (!source.roomCenter) { warnings.push(`${regionLabel}: merkez yok; oda çıkarımından çıkarıldı`); continue; }
     if (!Number.isFinite(source.roomCenter.world.x) || !Number.isFinite(source.roomCenter.world.y)) {
       throw new Error(`${source.id}: roomCenter world koordinatı geçersiz`);
     }
@@ -58,14 +58,14 @@ export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConf
       const normal = entrance.inwardNormal;
       if (normal && (!Number.isFinite(normal.x) || !Number.isFinite(normal.y) || Math.hypot(normal.x, normal.y) < 0.001)) throw new Error(`${source.id}: kapı normali geçersiz`);
       if (entrance.connectsTo && entrance.connectsTo !== "corridor" && !config.regions.some(r => r.id === entrance.connectsTo && r.id !== source.id)) throw new Error(`${source.id}: kapı bağlantısı geçersiz`);
-      if (!normal || !entrance.widthMeters || !entrance.connectsTo) warnings.push(`${source.id}/${entrance.id}: eksik kapı geometrisi; yönlü giriş/çıkış kanıtı kullanılamaz`);
+      if (!normal || !entrance.widthMeters || !entrance.connectsTo) warnings.push(`${regionLabel}/${entrance.label || entrance.id}: eksik kapı geometrisi; yönlü giriş/çıkış kanıtı kullanılamaz`);
       return { id: entrance.id, ...entrance.world, connectsTo: entrance.connectsTo,
         inwardNormal: normal ? { x: normal.x / Math.hypot(normal.x, normal.y), y: normal.y / Math.hypot(normal.x, normal.y) } : undefined,
         widthMeters: entrance.widthMeters === undefined ? undefined : numeric(entrance.widthMeters, 1, "widthMeters", 0.1, 20),
         approachDepthMeters: numeric(entrance.approachDepthMeters, 2, "approachDepthMeters", 0.1, 20),
         crossingDepthMeters: numeric(entrance.crossingDepthMeters, 0.15, "crossingDepthMeters", 0.01, 5) };
     });
-    if (!entrances.length) warnings.push(`${source.id}: kapı yok; yalnızca sürekli iç ölçüm ve kesinti sonrası yeniden konumlanma kullanılabilir`);
+    if (!entrances.length) warnings.push(`${regionLabel}: kapı yok; yalnızca sürekli iç ölçüm ve kesinti sonrası yeniden konumlanma kullanılabilir`);
     const compiled: CompiledRegion = {
       id: source.id,
       name: source.name,
@@ -83,8 +83,8 @@ export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConf
         maxY: Math.max(...polygon.map((point: { y: number }) => point.y)),
       },
     };
-    if (!pointInPolygon(compiled.roomCenter, compiled)) { warnings.push(`${source.id}: merkez poligon dışında; oda çıkarımından çıkarıldı, merkez düzeltilmeli`); continue; }
-    if (wallDistance(compiled.roomCenter, compiled) <= compiled.wallBandMeters!) warnings.push(`${source.id}: dar oda; güvenilir iç alan yetersiz, kapı kanıtı gerekebilir`);
+    if (!pointInPolygon(compiled.roomCenter, compiled)) { warnings.push(`${regionLabel}: merkez poligon dışında; oda çıkarımından çıkarıldı, merkez düzeltilmeli`); continue; }
+    if (wallDistance(compiled.roomCenter, compiled) <= compiled.wallBandMeters!) warnings.push(`${regionLabel}: dar oda; güvenilir iç alan yetersiz, kapı kanıtı gerekebilir`);
     for (const door of entrances) {
       if (wallDistance(door, compiled) > 0.5 && door.inwardNormal && door.widthMeters && door.connectsTo) throw new Error(`${source.id}/${door.id}: kapı duvardan uzak`);
       if (door.inwardNormal && !pointInPolygon({ x: door.x + door.inwardNormal.x * 0.2, y: door.y + door.inwardNormal.y * 0.2 }, compiled)) throw new Error(`${source.id}/${door.id}: normal odaya yönelmeli`);
@@ -100,7 +100,6 @@ export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConf
   return {
     version: createHash("sha256").update(JSON.stringify(config)).digest("hex").slice(0, 16),
     warnings,
-    mode: config.engine?.mode ?? "inference",
     regions,
     rules: {
       evidenceDurationMs: numeric(engine?.evidenceDurationMs, 1500, "evidenceDurationMs", 100),

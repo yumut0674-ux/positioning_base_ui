@@ -1,4 +1,8 @@
 .panel { height: 100%; min-height: 0; display: flex; flex-direction: column; color: #162133; }
+.warningDetails { min-width: 0; margin-bottom: 10px; padding: 9px 11px; border: 1px solid #d2e0e8; border-radius: 6px; background: rgba(247,251,253,.92); color: #657b90; font-size: 9px; line-height: 1.45; }
+.warningDetails summary { color: #405a70; font-weight: 600; cursor: pointer; }
+.warningDetails > div { margin-top: 7px; }
+.warningDetails p { margin: 4px 0; }
 .header { min-height: 58px; display: grid; grid-template-columns: minmax(180px, 1fr) auto auto auto; align-items: start; gap: 12px; }
 .header > div:first-child > span { display: block; margin-top: 2px; color: #6e8198; font: 8px ui-monospace, monospace; letter-spacing: .14em; }
 .header h1 { margin: 5px 0 0; color: #101b2d; font-size: 17px; font-weight: 650; }
@@ -136,6 +140,7 @@
 
 @media (max-width: 680px) {
   .panel { min-height: auto; }
+  .warningDetails { width: 100%; margin-bottom: 8px; padding: 9px; }
   .header { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 0 1px 12px; }
   .header > div:first-child > span { font-size: 7px; letter-spacing: .11em; }
   .header h1 { margin-top: 4px; font-size: 15px; }

@@ -39,7 +39,6 @@ export interface CompiledRegion {
 export interface CompiledRegionsConfig {
   readonly version?: string;
   readonly warnings?: readonly string[];
-  readonly mode?: "inference" | "shadow" | "legacy";
   readonly regions: readonly CompiledRegion[];
   readonly rules: RegionEngineRules;
 }
