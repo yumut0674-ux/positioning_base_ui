@@ -23,8 +23,8 @@ test("world coordinates are written as a compositor-friendly tag transform", () 
 
   renderHtmlTagPosition(target, coordinateTransform, 2, 3);
 
-  assert.equal(target.style.transform, htmlTagPositionTransform({ x: 60, y: 1_122 }));
-  assert.equal(target.style.transform, "translate3d(60px, 1122px, 0)");
+  assert.equal(target.style.transform, htmlTagPositionTransform({ x: 60, y: 1_224 }));
+  assert.equal(target.style.transform, "translate3d(60px, 1224px, 0)");
 });
 
 test("detached HTML renderers are not updated by later positions", () => {
@@ -39,9 +39,9 @@ test("detached HTML renderers are not updated by later positions", () => {
   });
 
   animation.ingest("TAG-HTML", { x: 1, y: 1, timestamp: 1_000, receivedAt: 1_000 });
-  assert.equal(target.style.transform, "translate3d(30px, 1182px, 0)");
+  assert.equal(target.style.transform, "translate3d(30px, 1284px, 0)");
 
   detach();
   animation.ingest("TAG-HTML", { x: 5, y: 5, timestamp: 2_000, receivedAt: 2_000 });
-  assert.equal(target.style.transform, "translate3d(30px, 1182px, 0)");
+  assert.equal(target.style.transform, "translate3d(30px, 1284px, 0)");
 });

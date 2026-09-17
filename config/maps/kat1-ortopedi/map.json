@@ -2,21 +2,21 @@
   "id": "kat1-ortopedi",
   "image": {
     "url": "/maps/kat1-ortopedi/floor-plan.png",
-    "width": 1348,
-    "height": 1212
+    "width": 714,
+    "height": 1314
   },
   "world": {
-    "widthMeters": 44.93333333333333,
-    "heightMeters": 40.4
+    "widthMeters": 23.8,
+    "heightMeters": 43.8
   },
   "calibration": {
     "worldOrigin": { "x": 0, "y": 0 },
-    "canvasOrigin": { "x": 0, "y": 1212 },
+    "canvasOrigin": { "x": 0, "y": 1314 },
     "pixelsPerMeter": 30,
     "invertYAxis": true,
     "rotationDegrees": 0
   },
-  "updatedAt": "2026-08-28T00:00:00.000Z",
+  "updatedAt": "2026-09-16T00:00:00.000Z",
   "status": "active",
   "liveTrackingEnabled": true
 }

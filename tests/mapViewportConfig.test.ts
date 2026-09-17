@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { constrainMapViewport, getFittedMapViewport, isAtFittedScale, MAP_FLOOR_PLAN, MAP_TAG_FOCUS_SCALE } from "../src/features/map/config/mapConfig";
+import { constrainMapViewport, getFittedMapViewport, isAtFittedScale, MAP_CALIBRATION, MAP_FLOOR_PLAN, MAP_TAG_FOCUS_SCALE } from "../src/features/map/config/mapConfig";
+import { CoordinateTransformService } from "../src/features/map/services/CoordinateTransformService";
 
 test("fits and centers the complete floor plan in a desktop map panel", () => {
   const panel = { width: 1_200, height: 800 };
@@ -42,9 +43,9 @@ test("locks panning at the fitted scale and constrains a zoomed plan to the map 
   const planWidth = MAP_FLOOR_PLAN.canvasSize.width * constrained.scale;
   const planHeight = MAP_FLOOR_PLAN.canvasSize.height * constrained.scale;
 
-  assert.equal(constrained.x, 0);
+  assert.equal(constrained.x, planWidth <= panel.width ? (panel.width - planWidth) / 2 : 0);
   assert.equal(constrained.y, panel.height - planHeight);
-  assert.ok(constrained.x + planWidth >= panel.width);
+  assert.ok(planWidth <= panel.width || constrained.x + planWidth >= panel.width);
   assert.ok(constrained.y <= 0);
 });
 
@@ -74,4 +75,14 @@ test("fit and constraints use the active map dimensions", () => {
 
 test("tracking label focus uses a fifty percent map scale", () => {
   assert.equal(MAP_TAG_FOCUS_SCALE, 0.5);
+});
+
+test("uses the lower-left corner as world origin with x horizontal and y vertical", () => {
+  const transform = new CoordinateTransformService(MAP_CALIBRATION);
+
+  assert.deepEqual(MAP_FLOOR_PLAN.canvasSize, { width: 714, height: 1314 });
+  assert.deepEqual(MAP_FLOOR_PLAN.worldSize, { width: 23.8, height: 43.8 });
+  assert.deepEqual(transform.worldToCanvas({ x: 0, y: 0 }), { x: 0, y: 1314 });
+  assert.deepEqual(transform.worldToCanvas({ x: 23.8, y: 43.8 }), { x: 714, y: 0 });
+  assert.deepEqual(transform.canvasToWorld({ x: 0, y: 1314 }), { x: 0, y: 0 });
 });

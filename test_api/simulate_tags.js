@@ -11,14 +11,14 @@ const LOCAL_INGEST_ENDPOINT = "http://127.0.0.1:3000/api/tracking/ingest";
 const PUBLIC_INGEST_ENDPOINT = "https://neu-demo.gekon.com.tr/api/tracking/ingest";
 const REGIONS_CONFIG_PATH = path.join(process.cwd(), "config", "regions.json");
 
-// Kat 1 planındaki mavi L biçimli koridorun merkez çizgisi. Oda ziyaretleri bu
+// Kat 1 planındaki T biçimli koridorun merkez çizgisi. Oda ziyaretleri bu
 // hat üzerinden yapılır; odanın merkezi yalnızca giriş/çıkış bağlantısında kullanılır.
 const CORRIDOR_ROUTE = Object.freeze([
-  { x: 1.75, y: 40 },
-  { x: 1.75, y: 5.5 },
-  { x: 5.5, y: 5.5 },
-  { x: 5.5, y: 1.75 },
-  { x: 44, y: 1.75 },
+  { x: 11.9, y: 1 },
+  { x: 11.9, y: 39.8 },
+  { x: 1.5, y: 39.8 },
+  { x: 11.9, y: 39.8 },
+  { x: 22.3, y: 39.8 },
 ]);
 const WALKING_SPEED_METERS_PER_SECOND = 0.85;
 const ROOM_STAY_MIN_MS = 2_000;
@@ -29,10 +29,10 @@ const FIRST_ROOM_VISIT_MIN_MS = 10_000;
 const FIRST_ROOM_VISIT_MAX_MS = 28_000;
 
 const tags = [
-  { tagId: "TAG-001", position: { x: 1.75, y: 34 }, direction: 1 },
-  { tagId: "TAG-014", position: { x: 1.75, y: 22 }, direction: -1 },
-  { tagId: "TAG-028", position: { x: 15, y: 1.75 }, direction: 1 },
-  { tagId: "TAG-036", position: { x: 34, y: 1.75 }, direction: -1 },
+  { tagId: "TAG-001", position: { x: 11.9, y: 34 }, direction: 1 },
+  { tagId: "TAG-014", position: { x: 11.9, y: 22 }, direction: -1 },
+  { tagId: "TAG-028", position: { x: 11.9, y: 8 }, direction: 1 },
+  { tagId: "TAG-036", position: { x: 5, y: 39.8 }, direction: -1 },
 ];
 
 function randomInteger(min, max, random = Math.random) {

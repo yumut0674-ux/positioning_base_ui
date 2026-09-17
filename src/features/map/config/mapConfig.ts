@@ -12,8 +12,8 @@ export const MAP_FLOOR_PLAN: FloorPlanDefinition = {
   building: "Neü Tıp Fakültesi",
   level: "Kat 1",
   imageUrl: "/maps/kat1-ortopedi/floor-plan.png",
-  canvasSize: { width: 1348, height: 1212 },
-  worldSize: { width: 44.93333333333333, height: 40.4 },
+  canvasSize: { width: 714, height: 1314 },
+  worldSize: { width: 23.8, height: 43.8 },
 };
 
 export const MAP_CALIBRATION: MapCalibration = {
@@ -94,10 +94,10 @@ export function isAtFittedScale(viewport: ViewportState, fittedViewport: Viewpor
 }
 
 export const DEFAULT_ANCHORS = [
-  { id: "A-01", x: 2.7, y: 21.4 },
-  { id: "A-02", x: 20.8, y: 21.4 },
-  { id: "A-03", x: 39.5, y: 21.4 },
-  { id: "A-04", x: 2.7, y: 2.8 },
-  { id: "A-05", x: 21.3, y: 2.8 },
-  { id: "A-06", x: 39.5, y: 2.8 },
+  { id: "A-01", x: 2.7, y: 40.5 },
+  { id: "A-02", x: 11.9, y: 40.5 },
+  { id: "A-03", x: 21.1, y: 40.5 },
+  { id: "A-04", x: 2.7, y: 3 },
+  { id: "A-05", x: 11.9, y: 3 },
+  { id: "A-06", x: 21.1, y: 3 },
 ] as const satisfies readonly AnchorDefinition[];

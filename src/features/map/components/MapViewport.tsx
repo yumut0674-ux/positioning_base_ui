@@ -226,15 +226,16 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
 
   const gridLines = useMemo(() => {
     const lines: React.ReactNode[] = [];
-    const step = transform.metersToPixels(1);
-    for (let x = 0; x <= map.image.width; x += step) {
-      lines.push(<Line key={`x-${x}`} points={[x, 0, x, map.image.height]} stroke="#8ab4c8" strokeWidth={x % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.34} />);
+    for (let meter = 0; meter <= Math.floor(map.world.widthMeters); meter += 1) {
+      const x = transform.worldToCanvas({ x: meter, y: 0 }).x;
+      lines.push(<Line key={`x-${meter}`} points={[x, 0, x, map.image.height]} stroke="#8ab4c8" strokeWidth={meter % 5 === 0 ? 0.8 : 0.35} opacity={0.34} />);
     }
-    for (let y = 0; y <= map.image.height; y += step) {
-      lines.push(<Line key={`y-${y}`} points={[0, y, map.image.width, y]} stroke="#8ab4c8" strokeWidth={y % (step * 5) === 0 ? 0.8 : 0.35} opacity={0.34} />);
+    for (let meter = 0; meter <= Math.floor(map.world.heightMeters); meter += 1) {
+      const y = transform.worldToCanvas({ x: 0, y: meter }).y;
+      lines.push(<Line key={`y-${meter}`} points={[0, y, map.image.width, y]} stroke="#8ab4c8" strokeWidth={meter % 5 === 0 ? 0.8 : 0.35} opacity={0.34} />);
     }
     return lines;
-  }, [map.image.height, map.image.width, transform]);
+  }, [map.image.height, map.image.width, map.world.heightMeters, map.world.widthMeters, transform]);
 
   const mapGroupProps = { x: viewport.x, y: viewport.y, scaleX: viewport.scale, scaleY: viewport.scale };
   const measurementStart = measurement.start ? transform.worldToCanvas(measurement.start) : null;
@@ -300,8 +301,8 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
             <Rect width={map.image.width} height={map.image.height} fill="#d8f5f0" opacity={0.08} />
           </Group>
           <Group {...mapGroupProps} visible={layers.references}>
-            <Line points={[0, map.image.height, transform.metersToPixels(5), map.image.height]} stroke="#00a896" strokeWidth={2} />
-            <Text x={8} y={map.image.height - 30} text="5 m" fill="#087f73" fontSize={12} fontFamily="monospace" />
+            <Line points={[map.calibration.canvasOrigin.x, map.calibration.canvasOrigin.y, map.calibration.canvasOrigin.x + transform.metersToPixels(5), map.calibration.canvasOrigin.y]} stroke="#00a896" strokeWidth={2} />
+            <Text x={map.calibration.canvasOrigin.x + 8} y={map.calibration.canvasOrigin.y - 30} text="5 m" fill="#087f73" fontSize={12} fontFamily="monospace" />
           </Group>
         </Layer>
         <Layer visible={layers.routes}>
