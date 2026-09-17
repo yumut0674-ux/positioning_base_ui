@@ -9,6 +9,8 @@ import {
   Power, Trash2, Upload, X,
 } from "lucide-react";
 import { MAP_FLOOR_PLAN, MAP_VIEWPORT_LIMITS } from "@/src/features/map/config/mapConfig";
+import { useIpsStore } from "@/src/app/store/useIpsStore";
+import { TAG_LIVE_TIMEOUT_MS } from "@/src/features/tracking/types/tracking.types";
 import { useElementSize } from "@/src/shared/hooks/useElementSize";
 import { DEFAULT_REGIONS_CONFIG } from "../config/defaultRegionsConfig";
 import { createAffineTransform, createInverseAffineTransform, withWorldCoordinates } from "../services/affineTransform";
@@ -23,6 +25,8 @@ import {
 import styles from "./regions.module.css";
 
 import { RegionInferenceEditor } from "./RegionInferenceEditor";
+import { RawTagLayer } from "./RawTagLayer";
+import { createRawTagMarkers } from "../services/rawTagPresentation";
 type SelectedPoint = { readonly type: "polygon" | "center" | "entrance"; readonly index: number } | null;
 type Viewport = { readonly x: number; readonly y: number; readonly scale: number };
 
@@ -73,9 +77,16 @@ export function RegionManagementPanel() {
   const [errors, setErrors] = useState<readonly string[]>([]);
   const [engineStatus, setEngineStatus] = useState<RegionEngineStatusResponse | null>(null);
   const [engineUpdating, setEngineUpdating] = useState(false);
+  const [showRawTagPositions, setShowRawTagPositions] = useState(false);
+  const [rawTagClock, setRawTagClock] = useState(() => Date.now());
+  const observedTags = useIpsStore((state) => state.observedTags);
 
   const transform = useMemo(() => createAffineTransform(config.map.calibration.points), [config.map.calibration.points]);
   const inverseTransform = useMemo(() => createInverseAffineTransform(config.map.calibration.points), [config.map.calibration.points]);
+  const rawTagMarkers = useMemo(
+    () => createRawTagMarkers(observedTags, inverseTransform, rawTagClock, TAG_LIVE_TIMEOUT_MS),
+    [inverseTransform, observedTags, rawTagClock],
+  );
   const selectedRegion = config.regions.find((region) => region.id === selectedRegionId) ?? null;
   const selectedCoordinate = !selectedRegion || !selectedPoint ? null
     : selectedPoint.type === "center" ? selectedRegion.roomCenter
@@ -123,6 +134,13 @@ export function RegionManagementPanel() {
       setStatus(error instanceof Error ? error.message : "Oda tespit modu durumu alınamadı");
     });
   }, []);
+
+  useEffect(() => {
+    if (!showRawTagPositions) return;
+    setRawTagClock(Date.now());
+    const timer = window.setInterval(() => setRawTagClock(Date.now()), 1_000);
+    return () => window.clearInterval(timer);
+  }, [showRawTagPositions]);
 
   const toggleRegionEngine = async () => {
     if (!engineStatus || engineUpdating) return;
@@ -378,6 +396,18 @@ export function RegionManagementPanel() {
           <span>ODA TESPİT MOTORU</span>
           <strong>{engineUpdating ? "GÜNCELLENİYOR" : engineStatus?.enabled ? `AKTİF · :${engineStatus.processedPort}` : "KAPALI"}</strong>
         </button>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={showRawTagPositions}
+          aria-label={`Ham tag konumları görünümünü ${showRawTagPositions ? "kapat" : "aç"}`}
+          className={`${styles.rawTagToggle} ${showRawTagPositions ? styles.rawTagToggleEnabled : ""}`}
+          onClick={() => setShowRawTagPositions((current) => !current)}
+        >
+          <Crosshair size={14} />
+          <span>HAM TAG KONUMLARI</span>
+          <strong>{showRawTagPositions ? "AKTİF" : "KAPALI"}</strong>
+        </button>
         <div className={styles.headerActions}>
           <input ref={fileInputRef} type="file" accept="application/json,.json" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) void importConfig(file); event.currentTarget.value = ""; }} />
           <button onClick={() => fileInputRef.current?.click()}><Upload size={14} /> Config yükle</button>
@@ -439,6 +469,7 @@ export function RegionManagementPanel() {
                 </Group>;
               })}
             </Group></Layer>
+            {showRawTagPositions && <RawTagLayer markers={rawTagMarkers} viewport={viewport} />}
           </Stage>
           <div className={styles.tools}>
             {(["select", "polygon", "center", "entrance"] as const).map((value) => {
@@ -448,6 +479,11 @@ export function RegionManagementPanel() {
             {tool === "polygon" && <button className={styles.finishTool} disabled={(selectedRegion?.polygon.length ?? 0) < 3} onClick={() => { setTool("select"); setStatus("Çokgen tamamlandı"); }}><Check size={16} /><span>Tamamla</span></button>}
           </div>
           <div className={styles.mapControls}><button onClick={fitToScreen}>SIĞDIR</button><span>{Math.round(viewport.scale * 100)}%</span></div>
+          {showRawTagPositions && (
+            <div className={styles.rawTagStatus}>
+              {rawTagMarkers.length > 0 ? `Ham konum görünümü aktif · ${rawTagMarkers.length} tag` : "Ham tag verisi bekleniyor…"}
+            </div>
+          )}
           <div className={styles.mapStatus}>{status}</div>
         </div>
 

@@ -3,7 +3,7 @@
 .warningDetails summary { color: #405a70; font-weight: 600; cursor: pointer; }
 .warningDetails > div { margin-top: 7px; }
 .warningDetails p { margin: 4px 0; }
-.header { min-height: 58px; display: grid; grid-template-columns: minmax(180px, 1fr) auto auto auto; align-items: start; gap: 12px; }
+.header { min-height: 58px; display: grid; grid-template-columns: minmax(180px, 1fr) auto auto auto auto; align-items: start; gap: 12px; }
 .header > div:first-child > span { display: block; margin-top: 2px; color: #6e8198; font: 8px ui-monospace, monospace; letter-spacing: .14em; }
 .header h1 { margin: 5px 0 0; color: #101b2d; font-size: 17px; font-weight: 650; }
 .systemMap { min-width: 170px; display: grid; grid-template-columns: 19px 1fr; align-items: center; padding: 7px 10px; border: 1px solid #bae2dc; border-radius: 5px; background: #e9f8f5; }
@@ -17,6 +17,12 @@
 .engineToggleEnabled { color: #087f73; border-color: #87cec4; background: #e5f7f4; box-shadow: 0 0 0 2px rgba(0,168,150,.06); }
 .engineToggleEnabled strong { color: #087f73; }
 .engineToggle:disabled { opacity: .6; cursor: wait; }
+.rawTagToggle { min-width: 145px; display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: center; padding: 7px 10px; border: 1px solid #d8c2cf; border-radius: 5px; background: #faf5f8; color: #866379; text-align: left; cursor: pointer; }
+.rawTagToggle svg { grid-row: 1 / 3; }
+.rawTagToggle span { overflow: hidden; font: 7px ui-monospace, monospace; letter-spacing: .08em; text-overflow: ellipsis; white-space: nowrap; }
+.rawTagToggle strong { margin-top: 2px; color: #78576b; font-size: 9px; }
+.rawTagToggleEnabled { color: #c22f78; border-color: #df8eb6; background: #fff0f7; box-shadow: 0 0 0 2px rgba(217,70,141,.07); }
+.rawTagToggleEnabled strong { color: #b52269; }
 .headerActions { display: flex; gap: 7px; padding-top: 3px; }
 .headerActions button, .panelTitle button, .tools button, .mapControls button, .deletePoint, .deleteZone { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid #c5d6e2; border-radius: 5px; background: #f7fbff; color: #52667d; cursor: pointer; }
 .headerActions button { min-height: 32px; padding: 0 10px; font-size: 9px; }
@@ -65,6 +71,7 @@
 .mapControls button { min-height: 29px; padding: 0 9px; border: 0; border-right: 1px solid #bdcedb; border-radius: 0; font: 8px ui-monospace, monospace; }
 .mapControls span { min-width: 45px; color: #5f7389; text-align: center; font: 8px ui-monospace, monospace; }
 .mapStatus { position: absolute; z-index: 3; left: 12px; bottom: 12px; max-width: calc(100% - 105px); padding: 7px 9px; border: 1px solid #c5d6e2; border-radius: 4px; background: rgba(255,255,255,.92); color: #5e748a; font: 8px ui-monospace, monospace; box-shadow: 0 8px 20px rgba(53,75,100,.1); }
+.rawTagStatus { position: absolute; z-index: 3; right: 12px; bottom: 48px; max-width: calc(100% - 24px); overflow: hidden; padding: 7px 9px; pointer-events: none; border: 1px solid #df8eb6; border-radius: 4px; background: rgba(255,240,247,.94); color: #a92968; font: 8px ui-monospace, monospace; text-overflow: ellipsis; white-space: nowrap; box-shadow: 0 8px 20px rgba(83,45,66,.1); }
 .properties > label, .fieldRow, .metrics, .coordinateSection, .pointListSection, .pointEditor, .selectHint, .deletePoint, .deleteZone, .errors { margin-left: 13px; margin-right: 13px; }
 .properties > label { margin-top: 14px; }
 .properties label > span { display: block; margin-bottom: 6px; color: #647a90; font-size: 9px; }
@@ -134,7 +141,7 @@
   .editor { grid-template-columns: 175px minmax(0,1fr) 250px; }
   .tools button span { display: none; }
   .systemMap { display: none; }
-  .header { grid-template-columns: minmax(150px,1fr) auto auto; }
+  .header { grid-template-columns: minmax(150px,1fr) auto auto auto; }
 }
 
 @media (max-width: 850px) {
@@ -154,6 +161,10 @@
   .engineToggle svg { grid-row: auto; }
   .engineToggle span { font-size: 7px; }
   .engineToggle strong { margin: 0; font-size: 8px; white-space: nowrap; }
+  .rawTagToggle { grid-column: 1 / -1; min-width: 0; min-height: 40px; grid-template-columns: 20px minmax(0, 1fr) auto; padding: 7px 9px; }
+  .rawTagToggle svg { grid-row: auto; }
+  .rawTagToggle span { font-size: 7px; }
+  .rawTagToggle strong { margin: 0; font-size: 8px; white-space: nowrap; }
   .headerActions { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 0; }
   .headerActions button { min-height: 38px; padding: 0 5px; font-size: 8px; white-space: nowrap; }
   .headerActions button:not(.primary) { font-size: 8px; }
@@ -174,6 +185,7 @@
   .mapControls { top: auto; right: 8px; bottom: 8px; }
   .mapControls button { min-height: 38px; padding: 0 10px; }
   .mapStatus { right: 8px; bottom: 54px; left: 8px; max-width: none; padding: 8px 9px; font-size: 8px; }
+  .rawTagStatus { right: 8px; bottom: 98px; max-width: calc(100% - 16px); }
   .properties { order: 3; overflow: visible; padding-bottom: 13px; }
   .properties > .panelTitle { border-top: 1px solid #cbd9e3; }
   .pointList { max-height: 220px; }
