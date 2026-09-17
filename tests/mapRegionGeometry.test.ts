@@ -10,6 +10,22 @@ const mapConfigPath = path.join(process.cwd(), "config", "maps", "kat1-ortopedi"
 const config = JSON.parse(readFileSync(configPath, "utf8")) as RegionsConfig;
 const mapConfig = JSON.parse(readFileSync(mapConfigPath, "utf8")) as RegionsConfig;
 const EPSILON = 0.0011;
+const ROOM_WALL_BOUNDS: Record<string, [number, number, number, number]> = {
+  "room-13": [50, 300, 19, 168],
+  "room-14": [412, 662, 19, 168],
+  "room-11": [50, 300, 278, 432],
+  "room-12": [412, 662, 278, 432],
+  "room-09": [50, 300, 446, 599],
+  "room-10": [412, 662, 446, 599],
+  "room-07": [50, 300, 614, 773],
+  "room-08": [412, 662, 614, 773],
+  "room-05": [50, 300, 787, 945],
+  "room-06": [412, 662, 787, 945],
+  "room-03": [50, 300, 959, 1117],
+  "room-04": [412, 662, 959, 1117],
+  "room-01": [50, 300, 1131, 1294],
+  "room-02": [412, 662, 1131, 1294],
+};
 
 function expectedWorld(pair: CoordinatePair) {
   return {
@@ -73,6 +89,28 @@ test("room interiors do not overlap and both corridor arms meet as a T", () => {
   const vertical = bounds(config.regions.find((region) => region.id === "corridor-vertical")!);
   assert.equal(horizontal.maxY, vertical.minY);
   assert.ok(vertical.minX > horizontal.minX && vertical.maxX < horizontal.maxX);
+});
+
+test("room polygons stay 10 cm from the corridor door wall and 30 cm from other walls", () => {
+  const rooms = config.regions.filter((region) => region.kind === "room");
+
+  for (const room of rooms) {
+    const wall = ROOM_WALL_BOUNDS[room.id];
+    const area = bounds(room);
+    const normal = room.entrances[0]?.inwardNormal;
+    assert.ok(wall, `${room.id}: duvar sınırları eksik`);
+    assert.deepEqual([
+      area.minX - wall[0],
+      wall[1] - area.maxX,
+      area.minY - wall[2],
+      wall[3] - area.maxY,
+    ], [
+      normal?.x === 1 ? 3 : 9,
+      normal?.x === -1 ? 3 : 9,
+      normal?.y === -1 ? 3 : 9,
+      normal?.y === 1 ? 3 : 9,
+    ], `${room.id}: 30 px/m ölçeğinde duvar boşlukları hatalı`);
+  }
 });
 
 test("every room has one doorway connected to the correct corridor", () => {

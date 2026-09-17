@@ -1,4 +1,5 @@
 import type { TrackingPosition } from "../trackingBuffer";
+import type { ResolvedDoorSettings, ResolvedRoomSettings } from "../../features/regions/types/region.types";
 
 export type VehicleRegionState =
   | "TRACKING_OUTSIDE"
@@ -8,19 +9,13 @@ export type VehicleRegionState =
   | "EXIT_CANDIDATE"
   | "LOCATION_LOST";
 
-export interface RegionEngineRules {
-  readonly evidenceDurationMs?: number;
-  readonly evidenceWindowMs?: number;
-  readonly maxEvidenceGapMs?: number;
-  readonly expectedIntervalMs?: number;
-  readonly maxSpeedMetersPerSecond?: number;
-  readonly lostAfterMs?: number;
-  readonly relocationAfterMs?: number;
-  readonly maxTags?: number;
-  readonly historySize?: number;
-  readonly entryConfirmationCount: number;
-  readonly exitConfirmationCount: number;
-  readonly exitMarginMeters: number;
+export type RegionEngineRules = ResolvedRoomSettings & { readonly maxTags: number; readonly historySize: number };
+
+export interface CompiledDoor {
+  readonly id: string; readonly x: number; readonly y: number;
+  readonly widthMeters?: number; readonly inwardNormal?: { readonly x: number; readonly y: number };
+  readonly connectsTo?: string; readonly approachDepthMeters?: number; readonly crossingDepthMeters?: number;
+  readonly settings: ResolvedDoorSettings;
 }
 
 export interface CompiledRegion {
@@ -29,10 +24,12 @@ export interface CompiledRegion {
   readonly expectedIntervalMs?: number;
   readonly wallBandMeters?: number;
   readonly sharedWallBandMeters?: number;
+  readonly settings: ResolvedRoomSettings;
+  readonly usesDoorPolicy: boolean;
   readonly id: string;
   readonly polygon: readonly { readonly x: number; readonly y: number }[];
   readonly roomCenter: { readonly x: number; readonly y: number };
-  readonly entrances: readonly ({ readonly id: string; readonly x: number; readonly y: number } & Pick<import("../../features/regions/types/region.types").RegionEntrance, "widthMeters" | "inwardNormal" | "connectsTo" | "approachDepthMeters" | "crossingDepthMeters">)[];
+  readonly entrances: readonly CompiledDoor[];
   readonly bounds: { readonly minX: number; readonly minY: number; readonly maxX: number; readonly maxY: number };
 }
 
@@ -88,4 +85,19 @@ export interface RegionEngineStatus {
   readonly activeVehicleCount: number;
   readonly vehiclesInRegions: number;
   readonly configLoaded: boolean;
+  readonly configVersion?: string;
+  readonly warnings?: readonly string[];
+  readonly diagnostics?: readonly RegionVehicleDiagnostic[];
+}
+
+export interface EvidenceScoreComponents {
+  readonly base: number; readonly duration: number; readonly measurements: number; readonly door: number; readonly total: number;
+}
+export interface RegionVehicleDiagnostic {
+  readonly vehicleId: string; readonly state: VehicleRegionState; readonly activeRegionId: string | null;
+  readonly candidateRegionId: string | null; readonly doorId: string | null; readonly doorDirection: "entry" | "exit" | null;
+  readonly doorEvidenceMode: string | null; readonly collectedDurationMs: number; readonly requiredDurationMs: number;
+  readonly collectedMeasurements: number; readonly requiredMeasurements: number; readonly lastMeasurementQuality: number | null;
+  readonly doorEvidenceRemainingMs: number | null; readonly score: EvidenceScoreComponents;
+  readonly reasons: readonly string[]; readonly configVersion?: string;
 }

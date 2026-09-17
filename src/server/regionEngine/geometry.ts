@@ -1,6 +1,10 @@
 import type { CompiledRegion } from "./types";
 
 type Point = { readonly x: number; readonly y: number };
+export interface DoorCrossingResult {
+  readonly doorId: string; readonly direction: "entry" | "exit"; readonly occurredAt: number;
+  readonly directionalMovementMeters: number; readonly evidenceWeight: number;
+}
 
 export function pointInPolygon(point: Point, region: CompiledRegion): boolean {
   const { bounds, polygon } = region;
@@ -29,19 +33,27 @@ export function wallDistance(point: Point, region: CompiledRegion): number {
 }
 
 /** Directed crossing of a defined door opening; never infer a normal from a centre. */
-export function crossesDoor(from: Point, to: Point, region: CompiledRegion, inward: boolean, connectedArea?: string | null): boolean {
-  return region.entrances.some((door) => {
-    if (!door.inwardNormal || !door.widthMeters || !door.connectsTo) return false;
-    if (connectedArea && door.connectsTo !== connectedArea) return false;
+export function crossesDoor(from: Point, to: Point, region: CompiledRegion, inward: boolean, connectedArea?: string | null, occurredAt = Date.now()): DoorCrossingResult | null {
+  for (const door of region.entrances) {
+    const direction = inward ? "entry" : "exit";
+    if (!door.settings.enabled || door.settings.evidenceMode === "ignored") continue;
+    if (inward && door.settings.direction === "exit-only") continue;
+    if (!inward && door.settings.direction === "entry-only") continue;
+    if (!door.inwardNormal || !door.widthMeters || !door.connectsTo) continue;
+    if (connectedArea && door.connectsTo !== connectedArea) continue;
     const n = door.inwardNormal;
     const side = (p: Point) => (p.x - door.x) * n.x + (p.y - door.y) * n.y;
     const a = side(from), b = side(to), depth = door.crossingDepthMeters ?? 0.15;
-    if (inward ? !(a <= -depth && b >= depth) : !(a >= depth && b <= -depth)) return false;
-    if (Math.max(Math.abs(a), Math.abs(b)) > (door.approachDepthMeters ?? 2)) return false;
+    if (inward ? !(a <= -depth && b >= depth) : !(a >= depth && b <= -depth)) continue;
+    if (Math.max(Math.abs(a), Math.abs(b)) > (door.approachDepthMeters ?? 2)) continue;
     const t = -a / (b - a);
     const lateral = Math.abs((from.x + t * (to.x - from.x) - door.x) * -n.y + (from.y + t * (to.y - from.y) - door.y) * n.x);
-    return lateral <= door.widthMeters / 2;
-  });
+    const movement = Math.abs(b - a);
+    if (lateral > door.widthMeters / 2 || movement < door.settings.minimumDirectionalMovementMeters) continue;
+    return { doorId: door.id, direction, occurredAt, directionalMovementMeters: movement,
+      evidenceWeight: inward ? door.settings.entryEvidenceWeight : door.settings.exitEvidenceWeight };
+  }
+  return null;
 }
 
 export function distanceFromPolygon(point: Point, region: CompiledRegion): number {

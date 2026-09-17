@@ -5,7 +5,7 @@ import type Konva from "konva";
 import { Circle, Group, Image as KonvaImage, Layer, Line, Rect, Stage, Text } from "react-konva";
 import useImage from "use-image";
 import {
-  Check, Crosshair, Download, DoorOpen, Hexagon, MousePointer2, Plus, Save,
+  Check, CircleHelp, Crosshair, Download, DoorOpen, Hexagon, MousePointer2, Plus, Save,
   Power, Trash2, Upload, X,
 } from "lucide-react";
 import { MAP_FLOOR_PLAN, MAP_VIEWPORT_LIMITS } from "@/src/features/map/config/mapConfig";
@@ -13,18 +13,20 @@ import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { TAG_LIVE_TIMEOUT_MS } from "@/src/features/tracking/types/tracking.types";
 import { useElementSize } from "@/src/shared/hooks/useElementSize";
 import { DEFAULT_REGIONS_CONFIG } from "../config/defaultRegionsConfig";
+import { nextParameterHelpVisibility } from "../config/inferenceParameterHelp";
 import { createAffineTransform, createInverseAffineTransform, withWorldCoordinates } from "../services/affineTransform";
 import { hasExceededDragThreshold, type RegionPointerGesture } from "../services/regionGesture";
 import { notifyRegionsConfigUpdated } from "../services/regionsConfig";
 import type { CoordinatePair, RegionDefinition, RegionEditorTool, RegionsConfig } from "../types/region.types";
 import { POSITION_ANIMATION_CONFIG_CHANGED_EVENT } from "@/src/features/tracking/config/positionAnimationConfig";
 import {
-  fetchRegionEngineStatus, REGION_ENGINE_STATUS_CHANGED_EVENT, reloadRegionEngineConfig, updateRegionEngineStatus,
+  fetchRegionEngineStatus, REGION_ENGINE_STATUS_CHANGED_EVENT, updateRegionEngineStatus,
   type RegionEngineStatusResponse,
 } from "../services/regionEngineApi";
 import styles from "./regions.module.css";
 
 import { RegionInferenceEditor } from "./RegionInferenceEditor";
+import { ParameterHelpPanel } from "./ParameterHelpPanel";
 import { RawTagLayer } from "./RawTagLayer";
 import { createRawTagMarkers } from "../services/rawTagPresentation";
 type SelectedPoint = { readonly type: "polygon" | "center" | "entrance"; readonly index: number } | null;
@@ -78,6 +80,9 @@ export function RegionManagementPanel() {
   const [engineStatus, setEngineStatus] = useState<RegionEngineStatusResponse | null>(null);
   const [engineUpdating, setEngineUpdating] = useState(false);
   const [showRawTagPositions, setShowRawTagPositions] = useState(false);
+  const [propertyHelpOpen, setPropertyHelpOpen] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const savedConfigRef = useRef("");
   const [rawTagClock, setRawTagClock] = useState(() => Date.now());
   const observedTags = useIpsStore((state) => state.observedTags);
 
@@ -111,6 +116,7 @@ export function RegionManagementPanel() {
         const payload = await response.json() as { config: RegionsConfig };
         const source = payload.config.regions.length > 0 || !stored ? payload.config : JSON.parse(stored) as RegionsConfig;
         const normalized = configWithSystemMap(source);
+        savedConfigRef.current = JSON.stringify(normalized);
         setConfig(normalized);
         setSelectedRegionId(normalized.regions[0]?.id ?? null);
         setStatus("Kaydedilmiş oda/bölge ayarları yüklendi");
@@ -118,6 +124,7 @@ export function RegionManagementPanel() {
         if (!stored) return;
         try {
           const normalized = configWithSystemMap(JSON.parse(stored) as RegionsConfig);
+          savedConfigRef.current = JSON.stringify(normalized);
           setConfig(normalized);
           setSelectedRegionId(normalized.regions[0]?.id ?? null);
           setStatus("Yerel oda/bölge ayarları yüklendi");
@@ -130,6 +137,16 @@ export function RegionManagementPanel() {
   }, []);
 
   useEffect(() => {
+    if (!savedConfigRef.current) return;
+    setHasUnsavedChanges(JSON.stringify(configWithSystemMap(config)) !== savedConfigRef.current);
+  }, [config]);
+
+  useEffect(() => {
+    const warn = (event: BeforeUnloadEvent) => { if (!hasUnsavedChanges) return; event.preventDefault(); event.returnValue = ""; };
+    window.addEventListener("beforeunload", warn); return () => window.removeEventListener("beforeunload", warn);
+  }, [hasUnsavedChanges]);
+
+  useEffect(() => {
     void fetchRegionEngineStatus().then(setEngineStatus).catch((error) => {
       setStatus(error instanceof Error ? error.message : "Oda tespit modu durumu alınamadı");
     });
@@ -137,7 +154,6 @@ export function RegionManagementPanel() {
 
   useEffect(() => {
     if (!showRawTagPositions) return;
-    setRawTagClock(Date.now());
     const timer = window.setInterval(() => setRawTagClock(Date.now()), 1_000);
     return () => window.clearInterval(timer);
   }, [showRawTagPositions]);
@@ -309,22 +325,28 @@ export function RegionManagementPanel() {
       return;
     }
     const normalized = configWithSystemMap(config);
-    window.localStorage.setItem("ips-regions-config", JSON.stringify(normalized));
-    setConfig(normalized);
+    if (!window.confirm("Ayarların uygulanması aktif oda kararlarını yeniden doğrulama durumuna geçirir. Yeni ölçümler geldikçe odalar tekrar doğrulanacaktır. Devam edilsin mi?")) return;
     try {
+      const validationResponse = await fetch("/api/regions/validate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(normalized) });
+      const validation = await validationResponse.json() as { valid?: boolean; error?: string; warnings?: readonly string[] };
+      if (!validationResponse.ok || !validation.valid) throw new Error(validation.error || "Config backend doğrulamasından geçemedi");
       const response = await fetch("/api/regions", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify(normalized) });
-      const payload = await response.json() as { error?: string; config?: RegionsConfig };
+      const payload = await response.json() as { error?: string; config?: RegionsConfig; configVersion?: string };
       if (!response.ok) throw new Error(payload.error || "Config dosyasına yazılamadı");
-      await reloadRegionEngineConfig(payload.config ?? normalized);
+      const saved = payload.config ?? normalized;
+      window.localStorage.setItem("ips-regions-config", JSON.stringify(saved));
+      savedConfigRef.current = JSON.stringify(saved);
+      setConfig(saved); setHasUnsavedChanges(false);
       window.dispatchEvent(new CustomEvent(
         POSITION_ANIMATION_CONFIG_CHANGED_EVENT,
-        { detail: (payload.config ?? normalized).positionAnimation },
+        { detail: saved.positionAnimation },
       ));
-      notifyRegionsConfigUpdated(payload.config ?? normalized);
-      setStatus("Oda/bölge ayarları kaydedildi");
+      notifyRegionsConfigUpdated(saved);
+      void fetchRegionEngineStatus().then(setEngineStatus);
+      setStatus(`Oda/bölge ayarları kaydedildi${payload.configVersion ? ` · ${payload.configVersion}` : ""}`);
     } catch (error) {
       setErrors([error instanceof Error ? error.message : "Config dosyasına yazılamadı"]);
-      setStatus("Tarayıcıya kaydedildi; config dosyasına yazılamadı");
+      setStatus("Config kaydedilmedi; mevcut çalışan ayarlar korundu");
     }
   };
 
@@ -402,7 +424,10 @@ export function RegionManagementPanel() {
           aria-checked={showRawTagPositions}
           aria-label={`Ham tag konumları görünümünü ${showRawTagPositions ? "kapat" : "aç"}`}
           className={`${styles.rawTagToggle} ${showRawTagPositions ? styles.rawTagToggleEnabled : ""}`}
-          onClick={() => setShowRawTagPositions((current) => !current)}
+          onClick={() => {
+            if (!showRawTagPositions) setRawTagClock(Date.now());
+            setShowRawTagPositions((current) => !current);
+          }}
         >
           <Crosshair size={14} />
           <span>HAM TAG KONUMLARI</span>
@@ -412,7 +437,7 @@ export function RegionManagementPanel() {
           <input ref={fileInputRef} type="file" accept="application/json,.json" hidden onChange={(event) => { const file = event.target.files?.[0]; if (file) void importConfig(file); event.currentTarget.value = ""; }} />
           <button onClick={() => fileInputRef.current?.click()}><Upload size={14} /> Config yükle</button>
           <button onClick={() => downloadJson(configWithSystemMap(config))}><Download size={14} /> Dışa aktar</button>
-          <button className={styles.primary} onClick={saveConfig}><Save size={14} /> Kaydet</button>
+          <button className={styles.primary} onClick={saveConfig}><Save size={14} /> {hasUnsavedChanges ? "Kaydet *" : "Kaydet"}</button>
         </div>
       </header>
 
@@ -488,7 +513,25 @@ export function RegionManagementPanel() {
         </div>
 
         <aside className={styles.properties}>
-          <div className={styles.panelTitle}><div><span>ÖZELLİKLER</span><strong>{selectedRegion ? "Seçili oda/bölge" : "Oda/bölge seçilmedi"}</strong></div></div>
+          <div className={styles.panelTitle}>
+            <div><span>ÖZELLİKLER</span><strong>{selectedRegion ? "Seçili oda/bölge" : "Oda/bölge seçilmedi"}</strong></div>
+            <button
+              type="button"
+              className={`${styles.propertyHelpButton} ${propertyHelpOpen ? styles.propertyHelpButtonActive : ""}`}
+              onClick={() => setPropertyHelpOpen(current => nextParameterHelpVisibility(current, "toggle"))}
+              title="Özellik ve hesaplama rehberi"
+              aria-label="Özellik ve hesaplama rehberini aç"
+              aria-expanded={propertyHelpOpen}
+              aria-controls="region-property-help"
+            >
+              <CircleHelp size={16} />
+            </button>
+          </div>
+          <ParameterHelpPanel
+            id="region-property-help"
+            open={propertyHelpOpen}
+            onClose={() => setPropertyHelpOpen(current => nextParameterHelpVisibility(current, "close"))}
+          />
           {!selectedRegion ? <div className={styles.empty}><MousePointer2 size={24} /><strong>Bir oda/bölge seçin</strong><span>Özellikleri burada düzenleyebilirsiniz.</span></div> : <>
             <section className={styles.pointListSection}>
               <div className={styles.pointListTitle}><span>NOKTA KOORDİNATLARI</span><strong>{coordinateItems.length} nokta</strong></div>
@@ -514,7 +557,7 @@ export function RegionManagementPanel() {
             </section> : coordinateItems.length > 0 && <div className={styles.selectHint}><MousePointer2 size={14} /> İnce ayar için listeden veya haritadan bir nokta seçin.</div>}
             <label><span>Oda/bölge adı</span><input value={selectedRegion.name} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, name: event.target.value }))} /></label>
             <div className={styles.fieldRow}><label><span>Kimlik</span><input value={selectedRegion.id} readOnly /></label><label className={styles.colorField}><span>Renk</span><input type="color" value={selectedRegion.color} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, color: event.target.value }))} /></label></div>
-            <RegionInferenceEditor key={`${selectedRegion.id}-${JSON.stringify(selectedRegion.entrances)}`} region={selectedRegion} onChange={region => updateRegion(region.id, () => region)} />
+            <RegionInferenceEditor region={selectedRegion} config={config} onConfigChange={setConfig} engineStatus={engineStatus} />
             <div className={styles.metrics}><div><span>ÇOKGEN</span><strong>{selectedRegion.polygon.length}</strong><small>köşe</small></div><div><span>GİRİŞLER</span><strong>{selectedRegion.entrances.length}</strong><small>nokta</small></div></div>
             <section className={styles.coordinateSection}><h2>Gerçek dünya koordinatları</h2>{selectedRegion.roomCenter ? <p>Merkez: <code>{selectedRegion.roomCenter.world.x.toFixed(2)}, {selectedRegion.roomCenter.world.y.toFixed(2)} m</code></p> : <p>Oda merkezi tanımlanmadı.</p>}<small>Haritadaki bir noktayı seçerek koordinatlarını ince ayarlayabilirsiniz.</small></section>
             {selectedPoint && <button className={styles.deletePoint} onClick={deleteSelectedPoint}><X size={14} /> Seçili noktayı sil</button>}

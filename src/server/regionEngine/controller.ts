@@ -4,7 +4,7 @@ import { compileRegionsConfig, loadRegionsConfig } from "./configLoader";
 import { ProcessedPositionServer } from "./ProcessedPositionServer";
 import { RegionPositionEngine } from "./RegionPositionEngine";
 import { getRegionEngineRuntimeConfig } from "./runtimeConfig";
-import type { RegionEngineStatus } from "./types";
+import type { CompiledRegionsConfig, RegionEngineStatus } from "./types";
 import { logger } from "../logger";
 import { roomDecisions } from "../location/roomDecisionRepository";
 
@@ -54,6 +54,10 @@ export class RegionEngineController {
 
   public reloadConfig(config: RegionsConfig): void {
     const compiled = compileRegionsConfig(config);
+    this.reloadCompiledConfig(compiled);
+  }
+
+  public reloadCompiledConfig(compiled: CompiledRegionsConfig): void {
     if (this.isEnabled()) this.engine.reload(compiled);
     this.warnings = compiled.warnings ?? [];
   }

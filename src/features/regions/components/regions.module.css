@@ -29,7 +29,7 @@
 .headerActions button:hover, .panelTitle button:hover, .tools button:hover { color: #087f73; border-color: rgba(0,168,150,.42); background: #e8f8f5; }
 .headerActions .primary { color: #fff; border-color: #087f73; background: #087f73; }
 .headerActions .primary:hover { color: #fff; background: #06685e; }
-.editor { flex: 1; min-height: 0; display: grid; grid-template-columns: 210px minmax(0, 1fr) 285px; overflow: hidden; border: 1px solid #bfd0dd; border-radius: 6px; background: rgba(255,255,255,.88); box-shadow: 0 20px 55px rgba(53,75,100,.12); }
+.editor { flex: 1; min-height: 0; display: grid; grid-template-columns: 210px minmax(0, 1fr) 355px; overflow: hidden; border: 1px solid #bfd0dd; border-radius: 6px; background: rgba(255,255,255,.88); box-shadow: 0 20px 55px rgba(53,75,100,.12); }
 .zonePanel, .properties { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: rgba(249,252,255,.96); }
 .zonePanel { border-right: 1px solid #cbd9e3; }
 .properties { padding-bottom: 13px; overflow-y: auto; border-left: 1px solid #cbd9e3; }
@@ -37,6 +37,51 @@
 .panelTitle span, .mapInfo > span { display: block; color: #7a8da1; font: 7px ui-monospace, monospace; letter-spacing: .13em; }
 .panelTitle strong { display: block; margin-top: 4px; color: #30465d; font-size: 10px; }
 .panelTitle button { width: 29px; height: 29px; padding: 0; }
+.propertyHelpButton { flex: 0 0 auto; color: #587087; transition: color .16s ease, border-color .16s ease, background-color .16s ease, box-shadow .16s ease; }
+.propertyHelpButtonActive { color: #087f73 !important; border-color: #87cec4 !important; background: #e5f7f4 !important; box-shadow: 0 0 0 2px rgba(0,168,150,.08); }
+.propertyHelpButton:focus-visible, .parameterHelpPanel button:focus-visible, .parameterHelpPanel input:focus-visible, .parameterHelpGroup summary:focus-visible { outline: 2px solid #087f73; outline-offset: 2px; }
+.parameterHelpPanel { margin: 10px 11px 1px; padding: 11px; border: 1px solid #a9d9d2; border-radius: 6px; background: linear-gradient(145deg, #f2fbf9, #f7fbff); box-shadow: 0 8px 22px rgba(53,75,100,.09); overflow-wrap: anywhere; }
+.parameterHelpPanel[hidden] { display: none; }
+.parameterHelpHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 9px; }
+.parameterHelpHeader span { display: block; color: #087f73; font: 7px ui-monospace, monospace; letter-spacing: .12em; }
+.parameterHelpHeader h2 { margin: 4px 0 0; color: #24445b; font-size: 12px; line-height: 1.35; }
+.parameterHelpHeader button { flex: 0 0 auto; width: 27px; height: 27px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 1px solid #bad6d3; border-radius: 5px; background: #fff; color: #597489; cursor: pointer; }
+.parameterHelpHeader button:hover { color: #087f73; border-color: #87cec4; background: #e8f8f5; }
+.parameterHelpIntro { margin: 10px 0; color: #526c81; font-size: 10px; line-height: 1.55; }
+.parameterWarning { padding: 9px 10px; border: 1px solid #e8cd91; border-radius: 5px; background: #fff9e8; color: #755919; }
+.parameterWarning strong { display: block; font-size: 10px; }
+.parameterWarning p { margin: 5px 0 0; font-size: 10px; line-height: 1.5; }
+.parameterHelpSearch { position: relative; display: grid; grid-template-columns: 20px minmax(0, 1fr) 25px; align-items: center; margin-top: 10px; border: 1px solid #bdd3df; border-radius: 5px; background: #fff; color: #6c8397; }
+.parameterHelpSearch:focus-within { border-color: rgba(0,168,150,.65); box-shadow: 0 0 0 3px rgba(0,168,150,.08); }
+.parameterHelpSearch > svg { margin-left: 7px; }
+.parameterHelpSearch input { width: 100%; min-width: 0; height: 34px; padding: 0 5px; border: 0; outline: 0; background: transparent; color: #26394f; font-size: 10px; }
+.parameterHelpSearch button { width: 25px; height: 25px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 0; background: transparent; color: #70869a; cursor: pointer; }
+.parameterHelpMode { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-top: 8px; }
+.parameterHelpMode button { min-height: 29px; padding: 0 6px; border: 1px solid #c8d9e3; border-radius: 4px; background: #fff; color: #647a90; font-size: 8px; cursor: pointer; }
+.parameterHelpMode .parameterHelpModeActive { color: #087f73; border-color: #8fcfc6; background: #e5f7f4; font-weight: 650; }
+.parameterHelpGroups { display: grid; gap: 6px; margin-top: 10px; }
+.parameterHelpGroup { min-width: 0; overflow: hidden; border: 1px solid #cbdde5; border-radius: 5px; background: rgba(255,255,255,.88); }
+.parameterHelpGroup summary { display: flex; align-items: center; justify-content: space-between; gap: 7px; padding: 9px; color: #36536a; cursor: pointer; font-size: 9px; font-weight: 650; }
+.parameterHelpGroup summary small { flex: 0 0 auto; color: #71889c; font: 7px ui-monospace, monospace; }
+.parameterHelpGroup[open] summary { border-bottom: 1px solid #d8e5eb; background: #f0faf8; color: #087f73; }
+.parameterHelpGroup > div { display: grid; gap: 7px; padding: 7px; }
+.parameterHelpItem { min-width: 0; padding: 9px; border: 1px solid #d9e5eb; border-radius: 5px; background: #fff; color: #50697e; }
+.parameterHelpItemTitle { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.parameterHelpItemTitle > strong { margin-right: auto; color: #243f56; font-size: 10px; line-height: 1.4; }
+.parameterBadge, .parameterUnit { display: inline-flex; align-items: center; min-height: 18px; padding: 0 5px; border-radius: 9px; font: 7px ui-monospace, monospace; white-space: nowrap; }
+.parameterBadge { color: #087f73; background: #e3f7f4; }
+.parameterUnit { color: #596f83; background: #edf3f6; }
+.parameterHelpItem p { margin: 7px 0 0; font-size: 10px; line-height: 1.55; }
+.parameterHelpItem b { color: #314e65; font-weight: 650; }
+.parameterDirectionEffects { margin-top: 7px; padding: 1px 8px 7px; border-left: 2px solid #9fcdc7; background: #f6fbfb; }
+.parameterFormula { margin: 8px 0 0; padding: 8px; overflow-x: auto; border: 1px solid #c8dce4; border-radius: 4px; background: #edf6f8; color: #075f58; font: 8px/1.55 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.parameterExample, .parameterItemWarning { margin-top: 7px; padding: 7px 8px; border-radius: 4px; font-size: 9px; line-height: 1.5; }
+.parameterExample { border: 1px solid #bddfd9; background: #effaf8; color: #315e5a; }
+.parameterItemWarning { border: 1px solid #ead39d; background: #fff9e9; color: #765a1b; }
+.parameterHelpEmpty { display: flex; flex-direction: column; align-items: center; padding: 18px 10px; color: #71879a; text-align: center; }
+.parameterHelpEmpty strong { color: #3f5d73; font-size: 10px; }
+.parameterHelpEmpty span { margin-top: 5px; font-size: 9px; line-height: 1.5; }
+.srOnly { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
 .zoneList { flex: 1; min-height: 0; overflow-y: auto; padding: 7px; }
 .zoneList > button { position: relative; width: 100%; min-height: 50px; display: grid; grid-template-columns: 8px minmax(0,1fr); align-items: center; gap: 10px; margin-bottom: 4px; padding: 8px; border: 1px solid transparent; border-radius: 5px; background: transparent; text-align: left; cursor: pointer; }
 .zoneList > button:hover { border-color: #d2e1e9; background: #f0f7fa; }
@@ -82,11 +127,32 @@
 .colorField input { padding: 3px; cursor: pointer; }
 .inferenceEditor { margin: 14px 13px 0; padding: 11px; border: 1px solid #c9dbe3; border-radius: 5px; background: #f7fbff; }
 .inferenceEditor h3 { margin: 0 0 10px; color: #455e76; font-size: 10px; font-weight: 650; }
+.inferenceEditor details { margin-top: 9px; border-top: 1px solid #d9e5ec; padding-top: 8px; }
+.inferenceEditor summary { color: #36536a; cursor: pointer; font-size: 9px; font-weight: 650; }
+.inferenceTabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; margin: -3px -3px 11px; }
+.inferenceTabs button { min-width: 0; min-height: 30px; padding: 0 3px; border: 1px solid #c9d9e5; border-radius: 4px; background: #fff; color: #647a90; font-size: 7px; cursor: pointer; }
+.inferenceTabs .activeInferenceTab { border-color: #8fcfc6; background: #e6f8f5; color: #087f73; }
+.settingHelp { color: #70869a; font-size: 8px; line-height: 1.5; }
 .inferenceFields { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 8px; }
 .inferenceFields label { min-width: 0; }
 .inferenceFields label > span { display: block; margin-bottom: 5px; color: #647a90; font-size: 8px; }
-.inferenceFields input, .inferenceFields select { width: 100%; min-width: 0; height: 32px; padding: 0 8px; border: 1px solid #c9d9e5; border-radius: 5px; outline: none; background: #fff; color: #26394f; font-size: 9px; }
+.inferenceFields input, .inferenceFields select, .doorPicker, .bulkActions select { box-sizing: border-box; width: 100%; min-width: 0; height: 32px; padding: 0 8px; border: 1px solid #c9d9e5; border-radius: 5px; outline: none; background: #fff; color: #26394f; font-size: 9px; }
+.inferenceFields input:disabled, .inferenceFields select:disabled { color: #7d8d9c; background: #edf3f6; }
 .inferenceFields input:focus, .inferenceFields select:focus { border-color: rgba(0,168,150,.55); box-shadow: 0 0 0 3px rgba(0,168,150,.08); }
+.overrideGrid { display: grid; gap: 8px; margin-top: 8px; }
+.overrideRow { padding: 8px; border: 1px solid #d8e4eb; border-radius: 5px; background: #fff; }
+.overrideRow > small { display: block; margin-top: 6px; color: #768b9e; font-size: 7px; line-height: 1.4; }
+.rowActions { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 7px; }
+.rowActions button, .resetGroup { min-height: 26px; padding: 0 5px; border: 1px solid #cadde4; border-radius: 4px; background: #f5fafc; color: #587087; font-size: 7px; cursor: pointer; }
+.resetGroup { width: 100%; margin-top: 7px; color: #9a6b15; border-color: #eadab8; background: #fff9ec; }
+.overrideToggle { display: flex; align-items: center; gap: 6px; margin: 7px 0; color: #536d82; font-size: 8px; }
+.overrideToggle input { width: 14px; height: 14px; margin: 0; }
+.bulkActions { display: grid; gap: 6px; margin-top: 10px; }
+.bulkActions button { min-height: 30px; border: 1px solid #b9d9d5; border-radius: 5px; background: #f2faf9; color: #087f73; font-size: 8px; cursor: pointer; }
+.doorPicker { margin-bottom: 8px; }
+.diagnosticCard { display: grid; gap: 4px; margin-top: 8px; padding: 9px; border: 1px solid #d1e0e8; border-radius: 5px; background: #fff; color: #60778c; font-size: 8px; }
+.diagnosticCard strong { color: #24445b; font-size: 9px; }
+.diagnosticCard small { color: #087f73; line-height: 1.4; }
 .entranceDetails { margin-top: 11px; color: #647a90; font-size: 8px; line-height: 1.45; }
 .entranceDetails summary { color: #36536a; cursor: pointer; font-size: 9px; font-weight: 600; }
 .entranceDetails p { margin: 9px 0; }
@@ -138,14 +204,14 @@
 .errors p { margin: 3px 0; font-size: 8px; line-height: 1.4; }
 
 @media (max-width: 1180px) {
-  .editor { grid-template-columns: 175px minmax(0,1fr) 250px; }
+  .editor { grid-template-columns: 175px minmax(0,1fr) 305px; }
   .tools button span { display: none; }
   .systemMap { display: none; }
   .header { grid-template-columns: minmax(150px,1fr) auto auto auto; }
 }
 
 @media (max-width: 850px) {
-  .editor { grid-template-columns: 135px minmax(320px,1fr) 225px; overflow-x: auto; }
+  .editor { grid-template-columns: 135px minmax(320px,1fr) 260px; overflow-x: auto; }
   .headerActions button { padding: 0 7px; }
   .headerActions button:not(.primary) { font-size: 0; }
 }
@@ -188,9 +254,15 @@
   .rawTagStatus { right: 8px; bottom: 98px; max-width: calc(100% - 16px); }
   .properties { order: 3; overflow: visible; padding-bottom: 13px; }
   .properties > .panelTitle { border-top: 1px solid #cbd9e3; }
+  .parameterHelpPanel { margin-right: 11px; margin-left: 11px; }
   .pointList { max-height: 220px; }
   .properties > label, .fieldRow, .metrics, .coordinateSection, .pointListSection, .pointEditor, .selectHint, .deletePoint, .deleteZone, .errors { margin-right: 11px; margin-left: 11px; }
   .inferenceEditor { margin-right: 11px; margin-left: 11px; }
+  .inferenceTabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .coordinateGrid { grid-template-columns: 1fr 1fr; gap: 6px; }
   .deleteZone { margin-top: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .propertyHelpButton { transition: none; }
 }

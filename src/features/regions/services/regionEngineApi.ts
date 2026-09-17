@@ -8,6 +8,15 @@ export interface RegionEngineStatusResponse {
   readonly activeVehicleCount: number;
   readonly vehiclesInRegions: number;
   readonly configLoaded: boolean;
+  readonly configVersion?: string;
+  readonly diagnostics?: readonly {
+    readonly vehicleId: string; readonly state: string; readonly activeRegionId: string | null; readonly candidateRegionId: string | null;
+    readonly doorId: string | null; readonly doorDirection: "entry" | "exit" | null; readonly doorEvidenceMode: string | null;
+    readonly collectedDurationMs: number; readonly requiredDurationMs: number; readonly collectedMeasurements: number; readonly requiredMeasurements: number;
+    readonly lastMeasurementQuality: number | null; readonly doorEvidenceRemainingMs: number | null;
+    readonly score: { readonly base: number; readonly duration: number; readonly measurements: number; readonly door: number; readonly total: number };
+    readonly reasons: readonly string[];
+  }[];
 }
 
 export const REGION_ENGINE_STATUS_CHANGED_EVENT = "region-engine-status-changed";

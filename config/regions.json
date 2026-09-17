@@ -191,42 +191,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 50,
-            "y": 19
+            "x": 59,
+            "y": 28
           },
           "world": {
-            "x": 1.667,
-            "y": 43.167
+            "x": 1.967,
+            "y": 42.867
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 19
+            "x": 291,
+            "y": 28
           },
           "world": {
-            "x": 10,
-            "y": 43.167
+            "x": 9.7,
+            "y": 42.867
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 168
+            "x": 291,
+            "y": 165
           },
           "world": {
-            "x": 10,
-            "y": 38.2
+            "x": 9.7,
+            "y": 38.3
           }
         },
         {
           "pixel": {
-            "x": 50,
-            "y": 168
+            "x": 59,
+            "y": 165
           },
           "world": {
-            "x": 1.667,
-            "y": 38.2
+            "x": 1.967,
+            "y": 38.3
           }
         }
       ],
@@ -263,7 +263,26 @@
           "id": "room-13-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     },
     {
       "id": "room-14",
@@ -272,42 +291,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 412,
-            "y": 19
+            "x": 421,
+            "y": 28
           },
           "world": {
-            "x": 13.733,
-            "y": 43.167
+            "x": 14.033,
+            "y": 42.867
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 19
+            "x": 653,
+            "y": 28
           },
           "world": {
-            "x": 22.067,
-            "y": 43.167
+            "x": 21.767,
+            "y": 42.867
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 168
+            "x": 653,
+            "y": 165
           },
           "world": {
-            "x": 22.067,
-            "y": 38.2
+            "x": 21.767,
+            "y": 38.3
           }
         },
         {
           "pixel": {
-            "x": 412,
-            "y": 168
+            "x": 421,
+            "y": 165
           },
           "world": {
-            "x": 13.733,
-            "y": 38.2
+            "x": 14.033,
+            "y": 38.3
           }
         }
       ],
@@ -344,7 +363,26 @@
           "id": "room-14-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     },
     {
       "id": "room-11",
@@ -353,42 +391,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 50,
-            "y": 278
+            "x": 59,
+            "y": 287
           },
           "world": {
-            "x": 1.667,
-            "y": 34.533
+            "x": 1.967,
+            "y": 34.233
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 278
+            "x": 297,
+            "y": 287
           },
           "world": {
-            "x": 10,
-            "y": 34.533
+            "x": 9.9,
+            "y": 34.233
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 432
+            "x": 297,
+            "y": 423
           },
           "world": {
-            "x": 10,
-            "y": 29.4
+            "x": 9.9,
+            "y": 29.7
           }
         },
         {
           "pixel": {
-            "x": 50,
-            "y": 432
+            "x": 59,
+            "y": 423
           },
           "world": {
-            "x": 1.667,
-            "y": 29.4
+            "x": 1.967,
+            "y": 29.7
           }
         }
       ],
@@ -425,7 +463,26 @@
           "id": "room-11-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     },
     {
       "id": "room-12",
@@ -434,42 +491,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 412,
-            "y": 278
+            "x": 415,
+            "y": 287
           },
           "world": {
-            "x": 13.733,
-            "y": 34.533
+            "x": 13.833,
+            "y": 34.233
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 278
+            "x": 653,
+            "y": 287
           },
           "world": {
-            "x": 22.067,
-            "y": 34.533
+            "x": 21.767,
+            "y": 34.233
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 432
+            "x": 653,
+            "y": 423
           },
           "world": {
-            "x": 22.067,
-            "y": 29.4
+            "x": 21.767,
+            "y": 29.7
           }
         },
         {
           "pixel": {
-            "x": 412,
-            "y": 432
+            "x": 415,
+            "y": 423
           },
           "world": {
-            "x": 13.733,
-            "y": 29.4
+            "x": 13.833,
+            "y": 29.7
           }
         }
       ],
@@ -506,7 +563,26 @@
           "id": "room-12-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     },
     {
       "id": "room-09",
@@ -515,42 +591,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 50,
-            "y": 446
+            "x": 59,
+            "y": 455
           },
           "world": {
-            "x": 1.667,
-            "y": 28.933
+            "x": 1.967,
+            "y": 28.633
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 446
+            "x": 297,
+            "y": 455
           },
           "world": {
-            "x": 10,
-            "y": 28.933
+            "x": 9.9,
+            "y": 28.633
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 599
+            "x": 297,
+            "y": 590
           },
           "world": {
-            "x": 10,
-            "y": 23.833
+            "x": 9.9,
+            "y": 24.133
           }
         },
         {
           "pixel": {
-            "x": 50,
-            "y": 599
+            "x": 59,
+            "y": 590
           },
           "world": {
-            "x": 1.667,
-            "y": 23.833
+            "x": 1.967,
+            "y": 24.133
           }
         }
       ],
@@ -587,7 +663,26 @@
           "id": "room-09-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     },
     {
       "id": "room-10",
@@ -596,42 +691,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 412,
-            "y": 446
+            "x": 415,
+            "y": 455
           },
           "world": {
-            "x": 13.733,
-            "y": 28.933
+            "x": 13.833,
+            "y": 28.633
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 446
+            "x": 653,
+            "y": 455
           },
           "world": {
-            "x": 22.067,
-            "y": 28.933
+            "x": 21.767,
+            "y": 28.633
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 599
+            "x": 653,
+            "y": 590
           },
           "world": {
-            "x": 22.067,
-            "y": 23.833
+            "x": 21.767,
+            "y": 24.133
           }
         },
         {
           "pixel": {
-            "x": 412,
-            "y": 599
+            "x": 415,
+            "y": 590
           },
           "world": {
-            "x": 13.733,
-            "y": 23.833
+            "x": 13.833,
+            "y": 24.133
           }
         }
       ],
@@ -668,7 +763,26 @@
           "id": "room-10-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     },
     {
       "id": "room-07",
@@ -677,42 +791,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 50,
-            "y": 614
+            "x": 59,
+            "y": 623
           },
           "world": {
-            "x": 1.667,
-            "y": 23.333
+            "x": 1.967,
+            "y": 23.033
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 614
+            "x": 297,
+            "y": 623
           },
           "world": {
-            "x": 10,
-            "y": 23.333
+            "x": 9.9,
+            "y": 23.033
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 773
+            "x": 297,
+            "y": 764
           },
           "world": {
-            "x": 10,
-            "y": 18.033
+            "x": 9.9,
+            "y": 18.333
           }
         },
         {
           "pixel": {
-            "x": 50,
-            "y": 773
+            "x": 59,
+            "y": 764
           },
           "world": {
-            "x": 1.667,
-            "y": 18.033
+            "x": 1.967,
+            "y": 18.333
           }
         }
       ],
@@ -749,7 +863,26 @@
           "id": "room-07-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     },
     {
       "id": "room-08",
@@ -758,42 +891,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 412,
-            "y": 614
+            "x": 415,
+            "y": 623
           },
           "world": {
-            "x": 13.733,
-            "y": 23.333
+            "x": 13.833,
+            "y": 23.033
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 614
+            "x": 653,
+            "y": 623
           },
           "world": {
-            "x": 22.067,
-            "y": 23.333
+            "x": 21.767,
+            "y": 23.033
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 773
+            "x": 653,
+            "y": 764
           },
           "world": {
-            "x": 22.067,
-            "y": 18.033
+            "x": 21.767,
+            "y": 18.333
           }
         },
         {
           "pixel": {
-            "x": 412,
-            "y": 773
+            "x": 415,
+            "y": 764
           },
           "world": {
-            "x": 13.733,
-            "y": 18.033
+            "x": 13.833,
+            "y": 18.333
           }
         }
       ],
@@ -830,7 +963,26 @@
           "id": "room-08-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     },
     {
       "id": "room-05",
@@ -839,42 +991,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 50,
-            "y": 787
+            "x": 59,
+            "y": 796
           },
           "world": {
-            "x": 1.667,
-            "y": 17.567
+            "x": 1.967,
+            "y": 17.267
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 787
+            "x": 297,
+            "y": 796
           },
           "world": {
-            "x": 10,
-            "y": 17.567
+            "x": 9.9,
+            "y": 17.267
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 945
+            "x": 297,
+            "y": 936
           },
           "world": {
-            "x": 10,
-            "y": 12.3
+            "x": 9.9,
+            "y": 12.6
           }
         },
         {
           "pixel": {
-            "x": 50,
-            "y": 945
+            "x": 59,
+            "y": 936
           },
           "world": {
-            "x": 1.667,
-            "y": 12.3
+            "x": 1.967,
+            "y": 12.6
           }
         }
       ],
@@ -911,7 +1063,26 @@
           "id": "room-05-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     },
     {
       "id": "room-06",
@@ -920,42 +1091,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 412,
-            "y": 787
+            "x": 415,
+            "y": 796
           },
           "world": {
-            "x": 13.733,
-            "y": 17.567
+            "x": 13.833,
+            "y": 17.267
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 787
+            "x": 653,
+            "y": 796
           },
           "world": {
-            "x": 22.067,
-            "y": 17.567
+            "x": 21.767,
+            "y": 17.267
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 945
+            "x": 653,
+            "y": 936
           },
           "world": {
-            "x": 22.067,
-            "y": 12.3
+            "x": 21.767,
+            "y": 12.6
           }
         },
         {
           "pixel": {
-            "x": 412,
-            "y": 945
+            "x": 415,
+            "y": 936
           },
           "world": {
-            "x": 13.733,
-            "y": 12.3
+            "x": 13.833,
+            "y": 12.6
           }
         }
       ],
@@ -992,7 +1163,26 @@
           "id": "room-06-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     },
     {
       "id": "room-03",
@@ -1001,42 +1191,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 50,
-            "y": 959
+            "x": 59,
+            "y": 968
           },
           "world": {
-            "x": 1.667,
-            "y": 11.833
+            "x": 1.967,
+            "y": 11.533
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 959
+            "x": 297,
+            "y": 968
           },
           "world": {
-            "x": 10,
-            "y": 11.833
+            "x": 9.9,
+            "y": 11.533
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 1117
+            "x": 297,
+            "y": 1108
           },
           "world": {
-            "x": 10,
-            "y": 6.567
+            "x": 9.9,
+            "y": 6.867
           }
         },
         {
           "pixel": {
-            "x": 50,
-            "y": 1117
+            "x": 59,
+            "y": 1108
           },
           "world": {
-            "x": 1.667,
-            "y": 6.567
+            "x": 1.967,
+            "y": 6.867
           }
         }
       ],
@@ -1073,7 +1263,26 @@
           "id": "room-03-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     },
     {
       "id": "room-04",
@@ -1082,42 +1291,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 412,
-            "y": 959
+            "x": 415,
+            "y": 968
           },
           "world": {
-            "x": 13.733,
-            "y": 11.833
+            "x": 13.833,
+            "y": 11.533
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 959
+            "x": 653,
+            "y": 968
           },
           "world": {
-            "x": 22.067,
-            "y": 11.833
+            "x": 21.767,
+            "y": 11.533
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 1117
+            "x": 653,
+            "y": 1108
           },
           "world": {
-            "x": 22.067,
-            "y": 6.567
+            "x": 21.767,
+            "y": 6.867
           }
         },
         {
           "pixel": {
-            "x": 412,
-            "y": 1117
+            "x": 415,
+            "y": 1108
           },
           "world": {
-            "x": 13.733,
-            "y": 6.567
+            "x": 13.833,
+            "y": 6.867
           }
         }
       ],
@@ -1154,7 +1363,26 @@
           "id": "room-04-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     },
     {
       "id": "room-01",
@@ -1163,42 +1391,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 50,
-            "y": 1131
+            "x": 59,
+            "y": 1140
           },
           "world": {
-            "x": 1.667,
-            "y": 6.1
+            "x": 1.967,
+            "y": 5.8
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 1131
+            "x": 297,
+            "y": 1140
           },
           "world": {
-            "x": 10,
-            "y": 6.1
+            "x": 9.9,
+            "y": 5.8
           }
         },
         {
           "pixel": {
-            "x": 300,
-            "y": 1294
+            "x": 297,
+            "y": 1285
           },
           "world": {
-            "x": 10,
-            "y": 0.667
+            "x": 9.9,
+            "y": 0.967
           }
         },
         {
           "pixel": {
-            "x": 50,
-            "y": 1294
+            "x": 59,
+            "y": 1285
           },
           "world": {
-            "x": 1.667,
-            "y": 0.667
+            "x": 1.967,
+            "y": 0.967
           }
         }
       ],
@@ -1235,7 +1463,26 @@
           "id": "room-01-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     },
     {
       "id": "room-02",
@@ -1244,42 +1491,42 @@
       "polygon": [
         {
           "pixel": {
-            "x": 412,
-            "y": 1131
+            "x": 415,
+            "y": 1140
           },
           "world": {
-            "x": 13.733,
-            "y": 6.1
+            "x": 13.833,
+            "y": 5.8
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 1131
+            "x": 653,
+            "y": 1140
           },
           "world": {
-            "x": 22.067,
-            "y": 6.1
+            "x": 21.767,
+            "y": 5.8
           }
         },
         {
           "pixel": {
-            "x": 662,
-            "y": 1294
+            "x": 653,
+            "y": 1285
           },
           "world": {
-            "x": 22.067,
-            "y": 0.667
+            "x": 21.767,
+            "y": 0.967
           }
         },
         {
           "pixel": {
-            "x": 412,
-            "y": 1294
+            "x": 415,
+            "y": 1285
           },
           "world": {
-            "x": 13.733,
-            "y": 0.667
+            "x": 13.833,
+            "y": 0.967
           }
         }
       ],
@@ -1316,7 +1563,26 @@
           "id": "room-02-door",
           "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4
+      }
     }
   ]
 }
