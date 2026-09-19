@@ -5,6 +5,9 @@ export const TAG_LIVE_TIMEOUT_MS = 10_000;
 export type TagStatus = "active" | "idle" | "warning" | "offline";
 
 export interface TrackedTag extends Point2D {
+  readonly mapId?: string | null;
+  readonly sourceZoneId?: string | null;
+  readonly sourceZoneName?: string | null;
   readonly rawPosition?: PositionMessage["rawPosition"];
   readonly regionInference?: PositionMessage["regionInference"];
   readonly lastRawDataTimestamp?: string;
@@ -19,6 +22,9 @@ export interface TrackedTag extends Point2D {
 }
 
 export interface PositionMessage extends Point2D {
+  readonly mapId?: string | null;
+  readonly sourceZoneId?: string | null;
+  readonly sourceZoneName?: string | null;
   readonly publishedAt?: string;
   readonly receivedAt?: string;
   readonly synthetic?: boolean;
@@ -38,7 +44,7 @@ export interface PositionMessage extends Point2D {
     readonly validUntil?: string;
     readonly uncertainAfter?: string;
   };
-  readonly rawPosition?: { readonly x: number; readonly y: number; readonly timestamp: string };
+  readonly rawPosition?: { readonly x: number; readonly y: number; readonly timestamp: string; readonly mapId?: string | null; readonly sourceZoneId?: string | null; readonly sourceZoneName?: string | null };
   readonly lastRawDataTimestamp?: string;
 }
 
@@ -57,6 +63,7 @@ export interface PositionAnimationConfig {
 }
 
 export interface PositionSample extends Point2D {
+  readonly mapId?: string | null;
   readonly timestamp: number;
   readonly receivedAt: number;
   readonly positionSource?: "RAW" | "REGION_CENTER";

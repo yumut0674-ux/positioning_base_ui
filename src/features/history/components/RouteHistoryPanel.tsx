@@ -11,9 +11,10 @@ import type Konva from "konva";
 import useImage from "use-image";
 import { HistoryChatWidget } from "@/src/features/assistant/components/HistoryChatWidget";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
-import { MAP_CALIBRATION, MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
 import { CoordinateTransformService } from "@/src/features/map/services/CoordinateTransformService";
-import { buildLocationTimeline, type HistoricalPosition, type LocationStay } from "@/src/features/map/services/RouteTimelineService";
+import { buildLocationTimeline, routeDistanceByMap, segmentRouteByMap, type HistoricalPosition, type LocationStay } from "@/src/features/map/services/RouteTimelineService";
+import { fetchMapCatalog, fetchMapDetails } from "@/src/features/map/services/mapApi";
+import type { MapCatalog, MapDetails } from "@/src/server/maps/map.types";
 import type {
   EntityMatch, ErrorEnvelope, RoutePointsHistoryData, SearchEntitiesData, SuccessEnvelope,
 } from "@/src/server/location/location.types";
@@ -23,7 +24,6 @@ import styles from "./routeHistoryPanel.module.css";
 type CanvasPoint = readonly [number, number];
 type HistoryLoadState = "idle" | "loading" | "success" | "no_data" | "unregistered" | "unassigned" | "database_error" | "error";
 
-const HISTORY_MAP_TRANSFORM = new CoordinateTransformService(MAP_CALIBRATION);
 const HISTORY_GRID_STEP = 80;
 const MAX_HISTORY_RANGE_MS = 7 * 24 * 60 * 60 * 1_000;
 
@@ -43,15 +43,6 @@ function toIstanbulIsoString(value: string): string | undefined {
   if (/(Z|[+-]\d{2}:\d{2})$/i.test(cleaned)) return cleaned;
   const withSeconds = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(cleaned) ? `${cleaned}:00` : cleaned;
   return `${withSeconds}+03:00`;
-}
-
-function worldToCanvas(position: Pick<HistoricalPosition, "x" | "y">): CanvasPoint {
-  const point = HISTORY_MAP_TRANSFORM.worldToCanvas(position);
-  return [point.x, point.y];
-}
-
-function routeDistance(positions: readonly HistoricalPosition[]): number {
-  return positions.slice(1).reduce((total, position, index) => total + Math.hypot(position.x - positions[index].x, position.y - positions[index].y), 0);
 }
 
 function formatTime(timestamp: string): string {
@@ -85,7 +76,9 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
   const hostRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const size = useElementSize(hostRef);
-  const [floorImage] = useImage(MAP_FLOOR_PLAN.imageUrl, "anonymous");
+  const [historyMap, setHistoryMap] = useState<MapDetails | null>(null);
+  const [mapCatalog, setMapCatalog] = useState<MapCatalog | null>(null);
+  const [floorImage] = useImage(historyMap?.image.url ?? "", "anonymous");
   const [initialRange] = useState(initialDateRange);
   const [entityQuery, setEntityQuery] = useState(() => requestedTagCode?.trim().toUpperCase() || "TAG-001");
   const [entities, setEntities] = useState<readonly EntityMatch[]>([]);
@@ -103,6 +96,20 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
   const [selectedStayId, setSelectedStayId] = useState<string | null>(null);
   const [viewport, setViewport] = useState({ x: 0, y: 0, scale: .9 });
   const [assistantDraftRequestId, setAssistantDraftRequestId] = useState(0);
+  const mapWidth = historyMap?.image.width ?? Math.max(1, size.width);
+  const mapHeight = historyMap?.image.height ?? Math.max(1, size.height);
+  const historyMapId = historyMap?.id ?? null;
+  const historyMapEntry = mapCatalog?.maps.find((map) => map.id === historyMapId);
+  const mapTransform = useMemo(() => historyMap ? new CoordinateTransformService(historyMap.calibration) : null, [historyMap]);
+  const worldToCanvas = useCallback((position: Pick<HistoricalPosition, "x" | "y">): CanvasPoint => {
+    if (!mapTransform) return [0, 0];
+    const point = mapTransform.worldToCanvas(position);
+    return [point.x, point.y];
+  }, [mapTransform]);
+
+  useEffect(() => {
+    void fetchMapCatalog().then(setMapCatalog).catch(() => setMapCatalog(null));
+  }, []);
 
   useEffect(() => {
     const requestedTag = requestedTagCode?.trim().toUpperCase();
@@ -124,15 +131,15 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
   const fitMap = useCallback(() => {
     const padding = 62;
     const scale = Math.min(
-      (size.width - padding * 2) / MAP_FLOOR_PLAN.canvasSize.width,
-      (size.height - padding * 2) / MAP_FLOOR_PLAN.canvasSize.height,
+      (size.width - padding * 2) / mapWidth,
+      (size.height - padding * 2) / mapHeight,
     );
     setViewport({
       scale,
-      x: (size.width - MAP_FLOOR_PLAN.canvasSize.width * scale) / 2,
-      y: (size.height - MAP_FLOOR_PLAN.canvasSize.height * scale) / 2,
+      x: (size.width - mapWidth * scale) / 2,
+      y: (size.height - mapHeight * scale) / 2,
     });
-  }, [size.height, size.width]);
+  }, [mapHeight, mapWidth, size.height, size.width]);
 
   useEffect(() => {
     if (size.width <= 1 || size.height <= 1) return;
@@ -201,18 +208,21 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
   const selectedEntity = entities.find((entity) => entity.entityId === selectedEntityId) ?? null;
   const assistantFrom = useMemo(() => toIstanbulIsoString(startDate), [startDate]);
   const assistantTo = useMemo(() => toIstanbulIsoString(endDate), [endDate]);
-  const regionsConfig = useIpsStore((state) => state.regionsConfig);
+  const regionsConfigByMapId = useIpsStore((state) => state.regionsConfigByMapId);
+  const setRegionsConfig = useIpsStore((state) => state.setRegionsConfig);
   const timeline = useMemo(() => historyData?.zoneTimeline
-    ? historyData.zoneTimeline.map((entry, i): LocationStay => ({ id: `decision-${i}`, locationLabel: entry.zoneName, startedAt: entry.enteredAt, endedAt: entry.exitedAt, durationMs: entry.durationSeconds * 1000,
-      positions: positions.filter(p => Date.parse(p.timestamp) >= Date.parse(entry.enteredAt) && Date.parse(p.timestamp) <= Date.parse(entry.exitedAt)), isDataGap: entry.zoneName === "Belirsiz" }))
-    : buildLocationTimeline(positions, MAP_FLOOR_PLAN.id, regionsConfig), [positions, regionsConfig, historyData]);
-  const pointValues = useMemo(() => positions.flatMap((position) => worldToCanvas(position)), [positions]);
-  const distance = useMemo(() => routeDistance(positions), [positions]);
+    ? historyData.zoneTimeline.map((entry, i, entries): LocationStay => ({ id: `decision-${i}`, locationLabel: entry.zoneName, startedAt: entry.enteredAt, endedAt: entry.exitedAt, durationMs: entry.durationSeconds * 1000,
+      positions: positions.filter(p => p.mapId === entry.mapId && Date.parse(p.timestamp) >= Date.parse(entry.enteredAt) && Date.parse(p.timestamp) <= Date.parse(entry.exitedAt)), mapId: entry.mapId, isMapTransition: i > 0 && entries[i - 1]?.mapId !== entry.mapId, isDataGap: entry.zoneName === "Belirsiz" }))
+    : buildLocationTimeline(positions, "", regionsConfigByMapId), [positions, regionsConfigByMapId, historyData]);
+  const plottedPositions = useMemo(() => historyMapId ? positions.filter((position) => position.mapId === historyMapId) : [], [historyMapId, positions]);
+  const pointValues = useMemo(() => plottedPositions.flatMap((position) => worldToCanvas(position)), [plottedPositions, worldToCanvas]);
+  const distance = useMemo(() => routeDistanceByMap(positions), [positions]);
+  const routeSegments = useMemo(() => segmentRouteByMap(positions), [positions]);
   const selectedStay = timeline.find((stay) => stay.id === selectedStayId) ?? null;
-  const selectedPointValues = useMemo(() => selectedStay ? selectedStay.positions.flatMap((position) => worldToCanvas(position)) : [], [selectedStay]);
-  const startPoint = positions[0] ? worldToCanvas(positions[0]) : undefined;
-  const endPoint = positions.at(-1) ? worldToCanvas(positions.at(-1)!) : undefined;
-  const visitedLocationCount = new Set(timeline.filter((stay) => !stay.isDataGap).map((stay) => stay.locationLabel)).size;
+  const selectedPointValues = useMemo(() => selectedStay?.mapId === historyMapId ? selectedStay.positions.flatMap((position) => worldToCanvas(position)) : [], [historyMapId, selectedStay, worldToCanvas]);
+  const startPoint = plottedPositions[0] ? worldToCanvas(plottedPositions[0]) : undefined;
+  const endPoint = plottedPositions.at(-1) ? worldToCanvas(plottedPositions.at(-1)!) : undefined;
+  const visitedLocationCount = new Set(timeline.filter((stay) => !stay.isDataGap).map((stay) => `${stay.mapId ?? "unresolved"}:${stay.locationLabel}`)).size;
   const totalDuration = positions.length > 1 ? Date.parse(positions.at(-1)!.timestamp) - Date.parse(positions[0].timestamp) : 0;
   const longestStay = timeline.filter((stay) => !stay.isDataGap).reduce<LocationStay | null>((longest, stay) => !longest || stay.durationMs > longest.durationMs ? stay : longest, null);
 
@@ -273,11 +283,25 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
         x: point.x,
         y: point.y,
         timestamp: point.observedAt,
+        mapId: point.mapId ?? null,
+        sourceZoneId: point.sourceZoneId ?? null,
+        sourceZoneName: point.sourceZoneName ?? null,
       }));
       setPositions(nextPositions);
       setHistoryData(data);
       setHistoryWarnings(payload.meta.warnings);
       setHistoryState(nextPositions.length === 0 ? "no_data" : "success");
+      const firstMapId = nextPositions.find((position) => position.mapId)?.mapId;
+      if (firstMapId) void fetchMapDetails(firstMapId).then(setHistoryMap).catch(() => setHistoryMap(null));
+      else setHistoryMap(null);
+      for (const mapId of new Set(nextPositions.flatMap((position) => position.mapId ? [position.mapId] : []))) {
+        void fetch(`/api/maps/${encodeURIComponent(mapId)}/regions`, { headers: { Accept: "application/json" }, cache: "no-store" })
+          .then(async (regionResponse) => {
+            if (!regionResponse.ok) return;
+            const regionPayload = await regionResponse.json() as { config: Parameters<typeof setRegionsConfig>[0] };
+            setRegionsConfig(regionPayload.config);
+          }).catch(() => undefined);
+      }
       window.requestAnimationFrame(fitMap);
     } catch (error) {
       setPositions([]);
@@ -288,6 +312,9 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
   };
 
   const focusStay = (stay: LocationStay) => {
+    if (stay.mapId && stay.mapId !== historyMapId) {
+      void fetchMapDetails(stay.mapId).then((map) => { setHistoryMap(map); window.requestAnimationFrame(fitMap); }).catch(() => undefined);
+    }
     if (stay.positions.length === 0 || size.width <= 1 || size.height <= 1) return;
     const canvasPoints = stay.positions.map(worldToCanvas);
     const xs = canvasPoints.map(([x]) => x);
@@ -321,21 +348,24 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
     y: point.y,
     observedAt: point.observedAt,
     zoneName: point.zoneName,
+    mapId: point.mapId,
+    sourceZoneId: point.sourceZoneId,
+    sourceZoneName: point.sourceZoneName,
   }));
 
   return <div className={styles.panelRoot}>
       <div className="workspace-heading">
-        <div><span>HAREKET ANALİZİ / {MAP_FLOOR_PLAN.level.toUpperCase()}</span><h1>Rota Geçmişi</h1></div>
+        <div><span>HAREKET ANALİZİ / {(historyMap?.id ?? "KAT BELİRLENEMEDİ").toUpperCase()}</span><h1>Rota Geçmişi</h1></div>
         <div className="workspace-meta"><i /><span>{historyData?.zoneTimeline ? "ODA KARAR GEÇMİŞİ" : "GERÇEK KONUM VERİSİ"}</span><strong>{selectedEntity?.tagCode ?? selectedEntity?.entityCode ?? "—"}</strong></div>
       </div>
       <section className={styles.mapFrame}>
         <div ref={hostRef} className={styles.mapCanvas}>
           <Stage ref={stageRef} width={size.width} height={size.height} x={viewport.x} y={viewport.y} draggable onWheel={handleWheel} onDragEnd={(event) => setViewport((current) => ({ ...current, x: event.target.x(), y: event.target.y() }))}>
-            <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}><Rect width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} fill="#e7f0f4" />{floorImage && <KonvaImage image={floorImage} width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} opacity={.68} />}<Rect width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} fill="#d8f5f0" opacity={.1} /></Group></Layer>
-            <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}>{Array.from({ length: Math.ceil(MAP_FLOOR_PLAN.canvasSize.width / HISTORY_GRID_STEP) + 1 }, (_, index) => <Line key={`vertical-${index}`} points={[index * HISTORY_GRID_STEP, 0, index * HISTORY_GRID_STEP, MAP_FLOOR_PLAN.canvasSize.height]} stroke="#6f9db1" strokeWidth={.4} opacity={.16} />)}{Array.from({ length: Math.ceil(MAP_FLOOR_PLAN.canvasSize.height / HISTORY_GRID_STEP) + 1 }, (_, index) => <Line key={`horizontal-${index}`} points={[0, index * HISTORY_GRID_STEP, MAP_FLOOR_PLAN.canvasSize.width, index * HISTORY_GRID_STEP]} stroke="#6f9db1" strokeWidth={.4} opacity={.16} />)}</Group></Layer>
+            <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}><Rect width={mapWidth} height={mapHeight} fill="#e7f0f4" />{historyMap && floorImage && <KonvaImage image={floorImage} width={mapWidth} height={mapHeight} opacity={.68} />}<Rect width={mapWidth} height={mapHeight} fill="#d8f5f0" opacity={.1} /></Group></Layer>
+            <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}>{Array.from({ length: Math.ceil(mapWidth / HISTORY_GRID_STEP) + 1 }, (_, index) => <Line key={`vertical-${index}`} points={[index * HISTORY_GRID_STEP, 0, index * HISTORY_GRID_STEP, mapHeight]} stroke="#6f9db1" strokeWidth={.4} opacity={.16} />)}{Array.from({ length: Math.ceil(mapHeight / HISTORY_GRID_STEP) + 1 }, (_, index) => <Line key={`horizontal-${index}`} points={[0, index * HISTORY_GRID_STEP, mapWidth, index * HISTORY_GRID_STEP]} stroke="#6f9db1" strokeWidth={.4} opacity={.16} />)}</Group></Layer>
             <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}>
               {!historyData?.zoneTimeline && pointValues.length >= 4 && <><Line points={pointValues} stroke="#00a896" strokeWidth={12} opacity={selectedStay ? .06 : .15} tension={.32} lineCap="round" lineJoin="round" /><Line points={pointValues} stroke="#3578e5" strokeWidth={3.5} opacity={selectedStay ? .2 : .95} tension={.32} lineCap="round" lineJoin="round" shadowColor="#00a896" shadowBlur={12} shadowOpacity={selectedStay ? .12 : .48} /></>}
-              {positions.map((position, index) => { const [x, y] = worldToCanvas(position); return <Circle key={`${position.timestamp}-${position.x}`} x={x} y={y} radius={index % 3 === 0 ? 3.5 : 2.2} fill="#ffffff" stroke="#00a896" strokeWidth={1.3} opacity={selectedStay ? .3 : .95} />; })}
+              {plottedPositions.map((position, index) => { const [x, y] = worldToCanvas(position); return <Circle key={`${position.timestamp}-${position.x}`} x={x} y={y} radius={index % 3 === 0 ? 3.5 : 2.2} fill="#ffffff" stroke="#00a896" strokeWidth={1.3} opacity={selectedStay ? .3 : .95} />; })}
               {!historyData?.zoneTimeline && selectedStay && selectedPointValues.length > 2 && <Line points={selectedPointValues} stroke="#00a896" strokeWidth={5} opacity={1} tension={.32} lineCap="round" lineJoin="round" shadowColor="#00a896" shadowBlur={15} shadowOpacity={.5} />}
               {selectedStay?.positions.map((position, index) => { const [x, y] = worldToCanvas(position); return <Circle key={`selected-${position.timestamp}`} x={x} y={y} radius={index === 0 || index === selectedStay.positions.length - 1 ? 6 : 3.2} fill={index === 0 ? "#13a875" : index === selectedStay.positions.length - 1 ? "#3578e5" : "#ffffff"} stroke="#ffffff" strokeWidth={2} />; })}
               {startPoint && <Group x={startPoint[0]} y={startPoint[1]}><Circle radius={14} fill="#21d497" opacity={.19} /><Circle radius={7} fill="#13a875" stroke="#ffffff" strokeWidth={2} /><Text x={15} y={-5} text="BAŞLANGIÇ" fill="#087f73" fontSize={10} fontStyle="bold" fontFamily="Inter, sans-serif" /></Group>}
@@ -344,7 +374,7 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
           </Stage>
         </div>
         <div className={styles.vignette} />
-        <div className={styles.mapMeta}><CircleDot size={13} /> PLAN KALİBRE EDİLDİ <span>{MAP_CALIBRATION.pixelsPerMeter} PX/M</span></div>
+        <div className={styles.mapMeta}><CircleDot size={13} /> {historyMap ? "PLAN KALİBRE EDİLDİ" : "KAT BELİRLENEMEDİ"} <span>{historyMap ? `${historyMap.calibration.pixelsPerMeter} PX/M` : "PLAN YOK"} · {routeSegments.length} SEGMENT</span></div>
         <div className={styles.zoomReadout}>{Math.round(viewport.scale * 100)}%</div>
         <div className={styles.mapTools}><button type="button" onClick={fitMap} title="Haritayı sığdır"><Maximize2 size={16} /></button><button type="button" title="Katmanlar"><Layers3 size={16} /></button><button type="button" title="Odak noktası"><Crosshair size={16} /></button></div>
         <motion.aside className={styles.sidebar} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>
@@ -366,7 +396,7 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
 
           {historyState === "success" && <motion.section className={styles.summary} key={positions[0]?.timestamp} initial={{ opacity: .4, y: 5 }} animate={{ opacity: 1, y: 0 }}><div className={styles.summaryTitle}><Route size={14} /><span>ROTA ÖZETİ</span><i>GERÇEK VERİ</i></div><div className={styles.stats}><div><small>BULUNAN NOKTA</small><strong>{positions.length}</strong><em>{historyData?.sourcePointCount ?? positions.length} kaynak kayıt</em></div><div><small>TOPLAM MESAFE</small><strong>{historyData?.zoneTimeline ? "—" : distance.toFixed(1)}{!historyData?.zoneTimeline && <b>m</b>}</strong><em>{historyData?.zoneTimeline ? "Geçiş rotası bilinmiyor" : "ham koordinat toplamı"}</em></div><div><small>ZİYARET EDİLEN BÖLGE</small><strong>{visitedLocationCount}</strong><em>benzersiz alan</em></div><div><small>TOPLAM TAKİP</small><strong>{formatDuration(totalDuration)}</strong><em>veri aralığı</em></div></div></motion.section>}
 
-          {historyState === "success" && <section className={styles.timeline} aria-label="Konum zaman çizelgesi"><div className={styles.timelineHeader}><div className={styles.timelineTitle}><MapPin size={14} /><span>KONUM ZAMAN ÇİZELGESİ</span></div><span className={styles.timelineCount}>{visitedLocationCount} BÖLGE</span></div>{selectedStay && <button type="button" className={styles.showAll} onClick={() => { setSelectedStayId(null); fitMap(); }}>Tüm rotayı göster</button>}<div className={styles.timelineList}>{timeline.map((stay) => <button key={stay.id} type="button" className={`${styles.timelineRow} ${selectedStayId === stay.id ? styles.selectedTimelineRow : ""} ${stay.isDataGap ? styles.gapTimelineRow : ""}`} onClick={() => chooseStay(stay)}><span className={styles.timelineMarker} aria-hidden="true" /><span className={styles.timelineContent}><span className={styles.timelineTime}>{formatTime(stay.startedAt)} — {formatTime(stay.endedAt)} <b>· {formatDuration(stay.durationMs)}</b></span><strong>{stay.locationLabel}</strong>{!stay.isDataGap && longestStay?.id === stay.id && <em>EN UZUN KALIŞ</em>}</span></button>)}</div>{longestStay && <p className={styles.longestSummary}>En uzun kalış: <strong>{longestStay.locationLabel}</strong> · {formatDuration(longestStay.durationMs)}</p>}</section>}
+          {historyState === "success" && <section className={styles.timeline} aria-label="Konum zaman çizelgesi"><div className={styles.timelineHeader}><div className={styles.timelineTitle}><MapPin size={14} /><span>KONUM ZAMAN ÇİZELGESİ</span></div><span className={styles.timelineCount}>{visitedLocationCount} BÖLGE</span></div>{selectedStay && <button type="button" className={styles.showAll} onClick={() => { setSelectedStayId(null); fitMap(); }}>Tüm rotayı göster</button>}<div className={styles.timelineList}>{timeline.map((stay) => <button key={stay.id} type="button" className={`${styles.timelineRow} ${selectedStayId === stay.id ? styles.selectedTimelineRow : ""} ${stay.isDataGap ? styles.gapTimelineRow : ""}`} onClick={() => chooseStay(stay)}><span className={styles.timelineMarker} aria-hidden="true" /><span className={styles.timelineContent}><span className={styles.timelineTime}>{formatTime(stay.startedAt)} — {formatTime(stay.endedAt)} <b>· {formatDuration(stay.durationMs)}</b></span><strong>{stay.locationLabel}</strong><small>{stay.mapId ? mapCatalog?.maps.find((map) => map.id === stay.mapId)?.displayName ?? stay.mapId : "Kat belirlenemedi"}{stay.isMapTransition ? " · Kat geçişi" : ""}</small>{!stay.isDataGap && longestStay?.id === stay.id && <em>EN UZUN KALIŞ</em>}</span></button>)}</div>{longestStay && <p className={styles.longestSummary}>En uzun kalış: <strong>{longestStay.locationLabel}</strong> · {formatDuration(longestStay.durationMs)}</p>}</section>}
           <div className={styles.legend}><span><i className={styles.startDot} /> Başlangıç</span><span><i className={styles.routeDot} /> Rota</span><span><i className={styles.endDot} /> Bitiş</span></div>
         </motion.aside>
       </section>
@@ -375,7 +405,10 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
       entityName={selectedEntity?.name}
       from={assistantFrom}
       to={assistantTo}
-      floorPlanId={MAP_FLOOR_PLAN.id}
+      floorPlanId={historyMapId ?? undefined}
+      floorPlanName={historyMapEntry?.displayName ?? historyMap?.id}
+      buildingName={historyMapEntry?.buildingName}
+      floorLabel={historyMapEntry?.floorLabel}
       draftText={selectedEntity?.name}
       draftRequestId={assistantDraftRequestId}
       history={historyData && !historyData.zoneTimeline ? {

@@ -111,3 +111,17 @@ export async function loadRegionsConfig(configPath = path.join(process.cwd(), "c
   try { return compileRegionsConfig(JSON.parse(await readFile(configPath, "utf8")) as RegionsConfig); }
   catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; return compileRegionsConfig(embeddedRegionsConfig as RegionsConfig); }
 }
+
+export function regionsConfigPathForMap(mapId: string): string {
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(mapId)) throw new Error("INVALID_MAP_ID");
+  const mapsDirectory = path.resolve(process.cwd(), "config", "maps");
+  const result = path.resolve(mapsDirectory, mapId, "regions.json");
+  if (!result.startsWith(`${mapsDirectory}${path.sep}`)) throw new Error("INVALID_MAP_PATH");
+  return result;
+}
+
+export async function loadRegionsConfigForMap(mapId: string): Promise<CompiledRegionsConfig> {
+  const value = JSON.parse(await readFile(regionsConfigPathForMap(mapId), "utf8")) as RegionsConfig;
+  if (value.map?.mapId !== mapId) throw new Error("REGION_CONFIG_MAP_MISMATCH");
+  return compileRegionsConfig(value);
+}

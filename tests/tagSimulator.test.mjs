@@ -10,8 +10,9 @@ import {
 } from "../test_api/simulate_tags.js";
 
 test("live room simulation CLI options are deterministic and validated", () => {
-  assert.deepEqual(readLiveSimulationOptions(["--scenario", "all", "--seed", "42"]), { scenario: "all", seed: 42 });
-  assert.deepEqual(readLiveSimulationOptions([]), { scenario: "all", seed: 42 });
+  assert.deepEqual(readLiveSimulationOptions(["--scenario", "all", "--seed", "42"]), { scenario: "all", seed: 42, mapId: "spor-koridor", zoneId: "zone-a", zoneName: "Spor Koridoru" });
+  assert.deepEqual(readLiveSimulationOptions([]), { scenario: "all", seed: 42, mapId: "spor-koridor", zoneId: "zone-a", zoneName: "Spor Koridoru" });
+  assert.deepEqual(readLiveSimulationOptions(["--scenario", "multi-floor", "--map", "kat1-ortopedi", "--zone-id", "zone-b", "--zone-name", "Kat B"]), { scenario: "multi-floor", seed: 42, mapId: "kat1-ortopedi", zoneId: "zone-b", zoneName: "Kat B" });
   assert.throws(() => readLiveSimulationOptions(["--scenario", "unknown"]), /Geçersiz canlı senaryo/);
   assert.throws(() => readLiveSimulationOptions(["--seed", "4.2"]), /Geçersiz seed/);
 });
@@ -164,4 +165,61 @@ test("old centre-only room definitions cannot create a wall shortcut", () => {
   let currentTime = new Date("2026-09-01T00:00:00Z");
   const movement = createTagMovement({ tag: { tagId: "T", position: { x: 1.75, y: 10 }, direction: 1 }, roomCenters: [{x:7,y:20}], random:()=>0, now:()=>currentTime });
   for(let i=0;i<60;i++){currentTime=new Date(currentTime.getTime()+1000);movement.next();assert.equal(movement.getState().activeRoom,null);}
+});
+
+test("normal payload carries the zone contract and multi-floor output is deterministic", async () => {
+  const bodies = [];
+  let now = new Date("2026-07-24T11:30:15.123Z");
+  const simulator = createTagSimulator({
+    scenario: "multi-floor", seed: 7, now: () => now,
+    fetchImplementation: async (_url, options) => { bodies.push(JSON.parse(options.body)); return { ok: true }; },
+    logger: { log() {}, error() {} },
+  });
+  await simulator.sendNextTagUpdates();
+  now = new Date(now.getTime() + 1_000);
+  await simulator.sendNextTagUpdates();
+  assert.equal(bodies.length, 8);
+  assert.ok(bodies.slice(0, 4).every((body) => body.zone_id === "zone-a" && body.zone_name === "Spor Koridoru"));
+  assert.ok(bodies.slice(4).every((body) => body.zone_id === "zone-b" && body.zone_name === "Ortopedi Katı"));
+  assert.deepEqual(Object.keys(bodies[0]).sort(), ["tag_id", "timestamp", "type", "x", "y", "zone_id", "zone_name"]);
+});
+
+test("null and unknown zone scenarios emit explicit values", async () => {
+  for (const [scenario, expected] of [["null-zone", null], ["unknown-zone", "unknown-zone"]]) {
+    const bodies = [];
+    const simulator = createTagSimulator({ scenario, seed: 1, fetchImplementation: async (_url, options) => { bodies.push(JSON.parse(options.body)); return { ok: true }; }, logger: { log() {}, error() {} } });
+    await simulator.sendNextTagUpdates();
+    assert.ok(bodies.every((body) => body.zone_id === expected));
+  }
+});
+
+test("delayed old-floor and same-coordinate scenarios preserve explicit floor evidence", async () => {
+  const delayed = [];
+  let now = new Date("2026-07-24T11:30:15.000Z");
+  const delayedSimulator = createTagSimulator({
+    scenario: "delayed-old-floor-event", seed: 9, now: () => now,
+    fetchImplementation: async (_url, options) => { delayed.push(JSON.parse(options.body)); return { ok: true }; },
+    logger: { log() {}, error() {} },
+  });
+  await delayedSimulator.sendNextTagUpdates();
+  now = new Date(now.getTime() + 1_000);
+  await delayedSimulator.sendNextTagUpdates();
+  now = new Date(now.getTime() + 1_000);
+  await delayedSimulator.sendNextTagUpdates();
+  assert.equal(delayed[0].zone_id, "zone-a");
+  assert.equal(delayed[4].zone_id, "zone-b");
+  assert.equal(delayed[8].zone_id, "zone-a");
+  assert.ok(Date.parse(delayed[8].timestamp) < Date.parse(delayed[4].timestamp));
+
+  const sameCoordinate = [];
+  const sameCoordinateSimulator = createTagSimulator({
+    scenario: "same-coordinate-different-floor", seed: 9,
+    fetchImplementation: async (_url, options) => { sameCoordinate.push(JSON.parse(options.body)); return { ok: true }; },
+    logger: { log() {}, error() {} },
+  });
+  await sameCoordinateSimulator.sendNextTagUpdates();
+  await sameCoordinateSimulator.sendNextTagUpdates();
+  assert.deepEqual([sameCoordinate[0].x, sameCoordinate[0].y], [5, 5]);
+  assert.deepEqual([sameCoordinate[4].x, sameCoordinate[4].y], [5, 5]);
+  assert.notEqual(sameCoordinate[0].zone_id, sameCoordinate[4].zone_id);
 });

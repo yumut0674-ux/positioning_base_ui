@@ -8,7 +8,7 @@ import {
   Check, CircleHelp, Crosshair, Download, DoorOpen, Hexagon, MousePointer2, Plus, Save,
   Power, Trash2, Upload, X,
 } from "lucide-react";
-import { MAP_FLOOR_PLAN, MAP_VIEWPORT_LIMITS } from "@/src/features/map/config/mapConfig";
+import { MAP_VIEWPORT_LIMITS } from "@/src/features/map/config/mapConfig";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { TAG_LIVE_TIMEOUT_MS } from "@/src/features/tracking/types/tracking.types";
 import { useElementSize } from "@/src/shared/hooks/useElementSize";
@@ -37,9 +37,7 @@ const TOOL_LABELS: Record<RegionEditorTool, string> = {
   select: "Seç ve taşı", polygon: "Çokgen çiz", center: "Oda merkezi", entrance: "Giriş ekle",
 };
 
-function configWithSystemMap(config: RegionsConfig): RegionsConfig {
-  return { ...config, map: DEFAULT_REGIONS_CONFIG.map };
-}
+function configWithSystemMap(config: RegionsConfig): RegionsConfig { return config; }
 
 function validateConfig(config: RegionsConfig): string[] {
   const errors: string[] = [];
@@ -69,8 +67,8 @@ export function RegionManagementPanel() {
   const pointerGestureRef = useRef<RegionPointerGesture | null>(null);
   const hasInitialFitRef = useRef(false);
   const size = useElementSize(hostRef);
-  const [floorImage] = useImage(MAP_FLOOR_PLAN.imageUrl, "anonymous");
   const [config, setConfig] = useState<RegionsConfig>(DEFAULT_REGIONS_CONFIG);
+  const [floorImage] = useImage(config.map.image, "anonymous");
   const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
   const [selectedPoint, setSelectedPoint] = useState<SelectedPoint>(null);
   const [tool, setTool] = useState<RegionEditorTool>("select");
@@ -85,18 +83,23 @@ export function RegionManagementPanel() {
   const savedConfigRef = useRef("");
   const [rawTagClock, setRawTagClock] = useState(() => Date.now());
   const observedTags = useIpsStore((state) => state.observedTags);
+  const activeMapId = useIpsStore((state) => state.activeMapId) ?? DEFAULT_REGIONS_CONFIG.map.mapId;
+  const regionsEndpoint = `/api/maps/${encodeURIComponent(activeMapId)}/regions`;
 
   const transform = useMemo(() => createAffineTransform(config.map.calibration.points), [config.map.calibration.points]);
   const inverseTransform = useMemo(() => createInverseAffineTransform(config.map.calibration.points), [config.map.calibration.points]);
   const rawTagMarkers = useMemo(
-    () => createRawTagMarkers(observedTags, inverseTransform, rawTagClock, TAG_LIVE_TIMEOUT_MS),
-    [inverseTransform, observedTags, rawTagClock],
+    () => createRawTagMarkers(Object.fromEntries(Object.entries(observedTags).filter(([, tag]) => tag.mapId === activeMapId)), inverseTransform, rawTagClock, TAG_LIVE_TIMEOUT_MS),
+    [activeMapId, inverseTransform, observedTags, rawTagClock],
   );
   const selectedRegion = config.regions.find((region) => region.id === selectedRegionId) ?? null;
   const selectedCoordinate = !selectedRegion || !selectedPoint ? null
     : selectedPoint.type === "center" ? selectedRegion.roomCenter
       : selectedPoint.type === "polygon" ? selectedRegion.polygon[selectedPoint.index] ?? null
         : selectedRegion.entrances[selectedPoint.index] ?? null;
+  const selectedEntrance = selectedRegion && selectedPoint?.type === "entrance"
+    ? selectedRegion.entrances[selectedPoint.index] ?? null
+    : null;
   const selectedPointLabel = selectedPoint?.type === "center" ? "Oda merkezi"
     : selectedPoint?.type === "polygon" ? `Polygon köşesi ${selectedPoint.index + 1}`
       : selectedPoint?.type === "entrance" ? selectedRegion?.entrances[selectedPoint.index]?.label ?? `Giriş ${selectedPoint.index + 1}`
@@ -108,10 +111,12 @@ export function RegionManagementPanel() {
   ] : [];
 
   useEffect(() => {
-    const stored = window.localStorage.getItem("ips-regions-config");
+    hasInitialFitRef.current = false;
+    const storageKey = `ips-regions-config:${activeMapId}`;
+    const stored = window.localStorage.getItem(storageKey);
     const load = async () => {
       try {
-        const response = await fetch("/api/regions");
+        const response = await fetch(regionsEndpoint);
         if (!response.ok) throw new Error("Config servisi yanıt vermedi");
         const payload = await response.json() as { config: RegionsConfig };
         const source = payload.config.regions.length > 0 || !stored ? payload.config : JSON.parse(stored) as RegionsConfig;
@@ -134,7 +139,7 @@ export function RegionManagementPanel() {
       }
     };
     void load();
-  }, []);
+  }, [activeMapId, regionsEndpoint]);
 
   useEffect(() => {
     if (!savedConfigRef.current) return;
@@ -187,15 +192,15 @@ export function RegionManagementPanel() {
     if (size.width <= 0 || size.height <= 0) return;
     const padding = 38;
     const scale = Math.max(0.1, Math.min(
-      (size.width - padding * 2) / MAP_FLOOR_PLAN.canvasSize.width,
-      (size.height - padding * 2) / MAP_FLOOR_PLAN.canvasSize.height,
+      (size.width - padding * 2) / config.map.widthPx,
+      (size.height - padding * 2) / config.map.heightPx,
     ));
     setViewport({
       scale,
-      x: (size.width - MAP_FLOOR_PLAN.canvasSize.width * scale) / 2,
-      y: (size.height - MAP_FLOOR_PLAN.canvasSize.height * scale) / 2,
+      x: (size.width - config.map.widthPx * scale) / 2,
+      y: (size.height - config.map.heightPx * scale) / 2,
     });
-  }, [size.height, size.width]);
+  }, [config.map.heightPx, config.map.widthPx, size.height, size.width]);
 
   useEffect(() => {
     if (hasInitialFitRef.current || size.width <= 0 || size.height <= 0) return;
@@ -207,9 +212,9 @@ export function RegionManagementPanel() {
     const pointer = stageRef.current?.getPointerPosition();
     if (!pointer) return null;
     const pixel = { x: (pointer.x - viewport.x) / viewport.scale, y: (pointer.y - viewport.y) / viewport.scale };
-    if (pixel.x < 0 || pixel.y < 0 || pixel.x > MAP_FLOOR_PLAN.canvasSize.width || pixel.y > MAP_FLOOR_PLAN.canvasSize.height) return null;
+    if (pixel.x < 0 || pixel.y < 0 || pixel.x > config.map.widthPx || pixel.y > config.map.heightPx) return null;
     return withWorldCoordinates(pixel, transform);
-  }, [transform, viewport]);
+  }, [config.map.heightPx, config.map.widthPx, transform, viewport]);
 
   const addRegion = () => {
     const number = config.regions.length + 1;
@@ -239,11 +244,13 @@ export function RegionManagementPanel() {
       setTool("select");
       setStatus("Oda merkezi eklendi");
     } else if (tool === "entrance") {
+      const entranceIndex = selectedRegion.entrances.length;
       updateRegion(selectedRegion.id, (region) => ({
         ...region,
         entrances: [...region.entrances, { ...point, id: `entrance-${crypto.randomUUID().slice(0, 8)}`, label: `Giriş ${region.entrances.length + 1}` }],
       }));
-      setStatus("Giriş eklendi; başka bir giriş ekleyebilirsiniz");
+      setSelectedPoint({ type: "entrance", index: entranceIndex });
+      setStatus("Giriş eklendi; kapı genişliğini özellikler panelinden ayrı olarak girebilirsiniz");
     }
   };
 
@@ -298,6 +305,14 @@ export function RegionManagementPanel() {
     });
   };
 
+  const updateSelectedEntrance = (changes: Partial<Pick<RegionDefinition["entrances"][number], "label" | "widthMeters">>) => {
+    if (!selectedRegion || selectedPoint?.type !== "entrance") return;
+    updateRegion(selectedRegion.id, (region) => ({
+      ...region,
+      entrances: region.entrances.map((entrance, index) => index === selectedPoint.index ? { ...entrance, ...changes } : entrance),
+    }));
+  };
+
   const deleteSelectedPoint = () => {
     if (!selectedRegion || !selectedPoint) return;
     updateRegion(selectedRegion.id, (region) => {
@@ -327,14 +342,14 @@ export function RegionManagementPanel() {
     const normalized = configWithSystemMap(config);
     if (!window.confirm("Ayarların uygulanması aktif oda kararlarını yeniden doğrulama durumuna geçirir. Yeni ölçümler geldikçe odalar tekrar doğrulanacaktır. Devam edilsin mi?")) return;
     try {
-      const validationResponse = await fetch("/api/regions/validate", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(normalized) });
+      const validationResponse = await fetch(`${regionsEndpoint}/validate`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(normalized) });
       const validation = await validationResponse.json() as { valid?: boolean; error?: string; warnings?: readonly string[] };
       if (!validationResponse.ok || !validation.valid) throw new Error(validation.error || "Config backend doğrulamasından geçemedi");
-      const response = await fetch("/api/regions", { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify(normalized) });
+      const response = await fetch(regionsEndpoint, { method: "PUT", headers: { "content-type": "application/json" }, body: JSON.stringify(normalized) });
       const payload = await response.json() as { error?: string; config?: RegionsConfig; configVersion?: string };
       if (!response.ok) throw new Error(payload.error || "Config dosyasına yazılamadı");
       const saved = payload.config ?? normalized;
-      window.localStorage.setItem("ips-regions-config", JSON.stringify(saved));
+      window.localStorage.setItem(`ips-regions-config:${activeMapId}`, JSON.stringify(saved));
       savedConfigRef.current = JSON.stringify(saved);
       setConfig(saved); setHasUnsavedChanges(false);
       window.dispatchEvent(new CustomEvent(
@@ -371,8 +386,8 @@ export function RegionManagementPanel() {
     if (!pointer) return;
     const direction = event.evt.deltaY > 0 ? -1 : 1;
     const minimumScale = Math.min(MAP_VIEWPORT_LIMITS.minZoom, Math.max(0.1, Math.min(
-      (size.width - 76) / MAP_FLOOR_PLAN.canvasSize.width,
-      (size.height - 76) / MAP_FLOOR_PLAN.canvasSize.height,
+      (size.width - 76) / config.map.widthPx,
+      (size.height - 76) / config.map.heightPx,
     )));
     const scale = Math.min(MAP_VIEWPORT_LIMITS.maxZoom, Math.max(minimumScale, viewport.scale * Math.pow(1.08, direction)));
     const mapPoint = { x: (pointer.x - viewport.x) / viewport.scale, y: (pointer.y - viewport.y) / viewport.scale };
@@ -404,8 +419,8 @@ export function RegionManagementPanel() {
         </details>
       ) : null}
       <header className={styles.header}>
-        <div><span>ODA/BÖLGE YÖNETİMİ / {MAP_FLOOR_PLAN.level.toUpperCase()}</span><h1>Oda/Bölge Paneli</h1></div>
-        <div className={styles.systemMap}><Check size={14} /><span>SİSTEM HARİTASI</span><strong>{MAP_FLOOR_PLAN.name}</strong></div>
+        <div><span>ODA/BÖLGE YÖNETİMİ / {config.map.mapId.toUpperCase()}</span><h1>Oda/Bölge Paneli</h1></div>
+        <div className={styles.systemMap}><Check size={14} /><span>AKTİF HARİTA</span><strong>{config.map.mapId}</strong></div>
         <button
           type="button"
           role="switch"
@@ -460,7 +475,7 @@ export function RegionManagementPanel() {
             {config.regions.length === 0 && <div className={styles.empty}><Hexagon size={24} /><strong>Henüz oda/bölge yok</strong><span>Yeni oda/bölge ekleyerek başlayın.</span></div>}
             {config.regions.map((region) => <button key={region.id} className={region.id === selectedRegionId ? styles.selectedZone : ""} onClick={() => { setSelectedRegionId(region.id); setSelectedPoint(null); setTool("select"); }}><i style={{ background: region.color }} /><div><strong>{region.name}</strong><span>{region.polygon.length} köşe · {region.entrances.length} giriş</span></div></button>)}
           </div>
-          <div className={styles.mapInfo}><span>HARİTA KAYNAĞI</span><strong>{MAP_FLOOR_PLAN.id}</strong><small>{MAP_FLOOR_PLAN.canvasSize.width} × {MAP_FLOOR_PLAN.canvasSize.height} px</small><p>Harita sistem ayarlarından alınır ve bu ekrandan değiştirilemez.</p></div>
+          <div className={styles.mapInfo}><span>HARİTA KAYNAĞI</span><strong>{config.map.mapId}</strong><small>{config.map.widthPx} × {config.map.heightPx} px</small><p>Harita aktif katalog kaydından alınır ve bu ekrandan değiştirilemez.</p></div>
         </aside>
 
         <div ref={hostRef} className={styles.map}>
@@ -480,7 +495,7 @@ export function RegionManagementPanel() {
               event.target.position({ x: 0, y: 0 });
             }}
           >
-            <Layer listening={false}><Group x={viewport.x} y={viewport.y} scaleX={viewport.scale} scaleY={viewport.scale}><Rect width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} fill="#eef5f7" />{floorImage && <KonvaImage image={floorImage} width={MAP_FLOOR_PLAN.canvasSize.width} height={MAP_FLOOR_PLAN.canvasSize.height} opacity={0.92} />}</Group></Layer>
+            <Layer listening={false}><Group x={viewport.x} y={viewport.y} scaleX={viewport.scale} scaleY={viewport.scale}><Rect width={config.map.widthPx} height={config.map.heightPx} fill="#eef5f7" />{floorImage && <KonvaImage image={floorImage} width={config.map.widthPx} height={config.map.heightPx} opacity={0.92} />}</Group></Layer>
             <Layer><Group x={viewport.x} y={viewport.y} scaleX={viewport.scale} scaleY={viewport.scale}>
               {config.regions.map((region) => {
                 const selected = region.id === selectedRegionId;
@@ -540,7 +555,7 @@ export function RegionManagementPanel() {
                   const active = selectedPoint?.type === item.type && selectedPoint.index === item.index;
                   return <button key={`${item.type}-${item.index}`} className={active ? styles.activePoint : ""} onClick={() => { setSelectedPoint({ type: item.type, index: item.index }); setTool("select"); }}>
                     <i style={{ background: item.type === "entrance" ? "#f29f05" : selectedRegion.color }} />
-                    <div><strong>{item.label}</strong><span>px {item.point.pixel.x.toFixed(2)}, {item.point.pixel.y.toFixed(2)}</span><small>m {item.point.world.x.toFixed(3)}, {item.point.world.y.toFixed(3)}</small></div>
+                    <div><strong>{item.label}</strong><span>px {item.point.pixel.x.toFixed(2)}, {item.point.pixel.y.toFixed(2)}</span><small>m {item.point.world.x.toFixed(3)}, {item.point.world.y.toFixed(3)}{item.type === "entrance" ? ` · genişlik ${item.point.widthMeters ? `${item.point.widthMeters} m` : "girilmedi"}` : ""}</small></div>
                   </button>;
                 })}
               </div>}
@@ -553,6 +568,11 @@ export function RegionManagementPanel() {
                 <label><span>Gerçek X (m)</span><input type="number" step="0.001" value={selectedCoordinate.world.x} onChange={(event) => updateSelectedWorld("x", event.currentTarget.valueAsNumber)} /></label>
                 <label><span>Gerçek Y (m)</span><input type="number" step="0.001" value={selectedCoordinate.world.y} onChange={(event) => updateSelectedWorld("y", event.currentTarget.valueAsNumber)} /></label>
               </div>
+              {selectedEntrance && <div className={styles.doorGeometryFields}>
+                <label><span>Kapı adı</span><input value={selectedEntrance.label} onChange={(event) => updateSelectedEntrance({ label: event.currentTarget.value })} /></label>
+                <label><span>Kapı genişliği (m)</span><input type="number" min="0.05" step="0.05" placeholder="Örn. 0,90" value={selectedEntrance.widthMeters ?? ""} onChange={(event) => updateSelectedEntrance({ widthMeters: event.currentTarget.value === "" ? undefined : event.currentTarget.valueAsNumber })} /></label>
+                <small>Standart bir değer atanmaz; her kapının ölçülen net geçiş genişliğini ayrı girin.</small>
+              </div>}
               <small>Bir değer değiştiğinde karşılığı sistem kalibrasyonuna göre otomatik hesaplanır.</small>
             </section> : coordinateItems.length > 0 && <div className={styles.selectHint}><MousePointer2 size={14} /> İnce ayar için listeden veya haritadan bir nokta seçin.</div>}
             <label><span>Oda/bölge adı</span><input value={selectedRegion.name} onChange={(event) => updateRegion(selectedRegion.id, (region) => ({ ...region, name: event.target.value }))} /></label>

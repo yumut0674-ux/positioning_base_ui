@@ -8,6 +8,9 @@ import { compileRegionsConfig } from "@/src/server/regionEngine/configLoader";
 import { regionEngineController } from "@/src/server/regionEngine/controller";
 import { resolvePositionAnimationConfig } from "@/src/features/tracking/config/positionAnimationConfig";
 import { resolveMapDisplayConfig } from "@/src/features/tracking/config/mapDisplayConfig";
+import { mapService } from "@/src/server/maps/mapService";
+import { mapIdSchema } from "@/src/server/maps/map.validation";
+import { regionsConfigPathForMap } from "@/src/server/regionEngine/configLoader";
 
 export const runtime = "nodejs";
 export const regionsConfigPath = path.join(process.cwd(), "config", "regions.json");
@@ -41,21 +44,24 @@ function cleanRegion(value: unknown): RegionDefinition {
       id: entrance.id?.trim().slice(0, 100) || `entrance-${index + 1}`, label: entrance.label?.trim().slice(0, 100) || `Giriş ${index + 1}` })) : [] };
 }
 
-export function cleanRegionsConfig(value: unknown): RegionsConfig {
-  const body = object(value, "Geçersiz config") as { regions?: unknown; engine?: unknown; positionAnimation?: unknown; mapDisplay?: unknown };
+export function cleanRegionsConfig(value: unknown, expectedMapId?: string): RegionsConfig {
+  const body = object(value, "Geçersiz config") as { regions?: unknown; engine?: unknown; positionAnimation?: unknown; mapDisplay?: unknown; map?: unknown };
   if (!Array.isArray(body.regions)) throw new Error("regions alanı bir liste olmalıdır");
   const rawEngine = body.engine === undefined ? {} : known(body.engine, new Set([...ENGINE_KEYS, "mode"]), "Global ayarlar");
   const engineRules = { ...rawEngine };
   delete engineRules.mode;
   const engine = { ...DEFAULT_REGION_ENGINE_SETTINGS, ...engineRules,
     doorDefaults: engineRules.doorDefaults === undefined ? DEFAULT_REGION_ENGINE_SETTINGS.doorDefaults : cleanDoorInference(engineRules.doorDefaults, "Global kapı varsayılanları") } as RegionsConfig["engine"];
-  const config: RegionsConfig = { ...DEFAULT_REGIONS_CONFIG, engine, positionAnimation: resolvePositionAnimationConfig(body.positionAnimation),
+  const map = (body.map ?? DEFAULT_REGIONS_CONFIG.map) as RegionsConfig["map"];
+  if (!map || typeof map !== "object" || !mapIdSchema.safeParse(map.mapId).success) throw new Error("Region config map.mapId geçersiz");
+  if (expectedMapId && map.mapId !== expectedMapId) throw new Error("Region config map.mapId URL mapId ile eşleşmiyor");
+  const config: RegionsConfig = { ...DEFAULT_REGIONS_CONFIG, map, engine, positionAnimation: resolvePositionAnimationConfig(body.positionAnimation),
     mapDisplay: resolveMapDisplayConfig(body.mapDisplay), regions: body.regions.map(cleanRegion) };
   compileRegionsConfig(config); return config;
 }
 
-export async function persistRegionsConfig(value: unknown, targetPath = regionsConfigPath) {
-  const config = cleanRegionsConfig(value); const compiled = compileRegionsConfig(config);
+export async function persistRegionsConfig(value: unknown, targetPath = regionsConfigPath, expectedMapId?: string) {
+  const config = cleanRegionsConfig(value, expectedMapId); const compiled = compileRegionsConfig(config);
   const temporaryPath = `${targetPath}.${process.pid}.${Date.now()}.tmp`;
   try { await writeFile(temporaryPath, `${JSON.stringify(config, null, 2)}\n`, "utf8"); await rename(temporaryPath, targetPath); }
   catch (error) { await rm(temporaryPath, { force: true }).catch(() => undefined); throw error; }
@@ -75,4 +81,37 @@ export async function PUT(request: Request) {
     return NextResponse.json({ config, configVersion: compiled.version, warnings: compiled.warnings });
   } catch (error) { const message = error instanceof Error ? error.message : "Bölge config kaydı başarısız";
     return NextResponse.json({ error: message }, { status: message.includes("kullanımda") ? 500 : 400 }); }
+}
+
+export async function getMapRegions(mapId: string) {
+  const parsed = mapIdSchema.safeParse(mapId);
+  if (!parsed.success) return NextResponse.json({ error: "Harita seçimi geçersiz." }, { status: 400 });
+  try {
+    const catalog = await mapService.getCatalog();
+    const entry = catalog.maps.find((map) => map.id === parsed.data);
+    if (!entry) return NextResponse.json({ error: "İstenen harita bulunamadı." }, { status: 404 });
+    if (!entry.regionsConfigPath) return NextResponse.json({ error: "Bu harita için region config bulunmuyor." }, { status: 409 });
+    const saved = JSON.parse(await readFile(regionsConfigPathForMap(parsed.data), "utf8")) as RegionsConfig;
+    const config = cleanRegionsConfig(saved, parsed.data);
+    const compiled = compileRegionsConfig(config);
+    return NextResponse.json({ config, defaults: DEFAULT_REGION_ENGINE_SETTINGS, configVersion: compiled.version, warnings: compiled.warnings });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Region config okunamadı" }, { status: 500 });
+  }
+}
+
+export async function putMapRegions(mapId: string, request: Request) {
+  const parsed = mapIdSchema.safeParse(mapId);
+  if (!parsed.success) return NextResponse.json({ error: "Harita seçimi geçersiz." }, { status: 400 });
+  try {
+    const catalog = await mapService.getCatalog();
+    const entry = catalog.maps.find((map) => map.id === parsed.data);
+    if (!entry) return NextResponse.json({ error: "İstenen harita bulunamadı." }, { status: 404 });
+    if (!entry.regionsConfigPath) return NextResponse.json({ error: "Bu harita için region config bulunmuyor." }, { status: 409 });
+    const { config, compiled } = await persistRegionsConfig(await request.json(), regionsConfigPathForMap(parsed.data), parsed.data);
+    regionEngineController.reloadCompiledConfig(compiled, parsed.data);
+    return NextResponse.json({ config, configVersion: compiled.version, warnings: compiled.warnings });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Bölge config kaydı başarısız" }, { status: 400 });
+  }
 }

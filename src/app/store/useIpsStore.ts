@@ -35,12 +35,14 @@ interface IpsState {
   readonly recentTagIds: readonly string[];
   readonly tagLocationEntries: Record<string, TagLocationEntry>;
   readonly regionsConfig: RegionsConfig | null;
+  readonly regionsConfigByMapId: Readonly<Record<string, RegionsConfig>>;
   readonly connectionMode: "live" | "simulation" | "reconnecting";
   readonly showLayersPanel: boolean;
   readonly measurement: MeasurementState;
   readonly mapFocusRequest: number;
   readonly mapFocusScale: number | null;
   readonly mapFitRequest: number;
+  readonly mapTransitionNotice: string | null;
   setActiveMapId: (mapId: string) => void;
   markMapReady: (mapId: string) => void;
   selectTagOnMap: (tagId: string, mapId: string) => void;
@@ -88,15 +90,17 @@ export const useIpsStore = create<IpsState>((set) => ({
   recentTagIds: [],
   tagLocationEntries: {},
   regionsConfig: null,
+  regionsConfigByMapId: {},
   connectionMode: "live",
   showLayersPanel: false,
   measurement: { enabled: false, start: null, end: null },
   mapFocusRequest: 0,
   mapFocusScale: null,
   mapFitRequest: 0,
+  mapTransitionNotice: null,
   setActiveMapId: (activeMapId) => set((state) => state.activeMapId === activeMapId
     ? state
-    : { activeMapId, readyMapId: null, pendingTagFocusId: null, mapFocusScale: null }),
+    : { activeMapId, regionsConfig: state.regionsConfigByMapId[activeMapId] ?? null, readyMapId: null, pendingTagFocusId: null, mapFocusScale: null, mapTagDisplays: {}, mapTransitionNotice: null }),
   markMapReady: (mapId) => set((state) => {
     if (state.activeMapId !== mapId) return state;
     if (!state.pendingTagFocusId) return state.readyMapId === mapId ? state : { readyMapId: mapId };
@@ -108,23 +112,33 @@ export const useIpsStore = create<IpsState>((set) => ({
   }),
   selectTagOnMap: (selectedTagId, activeMapId) => set((state) => ({
     activeMapId,
+    regionsConfig: state.regionsConfigByMapId[activeMapId] ?? null,
     readyMapId: state.activeMapId === activeMapId ? state.readyMapId : null,
     selectedTagId,
     recentTagIds: addRecentTagId(state.recentTagIds, selectedTagId),
     pendingTagFocusId: state.readyMapId === activeMapId ? null : selectedTagId,
     mapFocusRequest: state.readyMapId === activeMapId ? state.mapFocusRequest + 1 : state.mapFocusRequest,
     mapFocusScale: MAP_TAG_FOCUS_SCALE,
+    ...(state.activeMapId === activeMapId ? {} : { mapTagDisplays: {} }),
   })),
   setViewport: (viewport) => set({ viewport }),
   toggleLayer: (layer) => set((state) => ({ layers: { ...state.layers, [layer]: !state.layers[layer] } })),
-  upsertTag: (tag) => set((state) => ({
+  upsertTag: (tag) => set((state) => {
+    const current = state.tags[tag.id];
+    if (current && tag.timestamp <= current.timestamp) return state;
+    const followedMapId = state.selectedTagId === tag.id && tag.mapId && tag.mapId !== state.activeMapId ? tag.mapId : state.activeMapId;
+    return {
     tags: boundedRecord({ ...state.tags, [tag.id]: tag }),
     tagLocationEntries: boundedRecord({
       ...state.tagLocationEntries,
-      [tag.id]: nextTagLocationEntry(state.tagLocationEntries[tag.id], tag, state.regionsConfig),
+      [tag.id]: nextTagLocationEntry(state.tagLocationEntries[tag.id], tag, tag.mapId ? state.regionsConfigByMapId[tag.mapId] : null),
     }),
-  })),
-  observeTag: (tag) => set((state) => ({ observedTags: boundedRecord({ ...state.observedTags, [tag.id]: tag }) })),
+    ...(followedMapId !== state.activeMapId ? { activeMapId: followedMapId, regionsConfig: state.regionsConfigByMapId[followedMapId!] ?? null, readyMapId: null, pendingTagFocusId: tag.id, mapTagDisplays: {}, mapFocusScale: MAP_TAG_FOCUS_SCALE, mapTransitionNotice: `${tag.name} ${followedMapId} haritasına geçti.` } : {}),
+  }; }),
+  observeTag: (tag) => set((state) => {
+    const current = state.observedTags[tag.id];
+    return current && tag.timestamp <= current.timestamp ? state : { observedTags: boundedRecord({ ...state.observedTags, [tag.id]: tag }) };
+  }),
   refreshTagActivity: (now = Date.now()) => set((state) => {
     let changed = false;
     const refresh = (source: Record<string, TrackedTag>) => Object.fromEntries(Object.entries(source).map(([id, tag]) => {
@@ -138,16 +152,23 @@ export const useIpsStore = create<IpsState>((set) => ({
   }),
   setAnchors: (anchors) => set({ anchors }),
   setTagDefinitions: (tags) => set({ tagDefinitions: Object.fromEntries(tags.map((tag) => [tag.id.toUpperCase(), tag])) }),
-  setRegionsConfig: (regionsConfig) => set((state) => ({
-    regionsConfig,
+  setRegionsConfig: (regionsConfig) => set((state) => {
+    const regionsConfigByMapId = { ...state.regionsConfigByMapId, [regionsConfig.map.mapId]: regionsConfig };
+    return {
+    regionsConfigByMapId,
+    regionsConfig: state.activeMapId ? regionsConfigByMapId[state.activeMapId] ?? null : null,
     tagLocationEntries: Object.fromEntries(Object.entries(state.tags).map(([tagId, tag]) => [
       tagId,
-      nextTagLocationEntry(state.tagLocationEntries[tagId], tag, regionsConfig),
+      nextTagLocationEntry(state.tagLocationEntries[tagId], tag, tag.mapId ? regionsConfigByMapId[tag.mapId] ?? null : null),
     ])),
-  })),
+  }; }),
   selectTag: (selectedTagId) => set((state) => ({
     selectedTagId,
     recentTagIds: selectedTagId ? addRecentTagId(state.recentTagIds, selectedTagId) : state.recentTagIds,
+    ...(selectedTagId && state.tags[selectedTagId]?.mapId && state.tags[selectedTagId].mapId !== state.activeMapId ? {
+      activeMapId: state.tags[selectedTagId].mapId, readyMapId: null, pendingTagFocusId: selectedTagId,
+      regionsConfig: state.regionsConfigByMapId[state.tags[selectedTagId].mapId!] ?? null, mapTagDisplays: {}, mapFocusScale: MAP_TAG_FOCUS_SCALE,
+    } : {}),
   })),
   selectTagAndFocus: (selectedTagId) => set((state) => ({
     selectedTagId,

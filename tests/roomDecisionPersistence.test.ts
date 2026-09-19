@@ -16,7 +16,7 @@ function decisions() {
   const events:ProcessedPosition[]=[];let clock=Date.parse("2026-09-01T00:00:00Z");const start=clock;
   const engine=new RegionPositionEngine(p=>events.push(p),250,()=>clock,false);
   engine.enable(compileRegionsConfig(scenarioConfig() as RegionsConfig));
-  for(let i=0;i<3;i++){clock=start+i*1000;engine.ingest({tagCode:"ROOM-TEST",x:3+i*0.1,y:3,timestamp:new Date(clock).toISOString(),receivedAt:new Date(clock+20).toISOString()});}
+  for(let i=0;i<3;i++){clock=start+i*1000;engine.ingest({tagCode:"ROOM-TEST",x:3+i*0.1,y:3,timestamp:new Date(clock).toISOString(),receivedAt:new Date(clock+20).toISOString(),mapId:"map-a",sourceZoneId:"zone-a",sourceZoneName:"Zone A"});}
   clock=start+7000;engine.tick();clock+=1000;engine.tick();clock=start+40000;engine.tick();engine.disable();
   return events;
 }
@@ -31,6 +31,8 @@ test("decision queue stores raw decisions and state changes, deduplicates synthe
     assert.equal(history.length,5);
     await repo.flush();assert.equal(repo.status().queueSize,0);
     assert.ok(sql.at(-1)!.includes("ON CONFLICT (event_id) DO NOTHING"));
+    assert.ok(sql.at(-1)!.includes("map_id,zone_id,payload"));
+    assert.equal(events.at(-1)?.mapId,"map-a");assert.equal(events.at(-1)?.sourceZoneId,"zone-a");
     assert.ok(!sql.at(-1)!.includes("INSERT INTO tag_location_history"));
   } finally {repo.stop();}
 });
@@ -41,8 +43,8 @@ test("decision buffer caps memory, including an interrupted persistence flush",a
 test("raw buffer is bounded and received/measurement times persist independently",async()=>{
   const calls:string[]=[];const time=Date.parse("2026-09-01T00:00:10Z");
   const buffer=new TrackingBuffer(async sql=>{calls.push(sql);return sql.startsWith("SELECT")?[{tag_code:"ROOM-TEST"}]:[];},()=>time,false);
-  const raw={tagCode:"ROOM-TEST",x:1.2,y:3.4,timestamp:"2026-09-01T00:00:00Z",quality:0.8};
-  try {for(let i=0;i<21000;i++) await buffer.ingest(raw);assert.equal(buffer.status().queueSize,20000);assert.equal(buffer.status().dropped,1000);await buffer.flush();assert.ok(calls.at(-1)!.includes("received_at, quality"));assert.ok(calls.at(-1)!.includes(raw.timestamp));assert.ok(calls.at(-1)!.includes(new Date(time).toISOString()));assert.ok(!("receivedAt" in raw));}finally{buffer.stop();}
+  const raw={tagCode:"ROOM-TEST",x:1.2,y:3.4,timestamp:"2026-09-01T00:00:00Z",quality:0.8,mapId:"map-a",sourceZoneId:"zone-a",sourceZoneName:"Zone A"};
+  try {for(let i=0;i<21000;i++) await buffer.ingest(raw);assert.equal(buffer.status().queueSize,20000);assert.equal(buffer.status().dropped,1000);await buffer.flush();assert.ok(calls.at(-1)!.includes("received_at, quality, zone_id, zone_name, map_id"));assert.ok(calls.at(-1)!.includes(raw.timestamp));assert.ok(calls.at(-1)!.includes("'zone-a', 'Zone A', 'map-a'"));assert.ok(calls.at(-1)!.includes(new Date(time).toISOString()));assert.ok(!("receivedAt" in raw));}finally{buffer.stop();}
 });
 test("LocationService exposes the live decision and keeps inferred/uncertain visits separate",async()=>{
   const events=decisions(),latest=events.at(-1)!;
@@ -68,7 +70,7 @@ test("PostgreSQL roundtrip uses separate decision table and preserves measuremen
   const repo=new PostgresRoomDecisionRepository(async sql=>{
     const rows=await queryPostgres(`BEGIN;
       CREATE TEMP TABLE tags(tag_code TEXT); INSERT INTO tags VALUES ('ROOM-TEST');
-      CREATE TEMP TABLE tag_room_decisions(id BIGINT GENERATED ALWAYS AS IDENTITY,event_id TEXT UNIQUE,tag_code TEXT,measured_at TIMESTAMPTZ,published_at TIMESTAMPTZ,engine_version TEXT,config_version TEXT,payload JSONB);
+      CREATE TEMP TABLE tag_room_decisions(id BIGINT GENERATED ALWAYS AS IDENTITY,event_id TEXT UNIQUE,tag_code TEXT,measured_at TIMESTAMPTZ,published_at TIMESTAMPTZ,engine_version TEXT,config_version TEXT,map_id TEXT,zone_id TEXT,payload JSONB);
       ${sql}
       SELECT payload::text FROM tag_room_decisions ORDER BY published_at,id; ROLLBACK;`);
     stored=rows.filter(r=>r.payload).map(r=>JSON.parse(r.payload!) as ProcessedPosition);return rows;

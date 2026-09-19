@@ -6,6 +6,9 @@ export interface HistoricalPosition {
   readonly x: number;
   readonly y: number;
   readonly timestamp: string;
+  readonly mapId?: string | null;
+  readonly sourceZoneId?: string | null;
+  readonly sourceZoneName?: string | null;
 }
 
 export interface LocationStay {
@@ -16,6 +19,25 @@ export interface LocationStay {
   readonly durationMs: number;
   readonly positions: readonly HistoricalPosition[];
   readonly isDataGap?: boolean;
+  readonly mapId?: string | null;
+  readonly isMapTransition?: boolean;
+}
+
+export interface RouteSegment { readonly mapId: string | null; readonly positions: readonly HistoricalPosition[] }
+
+export function segmentRouteByMap(positions: readonly HistoricalPosition[]): readonly RouteSegment[] {
+  const result: { mapId: string | null; positions: HistoricalPosition[] }[] = [];
+  for (const position of [...positions].sort((a, b) => timestampOf(a) - timestampOf(b))) {
+    const mapId = position.mapId ?? null;
+    const current = result.at(-1);
+    if (!current || current.mapId !== mapId) result.push({ mapId, positions: [position] });
+    else current.positions.push(position);
+  }
+  return result;
+}
+
+export function routeDistanceByMap(positions: readonly HistoricalPosition[]): number {
+  return segmentRouteByMap(positions).reduce((sum, segment) => sum + segment.positions.slice(1).reduce((subtotal, position, index) => subtotal + Math.hypot(position.x - segment.positions[index].x, position.y - segment.positions[index].y), 0), 0);
 }
 
 const DATA_GAP_MS = 5 * 60 * 1_000;
@@ -30,18 +52,32 @@ function timestampOf(position: HistoricalPosition): number {
   return new Date(position.timestamp).getTime();
 }
 
-function resolveStableLocations(positions: readonly HistoricalPosition[], floorPlanId: string, regionsConfig?: RegionsConfig | null): readonly ResolvedPosition[] {
+type RegionsConfigSource = RegionsConfig | Readonly<Record<string, RegionsConfig>> | null | undefined;
+
+function isRegionsConfig(source: Exclude<RegionsConfigSource, null | undefined>): source is RegionsConfig {
+  return Array.isArray((source as RegionsConfig).regions) && typeof (source as RegionsConfig).map?.mapId === "string";
+}
+
+function configForMap(source: RegionsConfigSource, mapId: string | null | undefined): RegionsConfig | null {
+  if (!source || !mapId) return null;
+  if (isRegionsConfig(source)) return source.map.mapId === mapId ? source : null;
+  return source[mapId] ?? null;
+}
+
+function resolveStableLocations(positions: readonly HistoricalPosition[], floorPlanId: string, regionsConfig?: RegionsConfigSource): readonly ResolvedPosition[] {
   if (positions.length === 0) return [];
 
   const resolved: ResolvedPosition[] = [];
-  let currentLabel = resolveLocation(positions[0].x, positions[0].y, floorPlanId, regionsConfig);
+  const firstMapId = positions[0].mapId ?? null;
+  let currentLabel = firstMapId === null ? "Kat belirlenemedi" : resolveLocation(positions[0].x, positions[0].y, firstMapId || floorPlanId, configForMap(regionsConfig, firstMapId));
   let candidateLabel: string | null = null;
   let candidateIndexes: number[] = [];
 
   positions.forEach((position, index) => {
-    const rawLabel = resolveLocation(position.x, position.y, floorPlanId, regionsConfig);
+    const mapId = position.mapId ?? null;
+    const rawLabel = mapId === null ? "Kat belirlenemedi" : resolveLocation(position.x, position.y, mapId || floorPlanId, configForMap(regionsConfig, mapId));
     const previousPosition = positions[index - 1];
-    const hasDataGap = previousPosition && timestampOf(position) - timestampOf(previousPosition) > DATA_GAP_MS;
+    const hasDataGap = previousPosition && (timestampOf(position) - timestampOf(previousPosition) > DATA_GAP_MS || previousPosition.mapId !== position.mapId);
 
     if (index === 0 || hasDataGap) {
       currentLabel = rawLabel;
@@ -81,7 +117,7 @@ function resolveStableLocations(positions: readonly HistoricalPosition[], floorP
   return resolved;
 }
 
-export function buildLocationTimeline(positions: readonly HistoricalPosition[], floorPlanId: string, regionsConfig?: RegionsConfig | null): readonly LocationStay[] {
+export function buildLocationTimeline(positions: readonly HistoricalPosition[], floorPlanId: string, regionsConfig?: RegionsConfigSource): readonly LocationStay[] {
   const chronologicalPositions = [...positions].sort((left, right) => timestampOf(left) - timestampOf(right));
   const resolved = resolveStableLocations(chronologicalPositions, floorPlanId, regionsConfig);
   if (resolved.length === 0) return [];
@@ -90,6 +126,7 @@ export function buildLocationTimeline(positions: readonly HistoricalPosition[], 
   let currentPositions: HistoricalPosition[] = [resolved[0].position];
   let currentLabel = resolved[0].locationLabel;
   let startedAt = resolved[0].position.timestamp;
+  let currentIsMapTransition = false;
 
   const closeStay = (endedAt: string) => {
     stays.push({
@@ -99,6 +136,8 @@ export function buildLocationTimeline(positions: readonly HistoricalPosition[], 
       endedAt,
       durationMs: Math.max(0, new Date(endedAt).getTime() - new Date(startedAt).getTime()),
       positions: currentPositions,
+      mapId: currentPositions[0]?.mapId ?? null,
+      isMapTransition: currentIsMapTransition,
     });
   };
 
@@ -106,6 +145,7 @@ export function buildLocationTimeline(positions: readonly HistoricalPosition[], 
     const previous = resolved[index - 1];
     const current = resolved[index];
     const gapDuration = timestampOf(current.position) - timestampOf(previous.position);
+    const mapChanged = (previous.position.mapId ?? null) !== (current.position.mapId ?? null);
 
     if (gapDuration > DATA_GAP_MS) {
       closeStay(previous.position.timestamp);
@@ -117,10 +157,22 @@ export function buildLocationTimeline(positions: readonly HistoricalPosition[], 
         durationMs: gapDuration,
         positions: [],
         isDataGap: true,
+        mapId: null,
+        isMapTransition: previous.position.mapId !== current.position.mapId,
       });
       currentPositions = [current.position];
       currentLabel = current.locationLabel;
       startedAt = current.position.timestamp;
+      currentIsMapTransition = mapChanged;
+      continue;
+    }
+
+    if (mapChanged) {
+      closeStay(previous.position.timestamp);
+      currentPositions = [current.position];
+      currentLabel = current.locationLabel;
+      startedAt = current.position.timestamp;
+      currentIsMapTransition = true;
       continue;
     }
 
@@ -133,6 +185,7 @@ export function buildLocationTimeline(positions: readonly HistoricalPosition[], 
     currentPositions = [current.position];
     currentLabel = current.locationLabel;
     startedAt = current.position.timestamp;
+    currentIsMapTransition = false;
   }
 
   closeStay(currentPositions.at(-1)?.timestamp ?? startedAt);

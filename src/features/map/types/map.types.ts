@@ -34,6 +34,7 @@ export interface FloorPlanDefinition {
 
 export interface AnchorDefinition extends Point2D {
   readonly id: string;
+  readonly mapId?: string | null;
   readonly name?: string | null;
   readonly z?: number | null;
   readonly status?: string;

@@ -33,6 +33,7 @@ export function useRealtimeTracking(): PositionAnimationController {
   const setAnchors = useIpsStore((state) => state.setAnchors);
   const setTagDefinitions = useIpsStore((state) => state.setTagDefinitions);
   const setRegionsConfig = useIpsStore((state) => state.setRegionsConfig);
+  const activeMapId = useIpsStore((state) => state.activeMapId);
   const [engineStatus, setEngineStatus] = useState<RegionEngineStatusResponse | null>(null);
   const engineEnabled = engineStatus?.enabled ?? false;
   const rawGateway = useMemo(() => new SseTrackingGateway("/api/tracking/ingest"), []);
@@ -61,7 +62,8 @@ export function useRealtimeTracking(): PositionAnimationController {
         console.error("POSITION_ANIMATION_CONFIG_ERROR", error);
       }
     };
-    void fetch("/api/regions", { cache: "no-store" })
+    const endpoint = activeMapId ? `/api/maps/${encodeURIComponent(activeMapId)}/regions` : "/api/regions";
+    void fetch(endpoint, { cache: "no-store" })
       .then(async (response) => {
         if (!response.ok) throw new Error("Konum animasyon config'i alınamadı");
         return response.json() as Promise<{ config: RegionsConfig }>;
@@ -86,7 +88,7 @@ export function useRealtimeTracking(): PositionAnimationController {
       window.removeEventListener(POSITION_ANIMATION_CONFIG_CHANGED_EVENT, onConfigChanged);
       window.removeEventListener(REGIONS_CONFIG_UPDATED_EVENT, onRegionsConfigUpdated);
     };
-  }, [positionAnimation, setRegionsConfig]);
+  }, [activeMapId, positionAnimation, setRegionsConfig]);
 
   useEffect(() => {
     if (!animationEnabled) return;
@@ -156,6 +158,9 @@ export function useRealtimeTracking(): PositionAnimationController {
     const currentObserved = useIpsStore.getState().observedTags[tagId];
     if (currentObserved && incoming.timestamp <= currentObserved.timestamp) return;
     const observed = {
+      mapId: incoming.mapId,
+      sourceZoneId: incoming.sourceZoneId,
+      sourceZoneName: incoming.sourceZoneName,
       id: tagId,
       name: displayNames.current.get(tagId) || tagId,
       color: currentObserved?.color ?? colorForTag(tagId),
@@ -168,12 +173,17 @@ export function useRealtimeTracking(): PositionAnimationController {
 
     // Ham akış her zaman tag keşfi için dinlenir. Oda tespit modu kapalıyken
     // aynı veri haritanın da doğrudan konum kaynağıdır.
-    if (engineEnabled) return;
+    if (engineEnabled) {
+      // Unresolved positions never reach a map engine, but must remain visible in
+      // the tag list as "Kat belirlenemedi" while staying off every floor plan.
+      if (observed.mapId === null) upsertTag(observed);
+      return;
+    }
     const current = useIpsStore.getState().tags[tagId];
     if (!current) {
       return upsertTag(observed);
     }
-    const position = filter.next(current, incoming);
+    const position = current.mapId === incoming.mapId ? filter.next(current, incoming) : incoming;
     upsertTag({ ...observed, ...position });
   }), [engineEnabled, filter, observeTag, positionAnimation, rawGateway, upsertTag]);
 
@@ -186,6 +196,9 @@ export function useRealtimeTracking(): PositionAnimationController {
       if (incoming.publishedAt && current?.publishedAt && Date.parse(incoming.publishedAt) < Date.parse(current.publishedAt)) return;
       const measuredAt = incoming.lastRawDataTimestamp ? Date.parse(incoming.lastRawDataTimestamp) : incoming.timestamp;
       const next = {
+        mapId: incoming.mapId,
+        sourceZoneId: incoming.sourceZoneId,
+        sourceZoneName: incoming.sourceZoneName,
         id: tagId,
         name,
         color: current?.color ?? colorForTag(tagId),
@@ -195,7 +208,7 @@ export function useRealtimeTracking(): PositionAnimationController {
         y: incoming.y,
       };
       const position = current && !incoming.positionSource ? filter.next(current, incoming) : incoming;
-      upsertTag({ ...next, ...position, timestamp: incoming.lastRawDataTimestamp ? Date.parse(incoming.lastRawDataTimestamp) : incoming.timestamp });
+      upsertTag({ ...next, ...position, regionInference: incoming.regionInference, rawPosition: incoming.rawPosition, positionSource: incoming.positionSource, publishedAt: incoming.publishedAt, lastRawDataTimestamp: incoming.lastRawDataTimestamp, timestamp: incoming.lastRawDataTimestamp ? Date.parse(incoming.lastRawDataTimestamp) : incoming.timestamp });
     });
   }, [filter, positionAnimation, processedGateway, upsertTag]);
 

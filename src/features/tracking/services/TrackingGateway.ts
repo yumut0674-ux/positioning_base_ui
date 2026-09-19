@@ -23,7 +23,10 @@ export class SocketTrackingGateway implements TrackingGateway {
   }
 }
 
-type SsePositionPayload = {
+export type SsePositionPayload = {
+  readonly mapId?: string | null;
+  readonly sourceZoneId?: string | null;
+  readonly sourceZoneName?: string | null;
   readonly publishedAt?: string;
   readonly receivedAt?: string;
   readonly synthetic?: boolean;
@@ -51,6 +54,9 @@ export class SseTrackingGateway implements TrackingGateway {
         const parsedTimestamp = typeof payload.timestamp === "string" ? Date.parse(payload.timestamp) : Number.NaN;
         const timestamp = Number.isFinite(parsedTimestamp) ? parsedTimestamp : receivedAt;
         onPosition({
+          mapId: payload.mapId ?? null,
+          sourceZoneId: payload.sourceZoneId ?? null,
+          sourceZoneName: payload.sourceZoneName ?? null,
           publishedAt: payload.publishedAt,
           receivedAt: payload.receivedAt,
           synthetic: payload.synthetic,
@@ -79,6 +85,9 @@ export class MockTrackingGateway implements TrackingGateway {
       tick += 0.16;
       TAG_BLUEPRINTS.forEach((tag, index) => {
         onPosition({
+          mapId: null,
+          sourceZoneId: null,
+          sourceZoneName: null,
           id: tag.id,
           x: tag.x + Math.cos(tick + index * 2.1) * (index === 1 ? 2.8 : 1.25),
           y: tag.y + Math.sin(tick * 0.78 + index) * (index === 2 ? 1.8 : 0.9),

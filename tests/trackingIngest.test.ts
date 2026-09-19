@@ -8,6 +8,8 @@ const EXAMPLE_PAYLOAD = {
   tag_id: "A1B2C3D400000001",
   x: 1.25,
   y: 0.8,
+  zone_id: "zone-a",
+  zone_name: " Bölge A ",
   timestamp: "2026-07-21T14:30:15.123+03:00",
 } as const;
 
@@ -35,9 +37,32 @@ test("örnek position payload'ı 202 ile kabul edilir ve gönderilen zaman korun
       x: 1.25,
       y: 0.8,
       timestamp: "2026-07-21T14:30:15.123+03:00",
+      sourceZoneId: "zone-a",
+      sourceZoneName: "Bölge A",
+      mapId: "spor-koridor",
     });
   } finally {
     trackingBuffer.ingest = originalIngest;
+  }
+});
+
+test("null ve bilinmeyen zone kabul edilir fakat haritaya çözülmez", async () => {
+  const originalIngest = trackingBuffer.ingest.bind(trackingBuffer);
+  const captured: TrackingPosition[] = [];
+  trackingBuffer.ingest = async (position) => { captured.push(position); return false; };
+  try {
+    for (const zone of [null, "not-configured"]) {
+      const response = await POST(jsonRequest({ ...EXAMPLE_PAYLOAD, zone_id: zone, zone_name: null }));
+      assert.equal(response.status, 202);
+      assert.equal((await response.json() as { mapId: unknown }).mapId, null);
+    }
+    assert.deepEqual(captured.map((position) => position.mapId), [null, null]);
+  } finally { trackingBuffer.ingest = originalIngest; }
+});
+
+test("zone alanlarında tip ve uzunluk doğrulaması uygulanır", async () => {
+  for (const payload of [{ ...EXAMPLE_PAYLOAD, zone_id: 7 }, { ...EXAMPLE_PAYLOAD, zone_name: "x".repeat(161) }]) {
+    assert.equal((await POST(jsonRequest(payload))).status, 400);
   }
 });
 

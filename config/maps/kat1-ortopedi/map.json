@@ -17,6 +17,6 @@
     "rotationDegrees": 0
   },
   "updatedAt": "2026-09-16T00:00:00.000Z",
-  "status": "disabled",
-  "liveTrackingEnabled": false
+  "status": "active",
+  "liveTrackingEnabled": true
 }

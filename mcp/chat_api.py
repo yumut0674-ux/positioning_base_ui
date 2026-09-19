@@ -48,6 +48,9 @@ class ContextPosition(BaseModel):
     y: float
     observed_at: str = Field(alias="observedAt")
     zone_name: str | None = Field(default=None, alias="zoneName", max_length=160)
+    map_id: str | None = Field(default=None, alias="mapId", max_length=100)
+    source_zone_id: str | None = Field(default=None, alias="sourceZoneId", max_length=100)
+    source_zone_name: str | None = Field(default=None, alias="sourceZoneName", max_length=160)
 
     @field_validator("observed_at")
     @classmethod
@@ -77,6 +80,10 @@ class ChatContext(BaseModel):
     to_time: str | None = Field(default=None, alias="to")
     floor_plan_id: str | None = Field(default=None, alias="floorPlanId", max_length=100)
     floor_plan_name: str | None = Field(default=None, alias="floorPlanName", max_length=160)
+    building_name: str | None = Field(default=None, alias="buildingName", max_length=160)
+    floor_label: str | None = Field(default=None, alias="floorLabel", max_length=80)
+    source_zone_id: str | None = Field(default=None, alias="sourceZoneId", max_length=100)
+    source_zone_name: str | None = Field(default=None, alias="sourceZoneName", max_length=160)
     tag_status: str | None = Field(default=None, alias="tagStatus", max_length=50)
     zone_name: str | None = Field(default=None, alias="zoneName", max_length=160)
     live_position: ContextPosition | None = Field(default=None, alias="livePosition")
@@ -85,7 +92,8 @@ class ChatContext(BaseModel):
 
     @field_validator(
         "mode", "tag_code", "entity_name", "floor_plan_id",
-        "floor_plan_name", "tag_status", "zone_name", mode="before",
+        "floor_plan_name", "building_name", "floor_label", "source_zone_id",
+        "source_zone_name", "tag_status", "zone_name", mode="before",
     )
     @classmethod
     def trim_optional_strings(cls, value: Any) -> str | None:

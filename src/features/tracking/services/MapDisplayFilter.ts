@@ -26,6 +26,7 @@ export class MapDisplayFilter {
   private readonly states = new Map<string, State>();
   private polygons: readonly DisplayPolygon[] = [];
   private holdMs = 2_000;
+  private mapId: string | null = null;
   private timer?: ReturnType<typeof setTimeout>;
 
   public constructor(
@@ -34,7 +35,12 @@ export class MapDisplayFilter {
     private readonly clock: Clock = { now: Date.now, setTimeout, clearTimeout },
   ) {}
 
-  public configure(polygons: readonly DisplayPolygon[], holdMs: number): void {
+  public configure(polygons: readonly DisplayPolygon[], holdMs: number, mapId: string | null = null): void {
+    if (this.mapId !== mapId) {
+      for (const id of this.states.keys()) this.animation.remove(id);
+      this.states.clear();
+      this.mapId = mapId;
+    }
     this.polygons = polygons;
     this.holdMs = holdMs;
     this.animation.setDisplayArea(polygons);
@@ -46,6 +52,7 @@ export class MapDisplayFilter {
   }
 
   public ingest(candidate: TrackedTag, smooth = false, force = false): void {
+    if (this.mapId && candidate.mapId !== this.mapId) return;
     let state = this.states.get(candidate.id);
     if (state && !force) {
       if (candidate.timestamp < state.candidate.timestamp) return;

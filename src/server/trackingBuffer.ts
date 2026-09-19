@@ -9,6 +9,10 @@ export type TrackingPosition = {
   readonly timestamp: string;
   readonly receivedAt?: string;
   readonly quality?: number;
+  /** Optional only for internal rollout compatibility; ingest always supplies an explicit value. */
+  readonly sourceZoneId?: string | null;
+  readonly sourceZoneName?: string | null;
+  readonly mapId?: string | null;
 };
 
 const schemaSql = `
@@ -23,6 +27,11 @@ CREATE INDEX IF NOT EXISTS idx_tag_location_history_tag_time
   ON tag_location_history (tag_code, created_at DESC);
 ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS received_at TIMESTAMPTZ;
 ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS quality DOUBLE PRECISION;
+ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS zone_id VARCHAR(100);
+ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS zone_name VARCHAR(160);
+ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS map_id VARCHAR(100);
+CREATE INDEX IF NOT EXISTS idx_tag_location_history_tag_map_time ON tag_location_history(tag_code, map_id, created_at DESC, id DESC);
+CREATE INDEX IF NOT EXISTS idx_tag_location_history_map_time ON tag_location_history(map_id, created_at DESC, id DESC);
 `;
 
 const REGISTERED_TAG_CACHE_MS = 30_000;
@@ -41,6 +50,10 @@ export class TrackingBuffer extends EventEmitter {
   private lastPersistenceError: string | null = null;
   private lastSuccessfulFlushAt: string | null = null;
   private dropped = 0;
+  private mappedPositionCount = 0;
+  private unresolvedZoneCount = 0;
+  private nullZoneCount = 0;
+  private knownZoneCount = 0;
   private readonly timer?: ReturnType<typeof setInterval>;
 
   public constructor(private readonly query = queryPostgres, private readonly now: () => number = Date.now, automaticFlush = true) {
@@ -50,6 +63,9 @@ export class TrackingBuffer extends EventEmitter {
 
   public async ingest(position: TrackingPosition): Promise<boolean> {
     position = { ...position, receivedAt: new Date(this.now()).toISOString() };
+    if (position.sourceZoneId == null) this.nullZoneCount++;
+    else if (position.mapId == null) this.unresolvedZoneCount++;
+    else { this.knownZoneCount++; this.mappedPositionCount++; }
     this.emit("position", position);
     await this.refreshRegisteredTags();
     if (!this.registeredTagCodes.has(position.tagCode.toUpperCase())) return false;
@@ -91,9 +107,10 @@ export class TrackingBuffer extends EventEmitter {
     this.flushing = true;
     const batch = this.queue.splice(0, this.queue.length);
     try {
-      const values = batch.map((position) => `(${sqlString(position.tagCode)}, ${position.x}, ${position.y}, ${sqlString(position.timestamp)}::timestamptz, ${position.receivedAt ? `${sqlString(position.receivedAt)}::timestamptz` : "NULL"}, ${position.quality ?? "NULL"})`).join(",\n");
+      const nullable = (value: string | null) => value === null ? "NULL" : sqlString(value);
+      const values = batch.map((position) => `(${sqlString(position.tagCode)}, ${position.x}, ${position.y}, ${sqlString(position.timestamp)}::timestamptz, ${position.receivedAt ? `${sqlString(position.receivedAt)}::timestamptz` : "NULL"}, ${position.quality ?? "NULL"}, ${nullable(position.sourceZoneId ?? null)}, ${nullable(position.sourceZoneName ?? null)}, ${nullable(position.mapId ?? null)})`).join(",\n");
       await this.query(`${schemaSql}
-INSERT INTO tag_location_history (tag_code, x, y, created_at, received_at, quality)
+INSERT INTO tag_location_history (tag_code, x, y, created_at, received_at, quality, zone_id, zone_name, map_id)
 VALUES ${values};`);
       this.lastPersistenceError = null;
       this.lastSuccessfulFlushAt = new Date(this.now()).toISOString();
@@ -121,6 +138,10 @@ VALUES ${values};`);
       registeredTagCount: this.registeredTagCodes.size,
       flushing: this.flushing,
       lastSuccessfulFlushAt: this.lastSuccessfulFlushAt,
+      mappedPositionCount: this.mappedPositionCount,
+      knownZoneCount: this.knownZoneCount,
+      unresolvedZoneCount: this.unresolvedZoneCount,
+      nullZoneCount: this.nullZoneCount,
       error,
     } as const;
   }

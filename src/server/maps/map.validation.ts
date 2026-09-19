@@ -18,8 +18,10 @@ export const mapCatalogEntrySchema = z.object({
   displayName: z.string().trim().min(1).max(200),
   status: mapStatusSchema,
   liveTrackingEnabled: z.boolean(),
+  trackingZoneIds: z.array(z.string().trim().min(1).max(100).regex(/^[A-Za-z0-9][A-Za-z0-9._:-]*$/)).max(100).default([]),
   sortOrder: z.number().int().min(0).max(1_000_000),
   configPath: z.string().regex(/^[a-z0-9-]+\/map\.json$/).nullable(),
+  regionsConfigPath: z.string().regex(/^[a-z0-9-]+\/regions\.json$/).nullable().default(null),
 }).strict();
 
 export const mapCatalogSchema = z.object({
@@ -32,19 +34,22 @@ export const mapCatalogSchema = z.object({
   for (const entry of catalog.maps) {
     if (ids.has(entry.id)) context.addIssue({ code: "custom", message: `Tekrarlanan harita kimliği: ${entry.id}`, path: ["maps"] });
     ids.add(entry.id);
-    if (entry.liveTrackingEnabled && entry.id !== catalog.liveTrackingMapId) {
-      context.addIssue({ code: "custom", message: "Canlı takip yalnızca liveTrackingMapId haritasında etkin olabilir", path: ["maps"] });
-    }
+    if (entry.liveTrackingEnabled && (!entry.configPath || !["active", "preview"].includes(entry.status))) context.addIssue({ code: "custom", message: "Canlı takip haritası aktif/seçilebilir ve yapılandırılmış olmalıdır", path: ["maps"] });
+    if (!entry.liveTrackingEnabled && entry.trackingZoneIds.length) context.addIssue({ code: "custom", message: "trackingZoneIds yalnızca canlı takip etkin haritalarda kullanılabilir", path: ["maps"] });
+    if (entry.regionsConfigPath && entry.regionsConfigPath !== `${entry.id}/regions.json`) context.addIssue({ code: "custom", message: "regionsConfigPath map kimliğiyle aynı güvenli dizini kullanmalıdır", path: ["maps"] });
   }
   const defaultEntry = catalog.maps.find((entry) => entry.id === catalog.defaultMapId);
   if (!defaultEntry) context.addIssue({ code: "custom", message: "defaultMapId katalogda bulunamadı", path: ["defaultMapId"] });
   else if (!defaultEntry.configPath || !["active", "preview"].includes(defaultEntry.status)) {
     context.addIssue({ code: "custom", message: "Varsayılan harita kullanılabilir bir config içermelidir", path: ["defaultMapId"] });
   }
-  const liveEntry = catalog.maps.find((entry) => entry.id === catalog.liveTrackingMapId);
-  if (!liveEntry) context.addIssue({ code: "custom", message: "liveTrackingMapId katalogda bulunamadı", path: ["liveTrackingMapId"] });
-  else if (!liveEntry.liveTrackingEnabled || !liveEntry.configPath || liveEntry.status !== "active") {
-    context.addIssue({ code: "custom", message: "Canlı takip haritası aktif, yapılandırılmış ve canlı takip etkin olmalıdır", path: ["liveTrackingMapId"] });
+  if (catalog.liveTrackingMapId && !catalog.maps.some((entry) => entry.id === catalog.liveTrackingMapId && entry.liveTrackingEnabled)) context.addIssue({ code: "custom", message: "liveTrackingMapId etkin bir canlı haritayı göstermelidir", path: ["liveTrackingMapId"] });
+  const zones = new Map<string, string>();
+  for (const entry of catalog.maps) for (const zone of entry.trackingZoneIds) {
+    const key = zone.toLocaleLowerCase("en-US");
+    const owner = zones.get(key);
+    if (owner && owner !== entry.id) context.addIssue({ code: "custom", message: `Tracking zone birden fazla haritaya bağlı: ${zone}`, path: ["maps"] });
+    zones.set(key, entry.id);
   }
 });
 

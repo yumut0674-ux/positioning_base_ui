@@ -123,7 +123,7 @@ export class HttpLocationApiClient implements LocationApiClient {
   }
 
   public getLocationHistory(input: LocationHistoryInput): Promise<ApiEnvelope<LocationHistoryData>> {
-    return this.request(`api/location/entities/${encodeURIComponent(String(input.entityId))}/history`, input);
+    return this.request(`api/location/entities/${encodeURIComponent(String(input.entityId))}/history`, { ...input, mapId: input.mapId });
   }
 }
 

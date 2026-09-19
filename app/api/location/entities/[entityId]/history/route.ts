@@ -10,6 +10,7 @@ export async function GET(request: Request, { params }: { readonly params: Promi
     const input = locationHistoryInputSchema.parse({
       entityId: Number((await params).entityId), from: query.get("from") ?? "", to: query.get("to") ?? "",
       format: query.get("format") ?? "", limit: query.has("limit") ? Number(query.get("limit")) : undefined,
+      mapId: query.get("mapId") ?? undefined,
     });
     return locationService.history(input);
   });

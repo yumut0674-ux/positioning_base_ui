@@ -12,9 +12,11 @@ import {
   type AnchorHealthLog,
 } from "@/src/features/map/services/anchorApi";
 import styles from "./anchors.module.css";
+import { fetchMapCatalog } from "@/src/features/map/services/mapApi";
+import type { MapCatalogEntry } from "@/src/server/maps/map.types";
 
 const EMPTY_ANCHOR: AnchorDefinition = {
-  id: "", name: "", x: 0, y: 0, z: null, status: "active", note: "", floorLevel: null, locationDesc: "",
+  id: "", mapId: null, name: "", x: 0, y: 0, z: null, status: "active", note: "", floorLevel: null, locationDesc: "",
 };
 
 const STATUS_OPTIONS = ["active", "online", "offline", "error", "low_battery"];
@@ -59,6 +61,7 @@ export function AnchorManagementPanel({ embedded = false }: { readonly embedded?
   const [logs, setLogs] = useState<AnchorHealthLog[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
   const [logsError, setLogsError] = useState("");
+  const [maps, setMaps] = useState<readonly MapCatalogEntry[]>([]);
 
   async function reload(showSpinner = false) {
     if (showSpinner) setIsRefreshing(true);
@@ -73,6 +76,7 @@ export function AnchorManagementPanel({ embedded = false }: { readonly embedded?
   }
 
   useEffect(() => {
+    void fetchMapCatalog().then((catalog) => setMaps(catalog.maps.filter((map) => Boolean(map.configPath)))).catch(() => undefined);
     void fetchAnchors()
       .then(setAnchors)
       .catch((cause: unknown) => setError(cause instanceof Error ? cause.message : "Referans istasyonu listesi alınamadı."))
@@ -162,7 +166,7 @@ export function AnchorManagementPanel({ embedded = false }: { readonly embedded?
                 {!isLoading && filteredAnchors.map((anchor, index) => (
                   <motion.tr key={anchor.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(index * 0.035, 0.22) }}>
                     <td><div className={styles.anchorIdentity}><span><RadioTower size={16} /></span><div><code>{anchor.id}</code><strong>{anchor.name || "İsimsiz referans istasyonu"}</strong></div></div></td>
-                    <td><div className={styles.location}><MapPin size={15} /><div><strong>{anchor.floorLevel === null || anchor.floorLevel === undefined ? "Kat belirtilmedi" : `${anchor.floorLevel}. kat`}</strong><span>{anchor.locationDesc || "Konum açıklaması yok"}</span></div></div></td>
+                    <td><div className={styles.location}><MapPin size={15} /><div><strong>{maps.find((map) => map.id === anchor.mapId)?.displayName ?? "Harita belirtilmedi"}</strong><span>{anchor.locationDesc || "Konum açıklaması yok"}</span></div></div></td>
                     <td><div className={styles.coordinates}><span>X <b>{anchor.x.toFixed(2)}</b></span><span>Y <b>{anchor.y.toFixed(2)}</b></span><span>Z <b>{anchor.z == null ? "—" : anchor.z.toFixed(2)}</b></span></div></td>
                     <td><StatusBadge status={anchor.status} /></td>
                     <td><div className={styles.rowActions}><button type="button" onClick={() => void openLogs(anchor)} title="Sağlık loglarını görüntüle"><Activity size={16} /></button><button type="button" onClick={() => openEditForm(anchor)} title="Düzenle"><Pencil size={16} /></button><button type="button" className={styles.deleteButton} onClick={() => setDeleteTarget(anchor)} title="Sil"><Trash2 size={16} /></button></div></td>
@@ -181,7 +185,7 @@ export function AnchorManagementPanel({ embedded = false }: { readonly embedded?
           <div className={styles.drawerHeader}><div><span>{isNew ? "YENİ KAYIT" : "REFERANS İSTASYONUNU DÜZENLE"}</span><h2>{isNew ? "Yeni Referans İstasyonu Ekle" : form.id}</h2></div><button type="button" onClick={() => setIsFormOpen(false)} aria-label="Kapat"><X size={20} /></button></div>
           <form className={styles.form} onSubmit={submitForm}>
             <section><h3><RadioTower size={16} /> Temel Bilgiler</h3><div className={styles.fieldGrid}><label className={styles.field}><span>Referans istasyonu kodu *</span><input value={form.id} disabled={!isNew} onChange={(event) => setForm({ ...form, id: event.target.value })} placeholder="Örn. A-07" required />{!isNew && <small>Kimlik değiştirilemez; yeni referans istasyonu oluşturun.</small>}</label><label className={styles.field}><span>Referans istasyonu adı</span><input value={form.name ?? ""} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="Örn. Depo kuzey" /></label><label className={styles.field}><span>Durum</span><select value={form.status ?? "active"} onChange={(event) => setForm({ ...form, status: event.target.value })}>{STATUS_OPTIONS.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label></div></section>
-            <section><h3><MapPin size={16} /> Konum</h3><div className={styles.fieldGrid}><label className={styles.field}><span>X koordinatı *</span><input type="number" step="any" value={form.x} onChange={(event) => setForm({ ...form, x: Number(event.target.value) })} required /></label><label className={styles.field}><span>Y koordinatı *</span><input type="number" step="any" value={form.y} onChange={(event) => setForm({ ...form, y: Number(event.target.value) })} required /></label><label className={styles.field}><span>Z koordinatı</span><input type="number" step="any" value={form.z ?? ""} onChange={(event) => setForm({ ...form, z: numberValue(event.target.value) })} /></label><label className={styles.field}><span>Kat</span><input type="number" step="1" value={form.floorLevel ?? ""} onChange={(event) => setForm({ ...form, floorLevel: numberValue(event.target.value) })} /></label><label className={`${styles.field} ${styles.fullField}`}><span>Konum açıklaması</span><input value={form.locationDesc ?? ""} onChange={(event) => setForm({ ...form, locationDesc: event.target.value })} placeholder="Örn. A Blok giriş kapısı üzeri" /></label></div></section>
+            <section><h3><MapPin size={16} /> Konum</h3><div className={styles.fieldGrid}><label className={styles.field}><span>Harita</span><select value={form.mapId ?? ""} onChange={(event) => setForm({ ...form, mapId: event.target.value || null })}><option value="">Harita belirtilmedi</option>{maps.map((map) => <option key={map.id} value={map.id}>{map.displayName}</option>)}</select></label><label className={styles.field}><span>X koordinatı *</span><input type="number" step="any" value={form.x} onChange={(event) => setForm({ ...form, x: Number(event.target.value) })} required /></label><label className={styles.field}><span>Y koordinatı *</span><input type="number" step="any" value={form.y} onChange={(event) => setForm({ ...form, y: Number(event.target.value) })} required /></label><label className={styles.field}><span>Z koordinatı</span><input type="number" step="any" value={form.z ?? ""} onChange={(event) => setForm({ ...form, z: numberValue(event.target.value) })} /></label><label className={styles.field}><span>Kat (eski alan)</span><input type="number" step="1" value={form.floorLevel ?? ""} onChange={(event) => setForm({ ...form, floorLevel: numberValue(event.target.value) })} /></label><label className={`${styles.field} ${styles.fullField}`}><span>Konum açıklaması</span><input value={form.locationDesc ?? ""} onChange={(event) => setForm({ ...form, locationDesc: event.target.value })} placeholder="Örn. A Blok giriş kapısı üzeri" /></label></div></section>
             <section><h3><FileText size={16} /> Notlar</h3><label className={styles.field}><span>Operasyon notu</span><textarea value={form.note ?? ""} onChange={(event) => setForm({ ...form, note: event.target.value })} placeholder="Bakım, montaj veya erişim notları…" rows={5} /></label></section>
             <div className={styles.formFooter}><button type="button" className={styles.ghostButton} onClick={() => setIsFormOpen(false)}>Vazgeç</button><button className={styles.primaryButton} disabled={isSaving}>{isSaving ? <Loader2 size={16} className={styles.spin} /> : <ShieldCheck size={16} />}{isSaving ? "Kaydediliyor" : "Referans İstasyonunu Kaydet"}</button></div>
           </form>

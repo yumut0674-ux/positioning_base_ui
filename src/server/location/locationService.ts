@@ -6,7 +6,7 @@ import type { PositionRepository } from "./positionRepository";
 import type { RoomDecisionRepository } from "./roomDecisionRepository";
 import { ageDecision, decisionZone, projectHistory, projectDecisionTimeline } from "./roomDecisionProjection";
 import {
-  FLOOR_PLAN_ID, successEnvelope,
+  successEnvelope,
   type CurrentLocationData, type DataGap, type HistoryQuery, type LocationAtTimeData,
   type LocationHistoryData, type PositionRecord, type RoutePoint, type RoutePointsHistoryData,
   type SuccessEnvelope, type TrackingStatus, type ZoneTimelineEntry, type ZoneTimelineHistoryData,
@@ -22,12 +22,13 @@ function envInteger(name: string, fallback: number, minimum: number, maximum: nu
 function resolvedPosition(record: PositionRecord, zoneResolver: ZoneResolver) {
   if (record.decision) {
     const d = record.decision;
-    return { x: d.x, y: d.y, zoneName: decisionZone(d), floorPlanId: FLOOR_PLAN_ID, roomDecision: d.regionInference,
+    const mapId = d.mapId ?? record.mapId ?? null;
+    return { x: d.x, y: d.y, zoneName: decisionZone(d), floorPlanId: mapId, mapId, sourceZoneId: d.sourceZoneId ?? record.sourceZoneId ?? null, sourceZoneName: d.sourceZoneName ?? record.sourceZoneName ?? null, roomDecision: d.regionInference,
       rawPosition: d.rawPosition, publishedAt: d.publishedAt, engineVersion: d.engineVersion, configVersion: d.configVersion };
   }
   return {
-    x: record.x, y: record.y, zoneName: zoneResolver(record.x, record.y, FLOOR_PLAN_ID),
-    floorPlanId: FLOOR_PLAN_ID,
+    x: record.x, y: record.y, zoneName: record.mapId ? zoneResolver(record.x, record.y, record.mapId) : "Kat belirlenemedi",
+    floorPlanId: record.mapId ?? null, mapId: record.mapId ?? null, sourceZoneId: record.sourceZoneId ?? null, sourceZoneName: record.sourceZoneName ?? null,
   } as const;
 }
 
@@ -53,7 +54,8 @@ function toTimeline(positions: readonly PositionRecord[], zoneResolver: ZoneReso
   const entries: ZoneTimelineEntry[] = [];
   const chronological = [...positions].sort((left, right) => Date.parse(left.observedAt) - Date.parse(right.observedAt));
   for (const position of chronological) {
-    const zoneName = resolvedPosition(position, zoneResolver).zoneName;
+    const resolvedValue = resolvedPosition(position, zoneResolver);
+    const zoneName = resolvedValue.zoneName;
     const previous = entries.at(-1);
     const actualGapSeconds = previous
       ? Math.max(0, (Date.parse(position.observedAt) - Date.parse(previous.exitedAt)) / 1_000)
@@ -61,17 +63,17 @@ function toTimeline(positions: readonly PositionRecord[], zoneResolver: ZoneReso
     const isGap = !position.decision && (position.gapBeforeSeconds ?? actualGapSeconds) > 300;
     if (!previous || isGap) {
       entries.push({
-        zoneName, enteredAt: position.observedAt, exitedAt: position.observedAt, durationSeconds: 0,
+        zoneName, mapId: resolvedValue.mapId, floorPlanId: resolvedValue.mapId, sourceZoneId: resolvedValue.sourceZoneId, enteredAt: position.observedAt, exitedAt: position.observedAt, durationSeconds: 0,
       });
       continue;
     }
-    if (previous.zoneName !== zoneName) {
+    if (previous.zoneName !== zoneName || previous.mapId !== resolvedValue.mapId) {
       entries[entries.length - 1] = {
         ...previous,
         exitedAt: position.observedAt,
         durationSeconds: Math.max(0, Math.round((Date.parse(position.observedAt) - Date.parse(previous.enteredAt)) / 1_000)),
       };
-      entries.push({ zoneName, enteredAt: position.observedAt, exitedAt: position.observedAt, durationSeconds: 0 });
+      entries.push({ zoneName, mapId: resolvedValue.mapId, floorPlanId: resolvedValue.mapId, sourceZoneId: resolvedValue.sourceZoneId, enteredAt: position.observedAt, exitedAt: position.observedAt, durationSeconds: 0 });
       continue;
     }
     entries[entries.length - 1] = {
@@ -153,7 +155,7 @@ export class LocationService {
     if (decisionHistory.length >= 100000) warnings.push("Oda karar geçmişi işlem sınırına ulaştı; sonuç kısmi.");
     if (query.format === "route_points") {
       const configuredMax = envInteger("UWB_HISTORY_MAX_POINTS", 2_000, 1, 2_000);
-      const result = await this.positions.history(assignments, query.from, query.to, Math.min(query.limit, configuredMax));
+      const result = await this.positions.history(assignments, query.from, query.to, Math.min(query.limit, configuredMax), query.mapId);
       const sampled = result.sourcePointCount > result.positions.length;
       if (sampled) warnings.push(`Sonuç ${result.sourcePointCount} kayıttan güvenli biçimde ${result.positions.length} noktaya örneklendi.`);
       const data: RoutePointsHistoryData = {
@@ -174,7 +176,7 @@ export class LocationService {
     }
 
     const processingLimit = envInteger("UWB_HISTORY_PROCESSING_MAX_POINTS", 100_000, 1_000, 250_000);
-    const result = await this.positions.timelineHistory(assignments, query.from, query.to, processingLimit);
+    const result = await this.positions.timelineHistory(assignments, query.from, query.to, processingLimit, query.mapId);
     const projected = projectDecisionTimeline(result.positions, decisionHistory, query.from, query.to);
     const completeTimeline = toTimeline(projected, this.zoneResolver);
     const timeline = completeTimeline.slice(0, query.limit).map(entry=>decisionHistory.length?{...entry,timeMeaning:"decision_effective_at" as const}:entry);

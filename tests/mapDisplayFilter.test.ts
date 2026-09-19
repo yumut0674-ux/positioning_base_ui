@@ -17,7 +17,7 @@ const p = (x: number, y: number) => ({ x, y });
 const square = [p(0, 0), p(10, 0), p(10, 10), p(0, 10)];
 const elbow = [p(0, 0), p(6, 0), p(6, 2), p(2, 2), p(2, 6), p(0, 6)];
 const tag = (x: number, y: number, timestamp: number, id = "A"): TrackedTag => ({
-  id, name: id, color: "#ffffff", status: "active", x, y, timestamp,
+  id, name: id, color: "#ffffff", status: "active", x, y, timestamp, mapId: DEFAULT_REGIONS_CONFIG.map.mapId,
 });
 
 function fixture(publish?: (value: Record<string, MapTagDisplay>) => void) {
@@ -164,7 +164,7 @@ test("store binding switches RAW/engine coordinates and maps without modifying m
   const config = { ...DEFAULT_REGIONS_CONFIG, regions: [{ id: "room", name: "Room", color: "#ffffff",
     polygon: square.map(pair), roomCenter: pair(p(5, 5)), entrances: [] }] };
   try {
-    useIpsStore.setState({ tags: {}, observedTags: {}, tagLocationEntries: {}, regionsConfig: config, activeMapId: config.map.mapId });
+    useIpsStore.setState({ tags: {}, observedTags: {}, tagLocationEntries: {}, regionsConfig: config, regionsConfigByMapId: { [config.map.mapId]: config }, activeMapId: config.map.mapId });
     const raw = tag(20, 20, 1_000);
     const processed = { ...tag(5, 5, 1_000), positionSource: "REGION_CENTER" as const,
       regionInference: { enabled: true, state: "IN_REGION", regionId: "room" } };
@@ -184,7 +184,7 @@ test("store binding switches RAW/engine coordinates and maps without modifying m
     useIpsStore.getState().observeTag(tag(3, 3, 3_001));
     assert.equal(f.displays().A.visible, true);
     useIpsStore.getState().setActiveMapId("other-map");
-    assert.equal(f.displays().A.visible, false);
+    assert.equal(f.displays().A, undefined);
     useIpsStore.getState().setActiveMapId(config.map.mapId);
     assert.equal(f.displays().A.visible, true);
     useIpsStore.getState().setRegionsConfig({ ...config, regions: [] });

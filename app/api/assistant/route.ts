@@ -23,6 +23,9 @@ const positionSchema = z.object({
 }).strict();
 const historyPointSchema = positionSchema.extend({
   zoneName: optionalText(160),
+  mapId: optionalText(100).nullable(),
+  sourceZoneId: optionalText(100).nullable(),
+  sourceZoneName: optionalText(160).nullable(),
 }).strict();
 
 const assistantContextSchema = z.object({
@@ -34,6 +37,10 @@ const assistantContextSchema = z.object({
   to: isoWithTimezoneSchema.optional(),
   floorPlanId: optionalText(100),
   floorPlanName: optionalText(160),
+  buildingName: optionalText(160),
+  floorLabel: optionalText(80),
+  sourceZoneId: optionalText(100),
+  sourceZoneName: optionalText(160),
   tagStatus: optionalText(50),
   zoneName: optionalText(160),
   livePosition: positionSchema.optional(),

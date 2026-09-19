@@ -34,8 +34,9 @@ export class PostgresRoomDecisionRepository implements RoomDecisionRepository {
     const batch = this.queue.splice(0, 1000);
     this.inFlight = batch;
     try {
-      const values = batch.map(p => `(${p.decisionId ? quote(p.decisionId) : "NULL"},${quote(p.tagCode)},${quote(p.lastRawDataTimestamp)}::timestamptz,${quote(p.publishedAt!)}::timestamptz,${quote(p.engineVersion!)},${quote(p.configVersion!)},${quote(JSON.stringify(p))}::jsonb)`).join(",");
-      await this.query(`INSERT INTO tag_room_decisions(event_id,tag_code,measured_at,published_at,engine_version,config_version,payload) SELECT v.* FROM (VALUES ${values}) AS v(event_id,tag_code,measured_at,published_at,engine_version,config_version,payload) WHERE EXISTS(SELECT 1 FROM tags t WHERE upper(t.tag_code)=upper(v.tag_code)) ON CONFLICT (event_id) DO NOTHING;`);
+      const nullable = (value: string | null | undefined) => value ? quote(value) : "NULL";
+      const values = batch.map(p => `(${p.decisionId ? quote(p.decisionId) : "NULL"},${quote(p.tagCode)},${quote(p.lastRawDataTimestamp)}::timestamptz,${quote(p.publishedAt!)}::timestamptz,${quote(p.engineVersion!)},${quote(p.configVersion!)},${nullable(p.mapId)},${nullable(p.sourceZoneId)},${quote(JSON.stringify(p))}::jsonb)`).join(",");
+      await this.query(`ALTER TABLE tag_room_decisions ADD COLUMN IF NOT EXISTS map_id VARCHAR(100); ALTER TABLE tag_room_decisions ADD COLUMN IF NOT EXISTS zone_id VARCHAR(100); INSERT INTO tag_room_decisions(event_id,tag_code,measured_at,published_at,engine_version,config_version,map_id,zone_id,payload) SELECT v.* FROM (VALUES ${values}) AS v(event_id,tag_code,measured_at,published_at,engine_version,config_version,map_id,zone_id,payload) WHERE EXISTS(SELECT 1 FROM tags t WHERE upper(t.tag_code)=upper(v.tag_code)) ON CONFLICT (event_id) DO NOTHING;`);
       this.error = null;
     } catch (error) {
       this.queue = [...batch, ...this.queue];

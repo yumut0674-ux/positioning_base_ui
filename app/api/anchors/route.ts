@@ -17,12 +17,14 @@ function cleanAnchor(input: AnchorInput): AnchorInput {
   if (!Number.isFinite(input.x) || !Number.isFinite(input.y)) throw new Error("X and Y coordinates must be valid numbers");
   if (input.z !== null && input.z !== undefined && !Number.isFinite(input.z)) throw new Error("Z coordinate must be a valid number");
   if (input.floorLevel !== null && input.floorLevel !== undefined && !Number.isInteger(input.floorLevel)) throw new Error("Floor level must be an integer");
-  return { ...input, id, name: input.name?.trim().slice(0, 150) || null, status: input.status?.trim().slice(0, 30) || "active", note: input.note?.trim() || null, floorLevel: input.floorLevel ?? null, locationDesc: input.locationDesc?.trim().slice(0, 255) || null };
+  const mapId = input.mapId?.trim() || null;
+  if (mapId && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(mapId)) throw new Error("Map ID is invalid");
+  return { ...input, id, mapId, name: input.name?.trim().slice(0, 150) || null, status: input.status?.trim().slice(0, 30) || "active", note: input.note?.trim() || null, floorLevel: input.floorLevel ?? null, locationDesc: input.locationDesc?.trim().slice(0, 255) || null };
 }
 
 function anchorValues(input: AnchorInput): string {
   const anchor = cleanAnchor(input);
-  return [sqlString(anchor.id), sqlNullableString(anchor.name ?? anchor.id), sqlNumber(anchor.x), sqlNumber(anchor.y), sqlNumber(anchor.z), sqlString(anchor.status ?? "active"), sqlNullableString(anchor.note), sqlInteger(anchor.floorLevel), sqlNullableString(anchor.locationDesc)].join(", ");
+  return [sqlString(anchor.id), sqlNullableString(anchor.name ?? anchor.id), sqlNumber(anchor.x), sqlNumber(anchor.y), sqlNumber(anchor.z), sqlString(anchor.status ?? "active"), sqlNullableString(anchor.note), sqlInteger(anchor.floorLevel), sqlNullableString(anchor.locationDesc), sqlNullableString(anchor.mapId)].join(", ");
 }
 
 const schemaSql = `
@@ -35,6 +37,7 @@ CREATE TABLE IF NOT EXISTS anchors (
 ALTER TABLE anchors ADD COLUMN IF NOT EXISTS note TEXT;
 ALTER TABLE anchors ADD COLUMN IF NOT EXISTS floor_level INTEGER;
 ALTER TABLE anchors ADD COLUMN IF NOT EXISTS location_desc VARCHAR(255);
+ALTER TABLE anchors ADD COLUMN IF NOT EXISTS map_id VARCHAR(100);
 CREATE TABLE IF NOT EXISTS anchor_health_logs (
   id BIGSERIAL PRIMARY KEY,
   anchor_code VARCHAR(100) NOT NULL REFERENCES anchors(anchor_code) ON DELETE CASCADE,
@@ -46,27 +49,27 @@ CREATE INDEX IF NOT EXISTS idx_anchor_health_logs_anchor_time ON anchor_health_l
 const selectAnchorsSql = `
 SELECT a.anchor_code AS id, a.anchor_name AS name, a.x, a.y, a.z,
   COALESCE((SELECT l.status FROM anchor_health_logs l WHERE l.anchor_code = a.anchor_code ORDER BY l.created_at DESC LIMIT 1), a.status) AS status,
-  a.note, a.floor_level AS "floorLevel", a.location_desc AS "locationDesc"
+  a.note, a.floor_level AS "floorLevel", a.location_desc AS "locationDesc", a.map_id AS "mapId"
 FROM anchors a ORDER BY a.anchor_code;`;
 
 function seedAnchorsSql(): string {
-  return `INSERT INTO anchors (anchor_code, anchor_name, x, y, z, status, note, floor_level, location_desc)
+  return `INSERT INTO anchors (anchor_code, anchor_name, x, y, z, status, note, floor_level, location_desc, map_id)
 VALUES ${DEFAULT_ANCHORS.map((anchor) => `(${anchorValues(anchor)})`).join(",\n")}
 ON CONFLICT (anchor_code) DO NOTHING;`;
 }
 
 function upsertAnchorsSql(anchors: readonly AnchorInput[]): string {
   if (!anchors.length) throw new Error("No anchors provided");
-  return `INSERT INTO anchors (anchor_code, anchor_name, x, y, z, status, note, floor_level, location_desc)
+  return `INSERT INTO anchors (anchor_code, anchor_name, x, y, z, status, note, floor_level, location_desc, map_id)
 VALUES ${anchors.map((anchor) => `(${anchorValues(anchor)})`).join(",\n")}
 ON CONFLICT (anchor_code) DO UPDATE SET
   anchor_name = EXCLUDED.anchor_name, x = EXCLUDED.x, y = EXCLUDED.y, z = EXCLUDED.z,
   status = EXCLUDED.status, note = EXCLUDED.note, floor_level = EXCLUDED.floor_level,
-  location_desc = EXCLUDED.location_desc, updated_at = NOW();`;
+  location_desc = EXCLUDED.location_desc, map_id = EXCLUDED.map_id, updated_at = NOW();`;
 }
 
 function toAnchor(row: Record<string, string | null>): AnchorDefinition {
-  return { id: row.id ?? "", name: row.name, x: Number(row.x), y: Number(row.y), z: row.z === null ? null : Number(row.z), status: row.status ?? "active", note: row.note, floorLevel: row.floorLevel === null ? null : Number(row.floorLevel), locationDesc: row.locationDesc };
+  return { id: row.id ?? "", mapId: row.mapId, name: row.name, x: Number(row.x), y: Number(row.y), z: row.z === null ? null : Number(row.z), status: row.status ?? "active", note: row.note, floorLevel: row.floorLevel === null ? null : Number(row.floorLevel), locationDesc: row.locationDesc };
 }
 
 async function getAnchors(seed = false) {

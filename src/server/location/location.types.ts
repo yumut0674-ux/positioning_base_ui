@@ -1,4 +1,5 @@
 export const LOCATION_TIMEZONE = "Europe/Istanbul" as const;
+/** @deprecated Legacy fallback for records created before map-aware tracking. */
 export const FLOOR_PLAN_ID = "hq-l1" as const;
 
 export type DataStatus = "complete" | "partial" | "no_data" | "stale" | "ambiguous";
@@ -68,6 +69,9 @@ export interface PositionRecord {
   readonly y: number;
   readonly observedAt: string;
   readonly gapBeforeSeconds: number | null;
+  readonly mapId?: string | null;
+  readonly sourceZoneId?: string | null;
+  readonly sourceZoneName?: string | null;
 }
 
 export interface ResolvedPosition {
@@ -79,7 +83,10 @@ export interface ResolvedPosition {
   readonly x: number;
   readonly y: number;
   readonly zoneName: string;
-  readonly floorPlanId: typeof FLOOR_PLAN_ID;
+  readonly floorPlanId: string | null;
+  readonly mapId?: string | null;
+  readonly sourceZoneId?: string | null;
+  readonly sourceZoneName?: string | null;
 }
 
 export interface SearchEntitiesData {
@@ -114,7 +121,7 @@ export interface RoutePoint extends ResolvedPosition {
   readonly y: number;
   readonly observedAt: string;
   readonly zoneName: string;
-  readonly floorPlanId: typeof FLOOR_PLAN_ID;
+  readonly floorPlanId: string | null;
   readonly tagCode: string;
 }
 
@@ -125,6 +132,9 @@ export interface ZoneTimelineEntry {
   readonly enteredAt: string;
   readonly exitedAt: string;
   readonly durationSeconds: number;
+  readonly mapId?: string | null;
+  readonly floorPlanId?: string | null;
+  readonly sourceZoneId?: string | null;
 }
 
 export interface DataGap {
@@ -161,6 +171,7 @@ export interface HistoryQuery {
   readonly to: string;
   readonly format: HistoryFormat;
   readonly limit: number;
+  readonly mapId?: string;
 }
 
 export function toIstanbulIso(value: Date | string): string {

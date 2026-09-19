@@ -13,7 +13,7 @@ test("default selection survives empty or obsolete browser storage", () => {
   assert.equal(resolveInitialMapId(catalog, null), catalog.defaultMapId);
   assert.equal(resolveInitialMapId(catalog, "silinmis-harita"), catalog.defaultMapId);
   assert.equal(resolveInitialMapId(catalog, "kat1-ornek-birim"), catalog.defaultMapId);
-  assert.equal(resolveInitialMapId(catalog, "kat1-ortopedi"), catalog.defaultMapId);
+  assert.equal(resolveInitialMapId(catalog, "kat1-ortopedi"), "kat1-ortopedi");
   assert.equal(resolveInitialMapId(catalog, "spor-koridor"), "spor-koridor");
 });
 

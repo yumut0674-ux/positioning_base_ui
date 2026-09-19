@@ -14,13 +14,16 @@ export interface MapCatalogEntry {
   readonly displayName: string;
   readonly status: MapStatus;
   readonly liveTrackingEnabled: boolean;
+  readonly trackingZoneIds: readonly string[];
   readonly sortOrder: number;
   readonly configPath: string | null;
+  readonly regionsConfigPath: string | null;
 }
 
 export interface MapCatalog {
   readonly version: number;
   readonly defaultMapId: string;
+  /** @deprecated Compatibility hint. Consumers must use each map's liveTrackingEnabled flag. */
   readonly liveTrackingMapId: string;
   readonly maps: readonly MapCatalogEntry[];
 }

@@ -88,6 +88,13 @@ export interface RegionEngineStatus {
   readonly configVersion?: string;
   readonly warnings?: readonly string[];
   readonly diagnostics?: readonly RegionVehicleDiagnostic[];
+  readonly maps?: Readonly<Record<string, {
+    readonly activeVehicleCount: number;
+    readonly vehiclesInRegions: number;
+    readonly configLoaded: boolean;
+    readonly configVersion?: string;
+    readonly warnings?: readonly string[];
+  }>>;
 }
 
 export interface EvidenceScoreComponents {

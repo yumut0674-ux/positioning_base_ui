@@ -233,6 +233,10 @@ def _build_context_prompt(context: Mapping[str, Any] | None, tag_lookup_result: 
         "to": "Bitiş zamanı",
         "floorPlanId": "Kat planı",
         "floorPlanName": "Kat/harita adı",
+        "buildingName": "Bina",
+        "floorLabel": "Kat",
+        "sourceZoneId": "Kaynak UWB zone kimliği",
+        "sourceZoneName": "Kaynak UWB zone açıklaması",
         "tagStatus": "Tag durumu",
         "zoneName": "Bölge/oda",
     }

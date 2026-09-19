@@ -14,12 +14,25 @@ test("checked-in map catalog and live map config are valid", async () => {
   const catalog = await service.getCatalog();
   assert.equal(catalog.defaultMapId, "spor-koridor");
   assert.equal(catalog.liveTrackingMapId, "spor-koridor");
-  assert.ok(catalog.maps.some((entry) => entry.id === "kat1-ortopedi" && entry.status === "disabled"));
+  assert.ok(catalog.maps.some((entry) => entry.id === "kat1-ortopedi" && entry.status === "active" && entry.liveTrackingEnabled));
+  assert.deepEqual(catalog.maps.find((entry) => entry.id === "spor-koridor")?.trackingZoneIds, ["zone-a", "uwb-floor-1", "spor-koridor"]);
   assert.ok(catalog.maps.some((entry) => entry.status === "planned" && entry.configPath === null));
   const details = await service.getMapDetails(catalog.liveTrackingMapId);
   assert.equal(details.image.url, "/maps/spor-koridor/floor-plan.png");
   assert.equal(details.calibration.pixelsPerMeter, 113.584734212);
   assert.deepEqual(details.calibration.canvasOrigin, { x: 812.16, y: 1735.14 });
+});
+
+test("multiple live maps are valid but duplicate active zone mappings are rejected", async () => {
+  const catalog = await new FileMapRepository(mapsDirectory).readCatalog();
+  assert.equal(catalog.maps.filter((entry) => entry.liveTrackingEnabled).length, 2);
+  const duplicate = structuredClone(catalog) as unknown as { maps: Array<Record<string, unknown>> } & Record<string, unknown>;
+  duplicate.maps[1].trackingZoneIds = ["zone-a"];
+  const temporaryDirectory = await mkdtemp(path.join(os.tmpdir(), "gekon-map-zones-"));
+  try {
+    await writeFile(path.join(temporaryDirectory, "catalog.json"), JSON.stringify(duplicate), "utf8");
+    await assert.rejects(() => new FileMapRepository(temporaryDirectory).readCatalog(), /birden fazla haritaya/);
+  } finally { await rm(temporaryDirectory, { recursive: true, force: true }); }
 });
 
 test("invalid catalogs are rejected before being served", async () => {

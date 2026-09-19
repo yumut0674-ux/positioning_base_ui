@@ -27,6 +27,7 @@ export class RegionPositionEngine {
     if (!config.regions.some(r => r.id === v.activeRegionId)) v.activeRegionId = null;
     v.state = "LOCATION_LOST"; v.relocation = true; v.reasons = ["Harita değişti; yeni ölçüm kanıtı bekleniyor"]; this.send(v, true); } }
   public getVehicleState(id: string): State | undefined { return this.vehicles.get(id); }
+  public removeVehicle(id: string): void { this.vehicles.delete(id); }
   public getStatus(rawPort: number, processedPort: number): RegionEngineStatus {
     const config = this.config;
     return { enabled: this.enabled, rawPort, processedPort,

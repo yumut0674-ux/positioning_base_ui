@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { trackingBuffer, type TrackingPosition } from "@/src/server/trackingBuffer";
+import { zoneMapResolver } from "@/src/server/maps/zoneMapResolver";
 
 export const runtime = "nodejs";
 
 const EXPECTED_FIELDS = ["type", "tag_id", "x", "y", "timestamp"] as const;
+const ZONE_FIELDS = ["zone_id", "zone_name"] as const;
 const ISO_DATE_TIME = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|[+-]\d{2}:\d{2})$/;
 const encoder = new TextEncoder();
 
@@ -14,6 +16,8 @@ type IngestBody = {
   readonly y?: unknown;
   readonly timestamp?: unknown;
   readonly quality?: unknown;
+  readonly zone_id?: unknown;
+  readonly zone_name?: unknown;
 };
 
 function isIsoDateTime(value: string): boolean {
@@ -45,7 +49,7 @@ export function parsePositionPayload(value: unknown): TrackingPosition {
 
   const input = value as IngestBody;
   const unexpectedFields = Object.keys(input).filter(
-    (field) => field !== "quality" && !EXPECTED_FIELDS.includes(field as (typeof EXPECTED_FIELDS)[number]),
+    (field) => field !== "quality" && !EXPECTED_FIELDS.includes(field as (typeof EXPECTED_FIELDS)[number]) && !ZONE_FIELDS.includes(field as (typeof ZONE_FIELDS)[number]),
   );
   if (unexpectedFields.length > 0) {
     throw new Error(`Beklenmeyen alanlar: ${unexpectedFields.join(", ")}`);
@@ -64,6 +68,8 @@ export function parsePositionPayload(value: unknown): TrackingPosition {
   if (typeof input.timestamp !== "string" || !isIsoDateTime(input.timestamp)) {
     throw new Error("timestamp geçerli, zaman dilimi içeren bir ISO-8601 tarih/zaman değeri olmalıdır");
   }
+  const sourceZoneId = normalizeNullableString(input.zone_id, "zone_id", 100);
+  const sourceZoneName = normalizeNullableString(input.zone_name, "zone_name", 160);
 
   return {
     ...(input.quality === undefined ? {} : { quality: validateQuality(input.quality) }),
@@ -71,7 +77,19 @@ export function parsePositionPayload(value: unknown): TrackingPosition {
     x: input.x,
     y: input.y,
     timestamp: input.timestamp,
+    sourceZoneId,
+    sourceZoneName,
+    mapId: null,
   };
+}
+
+function normalizeNullableString(value: unknown, field: string, maxLength: number): string | null {
+  // Expand/migrate phase: omitted legacy keys are accepted exactly like explicit null.
+  if (value === undefined || value === null) return null;
+  if (typeof value !== "string") throw new Error(`${field} string veya null olmalıdır`);
+  const normalized = value.trim();
+  if (normalized.length > maxLength) throw new Error(`${field} en fazla ${maxLength} karakter olabilir`);
+  return normalized || null;
 }
 
 function validateQuality(value: unknown): number {
@@ -85,9 +103,11 @@ export async function POST(request: Request) {
     if (contentType !== "application/json") {
       throw new Error("Content-Type application/json olmalıdır");
     }
-    const position = parsePositionPayload(await request.json());
+    const parsed = parsePositionPayload(await request.json());
+    const resolution = await zoneMapResolver.resolve(parsed.sourceZoneId ?? null);
+    const position = { ...parsed, mapId: resolution.mapId };
     const buffered = await trackingBuffer.ingest(position);
-    return NextResponse.json({ accepted: 1, buffered: buffered ? 1 : 0 }, { status: 202 });
+    return NextResponse.json({ accepted: 1, buffered: buffered ? 1 : 0, mapId: resolution.mapId, resolved: resolution.resolved }, { status: 202 });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Geçersiz konum verisi" }, { status: 400 });
   }

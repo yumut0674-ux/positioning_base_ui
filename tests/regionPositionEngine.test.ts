@@ -16,7 +16,7 @@ function setup(overrides: RegionsConfig["engine"]={}) {
   const engine=new RegionPositionEngine(p=>published.push(p),250,()=>now,false);
   engine.enable(compileRegionsConfig(config));
   return {engine,published,config,
-    point(t:number,x:number,y:number,tagCode="T",quality?:number){now=epoch+t;return engine.ingest({tagCode,x,y,timestamp:new Date(now).toISOString(),quality});},
+    point(t:number,x:number,y:number,tagCode="T",quality?:number){now=epoch+t;return engine.ingest({tagCode,x,y,timestamp:new Date(now).toISOString(),quality,sourceZoneId:"zone-a",sourceZoneName:"Zone A",mapId:"map-a"});},
     tick(t:number){now=epoch+t;engine.tick();return published.at(-1)!;},
     enter(){this.point(0,3,2);this.point(1000,3,2.5);return this.point(2000,3,3)!;}
   };
@@ -65,6 +65,7 @@ test("synthetic publications preserve measurement time, long gaps expose uncerta
   const s=setup();const entered=s.enter();const p=s.tick(7000);
   assert.equal(p.timestamp,entered.timestamp);assert.equal(p.lastRawDataTimestamp,entered.timestamp);
   assert.notEqual(p.publishedAt,p.timestamp);assert.equal(p.synthetic,true);
+  assert.equal(p.mapId,"map-a");assert.equal(p.sourceZoneId,"zone-a");assert.equal(p.sourceZoneName,"Zone A");
   const lost=s.tick(40000);assert.equal(lost.regionInference.state,"LOCATION_LOST");assert.equal(lost.regionInference.regionId,null);
   assert.equal(lost.regionInference.lastKnownRegionId,"A");assert.deepEqual([lost.x,lost.y],[3,3]);
 });

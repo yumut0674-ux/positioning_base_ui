@@ -4,7 +4,7 @@ import test from "node:test";
 import { HttpLocationApiClient } from "../../mcp/client/locationApiClient";
 import { LocationError } from "../../src/server/location/locationErrors";
 import { errorEnvelope } from "../../src/server/location/location.types";
-import { searchEnvelope } from "./fixtures/testData";
+import { historyEnvelope, searchEnvelope } from "./fixtures/testData";
 
 test("istemci query parametrelerini encode eder ve opsiyonel token gönderir", async () => {
   let seenUrl = "";
@@ -21,6 +21,16 @@ test("istemci query parametrelerini encode eder ve opsiyonel token gönderir", a
   const url = new URL(seenUrl);
   assert.equal(url.searchParams.get("q"), "Palet 28 & özel");
   assert.equal(seenAuthorization, "Bearer secret-test-token");
+});
+
+test("history istemcisi opsiyonel mapId filtresini API'ye taşır", async () => {
+  let seenUrl = "";
+  const client = new HttpLocationApiClient({ fetchImplementation: async (input) => {
+    seenUrl = String(input);
+    return new Response(JSON.stringify(historyEnvelope()), { status: 200, headers: { "content-type": "application/json" } });
+  } });
+  await client.getLocationHistory({ entityId: 28, from: "2026-07-18T00:00:00+03:00", to: "2026-07-19T00:00:00+03:00", format: "route_points", limit: 100, mapId: "kat1-ortopedi" });
+  assert.equal(new URL(seenUrl).searchParams.get("mapId"), "kat1-ortopedi");
 });
 
 test("API timeout UPSTREAM_TIMEOUT olur", async () => {

@@ -15,9 +15,9 @@ export function bindMapDisplayTracking(filter: MapDisplayFilter, engineEnabled: 
       const config = state.regionsConfig;
       const polygons = config && (!state.activeMapId || config.map.mapId === state.activeMapId)
         ? config.regions.map((region) => region.polygon.map((pair) => pair.world)) : [];
-      filter.configure(polygons, resolveMapDisplayConfig(config?.mapDisplay).outsideHoldMs);
+      filter.configure(polygons, resolveMapDisplayConfig(config?.mapDisplay).outsideHoldMs, state.activeMapId);
     }
-    const candidates = Object.values(source).filter((tag) => !engineEnabled || !!tag.regionInference);
+    const candidates = Object.values(source).filter((tag) => tag.mapId === state.activeMapId && (!engineEnabled || !!tag.regionInference));
     filter.retain(new Set(candidates.map((tag) => tag.id)));
     for (const tag of candidates) filter.ingest(tag, !engineEnabled, reconfigure);
   };

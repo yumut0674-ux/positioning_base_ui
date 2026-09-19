@@ -17,7 +17,7 @@ export function resolveInitialMapId(catalog: MapCatalog, storedMapId: string | n
 }
 
 export function shouldShowLiveTracking(catalog: MapCatalog, map: MapDetails | undefined): boolean {
-  return Boolean(map && map.id === catalog.liveTrackingMapId && map.liveTrackingEnabled);
+  return Boolean(map && map.liveTrackingEnabled && catalog.maps.some((entry) => entry.id === map.id && entry.liveTrackingEnabled));
 }
 
 export function readStoredMapId(storage: MapSelectionStorage): string | null {

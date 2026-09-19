@@ -44,8 +44,8 @@ raw position event
   -> same-origin proxy: /api/tracking/processed
 
 Operasyon UI
-  -> /api/tags, /api/anchors, /api/regions, /api/location/*
-  -> PostgreSQL ve config/regions.json
+  -> /api/tags, /api/anchors, /api/maps/{mapId}/regions, /api/location/*
+  -> PostgreSQL ve config/maps/{mapId}/regions.json
 
 Opsiyonel asistan:
 History chat UI
@@ -98,7 +98,7 @@ Invoke-RestMethod `
   -Method Post `
   -Uri "http://127.0.0.1:3000/api/tracking/ingest" `
   -ContentType "application/json" `
-  -Body '{"type":"position","tag_id":"TAG-001","x":8.8,"y":7.8,"timestamp":"2026-07-26T12:00:00+03:00"}'
+  -Body '{"type":"position","tag_id":"TAG-001","x":8.8,"y":7.8,"zone_id":"zone-a","zone_name":"Bölge A","timestamp":"2026-07-26T12:00:00+03:00"}'
 ```
 
 Beklenen cevap:
@@ -106,7 +106,9 @@ Beklenen cevap:
 ```json
 {
   "accepted": 1,
-  "buffered": 1
+  "buffered": 1,
+  "mapId": "spor-koridor",
+  "resolved": true
 }
 ```
 
@@ -205,12 +207,15 @@ Uygulamanın kullandığı ana tablolar:
 ilk açılıştan önce bağlantıyı test etmek ve şemayı kontrollü oluşturmak daha
 sağlıklıdır.
 
-Entity/tag assignment migration'ı otomatik uygulanmaz. Önce yedek alın,
+Entity/tag assignment ve çok katlı tracking migration'ları otomatik uygulanmaz. Önce yedek alın,
 bakım penceresini doğrulayın, sonra manuel çalıştırın:
 
 ```powershell
 $env:PGPASSWORD="uwb_local_123456"
 psql -h 127.0.0.1 -p 5432 -U uwb_user -d uwb_db -f drizzle\0001_tracked_entities_and_tag_assignments.sql
+psql -h 127.0.0.1 -p 5432 -U uwb_user -d uwb_db -f drizzle\0002_tag_location_history.sql
+psql -h 127.0.0.1 -p 5432 -U uwb_user -d uwb_db -f drizzle\0003_room_decisions.sql
+psql -h 127.0.0.1 -p 5432 -U uwb_user -d uwb_db -f drizzle\0004_multifloor_tracking.sql
 ```
 
 Migration sonrası hızlı kontrol:
@@ -225,6 +230,13 @@ Not: `db/schema.ts` ve `drizzle.config.ts` bu projede ana PostgreSQL şema
 kaynağı değildir. Drizzle config eski D1/SQLite kurulum mirasından kalmıştır;
 aktif PostgreSQL sorguları `app/api/*` ve `src/server/location/*Repository.ts`
 dosyalarındadır.
+
+`0004_multifloor_tracking.sql` idempotent ve expand-only'dir: konum geçmişine
+`zone_id`, `zone_name`, `map_id`; room decision kayıtlarına `zone_id`, `map_id`;
+anchor kayıtlarına `map_id` nullable sütunlarını ve sorgu indekslerini ekler.
+Eski kayıtlar kanıt olmadan bir kata bağlanmaz. Backfill gerekiyorsa önce yalnız
+`SELECT tag_code, created_at, zone_id, map_id ... WHERE map_id IS NULL` ile dry-run
+raporu alın; doğrulanmış zaman/zone aralıkları olmadan `UPDATE` çalıştırmayın.
 
 ## Servisler ve portlar
 
@@ -259,6 +271,8 @@ Payload tam olarak şu alanları içermelidir:
   "tag_id": "TAG-001",
   "x": 8.8,
   "y": 7.8,
+  "zone_id": "zone-a",
+  "zone_name": "Bölge A",
   "timestamp": "2026-07-26T12:00:00+03:00"
 }
 ```
@@ -268,19 +282,40 @@ Kurallar:
 - `Content-Type` `application/json` olmalıdır.
 - JSON gövdesi tek nesne olmalıdır.
 - Ek alan kabul edilmez.
-- Zorunlu alanlar: `type`, `tag_id`, `x`, `y`, `timestamp`.
+- Yeni producer sözleşmesinde `zone_id` ve `zone_name` key'leri de gönderilir. Expand/migrate rollout aşamasında eski producer payload'ları bu iki alan yokmuş gibi `null` kabul edilir; producer geçişi ve metrik izlemesi tamamlanınca strict enforcement açılabilir.
 - `type` yalnızca `"position"` olabilir.
 - `tag_id` boş olmayan string olmalı, en fazla 100 karakter olmalıdır.
 - `tag_id` trim edilir ve uppercase normalize edilir.
 - `x` ve `y` sonlu number olmalıdır.
+- `zone_id` string veya `null`, en fazla 100 karakterdir; `zone_name` string veya `null`, en fazla 160 karakterdir. String değerler trim edilir ve boş string `null` olur.
+- `zone_id`, `config/maps/catalog.json` içindeki aktif/seçilebilir map'in `trackingZoneIds` listesi üzerinden `mapId` değerine çözülür. `zone_name` eşleme için kullanılmaz; yalnız kaynak snapshot açıklamasıdır.
+- Null veya bilinmeyen zone yapısal olarak geçerliyse kabul edilir, `mapId:null` olur, listede “Kat belirlenemedi” görünür ve hiçbir haritada çizilmez.
 - `timestamp` timezone içeren ISO-8601 olmalıdır. Örnek: `Z` veya `+03:00`.
+
+Katalog eşlemesi map başına birden fazla kaynak zone kabul eder; aynı zone iki
+etkin map'te tanımlanamaz:
+
+```json
+{
+  "id": "kat1-ortopedi",
+  "liveTrackingEnabled": true,
+  "trackingZoneIds": ["zone-b", "uwb-floor-2"],
+  "regionsConfigPath": "kat1-ortopedi/regions.json"
+}
+```
+
+`liveTrackingMapId` yalnız eski istemciler için geçici compatibility alanıdır;
+canlılık kararı her katalog girdisinin kendi `liveTrackingEnabled` değerinden
+verilir.
 
 Başarılı cevap:
 
 ```json
 {
   "accepted": 1,
-  "buffered": 1
+  "buffered": 1,
+  "mapId": "spor-koridor",
+  "resolved": true
 }
 ```
 
@@ -313,7 +348,10 @@ SSE event adı `position` değeridir. Event data shape:
   "tagCode": "TAG-001",
   "x": 8.8,
   "y": 7.8,
-  "timestamp": "2026-07-26T12:00:00+03:00"
+  "timestamp": "2026-07-26T12:00:00+03:00",
+  "sourceZoneId": "zone-a",
+  "sourceZoneName": "Bölge A",
+  "mapId": "spor-koridor"
 }
 ```
 
@@ -336,6 +374,18 @@ normal hareket, kapı girişinde veri kesintisi, oda içinde uzun veri kesintisi
 komşu odaya kısa ölçüm sıçraması üretir. Tek davranış için `normal`, `entry-gap`,
 `inside-long-gap` veya `neighbor-jumps` seçilebilir.
 
+Çok katlı ve zone hata profilleri:
+
+```powershell
+npm run simulate:rooms -- --scenario multi-floor --map spor-koridor --zone-id zone-a --zone-name "Spor Koridoru" --seed 42
+npm run simulate:rooms -- --scenario null-zone --seed 42
+npm run simulate:rooms -- --scenario unknown-zone --seed 42
+npm run simulate:rooms -- --scenario delayed-old-floor-event --seed 42
+npm run simulate:rooms -- --scenario same-coordinate-different-floor --seed 42
+```
+
+`multi-floor` aynı tag'i Zone A/Map A'dan Zone B/Map B'ye geçirir ve ikinci map'in yerel koordinatlarını kullanır. `delayed-old-floor-event` yeni kata geçişten sonra eski kata ait gecikmiş timestamp üretir. Seed aynı kaldığında payload dizisi deterministiktir.
+
 Gerekirse hedef endpoint:
 
 ```powershell
@@ -349,7 +399,7 @@ Region engine, raw ingest akışını değiştirmeden oda/bölge çıkarımı ya
 opsiyonel moddur. UI'daki "Oda Tespit Modu" açıldığında veya API ile enable
 edildiğinde:
 
-1. `config/regions.json` okunur ve world-coordinate polygon index'leri derlenir.
+1. Her canlı map için `config/maps/{mapId}/regions.json` okunur ve ayrı world-coordinate polygon index'i/state machine oluşturulur.
 2. Raw position event'leri memory state machine tarafından tüketilir.
 3. Araç oda içinde doğrulanırsa processed event room center koordinatıyla yayınlanır.
 4. Raw koordinatlar PostgreSQL'e aynen yazılmaya devam eder.
@@ -426,7 +476,7 @@ State değerleri:
 - `EXIT_CANDIDATE`: Region dışına çıkış için confirmation bekleniyor.
 - `LOCATION_LOST`: Yeterince uzun süre raw veri gelmedi.
 
-`config/regions.json` ana bölümleri:
+`config/maps/{mapId}/regions.json` ana bölümleri:
 
 - `map`: Kat planı görseli, pixel/world kalibrasyonu ve map kimliği.
 - `engine`: Entry/exit confirmation ve çıkış toleransı.
@@ -458,7 +508,7 @@ Local geliştirme farkı:
 - Vite middleware `REGION_POSITION_PORT` için processed SSE listener'ı dev server
   açılışında `REGION_POSITION_HOST` üzerinde başlatır.
 - Port doluysa `npm run dev` erken hata verir.
-- `/api/regions` local dev'de `config/regions.json` dosyasını günceller.
+- `/api/maps/{mapId}/regions` yalnız ilgili map'in dosyasını atomic temp+rename ile günceller; `/api/regions` geçici default-map compatibility endpoint'idir.
 
 Normal Node runtime farkı:
 
@@ -486,6 +536,8 @@ Operasyon endpoint'leri:
 | `/api/anchors?id=A-001` | `DELETE` | Anchor siler. |
 | `/api/anchors/{id}/logs?limit=100` | `GET` | Anchor health loglarını getirir. |
 | `/api/regions` | `GET`, `PUT` | Region config okur veya kaydeder. |
+| `/api/maps/{mapId}/regions` | `GET`, `PUT` | Map bazlı region config okur veya atomic kaydeder. |
+| `/api/maps/{mapId}/regions/validate` | `POST` | URL mapId/config mapId eşleşmesi dahil config doğrular. |
 | `/api/region-engine/status` | `GET`, `PUT` | Region engine durumunu okur veya değiştirir. |
 | `/api/region-engine/config` | `PUT` | Çalışan engine config'ini reload eder. |
 | `/api/location/entities/search?q=TAG&limit=10` | `GET` | Entity/tag araması. |
@@ -498,6 +550,26 @@ Operasyon endpoint'leri:
 Location API cevapları başarılı durumda `{ data, meta }`, hata durumunda
 `{ error, meta }` envelope'u döndürür. Tarihler `Europe/Istanbul` için `+03:00`
 formatına normalize edilir.
+
+### Çok katlı geçmiş
+
+`route_points` noktaları `mapId`, `floorPlanId`, `sourceZoneId` ve
+`sourceZoneName` taşır. History sorgusunda `mapId` opsiyonel filtredir. Arayüz
+noktaları ardışık `mapId` segmentlerine böler, yalnız seçilen segmenti kendi
+planında çizer ve kat değişimleri arasındaki koordinat farkını toplam mesafeye
+eklemez. `mapId:null` kayıtlar “Kat belirlenemedi” grubunda kalır ve plana
+çizilmez. Zone timeline aynı oda adı kullanılsa bile map değişiminde yeni kalış
+başlatır.
+
+### Rollout ve rollback
+
+Önerilen sıra expand → migrate → enforce'tur: önce nullable `0004` sütunlarını
+ekleyin; sonra yeni reader/ingest ve producer/simülatörü yayınlayın; ardından
+birden fazla `liveTrackingEnabled` map'i açın; son olarak health çıktısındaki
+`nullZoneCount` ve `unresolvedZoneCount` sayaçları sıfıra yaklaştığında eksik
+zone key'lerini producer tarafında zorunlu hale getirin. Rollback veri silmez:
+yeni sütunlar nullable, `liveTrackingMapId` geçici compatibility alanı ve eski
+`/api/regions` default-map wrapper'ı korunur. DROP içeren rollback hazırlamayın.
 
 ## MCP ve rota geçmişi asistanı
 
@@ -559,7 +631,7 @@ Yedek almadan önce:
 
 - Uygulama versiyonunu ve git commit'ini kaydedin.
 - `.env.local` değerlerini güvenli bir secret store'da doğrulayın.
-- `config/regions.json` dosyasını ayrıca yedekleyin.
+- Her aktif map için `config/maps/{mapId}/regions.json` dosyasını ayrıca yedekleyin. `config/regions.json` yalnız compatibility wrapper'ının legacy kopyasıdır.
 - Migration veya bulk veri değişikliği için bakım penceresi açın.
 
 PostgreSQL custom-format backup:
@@ -583,7 +655,8 @@ Region config backup:
 
 ```powershell
 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
-Copy-Item config\regions.json "backups\regions-$stamp.json"
+Copy-Item config\maps\spor-koridor\regions.json "backups\spor-koridor-regions-$stamp.json"
+Copy-Item config\maps\kat1-ortopedi\regions.json "backups\kat1-ortopedi-regions-$stamp.json"
 ```
 
 Geri dönüş için önce ayrı restore DB üzerinde test edin:
@@ -762,7 +835,7 @@ Invoke-RestMethod "http://127.0.0.1:3000/api/location/entities/search?q=TAG-001&
 ### Region engine açılmıyor
 
 - `GET /api/region-engine/status` ile mevcut durumu okuyun.
-- `config/regions.json` içinde tekrar eden region ID, eksik polygon,
+- İlgili `config/maps/{mapId}/regions.json` içinde tekrar eden region ID, eksik polygon,
   geçersiz world koordinatı veya geçersiz `roomCenter` olup olmadığını kontrol edin.
 - `REGION_POSITION_PORT` kullanımda ise enable isteği 409 döner.
 - Loglarda `REGION_ENGINE_CONFIG_ERROR` veya `PROCESSED_PORT_CONNECTION_ERROR`
@@ -790,8 +863,8 @@ Invoke-RestMethod "http://127.0.0.1:3000/api/location/entities/search?q=TAG-001&
 - Secret değerlerini README, test fixture veya log çıktısına yazmayın.
 - `.env.local` ve yedekleri git dışında, erişimi sınırlı bir yerde tutun.
 - PostgreSQL backup almadan migration çalıştırmayın.
-- Region config değişikliklerinde `config/regions.json` dosyasını ayrıca
-  versiyonlayın veya yedekleyin.
+- Region config değişikliklerinde ilgili `config/maps/{mapId}/regions.json`
+  dosyasını ayrıca versiyonlayın veya yedekleyin.
 - Region engine memory state process restart ile sıfırlanır.
 - Tracking buffer memory queue process crash durumunda son flush öncesi event'leri
   kaybedebilir.

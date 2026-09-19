@@ -9,7 +9,7 @@ const DEFAULT_MIN_INTERVAL_MS = 1_000;
 const DEFAULT_MAX_INTERVAL_MS = 1_000;
 const LOCAL_INGEST_ENDPOINT = "http://127.0.0.1:3000/api/tracking/ingest";
 const PUBLIC_INGEST_ENDPOINT = "https://neu-demo.gekon.com.tr/api/tracking/ingest";
-const REGIONS_CONFIG_PATH = path.join(process.cwd(), "config", "regions.json");
+const REGIONS_CONFIG_PATH = path.join(process.cwd(), "config", "maps", "spor-koridor", "regions.json");
 
 // Kat 1 planındaki T biçimli koridorun merkez çizgisi. Oda ziyaretleri bu
 // hat üzerinden yapılır; odanın merkezi yalnızca giriş/çıkış bağlantısında kullanılır.
@@ -172,15 +172,6 @@ export async function loadVerifiedRoomRoutes(configPath = REGIONS_CONFIG_PATH) {
   });
 }
 
-function nearestPointOnSegment(point, start, end) {
-  const dx = end.x - start.x;
-  const dy = end.y - start.y;
-  const lengthSquared = dx ** 2 + dy ** 2;
-  if (lengthSquared === 0) return copyPoint(start);
-  const ratio = clamp(((point.x - start.x) * dx + (point.y - start.y) * dy) / lengthSquared, 0, 1);
-  return { x: start.x + dx * ratio, y: start.y + dy * ratio };
-}
-
 function inferredRoomPortal(region) {
   const center = region.roomCenter?.world;
   const polygon = region.polygon?.map((point) => point.world);
@@ -221,12 +212,12 @@ export function readLiveSimulationOptions(argv = process.argv.slice(2)) {
     return index >= 0 ? argv[index + 1] : undefined;
   };
   const scenario = valueAfter("scenario") ?? "all";
-  const allowed = new Set(["normal", "all", "entry-gap", "inside-long-gap", "neighbor-jumps"]);
+  const allowed = new Set(["normal", "all", "entry-gap", "inside-long-gap", "neighbor-jumps", "multi-floor", "null-zone", "unknown-zone", "delayed-old-floor-event", "same-coordinate-different-floor"]);
   if (!allowed.has(scenario)) throw new Error(`Geçersiz canlı senaryo: ${scenario}`);
   const seedText = valueAfter("seed") ?? "42";
   const seed = Number(seedText);
   if (!Number.isInteger(seed)) throw new Error(`Geçersiz seed: ${seedText}`);
-  return { scenario, seed };
+  return { scenario, seed, mapId: valueAfter("map") ?? "spor-koridor", zoneId: valueAfter("zone-id") ?? "zone-a", zoneName: valueAfter("zone-name") ?? "Spor Koridoru" };
 }
 
 /**
@@ -370,6 +361,9 @@ export function createTagSimulator({
   random = Math.random,
   seed,
   scenario = "normal",
+  mapId = "spor-koridor",
+  zoneId = "zone-a",
+  zoneName = "Spor Koridoru",
   now = () => new Date(),
   logger = console,
 } = {}) {
@@ -382,6 +376,7 @@ export function createTagSimulator({
   const policies = scenario === "all"
     ? ["normal", "entry-gap", "inside-long-gap", "neighbor-jumps"]
     : tags.map(() => scenario);
+  let tickNumber = 0;
 
   function measuredPosition(index, position, state) {
     roomTicks[index] = state.isWaitingInRoom ? roomTicks[index] + 1 : 0;
@@ -399,19 +394,33 @@ export function createTagSimulator({
 
   async function sendNextTagUpdates() {
     const currentTime = now();
-    const timestamp = currentTime.toISOString();
+    const scenarioZone = scenario === "null-zone" ? { zoneId: null, zoneName: null }
+      : scenario === "unknown-zone" ? { zoneId: "unknown-zone", zoneName: "Bilinmeyen Kaynak Bölge" }
+      : scenario === "multi-floor" || scenario === "same-coordinate-different-floor" || scenario === "delayed-old-floor-event"
+        ? (tickNumber === 0 || (scenario === "delayed-old-floor-event" && tickNumber >= 2)
+          ? { zoneId, zoneName }
+          : { zoneId: "zone-b", zoneName: "Ortopedi Katı" })
+        : { zoneId, zoneName };
+    const timestamp = scenario === "delayed-old-floor-event" && tickNumber >= 2
+      ? new Date(currentTime.getTime() - 60_000).toISOString()
+      : currentTime.toISOString();
     const positions = movements.flatMap((movement, index) => {
       const position = movement.next(currentTime);
       const measured = measuredPosition(index, position, movement.getState());
       if (!measured) return [];
+      const coordinates = scenario === "same-coordinate-different-floor" ? { x: 5, y: 5 }
+        : scenario === "multi-floor" && tickNumber > 0 ? { x: 2 + index, y: 3 + index } : measured;
       return [{
         type: "position",
         tag_id: tags[index].tagId,
-        x: Number(measured.x.toFixed(2)),
-        y: Number(measured.y.toFixed(2)),
+        x: Number(coordinates.x.toFixed(2)),
+        y: Number(coordinates.y.toFixed(2)),
+        zone_id: scenarioZone.zoneId,
+        zone_name: scenarioZone.zoneName,
         timestamp,
       }];
     });
+    tickNumber += 1;
 
     const requestController = new AbortController();
     activeRequests.add(requestController);
@@ -453,7 +462,7 @@ export function createTagSimulator({
     stopped = false;
     logger.log(`UWB koridor rotası simülasyonu başlatıldı: ${endpoint}`);
     logger.log(`${roomCenters.length} oda merkezi ziyaret rotasına eklendi; oda içi bekleme: 2–20 sn.`);
-    logger.log(`Canlı senaryo: ${scenario}; seed: ${baseSeed}; profiller: ${policies.join(", ")}`);
+    logger.log(`Canlı senaryo: ${scenario}; seed: ${baseSeed}; harita: ${mapId}; zone: ${zoneId ?? "null"}; profiller: ${policies.join(", ")}`);
     logger.log(minDelayMs === maxDelayMs
       ? `Tag simulation interval: fixed ${minDelayMs} ms`
       : `Tag simulation interval: random ${minDelayMs}–${maxDelayMs} ms`);
@@ -487,11 +496,12 @@ async function selectEndpoint() {
 
 async function run() {
   const { minMs, maxMs } = readSimulatorIntervals();
-  const { scenario, seed } = readLiveSimulationOptions();
+  const { scenario, seed, mapId, zoneId, zoneName } = readLiveSimulationOptions();
   const endpoint = await selectEndpoint();
   let roomCenters = [];
   try {
-    const loaded = await loadSimulationRoomRoutes();
+    const configPath = path.join(process.cwd(), "config", "maps", mapId, "regions.json");
+    const loaded = await loadSimulationRoomRoutes(configPath);
     roomCenters = loaded.routes;
     if (loaded.inferred) console.warn("Kapı geometrisi eksik: canlı simülatör oda poligonundan geçici giriş rotası türetti. Bu rota regions.json dosyasını değiştirmez.");
     if (!roomCenters.length) console.warn("Geçerli oda bulunamadı; etiketler yalnızca koridorda hareket edecek.");
@@ -505,6 +515,9 @@ async function run() {
     roomCenters,
     scenario,
     seed,
+    mapId,
+    zoneId,
+    zoneName,
   });
   simulator.start();
 

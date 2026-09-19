@@ -65,11 +65,12 @@ class FakePositions implements PositionRepository {
   }
 }
 
-test("zone dışı koordinat kontrollü fallback ile çözülür", async () => {
+test("map bilgisi olmayan eski kayıt güvenli biçimde katı belirsiz bırakır", async () => {
   const service = new LocationService(new FakeEntities(), new FakePositions());
   const result = await service.current(28, now);
-  assert.ok(result.data.position.zoneName.length > 0);
-  assert.equal(result.data.position.floorPlanId, "hq-l1");
+  assert.equal(result.data.position.zoneName, "Kat belirlenemedi");
+  assert.equal(result.data.position.floorPlanId, null);
+  assert.equal(result.data.position.mapId, null);
 });
 
 test("tag başka ürüne atanmış olsa bile aralıktaki tarihsel atamalar birlikte kullanılır", async () => {
@@ -111,6 +112,7 @@ test("zone_timeline örneklenmemiş kayıtları oda aralıklarına birleştirir"
   // Repository gap değeri gerçek ardışık ham kaydı ifade eder. Bu testte zone birleşimini sınamak için normal akışı kullan.
   positions.timelinePositions = positions.timelinePositions.map((position, index) => ({
     ...position,
+    mapId: "test-floor",
     gapBeforeSeconds: index === 0 ? null : 10,
   }));
   const resolver = (x: number) => x < 10 ? "Oda 34" : "Oda 65";
@@ -126,20 +128,20 @@ test("zone_timeline örneklenmemiş kayıtları oda aralıklarına birleştirir"
     entityId: 28,
     entityName: "Palet 28",
     timeline: [
-      { zoneName: "Oda 34", enteredAt: "2026-07-19T10:39:28+03:00", exitedAt: "2026-07-19T10:52:14+03:00", durationSeconds: 766 },
-      { zoneName: "Oda 65", enteredAt: "2026-07-19T10:52:14+03:00", exitedAt: "2026-07-19T11:02:30+03:00", durationSeconds: 616 },
+      { zoneName: "Oda 34", mapId: "test-floor", floorPlanId: "test-floor", sourceZoneId: null, enteredAt: "2026-07-19T10:39:28+03:00", exitedAt: "2026-07-19T10:52:14+03:00", durationSeconds: 766 },
+      { zoneName: "Oda 65", mapId: "test-floor", floorPlanId: "test-floor", sourceZoneId: null, enteredAt: "2026-07-19T10:52:14+03:00", exitedAt: "2026-07-19T11:02:30+03:00", durationSeconds: 616 },
     ],
   });
   assert.equal(result.meta.timezone, "Europe/Istanbul");
   assert.ok("timeline" in result.data);
-  assert.deepEqual(Object.keys(result.data.timeline[0]).sort(), ["durationSeconds", "enteredAt", "exitedAt", "zoneName"]);
+  assert.deepEqual(Object.keys(result.data.timeline[0]).sort(), ["durationSeconds", "enteredAt", "exitedAt", "floorPlanId", "mapId", "sourceZoneId", "zoneName"]);
 });
 
 test("beş dakikadan uzun veri boşluğu aynı zone'u iki aralığa böler", async () => {
   const positions = new FakePositions();
   positions.timelinePositions = [
-    { tagCode: "TAG-NEW", x: 1, y: 1, observedAt: "2026-07-19T10:00:00+03:00", gapBeforeSeconds: null },
-    { tagCode: "TAG-NEW", x: 1, y: 1, observedAt: "2026-07-19T10:10:01+03:00", gapBeforeSeconds: 601 },
+    { tagCode: "TAG-NEW", x: 1, y: 1, mapId: "test-floor", observedAt: "2026-07-19T10:00:00+03:00", gapBeforeSeconds: null },
+    { tagCode: "TAG-NEW", x: 1, y: 1, mapId: "test-floor", observedAt: "2026-07-19T10:10:01+03:00", gapBeforeSeconds: 601 },
   ];
   const result = await new LocationService(new FakeEntities(), positions, () => "Oda 34").history({
     entityId: 28, from: "2026-07-19T10:00:00+03:00", to: "2026-07-19T11:00:00+03:00",

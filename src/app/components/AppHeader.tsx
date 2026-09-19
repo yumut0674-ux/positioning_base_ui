@@ -15,8 +15,8 @@ interface AppHeaderProps {
   readonly onMapSelect?: (mapId: string) => void;
 }
 
-function statusLabel(entry: MapCatalogEntry, liveTrackingMapId: string): string {
-  if (entry.id === liveTrackingMapId && entry.liveTrackingEnabled) return "CANLI";
+function statusLabel(entry: MapCatalogEntry): string {
+  if (entry.liveTrackingEnabled) return "CANLI";
   if (entry.status === "planned") return "PLANLANDI";
   if (entry.status === "disabled") return "DEVRE DIŞI";
   if (entry.status === "preview") return "ÖNİZLEME";
@@ -72,7 +72,7 @@ export function AppHeader({ sidebarCollapsed, mobileMenuOpen, onSidebarToggle, c
               <div>{floor.maps.map((entry) => {
                 const selectable = isSelectableMap(entry);
                 const selected = entry.id === activeMapId;
-                const label = statusLabel(entry, catalog.liveTrackingMapId);
+                const label = statusLabel(entry);
                 return <button type="button" key={entry.id} disabled={!selectable} className={selected ? "is-selected" : ""} aria-current={selected ? "true" : undefined} aria-label={`${floor.floorLabel}, ${entry.unitName}, ${label}${selectable ? "" : ", seçilemez"}`} onClick={() => { onMapSelect(entry.id); setSelectorOpen(false); }}>
                   <span>{selected ? <Check size={14} aria-hidden="true" /> : <i aria-hidden="true" />}{entry.unitName}</span>
                   <em>{label}</em>

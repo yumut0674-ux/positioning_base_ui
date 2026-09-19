@@ -26,6 +26,7 @@ export const locationHistoryInputSchema = z.object({
   to: isoWithTimezone,
   format: z.enum(["zone_timeline", "route_points"]),
   limit: z.number().int().min(1).max(2_000).default(2_000),
+  mapId: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
 }).strict();
 
 export type SearchEntitiesInput = z.infer<typeof searchEntitiesInputSchema>;

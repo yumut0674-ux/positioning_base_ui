@@ -15,8 +15,10 @@
       "displayName": "Spor Koridoru",
       "status": "active",
       "liveTrackingEnabled": true,
+      "trackingZoneIds": ["zone-a", "uwb-floor-1", "spor-koridor"],
       "sortOrder": 1,
-      "configPath": "spor-koridor/map.json"
+      "configPath": "spor-koridor/map.json",
+      "regionsConfigPath": "spor-koridor/regions.json"
     },
     {
       "id": "kat1-ortopedi",
@@ -28,10 +30,12 @@
       "unitId": "spor-salonu",
       "unitName": "Spor Salonu",
       "displayName": "Spor Salonu",
-      "status": "disabled",
-      "liveTrackingEnabled": false,
+      "status": "active",
+      "liveTrackingEnabled": true,
+      "trackingZoneIds": ["zone-b", "uwb-floor-2", "kat1-ortopedi"],
       "sortOrder": 10,
-      "configPath": "kat1-ortopedi/map.json"
+      "configPath": "kat1-ortopedi/map.json",
+      "regionsConfigPath": "kat1-ortopedi/regions.json"
     },
     {
       "id": "kat1-ornek-birim",
@@ -45,8 +49,10 @@
       "displayName": "Kat 1 · Örnek Birim",
       "status": "planned",
       "liveTrackingEnabled": false,
+      "trackingZoneIds": [],
       "sortOrder": 20,
-      "configPath": null
+      "configPath": null,
+      "regionsConfigPath": null
     },
     {
       "id": "kat2-ornek-birim",
@@ -60,8 +66,10 @@
       "displayName": "Kat 2 · Örnek Birim",
       "status": "planned",
       "liveTrackingEnabled": false,
+      "trackingZoneIds": [],
       "sortOrder": 30,
-      "configPath": null
+      "configPath": null,
+      "regionsConfigPath": null
     }
   ]
 }

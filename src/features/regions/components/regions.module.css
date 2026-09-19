@@ -193,6 +193,8 @@
 .pointEditorTitle strong { margin-top: 4px; color: #24445b; font-size: 10px; }
 .pointEditorTitle i { width: 9px; height: 28px; border-radius: 5px; }
 .coordinateGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.doorGeometryFields { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #cfe1df; }
+.doorGeometryFields > small { grid-column: 1 / -1; color: #6f8496; font-size: 7px; line-height: 1.45; }
 .coordinateGrid label > span { margin-bottom: 5px; color: #60798e; font: 8px ui-monospace, monospace; }
 .coordinateGrid input { height: 32px; color: #17364c; font: 9px ui-monospace, monospace; }
 .pointEditor > small { display: block; margin-top: 9px; color: #748a9d; font-size: 7px; line-height: 1.45; }

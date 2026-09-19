@@ -15,6 +15,9 @@ export type GekonAiRoutePoint = {
   readonly y: number;
   readonly observedAt: string;
   readonly zoneName?: string;
+  readonly mapId?: string | null;
+  readonly sourceZoneId?: string | null;
+  readonly sourceZoneName?: string | null;
 };
 
 export type GekonAiContext = {
@@ -26,6 +29,10 @@ export type GekonAiContext = {
   readonly to?: string;
   readonly floorPlanId?: string;
   readonly floorPlanName?: string;
+  readonly buildingName?: string;
+  readonly floorLabel?: string;
+  readonly sourceZoneId?: string;
+  readonly sourceZoneName?: string;
   readonly tagStatus?: string;
   readonly zoneName?: string;
   readonly livePosition?: {
@@ -54,6 +61,9 @@ type HistoryChatWidgetProps = {
   readonly from?: string;
   readonly to?: string;
   readonly floorPlanId?: string;
+  readonly floorPlanName?: string;
+  readonly buildingName?: string;
+  readonly floorLabel?: string;
   readonly draftText?: string;
   readonly draftRequestId?: number;
   readonly history?: GekonAiContext["history"];
@@ -125,6 +135,10 @@ export function GekonAiWidget({ context: suppliedContext, draftText, draftReques
     to: normalizeOptional(suppliedContext?.to),
     floorPlanId: normalizeOptional(suppliedContext?.floorPlanId),
     floorPlanName: normalizeOptional(suppliedContext?.floorPlanName),
+    buildingName: normalizeOptional(suppliedContext?.buildingName),
+    floorLabel: normalizeOptional(suppliedContext?.floorLabel),
+    sourceZoneId: normalizeOptional(suppliedContext?.sourceZoneId),
+    sourceZoneName: normalizeOptional(suppliedContext?.sourceZoneName),
     tagStatus: normalizeOptional(suppliedContext?.tagStatus),
     zoneName: normalizeOptional(suppliedContext?.zoneName),
     historyPoints: suppliedContext?.historyPoints?.slice(0, 200),
@@ -415,7 +429,7 @@ export function HistoryChatWidget({
   entityName,
   from,
   to,
-  floorPlanId,
+  floorPlanId, floorPlanName, buildingName, floorLabel,
   draftText,
   draftRequestId,
   history,
@@ -427,9 +441,9 @@ export function HistoryChatWidget({
     entityName,
     from,
     to,
-    floorPlanId,
+    floorPlanId, floorPlanName, buildingName, floorLabel,
     history,
     historyPoints,
-  }), [entityName, floorPlanId, from, history, historyPoints, tagCode, to]);
+  }), [buildingName, entityName, floorLabel, floorPlanId, floorPlanName, from, history, historyPoints, tagCode, to]);
   return <GekonAiWidget context={context} draftText={draftText} draftRequestId={draftRequestId} />;
 }
