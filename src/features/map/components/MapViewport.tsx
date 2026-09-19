@@ -305,11 +305,6 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
             <Text x={map.calibration.canvasOrigin.x + 8} y={map.calibration.canvasOrigin.y - 30} text="5 m" fill="#087f73" fontSize={12} fontFamily="monospace" />
           </Group>
         </Layer>
-        <Layer visible={layers.routes}>
-          <Group {...mapGroupProps} visible={layers.routes} listening={false}>
-            {liveTrackingVisible && <Line points={[260, 486, 334, 473, 407, 498, 471, 478]} stroke="#00a896" strokeWidth={1.5} opacity={0.46} dash={[5, 8]} tension={0.35} />}
-          </Group>
-        </Layer>
         <Layer listening={false}>
           <Group {...mapGroupProps}>
             {measurementStart && <Circle x={measurementStart.x} y={measurementStart.y} radius={6 / viewport.scale} fill="#ffffff" stroke="#f29f05" strokeWidth={2 / viewport.scale} />}

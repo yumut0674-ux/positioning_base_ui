@@ -67,7 +67,7 @@ export function RegionManagementPanel() {
   const stageRef = useRef<Konva.Stage>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pointerGestureRef = useRef<RegionPointerGesture | null>(null);
-  const hasMobileInitialFitRef = useRef(false);
+  const hasInitialFitRef = useRef(false);
   const size = useElementSize(hostRef);
   const [floorImage] = useImage(MAP_FLOOR_PLAN.imageUrl, "anonymous");
   const [config, setConfig] = useState<RegionsConfig>(DEFAULT_REGIONS_CONFIG);
@@ -198,8 +198,8 @@ export function RegionManagementPanel() {
   }, [size.height, size.width]);
 
   useEffect(() => {
-    if (hasMobileInitialFitRef.current || size.width <= 0 || size.height <= 0 || !window.matchMedia("(max-width: 680px)").matches) return;
-    hasMobileInitialFitRef.current = true;
+    if (hasInitialFitRef.current || size.width <= 0 || size.height <= 0) return;
+    hasInitialFitRef.current = true;
     fitToScreen();
   }, [fitToScreen, size.height, size.width]);
 
@@ -464,7 +464,7 @@ export function RegionManagementPanel() {
         </aside>
 
         <div ref={hostRef} className={styles.map}>
-          <Stage
+          {size.width > 0 && size.height > 0 && <Stage
             ref={stageRef}
             width={size.width}
             height={size.height}
@@ -495,7 +495,7 @@ export function RegionManagementPanel() {
               })}
             </Group></Layer>
             {showRawTagPositions && <RawTagLayer markers={rawTagMarkers} viewport={viewport} />}
-          </Stage>
+          </Stage>}
           <div className={styles.tools}>
             {(["select", "polygon", "center", "entrance"] as const).map((value) => {
               const Icon = value === "select" ? MousePointer2 : value === "polygon" ? Hexagon : value === "center" ? Crosshair : DoorOpen;

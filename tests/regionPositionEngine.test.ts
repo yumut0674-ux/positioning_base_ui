@@ -46,6 +46,21 @@ test("directional door crossing and one strong inside measurement allow estimate
   assert.equal(p.regionInference.state,"INFERRED_IN_REGION");assert.equal(p.regionInference.regionId,"A");
   assert.ok(p.regionInference.confidence!<=before.regionInference.confidence!);
 });
+test("required door crossing can infer a silent concrete room when signal stops at the wall",()=>{
+  const s=setup();
+  const config={...s.config,regions:s.config.regions.map(r=>({...r,coverage:"silent" as const,inference:{
+    ...r.inference,doorDefaults:{...r.inference?.doorDefaults,evidenceMode:"required" as const,allowEstimatedEntryAfterSignalLoss:true}
+  }}))};
+  s.engine.reload(compileRegionsConfig(config));
+  s.point(0,3,-0.5);s.point(1000,3,0.2);
+  const before=s.published.at(-1)!;
+  assert.equal(before.regionInference.state,"ENTRY_CANDIDATE");
+  assert.equal(s.engine.getVehicleState("T")!.insideConfirmationCount,0);
+  const inferred=s.tick(9000);
+  assert.equal(inferred.regionInference.state,"INFERRED_IN_REGION");
+  assert.equal(inferred.regionInference.regionId,"A");
+  assert.match(inferred.regionInference.reasons!.join(),/Beton oda kapısından/);
+});
 test("synthetic publications preserve measurement time, long gaps expose uncertainty",()=>{
   const s=setup();const entered=s.enter();const p=s.tick(7000);
   assert.equal(p.timestamp,entered.timestamp);assert.equal(p.lastRawDataTimestamp,entered.timestamp);

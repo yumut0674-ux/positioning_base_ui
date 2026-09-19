@@ -1,0 +1,219 @@
+{
+  "mapDisplay": { "outsideHoldMs": 2000 },
+  "engine": {
+    "entryConfirmationCount": 2,
+    "exitConfirmationCount": 2,
+    "exitMarginMeters": 0.5,
+    "maximumSpeedMetersPerSecond": 3,
+    "silentCoverageStaleMultiplier": 3,
+    "lostAfterMs": 60000,
+    "doorDefaults": {
+      "evidenceMode": "required",
+      "crossingValidityMs": 12000,
+      "allowEstimatedEntryAfterSignalLoss": true,
+      "allowEstimatedExitAfterSignalLoss": true
+    }
+  },
+  "map": {
+    "source": "system",
+    "mapId": "spor-koridor",
+    "image": "/maps/spor-koridor/floor-plan.png",
+    "widthPx": 3840,
+    "heightPx": 2160,
+    "calibration": {
+      "type": "affine",
+      "points": [
+        { "id": "origin", "pixel": { "x": 812.16, "y": 1735.14 }, "world": { "x": 0, "y": 0 } },
+        { "id": "x-axis", "pixel": { "x": 925.744734, "y": 1735.14 }, "world": { "x": 1, "y": 0 } },
+        { "id": "y-axis", "pixel": { "x": 812.16, "y": 1621.555266 }, "world": { "x": 0, "y": 1 } }
+      ]
+    }
+  },
+  "positionAnimation": {
+    "enabled": true,
+    "mode": "buffered_interpolation",
+    "interpolationDelayMs": 3000,
+    "maximumBufferSize": 10,
+    "maximumSegmentDurationMs": 2500,
+    "maximumExtrapolationMs": 250,
+    "stalePositionTimeoutMs": 4000,
+    "teleportDistanceMeters": 6,
+    "teleportAnimationDurationMs": 300,
+    "regionTransitionDurationMs": 500,
+    "easing": "linear"
+  },
+  "regions": [
+    {
+      "id": "corridor-main",
+      "name": "Ana Koridor",
+      "kind": "corridor",
+      "color": "#5b8def",
+      "polygon": [
+        { "pixel": { "x": 816, "y": 76 }, "world": { "x": 0.033807, "y": 14.607069 } },
+        { "pixel": { "x": 1209, "y": 76 }, "world": { "x": 3.493779, "y": 14.607069 } },
+        { "pixel": { "x": 1209, "y": 1447 }, "world": { "x": 3.493779, "y": 2.536785 } },
+        { "pixel": { "x": 3258, "y": 1447 }, "world": { "x": 21.533175, "y": 2.536785 } },
+        { "pixel": { "x": 3258, "y": 1739 }, "world": { "x": 21.533175, "y": -0.033983 } },
+        { "pixel": { "x": 812.16, "y": 1739 }, "world": { "x": 0, "y": -0.033983 } },
+        { "pixel": { "x": 812.16, "y": 1447 }, "world": { "x": 0, "y": 2.536785 } },
+        { "pixel": { "x": 816, "y": 1447 }, "world": { "x": 0.033807, "y": 2.536785 } }
+      ],
+      "roomCenter": { "pixel": { "x": 2000, "y": 1593 }, "world": { "x": 10.457743, "y": 1.251401 } },
+      "entrances": []
+    },
+    {
+      "id": "room-01",
+      "name": "Oda 1",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#00a896",
+      "polygon": [
+        { "pixel": { "x": 1210, "y": 1041 }, "world": { "x": 3.502583, "y": 6.111209 } },
+        { "pixel": { "x": 1957, "y": 1041 }, "world": { "x": 10.079171, "y": 6.111209 } },
+        { "pixel": { "x": 1957, "y": 1447 }, "world": { "x": 10.079171, "y": 2.536785 } },
+        { "pixel": { "x": 1210, "y": 1447 }, "world": { "x": 3.502583, "y": 2.536785 } }
+      ],
+      "roomCenter": { "pixel": { "x": 1583.5, "y": 1244 }, "world": { "x": 6.790877, "y": 4.323997 } },
+      "entrances": [
+        { "id": "room-01-north-door", "label": "Kuzey duvarı kapısı", "pixel": { "x": 1583.5, "y": 1041 }, "world": { "x": 6.790877, "y": 6.111209 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": -1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-01-east-door", "label": "Doğu duvarı kapısı", "pixel": { "x": 1957, "y": 1244 }, "world": { "x": 10.079171, "y": 4.323997 }, "widthMeters": 1.2, "inwardNormal": { "x": -1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-01-south-door", "label": "Güney duvarı kapısı", "pixel": { "x": 1583.5, "y": 1447 }, "world": { "x": 6.790877, "y": 2.536785 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": 1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-01-west-door", "label": "Batı duvarı kapısı", "pixel": { "x": 1210, "y": 1244 }, "world": { "x": 3.502583, "y": 4.323997 }, "widthMeters": 1.2, "inwardNormal": { "x": 1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 }
+      ],
+      "inference": { "doorDefaults": { "evidenceMode": "required" } }
+    },
+    {
+      "id": "room-02",
+      "name": "Oda 2",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#2a9d8f",
+      "polygon": [
+        { "pixel": { "x": 1957, "y": 1041 }, "world": { "x": 10.079171, "y": 6.111209 } },
+        { "pixel": { "x": 2750, "y": 1041 }, "world": { "x": 17.060743, "y": 6.111209 } },
+        { "pixel": { "x": 2750, "y": 1447 }, "world": { "x": 17.060743, "y": 2.536785 } },
+        { "pixel": { "x": 1957, "y": 1447 }, "world": { "x": 10.079171, "y": 2.536785 } }
+      ],
+      "roomCenter": { "pixel": { "x": 2353.5, "y": 1244 }, "world": { "x": 13.569957, "y": 4.323997 } },
+      "entrances": [
+        { "id": "room-02-north-door", "label": "Kuzey duvarı kapısı", "pixel": { "x": 2353.5, "y": 1041 }, "world": { "x": 13.569957, "y": 6.111209 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": -1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-02-east-door", "label": "Doğu duvarı kapısı", "pixel": { "x": 2750, "y": 1244 }, "world": { "x": 17.060743, "y": 4.323997 }, "widthMeters": 1.2, "inwardNormal": { "x": -1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-02-south-door", "label": "Güney duvarı kapısı", "pixel": { "x": 2353.5, "y": 1447 }, "world": { "x": 13.569957, "y": 2.536785 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": 1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-02-west-door", "label": "Batı duvarı kapısı", "pixel": { "x": 1957, "y": 1244 }, "world": { "x": 10.079171, "y": 4.323997 }, "widthMeters": 1.2, "inwardNormal": { "x": 1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 }
+      ],
+      "inference": { "doorDefaults": { "evidenceMode": "required" } }
+    },
+    {
+      "id": "room-03",
+      "name": "Oda 3",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#7a83d1",
+      "polygon": [
+        { "pixel": { "x": 582, "y": 1216 }, "world": { "x": -2.026329, "y": 4.570509 } },
+        { "pixel": { "x": 812.16, "y": 1216 }, "world": { "x": 0, "y": 4.570509 } },
+        { "pixel": { "x": 812.16, "y": 1735.14 }, "world": { "x": 0, "y": 0 } },
+        { "pixel": { "x": 582, "y": 1735.14 }, "world": { "x": -2.026329, "y": 0 } }
+      ],
+      "roomCenter": { "pixel": { "x": 697.08, "y": 1475.57 }, "world": { "x": -1.013164, "y": 2.285254 } },
+      "entrances": [
+        { "id": "room-03-north-door", "label": "Kuzey duvarı kapısı", "pixel": { "x": 697.08, "y": 1216 }, "world": { "x": -1.013164, "y": 4.570509 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": -1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-03-east-door", "label": "Doğu duvarı kapısı", "pixel": { "x": 812.16, "y": 1475.57 }, "world": { "x": 0, "y": 2.285254 }, "widthMeters": 1.2, "inwardNormal": { "x": -1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-03-south-door", "label": "Güney duvarı kapısı", "pixel": { "x": 697.08, "y": 1735.14 }, "world": { "x": -1.013164, "y": 0 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": 1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-03-west-door", "label": "Batı duvarı kapısı", "pixel": { "x": 582, "y": 1475.57 }, "world": { "x": -2.026329, "y": 2.285254 }, "widthMeters": 1.2, "inwardNormal": { "x": 1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 }
+      ],
+      "inference": { "doorDefaults": { "evidenceMode": "required" } }
+    },
+    {
+      "id": "room-04",
+      "name": "Oda 4",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#9b7ede",
+      "polygon": [
+        { "pixel": { "x": 2750, "y": 1041 }, "world": { "x": 17.060743, "y": 6.111209 } },
+        { "pixel": { "x": 3212, "y": 1041 }, "world": { "x": 21.128191, "y": 6.111209 } },
+        { "pixel": { "x": 3212, "y": 1447 }, "world": { "x": 21.128191, "y": 2.536785 } },
+        { "pixel": { "x": 2750, "y": 1447 }, "world": { "x": 17.060743, "y": 2.536785 } }
+      ],
+      "roomCenter": { "pixel": { "x": 2981, "y": 1244 }, "world": { "x": 19.094467, "y": 4.323997 } },
+      "entrances": [
+        { "id": "room-04-north-door", "label": "Kuzey duvarı kapısı", "pixel": { "x": 2981, "y": 1041 }, "world": { "x": 19.094467, "y": 6.111209 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": -1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-04-east-door", "label": "Doğu duvarı kapısı", "pixel": { "x": 3212, "y": 1244 }, "world": { "x": 21.128191, "y": 4.323997 }, "widthMeters": 1.2, "inwardNormal": { "x": -1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-04-south-door", "label": "Güney duvarı kapısı", "pixel": { "x": 2981, "y": 1447 }, "world": { "x": 19.094467, "y": 2.536785 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": 1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-04-west-door", "label": "Batı duvarı kapısı", "pixel": { "x": 2750, "y": 1244 }, "world": { "x": 17.060743, "y": 4.323997 }, "widthMeters": 1.2, "inwardNormal": { "x": 1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 }
+      ],
+      "inference": { "doorDefaults": { "evidenceMode": "required" } }
+    },
+    {
+      "id": "room-05",
+      "name": "Oda 5",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#b56e9d",
+      "polygon": [
+        { "pixel": { "x": 809, "y": 1739 }, "world": { "x": -0.027821, "y": -0.033983 } },
+        { "pixel": { "x": 1385, "y": 1739 }, "world": { "x": 5.043283, "y": -0.033983 } },
+        { "pixel": { "x": 1385, "y": 2084 }, "world": { "x": 5.043283, "y": -3.071363 } },
+        { "pixel": { "x": 809, "y": 2084 }, "world": { "x": -0.027821, "y": -3.071363 } }
+      ],
+      "roomCenter": { "pixel": { "x": 1097, "y": 1911.5 }, "world": { "x": 2.507731, "y": -1.552673 } },
+      "entrances": [
+        { "id": "room-05-north-door", "label": "Kuzey duvarı kapısı", "pixel": { "x": 1097, "y": 1739 }, "world": { "x": 2.507731, "y": -0.033983 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": -1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-05-east-door", "label": "Doğu duvarı kapısı", "pixel": { "x": 1385, "y": 1911.5 }, "world": { "x": 5.043283, "y": -1.552673 }, "widthMeters": 1.2, "inwardNormal": { "x": -1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-05-south-door", "label": "Güney duvarı kapısı", "pixel": { "x": 1097, "y": 2084 }, "world": { "x": 2.507731, "y": -3.071363 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": 1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-05-west-door", "label": "Batı duvarı kapısı", "pixel": { "x": 809, "y": 1911.5 }, "world": { "x": -0.027821, "y": -1.552673 }, "widthMeters": 1.2, "inwardNormal": { "x": 1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 }
+      ],
+      "inference": { "doorDefaults": { "evidenceMode": "required" } }
+    },
+    {
+      "id": "room-06",
+      "name": "Oda 6",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#a06fb8",
+      "polygon": [
+        { "pixel": { "x": 1385, "y": 1739 }, "world": { "x": 5.043283, "y": -0.033983 } },
+        { "pixel": { "x": 2140, "y": 1739 }, "world": { "x": 11.690303, "y": -0.033983 } },
+        { "pixel": { "x": 2140, "y": 2084 }, "world": { "x": 11.690303, "y": -3.071363 } },
+        { "pixel": { "x": 1385, "y": 2084 }, "world": { "x": 5.043283, "y": -3.071363 } }
+      ],
+      "roomCenter": { "pixel": { "x": 1762.5, "y": 1911.5 }, "world": { "x": 8.366793, "y": -1.552673 } },
+      "entrances": [
+        { "id": "room-06-north-door", "label": "Kuzey duvarı kapısı", "pixel": { "x": 1762.5, "y": 1739 }, "world": { "x": 8.366793, "y": -0.033983 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": -1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-06-east-door", "label": "Doğu duvarı kapısı", "pixel": { "x": 2140, "y": 1911.5 }, "world": { "x": 11.690303, "y": -1.552673 }, "widthMeters": 1.2, "inwardNormal": { "x": -1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-06-south-door", "label": "Güney duvarı kapısı", "pixel": { "x": 1762.5, "y": 2084 }, "world": { "x": 8.366793, "y": -3.071363 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": 1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-06-west-door", "label": "Batı duvarı kapısı", "pixel": { "x": 1385, "y": 1911.5 }, "world": { "x": 5.043283, "y": -1.552673 }, "widthMeters": 1.2, "inwardNormal": { "x": 1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 }
+      ],
+      "inference": { "doorDefaults": { "evidenceMode": "required" } }
+    },
+    {
+      "id": "room-07",
+      "name": "Oda 7",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#8d78c9",
+      "polygon": [
+        { "pixel": { "x": 2140, "y": 1739 }, "world": { "x": 11.690303, "y": -0.033983 } },
+        { "pixel": { "x": 2829, "y": 1739 }, "world": { "x": 17.756259, "y": -0.033983 } },
+        { "pixel": { "x": 2829, "y": 2084 }, "world": { "x": 17.756259, "y": -3.071363 } },
+        { "pixel": { "x": 2140, "y": 2084 }, "world": { "x": 11.690303, "y": -3.071363 } }
+      ],
+      "roomCenter": { "pixel": { "x": 2484.5, "y": 1911.5 }, "world": { "x": 14.723281, "y": -1.552673 } },
+      "entrances": [
+        { "id": "room-07-north-door", "label": "Kuzey duvarı kapısı", "pixel": { "x": 2484.5, "y": 1739 }, "world": { "x": 14.723281, "y": -0.033983 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": -1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-07-east-door", "label": "Doğu duvarı kapısı", "pixel": { "x": 2829, "y": 1911.5 }, "world": { "x": 17.756259, "y": -1.552673 }, "widthMeters": 1.2, "inwardNormal": { "x": -1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-07-south-door", "label": "Güney duvarı kapısı", "pixel": { "x": 2484.5, "y": 2084 }, "world": { "x": 14.723281, "y": -3.071363 }, "widthMeters": 1.2, "inwardNormal": { "x": 0, "y": 1 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 },
+        { "id": "room-07-west-door", "label": "Batı duvarı kapısı", "pixel": { "x": 2140, "y": 1911.5 }, "world": { "x": 11.690303, "y": -1.552673 }, "widthMeters": 1.2, "inwardNormal": { "x": 1, "y": 0 }, "connectsTo": "corridor-main", "approachDepthMeters": 1.5, "crossingDepthMeters": 0.12 }
+      ],
+      "inference": { "doorDefaults": { "evidenceMode": "required" } }
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import embeddedCatalog from "../../../config/maps/catalog.json";
 import embeddedOrthopedicsMap from "../../../config/maps/kat1-ortopedi/map.json";
+import embeddedSportsCorridorMap from "../../../config/maps/spor-koridor/map.json";
 import { mapCatalogSchema, mapDetailsSchema } from "./map.validation";
 import type { MapCatalog, MapCatalogEntry, MapDetails } from "./map.types";
 
@@ -28,7 +29,11 @@ export class FileMapRepository implements MapRepository {
     if (!entry.configPath) throw new Error("MAP_CONFIG_UNAVAILABLE");
     const configFile = path.resolve(this.mapsDirectory, entry.configPath);
     if (!configFile.startsWith(`${this.mapsDirectory}${path.sep}`)) throw new Error("MAP_CONFIG_PATH_INVALID");
-    const fallback = entry.id === embeddedOrthopedicsMap.id ? embeddedOrthopedicsMap : undefined;
+    const fallback = entry.id === embeddedSportsCorridorMap.id
+      ? embeddedSportsCorridorMap
+      : entry.id === embeddedOrthopedicsMap.id
+        ? embeddedOrthopedicsMap
+        : undefined;
     const value = await this.readJson(configFile, fallback);
     return mapDetailsSchema.parse(value) as MapDetails;
   }

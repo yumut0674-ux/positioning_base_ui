@@ -7,19 +7,19 @@ import type {
 import type { Size2D } from "@/src/shared/types/geometry";
 
 export const MAP_FLOOR_PLAN: FloorPlanDefinition = {
-  id: "kat1-ortopedi",
-  name: "Ortopedi",
-  building: "Neü Tıp Fakültesi",
-  level: "Kat 1",
-  imageUrl: "/maps/kat1-ortopedi/floor-plan.png",
-  canvasSize: { width: 714, height: 1314 },
-  worldSize: { width: 23.8, height: 43.8 },
+  id: "spor-koridor",
+  name: "spor_koridor",
+  building: "Spor Tesisi",
+  level: "Spor Koridoru",
+  imageUrl: "/maps/spor-koridor/floor-plan.png",
+  canvasSize: { width: 3840, height: 2160 },
+  worldSize: { width: 33.80736, height: 19.01664 },
 };
 
 export const MAP_CALIBRATION: MapCalibration = {
   worldOrigin: { x: 0, y: 0 },
-  canvasOrigin: { x: 0, y: MAP_FLOOR_PLAN.canvasSize.height },
-  pixelsPerMeter: 30,
+  canvasOrigin: { x: 812.16, y: 1735.14 },
+  pixelsPerMeter: 113.584734212,
   invertYAxis: true,
   rotationDegrees: 0,
 };
@@ -94,10 +94,10 @@ export function isAtFittedScale(viewport: ViewportState, fittedViewport: Viewpor
 }
 
 export const DEFAULT_ANCHORS = [
-  { id: "A-01", x: 2.7, y: 40.5 },
-  { id: "A-02", x: 11.9, y: 40.5 },
-  { id: "A-03", x: 21.1, y: 40.5 },
-  { id: "A-04", x: 2.7, y: 3 },
-  { id: "A-05", x: 11.9, y: 3 },
-  { id: "A-06", x: 21.1, y: 3 },
+  { id: "A-01", x: 1.75, y: 13.8 },
+  { id: "A-02", x: 1.75, y: 7.5 },
+  { id: "A-03", x: 1.5, y: 1.25 },
+  { id: "A-04", x: 8.0, y: 1.25 },
+  { id: "A-05", x: 14.5, y: 1.25 },
+  { id: "A-06", x: 20.8, y: 1.25 },
 ] as const satisfies readonly AnchorDefinition[];

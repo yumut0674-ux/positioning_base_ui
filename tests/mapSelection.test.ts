@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import catalogJson from "../config/maps/catalog.json";
-import mapJson from "../config/maps/kat1-ortopedi/map.json";
+import mapJson from "../config/maps/spor-koridor/map.json";
 import { mapCatalogSchema, mapDetailsSchema } from "../src/server/maps/map.validation";
 import { groupMapCatalog, isSelectableMap, resolveInitialMapId, shouldShowLiveTracking } from "../src/features/map/services/mapSelection";
 import { useIpsStore } from "../src/app/store/useIpsStore";
@@ -13,13 +13,16 @@ test("default selection survives empty or obsolete browser storage", () => {
   assert.equal(resolveInitialMapId(catalog, null), catalog.defaultMapId);
   assert.equal(resolveInitialMapId(catalog, "silinmis-harita"), catalog.defaultMapId);
   assert.equal(resolveInitialMapId(catalog, "kat1-ornek-birim"), catalog.defaultMapId);
-  assert.equal(resolveInitialMapId(catalog, "kat1-ortopedi"), "kat1-ortopedi");
+  assert.equal(resolveInitialMapId(catalog, "kat1-ortopedi"), catalog.defaultMapId);
+  assert.equal(resolveInitialMapId(catalog, "spor-koridor"), "spor-koridor");
 });
 
 test("catalog groups floors and keeps planned units visible but disabled", () => {
   const groups = groupMapCatalog(catalog.maps);
-  assert.equal(groups.length, 1);
-  assert.deepEqual(groups[0].floors.map((floor) => floor.floorLabel), ["Kat 1", "Kat 2"]);
+  assert.equal(groups.length, 2);
+  const sportsFacility = groups.find((group) => group.buildingId === "spor-tesisi");
+  assert.ok(sportsFacility);
+  assert.deepEqual(sportsFacility.floors.map((floor) => floor.floorLabel), ["Spor Koridoru", "Spor Salonu"]);
   const planned = catalog.maps.find((entry) => entry.id === "kat1-ornek-birim");
   assert.ok(planned);
   assert.equal(isSelectableMap(planned), false);

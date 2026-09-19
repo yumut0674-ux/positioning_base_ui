@@ -12,12 +12,14 @@ const mapsDirectory = path.join(process.cwd(), "config", "maps");
 test("checked-in map catalog and live map config are valid", async () => {
   const service = new MapService(new FileMapRepository(mapsDirectory));
   const catalog = await service.getCatalog();
-  assert.equal(catalog.defaultMapId, "kat1-ortopedi");
-  assert.equal(catalog.liveTrackingMapId, "kat1-ortopedi");
+  assert.equal(catalog.defaultMapId, "spor-koridor");
+  assert.equal(catalog.liveTrackingMapId, "spor-koridor");
+  assert.ok(catalog.maps.some((entry) => entry.id === "kat1-ortopedi" && entry.status === "disabled"));
   assert.ok(catalog.maps.some((entry) => entry.status === "planned" && entry.configPath === null));
   const details = await service.getMapDetails(catalog.liveTrackingMapId);
-  assert.equal(details.image.url, "/maps/kat1-ortopedi/floor-plan.png");
-  assert.equal(details.calibration.pixelsPerMeter, 30);
+  assert.equal(details.image.url, "/maps/spor-koridor/floor-plan.png");
+  assert.equal(details.calibration.pixelsPerMeter, 113.584734212);
+  assert.deepEqual(details.calibration.canvasOrigin, { x: 812.16, y: 1735.14 });
 });
 
 test("invalid catalogs are rejected before being served", async () => {

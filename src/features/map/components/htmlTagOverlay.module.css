@@ -50,6 +50,8 @@
   pointer-events: auto;
   appearance: none;
   -webkit-tap-highlight-color: transparent;
+  transform: scale(1.6);
+  transform-origin: 20px 24px;
 }
 
 .selection,

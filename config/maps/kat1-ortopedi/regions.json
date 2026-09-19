@@ -1,4 +1,7 @@
 {
+  "mapDisplay": {
+    "outsideHoldMs": 2000
+  },
   "engine": {
     "entryConfirmationCount": 2,
     "exitConfirmationCount": 2,
@@ -66,7 +69,6 @@
     {
       "id": "corridor-horizontal",
       "name": "Üst Koridor",
-      "kind": "corridor",
       "color": "#3498db",
       "polygon": [
         {
@@ -120,12 +122,15 @@
           "y": 36.367
         }
       },
-      "entrances": []
+      "kind": "room",
+      "entrances": [],
+      "inference": {
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "corridor-vertical",
       "name": "Ana Koridor",
-      "kind": "corridor",
       "color": "#5dade2",
       "polygon": [
         {
@@ -179,13 +184,12 @@
           "y": 17.5
         }
       },
+      "kind": "corridor",
       "entrances": []
     },
     {
       "id": "room-13",
       "name": "ODA 13",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#2a9d8f",
       "polygon": [
         {
@@ -239,6 +243,8 @@
           "y": 40.683
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -249,8 +255,6 @@
             "x": 9.267,
             "y": 38.2
           },
-          "id": "room-13-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": 0,
@@ -258,15 +262,35 @@
           },
           "connectsTo": "corridor-horizontal",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-13-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "room-14",
       "name": "ODA 14",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#2a9d8f",
       "polygon": [
         {
@@ -320,6 +344,8 @@
           "y": 40.683
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -330,8 +356,6 @@
             "x": 14.5,
             "y": 38.2
           },
-          "id": "room-14-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": 0,
@@ -339,15 +363,35 @@
           },
           "connectsTo": "corridor-horizontal",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-14-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "room-11",
       "name": "ODA 11",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#3a86a8",
       "polygon": [
         {
@@ -401,6 +445,8 @@
           "y": 31.967
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -411,8 +457,6 @@
             "x": 10,
             "y": 30.633
           },
-          "id": "room-11-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": -1,
@@ -420,15 +464,35 @@
           },
           "connectsTo": "corridor-vertical",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-11-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "room-12",
       "name": "ODA 12",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#3a86a8",
       "polygon": [
         {
@@ -482,6 +546,8 @@
           "y": 31.967
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -492,8 +558,6 @@
             "x": 13.733,
             "y": 30.633
           },
-          "id": "room-12-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": 1,
@@ -501,15 +565,35 @@
           },
           "connectsTo": "corridor-vertical",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-12-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "room-09",
       "name": "ODA 09",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#5f8fce",
       "polygon": [
         {
@@ -563,6 +647,8 @@
           "y": 26.383
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -573,8 +659,6 @@
             "x": 10,
             "y": 24.967
           },
-          "id": "room-09-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": -1,
@@ -582,15 +666,35 @@
           },
           "connectsTo": "corridor-vertical",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-09-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "room-10",
       "name": "ODA 10",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#5f8fce",
       "polygon": [
         {
@@ -644,6 +748,8 @@
           "y": 26.383
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -654,8 +760,6 @@
             "x": 13.733,
             "y": 24.967
           },
-          "id": "room-10-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": 1,
@@ -663,15 +767,35 @@
           },
           "connectsTo": "corridor-vertical",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-10-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "room-07",
       "name": "ODA 07",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#7a83d1",
       "polygon": [
         {
@@ -725,6 +849,8 @@
           "y": 20.683
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -735,8 +861,6 @@
             "x": 10,
             "y": 19.3
           },
-          "id": "room-07-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": -1,
@@ -744,15 +868,35 @@
           },
           "connectsTo": "corridor-vertical",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-07-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "room-08",
       "name": "ODA 08",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#7a83d1",
       "polygon": [
         {
@@ -806,6 +950,8 @@
           "y": 20.683
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -816,8 +962,6 @@
             "x": 13.733,
             "y": 19.3
           },
-          "id": "room-08-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": 1,
@@ -825,15 +969,35 @@
           },
           "connectsTo": "corridor-vertical",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-08-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "room-05",
       "name": "ODA 05",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#8d78c9",
       "polygon": [
         {
@@ -887,6 +1051,8 @@
           "y": 14.933
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -897,8 +1063,6 @@
             "x": 10,
             "y": 13.633
           },
-          "id": "room-05-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": -1,
@@ -906,15 +1070,35 @@
           },
           "connectsTo": "corridor-vertical",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-05-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "room-06",
       "name": "ODA 06",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#8d78c9",
       "polygon": [
         {
@@ -968,6 +1152,8 @@
           "y": 14.933
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -978,8 +1164,6 @@
             "x": 13.733,
             "y": 13.633
           },
-          "id": "room-06-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": 1,
@@ -987,15 +1171,35 @@
           },
           "connectsTo": "corridor-vertical",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-06-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "room-03",
       "name": "ODA 03",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#a06fb8",
       "polygon": [
         {
@@ -1049,6 +1253,8 @@
           "y": 9.2
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -1059,8 +1265,6 @@
             "x": 10,
             "y": 7.967
           },
-          "id": "room-03-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": -1,
@@ -1068,15 +1272,35 @@
           },
           "connectsTo": "corridor-vertical",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-03-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "room-04",
       "name": "ODA 04",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#a06fb8",
       "polygon": [
         {
@@ -1130,6 +1354,8 @@
           "y": 9.2
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -1140,8 +1366,6 @@
             "x": 13.733,
             "y": 7.967
           },
-          "id": "room-04-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": 1,
@@ -1149,15 +1373,35 @@
           },
           "connectsTo": "corridor-vertical",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-04-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "room-01",
       "name": "ODA 01",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#b56e9d",
       "polygon": [
         {
@@ -1211,6 +1455,8 @@
           "y": 3.383
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -1221,8 +1467,6 @@
             "x": 10,
             "y": 2.467
           },
-          "id": "room-01-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": -1,
@@ -1230,15 +1474,35 @@
           },
           "connectsTo": "corridor-vertical",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-01-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     },
     {
       "id": "room-02",
       "name": "ODA 02",
-      "kind": "room",
-      "coverage": "regular",
       "color": "#b56e9d",
       "polygon": [
         {
@@ -1292,6 +1556,8 @@
           "y": 3.383
         }
       },
+      "coverage": "regular",
+      "kind": "room",
       "entrances": [
         {
           "pixel": {
@@ -1302,8 +1568,6 @@
             "x": 13.733,
             "y": 2.467
           },
-          "id": "room-02-door",
-          "label": "Koridor kapısı",
           "widthMeters": 1,
           "inwardNormal": {
             "x": 1,
@@ -1311,9 +1575,31 @@
           },
           "connectsTo": "corridor-vertical",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2
+          "crossingDepthMeters": 0.2,
+          "id": "room-02-door",
+          "label": "Koridor kapısı"
         }
-      ]
+      ],
+      "inference": {
+        "doorDefaults": {
+          "enabled": false,
+          "direction": "bidirectional",
+          "evidenceMode": "preferred",
+          "entryEvidenceWeight": 1,
+          "exitEvidenceWeight": 1,
+          "entryConfidenceBonus": 0.25,
+          "exitConfidenceBonus": 0,
+          "crossingValidityMs": 12000,
+          "minimumDirectionalMovementMeters": 0,
+          "missingDoorEvidenceDurationMultiplier": 1,
+          "missingDoorEvidenceCountMultiplier": 1,
+          "allowEstimatedEntryAfterSignalLoss": true,
+          "allowEstimatedExitAfterSignalLoss": true
+        },
+        "relocationEvidenceDurationMultiplier": 1.4,
+        "outsideReleaseDurationMultiplier": 1.4,
+        "maximumSpeedMetersPerSecond": 3
+      }
     }
   ]
 }

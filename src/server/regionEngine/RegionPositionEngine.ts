@@ -150,7 +150,17 @@ export class RegionPositionEngine {
     if (age >= this.lostAfter(v, r)) { v.state = "LOCATION_LOST"; v.relocation = true; v.entryConfidence = Math.min(v.entryConfidence, Math.max(0, this.settings(r).invalidMeasurementMaximumScore * (1 - age / (this.lostAfter(v, r) * this.settings(r).lostAfterStaleMultiplier)))); v.reasons = ["Uzun ölçüm kesintisi; güncel konum belirsiz, son bilinen oda korunuyor"]; }
     else if (age >= this.staleAfter(v, r)) { if (v.activeRegionId && r && r.usesDoorPolicy && v.exitCrossing && r.entrances.find(d => d.id === v.exitCrossing?.doorId)?.settings.allowEstimatedExitAfterSignalLoss) { v.activeRegionId = null; v.state = "TRACKING_OUTSIDE"; v.reasons = ["Yönlü kapı çıkışı sonrası ölçüm kesildi; tahmini çıkış uygulandı"]; }
       else if (v.activeRegionId) { v.state = "INFERRED_IN_REGION"; v.entryConfidence = Math.min(v.entryConfidence, this.settings(r).inferredInsideMaximumScore); v.reasons = ["Gerçek ölçüm kesildi; önceki oda tahmini korunuyor"]; }
-      else if (r && v.crossing && v.lastRawDataTimestamp - v.crossing.occurredAt <= this.gap(v, r) && r.entrances.find(d => d.id === v.crossing?.doorId)?.settings.allowEstimatedEntryAfterSignalLoss && v.history.some(e => e.room === r.id && e.weight >= r.settings.reliableEvidenceWeight && e.at >= v.crossing!.occurredAt)) { v.activeRegionId = r.id; v.lastKnown = r.id; v.state = "INFERRED_IN_REGION"; v.reasons = ["Yönlü kapı geçişi ve iç ölçüm sonrası kesinti; tahmini oda"]; }
+      else if (r && v.crossing && v.lastRawDataTimestamp - v.crossing.occurredAt <= this.gap(v, r)) {
+        const door = r.entrances.find(d => d.id === v.crossing?.doorId);
+        const hasReliableInsideMeasurement = v.history.some(e => e.room === r.id && e.weight >= r.settings.reliableEvidenceWeight && e.at >= v.crossing!.occurredAt);
+        const isConcreteRoomDoorEntry = r.settings.coverage === "silent" && door?.settings.evidenceMode === "required";
+        if (door?.settings.allowEstimatedEntryAfterSignalLoss && (hasReliableInsideMeasurement || isConcreteRoomDoorEntry)) {
+          v.activeRegionId = r.id; v.lastKnown = r.id; v.state = "INFERRED_IN_REGION";
+          v.reasons = [isConcreteRoomDoorEntry && !hasReliableInsideMeasurement
+            ? "Beton oda kapısından yönlü geçiş sonrası sinyal kesildi; tahmini oda"
+            : "Yönlü kapı geçişi ve iç ölçüm sonrası kesinti; tahmini oda"];
+        }
+      }
       else { if (!v.candidateRegionId) v.state = "LOCATION_LOST"; v.reasons = ["Kesinti giriş kanıtı değildir; güncel konum belirsiz"]; } }
     else continue; this.send(v, true); } }
   private send(v: State, synthetic = false): ProcessedPosition { const r = this.region(v.activeRegionId), raw = v.lastRawPosition;

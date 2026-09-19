@@ -77,12 +77,14 @@ test("tracking label focus uses a fifty percent map scale", () => {
   assert.equal(MAP_TAG_FOCUS_SCALE, 0.5);
 });
 
-test("uses the lower-left corner as world origin with x horizontal and y vertical", () => {
+test("uses the supplied plan origin with x horizontal and y inverted", () => {
   const transform = new CoordinateTransformService(MAP_CALIBRATION);
 
-  assert.deepEqual(MAP_FLOOR_PLAN.canvasSize, { width: 714, height: 1314 });
-  assert.deepEqual(MAP_FLOOR_PLAN.worldSize, { width: 23.8, height: 43.8 });
-  assert.deepEqual(transform.worldToCanvas({ x: 0, y: 0 }), { x: 0, y: 1314 });
-  assert.deepEqual(transform.worldToCanvas({ x: 23.8, y: 43.8 }), { x: 714, y: 0 });
-  assert.deepEqual(transform.canvasToWorld({ x: 0, y: 1314 }), { x: 0, y: 0 });
+  assert.deepEqual(MAP_FLOOR_PLAN.canvasSize, { width: 3840, height: 2160 });
+  assert.deepEqual(MAP_FLOOR_PLAN.worldSize, { width: 33.80736, height: 19.01664 });
+  assert.deepEqual(transform.worldToCanvas({ x: 0, y: 0 }), { x: 812.16, y: 1735.14 });
+  const oneMeter = transform.worldToCanvas({ x: 1, y: 1 });
+  assert.ok(Math.abs(oneMeter.x - 925.744734212) < 0.000001);
+  assert.ok(Math.abs(oneMeter.y - 1621.555265788) < 0.000001);
+  assert.deepEqual(transform.canvasToWorld({ x: 812.16, y: 1735.14 }), { x: 0, y: 0 });
 });

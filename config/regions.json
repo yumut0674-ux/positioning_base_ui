@@ -5,22 +5,31 @@
   "engine": {
     "entryConfirmationCount": 2,
     "exitConfirmationCount": 2,
-    "exitMarginMeters": 0.5
+    "exitMarginMeters": 0.5,
+    "maximumSpeedMetersPerSecond": 3,
+    "silentCoverageStaleMultiplier": 3,
+    "lostAfterMs": 60000,
+    "doorDefaults": {
+      "evidenceMode": "required",
+      "crossingValidityMs": 12000,
+      "allowEstimatedEntryAfterSignalLoss": true,
+      "allowEstimatedExitAfterSignalLoss": true
+    }
   },
   "map": {
     "source": "system",
-    "mapId": "kat1-ortopedi",
-    "image": "/maps/kat1-ortopedi/floor-plan.png",
-    "widthPx": 714,
-    "heightPx": 1314,
+    "mapId": "spor-koridor",
+    "image": "/maps/spor-koridor/floor-plan.png",
+    "widthPx": 3840,
+    "heightPx": 2160,
     "calibration": {
       "type": "affine",
       "points": [
         {
           "id": "origin",
           "pixel": {
-            "x": 0,
-            "y": 1314
+            "x": 812.16,
+            "y": 1735.14
           },
           "world": {
             "x": 0,
@@ -30,23 +39,23 @@
         {
           "id": "x-axis",
           "pixel": {
-            "x": 714,
-            "y": 1314
+            "x": 925.744734,
+            "y": 1735.14
           },
           "world": {
-            "x": 23.8,
+            "x": 1,
             "y": 0
           }
         },
         {
           "id": "y-axis",
           "pixel": {
-            "x": 0,
-            "y": 0
+            "x": 812.16,
+            "y": 1621.555266
           },
           "world": {
             "x": 0,
-            "y": 43.8
+            "y": 1
           }
         }
       ]
@@ -67,1521 +76,718 @@
   },
   "regions": [
     {
-      "id": "corridor-horizontal",
-      "name": "Üst Koridor",
-      "color": "#3498db",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 35,
-            "y": 181
-          },
-          "world": {
-            "x": 1.167,
-            "y": 37.767
-          }
-        },
-        {
-          "pixel": {
-            "x": 678,
-            "y": 181
-          },
-          "world": {
-            "x": 22.6,
-            "y": 37.767
-          }
-        },
-        {
-          "pixel": {
-            "x": 678,
-            "y": 265
-          },
-          "world": {
-            "x": 22.6,
-            "y": 34.967
-          }
-        },
-        {
-          "pixel": {
-            "x": 35,
-            "y": 265
-          },
-          "world": {
-            "x": 1.167,
-            "y": 34.967
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 356.5,
-          "y": 223
-        },
-        "world": {
-          "x": 11.883,
-          "y": 36.367
-        }
-      },
-      "kind": "corridor",
-      "entrances": []
-    },
-    {
-      "id": "corridor-vertical",
+      "id": "corridor-main",
       "name": "Ana Koridor",
-      "color": "#5dade2",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 312,
-            "y": 265
-          },
-          "world": {
-            "x": 10.4,
-            "y": 34.967
-          }
-        },
-        {
-          "pixel": {
-            "x": 401,
-            "y": 265
-          },
-          "world": {
-            "x": 13.367,
-            "y": 34.967
-          }
-        },
-        {
-          "pixel": {
-            "x": 401,
-            "y": 1313
-          },
-          "world": {
-            "x": 13.367,
-            "y": 0.033
-          }
-        },
-        {
-          "pixel": {
-            "x": 312,
-            "y": 1313
-          },
-          "world": {
-            "x": 10.4,
-            "y": 0.033
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 356.5,
-          "y": 789
-        },
-        "world": {
-          "x": 11.883,
-          "y": 17.5
-        }
-      },
       "kind": "corridor",
+      "color": "#5b8def",
+      "polygon": [
+        {
+          "pixel": {
+            "x": 816,
+            "y": 76
+          },
+          "world": {
+            "x": 0.033807,
+            "y": 14.607069
+          }
+        },
+        {
+          "pixel": {
+            "x": 1209,
+            "y": 76
+          },
+          "world": {
+            "x": 3.493779,
+            "y": 14.607069
+          }
+        },
+        {
+          "pixel": {
+            "x": 1209,
+            "y": 1447
+          },
+          "world": {
+            "x": 3.493779,
+            "y": 2.536785
+          }
+        },
+        {
+          "pixel": {
+            "x": 3258,
+            "y": 1447
+          },
+          "world": {
+            "x": 21.533175,
+            "y": 2.536785
+          }
+        },
+        {
+          "pixel": {
+            "x": 3258,
+            "y": 1739
+          },
+          "world": {
+            "x": 21.533175,
+            "y": -0.033983
+          }
+        },
+        {
+          "pixel": {
+            "x": 812.16,
+            "y": 1739
+          },
+          "world": {
+            "x": 0,
+            "y": -0.033983
+          }
+        },
+        {
+          "pixel": {
+            "x": 812.16,
+            "y": 1447
+          },
+          "world": {
+            "x": 0,
+            "y": 2.536785
+          }
+        },
+        {
+          "pixel": {
+            "x": 816,
+            "y": 1447
+          },
+          "world": {
+            "x": 0.033807,
+            "y": 2.536785
+          }
+        }
+      ],
+      "roomCenter": {
+        "pixel": {
+          "x": 2000,
+          "y": 1593
+        },
+        "world": {
+          "x": 10.457743,
+          "y": 1.251401
+        }
+      },
       "entrances": []
-    },
-    {
-      "id": "room-13",
-      "name": "ODA 13",
-      "color": "#2a9d8f",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 59,
-            "y": 28
-          },
-          "world": {
-            "x": 1.967,
-            "y": 42.867
-          }
-        },
-        {
-          "pixel": {
-            "x": 291,
-            "y": 28
-          },
-          "world": {
-            "x": 9.7,
-            "y": 42.867
-          }
-        },
-        {
-          "pixel": {
-            "x": 291,
-            "y": 165
-          },
-          "world": {
-            "x": 9.7,
-            "y": 38.3
-          }
-        },
-        {
-          "pixel": {
-            "x": 59,
-            "y": 165
-          },
-          "world": {
-            "x": 1.967,
-            "y": 38.3
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 175,
-          "y": 93.5
-        },
-        "world": {
-          "x": 5.833,
-          "y": 40.683
-        }
-      },
-      "coverage": "regular",
-      "kind": "room",
-      "entrances": [
-        {
-          "pixel": {
-            "x": 278,
-            "y": 168
-          },
-          "world": {
-            "x": 9.267,
-            "y": 38.2
-          },
-          "widthMeters": 1,
-          "inwardNormal": {
-            "x": 0,
-            "y": 1
-          },
-          "connectsTo": "corridor-horizontal",
-          "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-13-door",
-          "label": "Koridor kapısı"
-        }
-      ],
-      "inference": {
-        "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
-        },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
-      }
-    },
-    {
-      "id": "room-14",
-      "name": "ODA 14",
-      "color": "#2a9d8f",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 421,
-            "y": 28
-          },
-          "world": {
-            "x": 14.033,
-            "y": 42.867
-          }
-        },
-        {
-          "pixel": {
-            "x": 653,
-            "y": 28
-          },
-          "world": {
-            "x": 21.767,
-            "y": 42.867
-          }
-        },
-        {
-          "pixel": {
-            "x": 653,
-            "y": 165
-          },
-          "world": {
-            "x": 21.767,
-            "y": 38.3
-          }
-        },
-        {
-          "pixel": {
-            "x": 421,
-            "y": 165
-          },
-          "world": {
-            "x": 14.033,
-            "y": 38.3
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 537,
-          "y": 93.5
-        },
-        "world": {
-          "x": 17.9,
-          "y": 40.683
-        }
-      },
-      "coverage": "regular",
-      "kind": "room",
-      "entrances": [
-        {
-          "pixel": {
-            "x": 435,
-            "y": 168
-          },
-          "world": {
-            "x": 14.5,
-            "y": 38.2
-          },
-          "widthMeters": 1,
-          "inwardNormal": {
-            "x": 0,
-            "y": 1
-          },
-          "connectsTo": "corridor-horizontal",
-          "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-14-door",
-          "label": "Koridor kapısı"
-        }
-      ],
-      "inference": {
-        "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
-        },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
-      }
-    },
-    {
-      "id": "room-11",
-      "name": "ODA 11",
-      "color": "#3a86a8",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 59,
-            "y": 287
-          },
-          "world": {
-            "x": 1.967,
-            "y": 34.233
-          }
-        },
-        {
-          "pixel": {
-            "x": 297,
-            "y": 287
-          },
-          "world": {
-            "x": 9.9,
-            "y": 34.233
-          }
-        },
-        {
-          "pixel": {
-            "x": 297,
-            "y": 423
-          },
-          "world": {
-            "x": 9.9,
-            "y": 29.7
-          }
-        },
-        {
-          "pixel": {
-            "x": 59,
-            "y": 423
-          },
-          "world": {
-            "x": 1.967,
-            "y": 29.7
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 175,
-          "y": 355
-        },
-        "world": {
-          "x": 5.833,
-          "y": 31.967
-        }
-      },
-      "coverage": "regular",
-      "kind": "room",
-      "entrances": [
-        {
-          "pixel": {
-            "x": 300,
-            "y": 395
-          },
-          "world": {
-            "x": 10,
-            "y": 30.633
-          },
-          "widthMeters": 1,
-          "inwardNormal": {
-            "x": -1,
-            "y": 0
-          },
-          "connectsTo": "corridor-vertical",
-          "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-11-door",
-          "label": "Koridor kapısı"
-        }
-      ],
-      "inference": {
-        "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
-        },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
-      }
-    },
-    {
-      "id": "room-12",
-      "name": "ODA 12",
-      "color": "#3a86a8",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 415,
-            "y": 287
-          },
-          "world": {
-            "x": 13.833,
-            "y": 34.233
-          }
-        },
-        {
-          "pixel": {
-            "x": 653,
-            "y": 287
-          },
-          "world": {
-            "x": 21.767,
-            "y": 34.233
-          }
-        },
-        {
-          "pixel": {
-            "x": 653,
-            "y": 423
-          },
-          "world": {
-            "x": 21.767,
-            "y": 29.7
-          }
-        },
-        {
-          "pixel": {
-            "x": 415,
-            "y": 423
-          },
-          "world": {
-            "x": 13.833,
-            "y": 29.7
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 537,
-          "y": 355
-        },
-        "world": {
-          "x": 17.9,
-          "y": 31.967
-        }
-      },
-      "coverage": "regular",
-      "kind": "room",
-      "entrances": [
-        {
-          "pixel": {
-            "x": 412,
-            "y": 395
-          },
-          "world": {
-            "x": 13.733,
-            "y": 30.633
-          },
-          "widthMeters": 1,
-          "inwardNormal": {
-            "x": 1,
-            "y": 0
-          },
-          "connectsTo": "corridor-vertical",
-          "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-12-door",
-          "label": "Koridor kapısı"
-        }
-      ],
-      "inference": {
-        "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
-        },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
-      }
-    },
-    {
-      "id": "room-09",
-      "name": "ODA 09",
-      "color": "#5f8fce",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 59,
-            "y": 455
-          },
-          "world": {
-            "x": 1.967,
-            "y": 28.633
-          }
-        },
-        {
-          "pixel": {
-            "x": 297,
-            "y": 455
-          },
-          "world": {
-            "x": 9.9,
-            "y": 28.633
-          }
-        },
-        {
-          "pixel": {
-            "x": 297,
-            "y": 590
-          },
-          "world": {
-            "x": 9.9,
-            "y": 24.133
-          }
-        },
-        {
-          "pixel": {
-            "x": 59,
-            "y": 590
-          },
-          "world": {
-            "x": 1.967,
-            "y": 24.133
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 175,
-          "y": 522.5
-        },
-        "world": {
-          "x": 5.833,
-          "y": 26.383
-        }
-      },
-      "coverage": "regular",
-      "kind": "room",
-      "entrances": [
-        {
-          "pixel": {
-            "x": 300,
-            "y": 565
-          },
-          "world": {
-            "x": 10,
-            "y": 24.967
-          },
-          "widthMeters": 1,
-          "inwardNormal": {
-            "x": -1,
-            "y": 0
-          },
-          "connectsTo": "corridor-vertical",
-          "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-09-door",
-          "label": "Koridor kapısı"
-        }
-      ],
-      "inference": {
-        "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
-        },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
-      }
-    },
-    {
-      "id": "room-10",
-      "name": "ODA 10",
-      "color": "#5f8fce",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 415,
-            "y": 455
-          },
-          "world": {
-            "x": 13.833,
-            "y": 28.633
-          }
-        },
-        {
-          "pixel": {
-            "x": 653,
-            "y": 455
-          },
-          "world": {
-            "x": 21.767,
-            "y": 28.633
-          }
-        },
-        {
-          "pixel": {
-            "x": 653,
-            "y": 590
-          },
-          "world": {
-            "x": 21.767,
-            "y": 24.133
-          }
-        },
-        {
-          "pixel": {
-            "x": 415,
-            "y": 590
-          },
-          "world": {
-            "x": 13.833,
-            "y": 24.133
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 537,
-          "y": 522.5
-        },
-        "world": {
-          "x": 17.9,
-          "y": 26.383
-        }
-      },
-      "coverage": "regular",
-      "kind": "room",
-      "entrances": [
-        {
-          "pixel": {
-            "x": 412,
-            "y": 565
-          },
-          "world": {
-            "x": 13.733,
-            "y": 24.967
-          },
-          "widthMeters": 1,
-          "inwardNormal": {
-            "x": 1,
-            "y": 0
-          },
-          "connectsTo": "corridor-vertical",
-          "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-10-door",
-          "label": "Koridor kapısı"
-        }
-      ],
-      "inference": {
-        "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
-        },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
-      }
-    },
-    {
-      "id": "room-07",
-      "name": "ODA 07",
-      "color": "#7a83d1",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 59,
-            "y": 623
-          },
-          "world": {
-            "x": 1.967,
-            "y": 23.033
-          }
-        },
-        {
-          "pixel": {
-            "x": 297,
-            "y": 623
-          },
-          "world": {
-            "x": 9.9,
-            "y": 23.033
-          }
-        },
-        {
-          "pixel": {
-            "x": 297,
-            "y": 764
-          },
-          "world": {
-            "x": 9.9,
-            "y": 18.333
-          }
-        },
-        {
-          "pixel": {
-            "x": 59,
-            "y": 764
-          },
-          "world": {
-            "x": 1.967,
-            "y": 18.333
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 175,
-          "y": 693.5
-        },
-        "world": {
-          "x": 5.833,
-          "y": 20.683
-        }
-      },
-      "coverage": "regular",
-      "kind": "room",
-      "entrances": [
-        {
-          "pixel": {
-            "x": 300,
-            "y": 735
-          },
-          "world": {
-            "x": 10,
-            "y": 19.3
-          },
-          "widthMeters": 1,
-          "inwardNormal": {
-            "x": -1,
-            "y": 0
-          },
-          "connectsTo": "corridor-vertical",
-          "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-07-door",
-          "label": "Koridor kapısı"
-        }
-      ],
-      "inference": {
-        "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
-        },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
-      }
-    },
-    {
-      "id": "room-08",
-      "name": "ODA 08",
-      "color": "#7a83d1",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 415,
-            "y": 623
-          },
-          "world": {
-            "x": 13.833,
-            "y": 23.033
-          }
-        },
-        {
-          "pixel": {
-            "x": 653,
-            "y": 623
-          },
-          "world": {
-            "x": 21.767,
-            "y": 23.033
-          }
-        },
-        {
-          "pixel": {
-            "x": 653,
-            "y": 764
-          },
-          "world": {
-            "x": 21.767,
-            "y": 18.333
-          }
-        },
-        {
-          "pixel": {
-            "x": 415,
-            "y": 764
-          },
-          "world": {
-            "x": 13.833,
-            "y": 18.333
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 537,
-          "y": 693.5
-        },
-        "world": {
-          "x": 17.9,
-          "y": 20.683
-        }
-      },
-      "coverage": "regular",
-      "kind": "room",
-      "entrances": [
-        {
-          "pixel": {
-            "x": 412,
-            "y": 735
-          },
-          "world": {
-            "x": 13.733,
-            "y": 19.3
-          },
-          "widthMeters": 1,
-          "inwardNormal": {
-            "x": 1,
-            "y": 0
-          },
-          "connectsTo": "corridor-vertical",
-          "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-08-door",
-          "label": "Koridor kapısı"
-        }
-      ],
-      "inference": {
-        "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
-        },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
-      }
-    },
-    {
-      "id": "room-05",
-      "name": "ODA 05",
-      "color": "#8d78c9",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 59,
-            "y": 796
-          },
-          "world": {
-            "x": 1.967,
-            "y": 17.267
-          }
-        },
-        {
-          "pixel": {
-            "x": 297,
-            "y": 796
-          },
-          "world": {
-            "x": 9.9,
-            "y": 17.267
-          }
-        },
-        {
-          "pixel": {
-            "x": 297,
-            "y": 936
-          },
-          "world": {
-            "x": 9.9,
-            "y": 12.6
-          }
-        },
-        {
-          "pixel": {
-            "x": 59,
-            "y": 936
-          },
-          "world": {
-            "x": 1.967,
-            "y": 12.6
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 175,
-          "y": 866
-        },
-        "world": {
-          "x": 5.833,
-          "y": 14.933
-        }
-      },
-      "coverage": "regular",
-      "kind": "room",
-      "entrances": [
-        {
-          "pixel": {
-            "x": 300,
-            "y": 905
-          },
-          "world": {
-            "x": 10,
-            "y": 13.633
-          },
-          "widthMeters": 1,
-          "inwardNormal": {
-            "x": -1,
-            "y": 0
-          },
-          "connectsTo": "corridor-vertical",
-          "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-05-door",
-          "label": "Koridor kapısı"
-        }
-      ],
-      "inference": {
-        "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
-        },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
-      }
-    },
-    {
-      "id": "room-06",
-      "name": "ODA 06",
-      "color": "#8d78c9",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 415,
-            "y": 796
-          },
-          "world": {
-            "x": 13.833,
-            "y": 17.267
-          }
-        },
-        {
-          "pixel": {
-            "x": 653,
-            "y": 796
-          },
-          "world": {
-            "x": 21.767,
-            "y": 17.267
-          }
-        },
-        {
-          "pixel": {
-            "x": 653,
-            "y": 936
-          },
-          "world": {
-            "x": 21.767,
-            "y": 12.6
-          }
-        },
-        {
-          "pixel": {
-            "x": 415,
-            "y": 936
-          },
-          "world": {
-            "x": 13.833,
-            "y": 12.6
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 537,
-          "y": 866
-        },
-        "world": {
-          "x": 17.9,
-          "y": 14.933
-        }
-      },
-      "coverage": "regular",
-      "kind": "room",
-      "entrances": [
-        {
-          "pixel": {
-            "x": 412,
-            "y": 905
-          },
-          "world": {
-            "x": 13.733,
-            "y": 13.633
-          },
-          "widthMeters": 1,
-          "inwardNormal": {
-            "x": 1,
-            "y": 0
-          },
-          "connectsTo": "corridor-vertical",
-          "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-06-door",
-          "label": "Koridor kapısı"
-        }
-      ],
-      "inference": {
-        "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
-        },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
-      }
-    },
-    {
-      "id": "room-03",
-      "name": "ODA 03",
-      "color": "#a06fb8",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 59,
-            "y": 968
-          },
-          "world": {
-            "x": 1.967,
-            "y": 11.533
-          }
-        },
-        {
-          "pixel": {
-            "x": 297,
-            "y": 968
-          },
-          "world": {
-            "x": 9.9,
-            "y": 11.533
-          }
-        },
-        {
-          "pixel": {
-            "x": 297,
-            "y": 1108
-          },
-          "world": {
-            "x": 9.9,
-            "y": 6.867
-          }
-        },
-        {
-          "pixel": {
-            "x": 59,
-            "y": 1108
-          },
-          "world": {
-            "x": 1.967,
-            "y": 6.867
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 175,
-          "y": 1038
-        },
-        "world": {
-          "x": 5.833,
-          "y": 9.2
-        }
-      },
-      "coverage": "regular",
-      "kind": "room",
-      "entrances": [
-        {
-          "pixel": {
-            "x": 300,
-            "y": 1075
-          },
-          "world": {
-            "x": 10,
-            "y": 7.967
-          },
-          "widthMeters": 1,
-          "inwardNormal": {
-            "x": -1,
-            "y": 0
-          },
-          "connectsTo": "corridor-vertical",
-          "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-03-door",
-          "label": "Koridor kapısı"
-        }
-      ],
-      "inference": {
-        "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
-        },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
-      }
-    },
-    {
-      "id": "room-04",
-      "name": "ODA 04",
-      "color": "#a06fb8",
-      "polygon": [
-        {
-          "pixel": {
-            "x": 415,
-            "y": 968
-          },
-          "world": {
-            "x": 13.833,
-            "y": 11.533
-          }
-        },
-        {
-          "pixel": {
-            "x": 653,
-            "y": 968
-          },
-          "world": {
-            "x": 21.767,
-            "y": 11.533
-          }
-        },
-        {
-          "pixel": {
-            "x": 653,
-            "y": 1108
-          },
-          "world": {
-            "x": 21.767,
-            "y": 6.867
-          }
-        },
-        {
-          "pixel": {
-            "x": 415,
-            "y": 1108
-          },
-          "world": {
-            "x": 13.833,
-            "y": 6.867
-          }
-        }
-      ],
-      "roomCenter": {
-        "pixel": {
-          "x": 537,
-          "y": 1038
-        },
-        "world": {
-          "x": 17.9,
-          "y": 9.2
-        }
-      },
-      "coverage": "regular",
-      "kind": "room",
-      "entrances": [
-        {
-          "pixel": {
-            "x": 412,
-            "y": 1075
-          },
-          "world": {
-            "x": 13.733,
-            "y": 7.967
-          },
-          "widthMeters": 1,
-          "inwardNormal": {
-            "x": 1,
-            "y": 0
-          },
-          "connectsTo": "corridor-vertical",
-          "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-04-door",
-          "label": "Koridor kapısı"
-        }
-      ],
-      "inference": {
-        "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
-        },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
-      }
     },
     {
       "id": "room-01",
-      "name": "ODA 01",
-      "color": "#b56e9d",
+      "name": "Oda 1",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#00a896",
       "polygon": [
         {
           "pixel": {
-            "x": 59,
-            "y": 1140
+            "x": 1210,
+            "y": 1041
           },
           "world": {
-            "x": 1.967,
-            "y": 5.8
+            "x": 3.502583,
+            "y": 6.111209
           }
         },
         {
           "pixel": {
-            "x": 297,
-            "y": 1140
+            "x": 1957,
+            "y": 1041
           },
           "world": {
-            "x": 9.9,
-            "y": 5.8
+            "x": 10.079171,
+            "y": 6.111209
           }
         },
         {
           "pixel": {
-            "x": 297,
-            "y": 1285
+            "x": 1957,
+            "y": 1447
           },
           "world": {
-            "x": 9.9,
-            "y": 0.967
+            "x": 10.079171,
+            "y": 2.536785
           }
         },
         {
           "pixel": {
-            "x": 59,
-            "y": 1285
+            "x": 1210,
+            "y": 1447
           },
           "world": {
-            "x": 1.967,
-            "y": 0.967
+            "x": 3.502583,
+            "y": 2.536785
           }
         }
       ],
       "roomCenter": {
         "pixel": {
-          "x": 175,
-          "y": 1212.5
+          "x": 1583.5,
+          "y": 1244
         },
         "world": {
-          "x": 5.833,
-          "y": 3.383
+          "x": 6.790877,
+          "y": 4.323997
         }
       },
-      "coverage": "regular",
-      "kind": "room",
       "entrances": [
         {
+          "id": "room-01-south-door",
+          "label": "Güney duvarı kapısı",
           "pixel": {
-            "x": 300,
-            "y": 1240
+            "x": 1414.08,
+            "y": 1436.3
           },
           "world": {
-            "x": 10,
-            "y": 2.467
+            "x": 5.299,
+            "y": 2.631
           },
-          "widthMeters": 1,
+          "widthMeters": 1.2,
           "inwardNormal": {
-            "x": -1,
-            "y": 0
+            "x": 0,
+            "y": 1
           },
-          "connectsTo": "corridor-vertical",
+          "connectsTo": "corridor-main",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-01-door",
-          "label": "Koridor kapısı"
+          "crossingDepthMeters": 0.12
         }
       ],
       "inference": {
         "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
+          "evidenceMode": "required"
         },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
+        "coverage": "intermittent"
       }
     },
     {
       "id": "room-02",
-      "name": "ODA 02",
-      "color": "#b56e9d",
+      "name": "Oda 2",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#2a9d8f",
       "polygon": [
         {
           "pixel": {
-            "x": 415,
-            "y": 1140
+            "x": 1957,
+            "y": 1041
           },
           "world": {
-            "x": 13.833,
-            "y": 5.8
+            "x": 10.079171,
+            "y": 6.111209
           }
         },
         {
           "pixel": {
-            "x": 653,
-            "y": 1140
+            "x": 2750,
+            "y": 1041
           },
           "world": {
-            "x": 21.767,
-            "y": 5.8
+            "x": 17.060743,
+            "y": 6.111209
           }
         },
         {
           "pixel": {
-            "x": 653,
-            "y": 1285
+            "x": 2750,
+            "y": 1447
           },
           "world": {
-            "x": 21.767,
-            "y": 0.967
+            "x": 17.060743,
+            "y": 2.536785
           }
         },
         {
           "pixel": {
-            "x": 415,
-            "y": 1285
+            "x": 1957,
+            "y": 1447
           },
           "world": {
-            "x": 13.833,
-            "y": 0.967
+            "x": 10.079171,
+            "y": 2.536785
           }
         }
       ],
       "roomCenter": {
         "pixel": {
-          "x": 537,
-          "y": 1212.5
+          "x": 2353.5,
+          "y": 1244
         },
         "world": {
-          "x": 17.9,
-          "y": 3.383
+          "x": 13.569957,
+          "y": 4.323997
         }
       },
-      "coverage": "regular",
-      "kind": "room",
       "entrances": [
         {
+          "id": "room-02-south-door",
+          "label": "Güney duvarı kapısı",
           "pixel": {
-            "x": 412,
-            "y": 1240
+            "x": 2413.7,
+            "y": 1441.64
           },
           "world": {
-            "x": 13.733,
-            "y": 2.467
+            "x": 14.1,
+            "y": 2.584
           },
-          "widthMeters": 1,
+          "widthMeters": 1.2,
           "inwardNormal": {
-            "x": 1,
-            "y": 0
+            "x": 0,
+            "y": 1
           },
-          "connectsTo": "corridor-vertical",
+          "connectsTo": "corridor-main",
           "approachDepthMeters": 1.5,
-          "crossingDepthMeters": 0.2,
-          "id": "room-02-door",
-          "label": "Koridor kapısı"
+          "crossingDepthMeters": 0.12
         }
       ],
       "inference": {
         "doorDefaults": {
-          "enabled": false,
-          "direction": "bidirectional",
-          "evidenceMode": "preferred",
-          "entryEvidenceWeight": 1,
-          "exitEvidenceWeight": 1,
-          "entryConfidenceBonus": 0.25,
-          "exitConfidenceBonus": 0,
-          "crossingValidityMs": 12000,
-          "minimumDirectionalMovementMeters": 0,
-          "missingDoorEvidenceDurationMultiplier": 1,
-          "missingDoorEvidenceCountMultiplier": 1,
-          "allowEstimatedEntryAfterSignalLoss": true,
-          "allowEstimatedExitAfterSignalLoss": true
+          "evidenceMode": "required"
         },
-        "relocationEvidenceDurationMultiplier": 1.4,
-        "outsideReleaseDurationMultiplier": 1.4
+        "coverage": "intermittent"
+      }
+    },
+    {
+      "id": "room-03",
+      "name": "Oda 3",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#7a83d1",
+      "polygon": [
+        {
+          "pixel": {
+            "x": 478.93,
+            "y": 1216
+          },
+          "world": {
+            "x": -2.934,
+            "y": 4.571
+          }
+        },
+        {
+          "pixel": {
+            "x": 812.16,
+            "y": 1216
+          },
+          "world": {
+            "x": 0,
+            "y": 4.570509
+          }
+        },
+        {
+          "pixel": {
+            "x": 812.16,
+            "y": 1735.14
+          },
+          "world": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "pixel": {
+            "x": 497.48,
+            "y": 1801.14
+          },
+          "world": {
+            "x": -2.77,
+            "y": -0.581
+          }
+        }
+      ],
+      "roomCenter": {
+        "pixel": {
+          "x": 697.08,
+          "y": 1475.57
+        },
+        "world": {
+          "x": -1.013164,
+          "y": 2.285254
+        }
+      },
+      "entrances": [
+        {
+          "id": "room-03-east-door",
+          "label": "Doğu duvarı kapısı",
+          "pixel": {
+            "x": 809.1,
+            "y": 1425.08
+          },
+          "world": {
+            "x": -0.027,
+            "y": 2.73
+          },
+          "widthMeters": 1.2,
+          "inwardNormal": {
+            "x": -1,
+            "y": 0
+          },
+          "connectsTo": "corridor-main",
+          "approachDepthMeters": 1.5,
+          "crossingDepthMeters": 0.12
+        }
+      ],
+      "inference": {
+        "doorDefaults": {
+          "evidenceMode": "required"
+        },
+        "coverage": "intermittent"
+      }
+    },
+    {
+      "id": "room-04",
+      "name": "Oda 4",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#9b7ede",
+      "polygon": [
+        {
+          "pixel": {
+            "x": 2750,
+            "y": 1041
+          },
+          "world": {
+            "x": 17.060743,
+            "y": 6.111209
+          }
+        },
+        {
+          "pixel": {
+            "x": 3212,
+            "y": 1041
+          },
+          "world": {
+            "x": 21.128191,
+            "y": 6.111209
+          }
+        },
+        {
+          "pixel": {
+            "x": 3212,
+            "y": 1447
+          },
+          "world": {
+            "x": 21.128191,
+            "y": 2.536785
+          }
+        },
+        {
+          "pixel": {
+            "x": 2750,
+            "y": 1447
+          },
+          "world": {
+            "x": 17.060743,
+            "y": 2.536785
+          }
+        }
+      ],
+      "roomCenter": {
+        "pixel": {
+          "x": 2981,
+          "y": 1244
+        },
+        "world": {
+          "x": 19.094467,
+          "y": 4.323997
+        }
+      },
+      "entrances": [
+        {
+          "id": "room-04-south-door",
+          "label": "Güney duvarı kapısı",
+          "pixel": {
+            "x": 3072.5,
+            "y": 1446.98
+          },
+          "world": {
+            "x": 19.9,
+            "y": 2.537
+          },
+          "widthMeters": 1.2,
+          "inwardNormal": {
+            "x": 0,
+            "y": 1
+          },
+          "connectsTo": "corridor-main",
+          "approachDepthMeters": 1.5,
+          "crossingDepthMeters": 0.12
+        }
+      ],
+      "inference": {
+        "doorDefaults": {
+          "evidenceMode": "required"
+        },
+        "coverage": "intermittent"
+      }
+    },
+    {
+      "id": "room-05",
+      "name": "Oda 5",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#b56e9d",
+      "polygon": [
+        {
+          "pixel": {
+            "x": 809,
+            "y": 1739
+          },
+          "world": {
+            "x": -0.027821,
+            "y": -0.033983
+          }
+        },
+        {
+          "pixel": {
+            "x": 1385,
+            "y": 1739
+          },
+          "world": {
+            "x": 5.043283,
+            "y": -0.033983
+          }
+        },
+        {
+          "pixel": {
+            "x": 1385,
+            "y": 2084
+          },
+          "world": {
+            "x": 5.043283,
+            "y": -3.071363
+          }
+        },
+        {
+          "pixel": {
+            "x": 809,
+            "y": 2084
+          },
+          "world": {
+            "x": -0.027821,
+            "y": -3.071363
+          }
+        }
+      ],
+      "roomCenter": {
+        "pixel": {
+          "x": 1097,
+          "y": 1911.5
+        },
+        "world": {
+          "x": 2.507731,
+          "y": -1.552673
+        }
+      },
+      "entrances": [
+        {
+          "id": "room-05-north-door",
+          "label": "Kuzey duvarı kapısı",
+          "pixel": {
+            "x": 1169.8,
+            "y": 1747.32
+          },
+          "world": {
+            "x": 3.149,
+            "y": -0.107
+          },
+          "widthMeters": 1.2,
+          "inwardNormal": {
+            "x": 0,
+            "y": -1
+          },
+          "connectsTo": "corridor-main",
+          "approachDepthMeters": 1.5,
+          "crossingDepthMeters": 0.12
+        }
+      ],
+      "inference": {
+        "doorDefaults": {
+          "evidenceMode": "required"
+        },
+        "coverage": "intermittent"
+      }
+    },
+    {
+      "id": "room-06",
+      "name": "Oda 6",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#a06fb8",
+      "polygon": [
+        {
+          "pixel": {
+            "x": 1385,
+            "y": 1739
+          },
+          "world": {
+            "x": 5.043283,
+            "y": -0.033983
+          }
+        },
+        {
+          "pixel": {
+            "x": 2140,
+            "y": 1739
+          },
+          "world": {
+            "x": 11.690303,
+            "y": -0.033983
+          }
+        },
+        {
+          "pixel": {
+            "x": 2140,
+            "y": 2084
+          },
+          "world": {
+            "x": 11.690303,
+            "y": -3.071363
+          }
+        },
+        {
+          "pixel": {
+            "x": 1385,
+            "y": 2084
+          },
+          "world": {
+            "x": 5.043283,
+            "y": -3.071363
+          }
+        }
+      ],
+      "roomCenter": {
+        "pixel": {
+          "x": 1762.5,
+          "y": 1911.5
+        },
+        "world": {
+          "x": 8.366793,
+          "y": -1.552673
+        }
+      },
+      "entrances": [
+        {
+          "id": "room-06-north-door",
+          "label": "Kuzey duvarı kapısı",
+          "pixel": {
+            "x": 2101.55,
+            "y": 1745.24
+          },
+          "world": {
+            "x": 11.352,
+            "y": -0.089
+          },
+          "widthMeters": 1.2,
+          "inwardNormal": {
+            "x": 0,
+            "y": -1
+          },
+          "connectsTo": "corridor-main",
+          "approachDepthMeters": 1.5,
+          "crossingDepthMeters": 0.12
+        }
+      ],
+      "inference": {
+        "doorDefaults": {
+          "evidenceMode": "required"
+        },
+        "coverage": "intermittent"
+      }
+    },
+    {
+      "id": "room-07",
+      "name": "Oda 7",
+      "kind": "room",
+      "coverage": "silent",
+      "expectedIntervalMs": 1000,
+      "color": "#8d78c9",
+      "polygon": [
+        {
+          "pixel": {
+            "x": 2164.46,
+            "y": 1743.59
+          },
+          "world": {
+            "x": 11.906,
+            "y": -0.074
+          }
+        },
+        {
+          "pixel": {
+            "x": 2829,
+            "y": 1739
+          },
+          "world": {
+            "x": 17.756259,
+            "y": -0.033983
+          }
+        },
+        {
+          "pixel": {
+            "x": 2829,
+            "y": 2084
+          },
+          "world": {
+            "x": 17.756259,
+            "y": -3.071363
+          }
+        },
+        {
+          "pixel": {
+            "x": 2161.41,
+            "y": 2079.41
+          },
+          "world": {
+            "x": 11.879,
+            "y": -3.031
+          }
+        }
+      ],
+      "roomCenter": {
+        "pixel": {
+          "x": 2484.5,
+          "y": 1911.5
+        },
+        "world": {
+          "x": 14.723281,
+          "y": -1.552673
+        }
+      },
+      "entrances": [
+        {
+          "id": "room-07-north-door",
+          "label": "Kuzey duvarı kapısı",
+          "pixel": {
+            "x": 2232.04,
+            "y": 1743.86
+          },
+          "world": {
+            "x": 12.501,
+            "y": -0.077
+          },
+          "widthMeters": 1.2,
+          "inwardNormal": {
+            "x": 0,
+            "y": -1
+          },
+          "connectsTo": "corridor-main",
+          "approachDepthMeters": 1.5,
+          "crossingDepthMeters": 0.12
+        }
+      ],
+      "inference": {
+        "doorDefaults": {
+          "evidenceMode": "required"
+        },
+        "coverage": "intermittent"
       }
     }
   ]

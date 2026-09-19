@@ -5,32 +5,22 @@ import test from "node:test";
 import { compileRegionsConfig } from "../src/server/regionEngine/configLoader";
 import type { CoordinatePair, RegionDefinition, RegionsConfig } from "../src/features/regions/types/region.types";
 
-const configPath = path.join(process.cwd(), "config", "regions.json");
-const mapConfigPath = path.join(process.cwd(), "config", "maps", "kat1-ortopedi", "regions.json");
-const config = JSON.parse(readFileSync(configPath, "utf8")) as RegionsConfig;
+const activeConfigPath = path.join(process.cwd(), "config", "regions.json");
+const mapConfigPath = path.join(process.cwd(), "config", "maps", "spor-koridor", "regions.json");
+const archivedConfigPath = path.join(process.cwd(), "config", "maps", "kat1-ortopedi", "regions.json");
+const previousSportsConfigPath = path.join(process.cwd(), "config", "maps", "spor-koridor", "regions-v1.json");
+const config = JSON.parse(readFileSync(activeConfigPath, "utf8")) as RegionsConfig;
 const mapConfig = JSON.parse(readFileSync(mapConfigPath, "utf8")) as RegionsConfig;
-const EPSILON = 0.0011;
-const ROOM_WALL_BOUNDS: Record<string, [number, number, number, number]> = {
-  "room-13": [50, 300, 19, 168],
-  "room-14": [412, 662, 19, 168],
-  "room-11": [50, 300, 278, 432],
-  "room-12": [412, 662, 278, 432],
-  "room-09": [50, 300, 446, 599],
-  "room-10": [412, 662, 446, 599],
-  "room-07": [50, 300, 614, 773],
-  "room-08": [412, 662, 614, 773],
-  "room-05": [50, 300, 787, 945],
-  "room-06": [412, 662, 787, 945],
-  "room-03": [50, 300, 959, 1117],
-  "room-04": [412, 662, 959, 1117],
-  "room-01": [50, 300, 1131, 1294],
-  "room-02": [412, 662, 1131, 1294],
-};
+const archivedConfig = JSON.parse(readFileSync(archivedConfigPath, "utf8")) as RegionsConfig;
+const previousSportsConfig = JSON.parse(readFileSync(previousSportsConfigPath, "utf8")) as RegionsConfig;
+const PIXEL_METERS = 0.008804;
+const ORIGIN = { x: 812.16, y: 1735.14 };
+const EPSILON = 0.000002;
 
 function expectedWorld(pair: CoordinatePair) {
   return {
-    x: pair.pixel.x / 30,
-    y: (1314 - pair.pixel.y) / 30,
+    x: (pair.pixel.x - ORIGIN.x) * PIXEL_METERS,
+    y: (ORIGIN.y - pair.pixel.y) * PIXEL_METERS,
   };
 }
 
@@ -38,8 +28,8 @@ function assertCalibrated(pair: CoordinatePair, label: string) {
   const expected = expectedWorld(pair);
   assert.ok(Math.abs(pair.world.x - expected.x) <= EPSILON, `${label}: x kalibrasyonu uyuşmuyor`);
   assert.ok(Math.abs(pair.world.y - expected.y) <= EPSILON, `${label}: y kalibrasyonu uyuşmuyor`);
-  assert.ok(pair.pixel.x >= 0 && pair.pixel.x <= 714, `${label}: x harita dışında`);
-  assert.ok(pair.pixel.y >= 0 && pair.pixel.y <= 1314, `${label}: y harita dışında`);
+  assert.ok(pair.pixel.x >= 0 && pair.pixel.x <= 3840, `${label}: x harita dışında`);
+  assert.ok(pair.pixel.y >= 0 && pair.pixel.y <= 2160, `${label}: y harita dışında`);
 }
 
 function bounds(region: RegionDefinition) {
@@ -48,20 +38,25 @@ function bounds(region: RegionDefinition) {
   return { minX: Math.min(...xs), maxX: Math.max(...xs), minY: Math.min(...ys), maxY: Math.max(...ys) };
 }
 
-test("floor plan has two corridors and fourteen calibrated room regions", () => {
+test("sports corridor uses the supplied scale and origin while previous plans remain archived", () => {
+  assert.equal(config.map.mapId, "spor-koridor");
+  assert.deepEqual(mapConfig, config);
+  assert.equal(archivedConfig.map.mapId, "kat1-ortopedi");
+  assert.equal(previousSportsConfig.map.mapId, "spor-koridor");
+  assert.ok(archivedConfig.regions.length > 0);
+  assert.ok(previousSportsConfig.regions.length > 0);
+
   const corridors = config.regions.filter((region) => region.kind === "corridor");
   const rooms = config.regions.filter((region) => region.kind === "room");
-  assert.equal(corridors.length, 2);
-  assert.equal(rooms.length, 14);
-  assert.deepEqual(new Set(rooms.map((room) => room.name)), new Set(Array.from({ length: 14 }, (_, index) => `ODA ${String(index + 1).padStart(2, "0")}`)));
-  assert.deepEqual(mapConfig.regions, config.regions);
+  assert.equal(corridors.length, 1);
+  assert.deepEqual(rooms.map((room) => room.name), ["Oda 1", "Oda 2", "Oda 3", "Oda 4", "Oda 5", "Oda 6", "Oda 7"]);
 
   const compiled = compileRegionsConfig(config);
-  assert.equal(compiled.regions.length, 14);
+  assert.equal(compiled.regions.length, 7);
   assert.deepEqual(compiled.warnings, []);
 });
 
-test("all polygons, centres and doors use the 30 px/m lower-left calibration", () => {
+test("all polygons, centres and doors use 1 px = 0.8804 cm and the supplied canvas origin", () => {
   for (const region of config.regions) {
     region.polygon.forEach((pair, index) => assertCalibrated(pair, `${region.id}/polygon-${index}`));
     assert.ok(region.roomCenter, `${region.id}: merkez eksik`);
@@ -69,11 +64,31 @@ test("all polygons, centres and doors use the 30 px/m lower-left calibration", (
     const area = bounds(region);
     assert.ok(region.roomCenter!.pixel.x > area.minX && region.roomCenter!.pixel.x < area.maxX, `${region.id}: merkez x sınır dışında`);
     assert.ok(region.roomCenter!.pixel.y > area.minY && region.roomCenter!.pixel.y < area.maxY, `${region.id}: merkez y sınır dışında`);
-    for (const entrance of region.entrances) assertCalibrated(entrance, `${region.id}/${entrance.id}`);
+    region.entrances.forEach((entrance) => assertCalibrated(entrance, `${region.id}/${entrance.id}`));
   }
 });
 
-test("room interiors do not overlap and both corridor arms meet as a T", () => {
+test("every concrete room is silent and has an editable required door on each wall", () => {
+  const rooms = config.regions.filter((region) => region.kind === "room");
+  for (const room of rooms) {
+    assert.equal(room.coverage, "silent");
+    assert.equal(room.inference?.doorDefaults?.evidenceMode, "required");
+    assert.equal(room.entrances.length, 4, `${room.id}: dört duvar kapısı bekleniyor`);
+    assert.deepEqual(room.entrances.map((door) => door.label), [
+      "Kuzey duvarı kapısı",
+      "Doğu duvarı kapısı",
+      "Güney duvarı kapısı",
+      "Batı duvarı kapısı",
+    ]);
+    for (const entrance of room.entrances) {
+      assert.equal(entrance.connectsTo, "corridor-main");
+      assert.equal(entrance.widthMeters, 1.2);
+      assert.ok(entrance.inwardNormal);
+    }
+  }
+});
+
+test("concrete room interiors do not overlap", () => {
   const rooms = config.regions.filter((region) => region.kind === "room");
   for (let first = 0; first < rooms.length; first += 1) {
     for (let second = first + 1; second < rooms.length; second += 1) {
@@ -83,43 +98,5 @@ test("room interiors do not overlap and both corridor arms meet as a T", () => {
       const overlapHeight = Math.max(0, Math.min(a.maxY, b.maxY) - Math.max(a.minY, b.minY));
       assert.equal(overlapWidth * overlapHeight, 0, `${rooms[first].id} ile ${rooms[second].id} çakışıyor`);
     }
-  }
-
-  const horizontal = bounds(config.regions.find((region) => region.id === "corridor-horizontal")!);
-  const vertical = bounds(config.regions.find((region) => region.id === "corridor-vertical")!);
-  assert.equal(horizontal.maxY, vertical.minY);
-  assert.ok(vertical.minX > horizontal.minX && vertical.maxX < horizontal.maxX);
-});
-
-test("room polygons stay 10 cm from the corridor door wall and 30 cm from other walls", () => {
-  const rooms = config.regions.filter((region) => region.kind === "room");
-
-  for (const room of rooms) {
-    const wall = ROOM_WALL_BOUNDS[room.id];
-    const area = bounds(room);
-    const normal = room.entrances[0]?.inwardNormal;
-    assert.ok(wall, `${room.id}: duvar sınırları eksik`);
-    assert.deepEqual([
-      area.minX - wall[0],
-      wall[1] - area.maxX,
-      area.minY - wall[2],
-      wall[3] - area.maxY,
-    ], [
-      normal?.x === 1 ? 3 : 9,
-      normal?.x === -1 ? 3 : 9,
-      normal?.y === -1 ? 3 : 9,
-      normal?.y === 1 ? 3 : 9,
-    ], `${room.id}: 30 px/m ölçeğinde duvar boşlukları hatalı`);
-  }
-});
-
-test("every room has one doorway connected to the correct corridor", () => {
-  const rooms = config.regions.filter((region) => region.kind === "room");
-  for (const room of rooms) {
-    assert.equal(room.entrances.length, 1, `${room.id}: tek kapı bekleniyor`);
-    const entrance = room.entrances[0];
-    const target = config.regions.find((region) => region.id === entrance.connectsTo);
-    assert.equal(target?.kind, "corridor", `${room.id}: kapı koridora bağlı değil`);
-    assert.equal(entrance.widthMeters, 1);
   }
 });
