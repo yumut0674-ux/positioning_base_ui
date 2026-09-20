@@ -46,7 +46,7 @@ test("help search filters by label and description without Turkish case sensitiv
 test("catalog covers base room, every engine setting, and every door setting", () => {
   const baseIds = [
     "name", "id", "color", "kind", "polygon", "roomCenter", "entrances",
-    "pixelCoordinates", "worldCoordinates", "coverage", "expectedIntervalMs",
+    "pixelCoordinates", "worldCoordinates", "coverage", "silentEntryMaxDistanceMeters", "expectedIntervalMs",
     "wallBandMeters", "sharedWallBandMeters",
   ];
   for (const id of baseIds) assert(ids.has(id), `Eksik temel yardım: ${id}`);
@@ -71,6 +71,7 @@ test("door roles, score warning, override order and verified formulas are docume
   assert.match(INFERENCE_PARAMETER_HELP.find(item => item.id === "overridePriority")?.formula ?? "", /Kapı özel değeri[\s\S]*Oda özel değeri[\s\S]*Global değer[\s\S]*Sistem varsayılanı/);
   assert.match(INFERENCE_PARAMETER_HELP.find(item => item.id === "entryCalculation")?.formula ?? "", /ceil\(girişSayısı × kapıSayıÇarpanı\)/);
   assert.match(INFERENCE_PARAMETER_HELP.find(item => item.id === "coverageCalculation")?.formula ?? "", /max\(ölçümRitmi, beklenenAralık\) × kapsamaÇarpanı/);
+  assert.match(INFERENCE_PARAMETER_HELP.find(item => item.id === "silentEntryMaxDistanceMeters")?.formula ?? "", /hypot\(tag\.x - kapı\.x, tag\.y - kapı\.y\)/);
   assert.match(INFERENCE_PARAMETER_HELP.find(item => item.id === "preferredDoorExample")?.formula ?? "", /ceil\(3 × 1,5\) = 5/);
   assert.match(helpSource, /styles\.parameterFormula/);
 });

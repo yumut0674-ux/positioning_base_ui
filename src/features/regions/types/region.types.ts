@@ -53,11 +53,13 @@ export type GlobalRegionEngineSettings = DecisionEvidenceSettings & EvidenceScor
 };
 export type RoomInferenceSettings = Partial<Omit<GlobalRegionEngineSettings, "maxTags" | "historySize" | "doorDefaults" | "evidenceDurationMs">> & {
   readonly coverage?: RegionCoverage; readonly wallBandMeters?: number; readonly sharedWallBandMeters?: number;
+  readonly silentEntryMaxDistanceMeters?: number;
   readonly doorDefaults?: Partial<DoorInferenceSettings>;
 };
 export type DoorInferenceOverrides = Partial<DoorInferenceSettings>;
 export type ResolvedRoomSettings = Omit<GlobalRegionEngineSettings, "doorDefaults" | "evidenceDurationMs"> & {
   readonly coverage: RegionCoverage; readonly wallBandMeters: number; readonly sharedWallBandMeters: number;
+  readonly silentEntryMaxDistanceMeters: number;
   readonly doorDefaults: DoorInferenceSettings;
 };
 export type ResolvedDoorSettings = DoorInferenceSettings;

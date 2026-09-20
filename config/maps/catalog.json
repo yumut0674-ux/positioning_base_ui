@@ -11,11 +11,11 @@
       "floorLevel": 1,
       "floorLabel": "Spor Koridoru",
       "unitId": "spor-koridor",
-      "unitName": "spor_koridor",
+      "unitName": "spor",
       "displayName": "Spor Koridoru",
       "status": "active",
       "liveTrackingEnabled": true,
-      "trackingZoneIds": ["zone-a", "uwb-floor-1", "spor-koridor"],
+      "trackingZoneIds": ["zone-a", "uwb-floor-1", "spor-koridor", "spor-2"],
       "sortOrder": 1,
       "configPath": "spor-koridor/map.json",
       "regionsConfigPath": "spor-koridor/regions.json"

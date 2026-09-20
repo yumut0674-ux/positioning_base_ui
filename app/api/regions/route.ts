@@ -16,7 +16,7 @@ export const runtime = "nodejs";
 export const regionsConfigPath = path.join(process.cwd(), "config", "regions.json");
 const ENGINE_KEYS = new Set([...Object.keys(DEFAULT_REGION_ENGINE_SETTINGS), "evidenceDurationMs"]);
 const DOOR_KEYS = new Set(Object.keys(DEFAULT_DOOR_INFERENCE_SETTINGS));
-const ROOM_KEYS = new Set([...ENGINE_KEYS].filter(key => !["maxTags", "historySize", "doorDefaults", "evidenceDurationMs"].includes(key)).concat(["coverage", "wallBandMeters", "sharedWallBandMeters", "doorDefaults"]));
+const ROOM_KEYS = new Set([...ENGINE_KEYS].filter(key => !["maxTags", "historySize", "doorDefaults", "evidenceDurationMs"].includes(key)).concat(["coverage", "wallBandMeters", "sharedWallBandMeters", "silentEntryMaxDistanceMeters", "doorDefaults"]));
 
 function object(value: unknown, label: string): Record<string, unknown> { if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error(`${label}: geçersiz nesne`); return value as Record<string, unknown>; }
 function known(value: unknown, keys: Set<string>, label: string): Record<string, unknown> {

@@ -68,7 +68,20 @@ Bandı artırmak komşu oda sıçramalarına karşı korumayı artırır ama gir
 | `intermittent` | Paketler aralıklı gelebilir. | 5× |
 | `silent` | Oda içinde uzun süre paket gelmeyebilir. | 8× |
 
-Kapsama tipi giriş eşiğini değil, veri kesildiğinde oda bilgisinin ne kadar süre korunacağını etkiler.
+Sessiz kapsamanın iki ayrı etkisi vardır:
+
+1. Ölçüm kesintisine düzenli ve aralıklı kapsamalardan daha uzun tolerans gösterir.
+2. Oda bazında `silentEntryMaxDistanceMeters > 0` tanımlanmışsa, son geçerli koridor ölçümü uygun bir kapıya yeterince yakınken sinyal kesildiğinde en yakın uygun kapının odasına tahmini giriş üretebilir.
+
+Bu ikinci karar gerçek veya ölçülmüş bir kapı geçişi değildir. Sonuç `INFERRED_IN_REGION`, `measurementKind: "estimated"` ve `positionSource: "REGION_CENTER"` olarak yayımlanır. Yanlış pozitif riski azami mesafeyi küçük ve saha geometrisine uygun tutarak yönetilmelidir. Boş, tanımsız veya `0` değer özelliği kapatır; mevcut yapılandırmalar böylece davranış değiştirmez. Önerilen başlangıç değeri 1,5 metredir ve kabul edilen aralık 0–20 metredir.
+
+Mesafe hareket yönünden bağımsız olarak dünya koordinatlarında hesaplanır:
+
+```text
+mesafe = hypot(tag.x - kapı.x, tag.y - kapı.y)
+```
+
+Yalnız etkin, girişe izin veren, `evidenceMode: "ignored"` olmayan ve `allowEstimatedEntryAfterSignalLoss: true` kapılar değerlendirilir. Eşit mesafede yapılandırmadaki ilk oda/kapı seçilir. `approachDepthMeters` bu özellikte kullanılmaz; yönlü gerçek kapı geçişi geometrisine ait olmaya devam eder.
 
 ## 3. Giriş ve çıkış kararı
 
@@ -105,6 +118,7 @@ Motor, güvenlik için giriş ve çıkışta etkili ölçüm eşiğini en az `2`
 | `evidenceWindowMs` | 12 sn | Kanıt geçmişinin en fazla yaşını sınırlar. | Daha uzun geçmiş birlikte değerlendirilir. | Kanıt daha hızlı unutulur. |
 | `maxEvidenceGapMs` | 4 sn | Kanıt zincirinin korunabileceği temel ölçüm boşluğudur. | Seyrek paketlere daha çok tolerans verir. | Boşlukta aday daha çabuk sıfırlanır. |
 | `expectedIntervalMs` | 1 sn | Beklenen paket ritmidir. | Seyrek veri alan odalara tolerans artar. | Kesintiler daha erken fark edilir. |
+| `silentEntryMaxDistanceMeters` | Kapalı; önerilen başlangıç 1,5 m | Yalnız sessiz odada, son koridor ölçümünden kapıya tahmini giriş için azami mesafedir. | Daha uzak noktalar aday olur; yanlış pozitif riski artar. | Aday alan daralır; `0` özelliği kapatır. |
 | `relocationAfterMs` | 15 sn | Bu kadar uzun boşluktan sonra yeni ölçüm yeniden konumlanma adayı sayılır. | Uzun sıçramalar daha geç yeniden konumlanır. | Kesinti sonrası yeni oda daha erken değerlendirilir. |
 | `relocationEvidenceDurationMultiplier` | 2× | Yeniden konumlanma sırasında giriş süresini çarpar. | Kesinti sonrası oda değişimi daha temkinli olur. | Yeni oda daha erken kabul edilir. |
 | `outsideReleaseDurationMultiplier` | 2× | Kesinti sonrası tutarlı dış ölçümlerin eski odayı bırakma süresini çarpar. | Eski oda daha uzun korunur. | Eski oda daha erken bırakılır. |

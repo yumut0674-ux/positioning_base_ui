@@ -133,6 +133,22 @@ test("unsafe L corridor animation snaps; queued motion and extrapolation stay in
   f.filter.dispose();
 });
 
+test("RAW map presentation suppresses jitter and requires confirmation for a sudden jump", () => {
+  const f = fixture();
+  f.filter.ingest(tag(5, 5, 1_000), true);
+
+  f.filter.ingest(tag(5.10, 4.93, 1_100), true);
+  assert.deepEqual(f.displays().A.position, p(5, 5));
+
+  f.filter.ingest(tag(9, 9, 1_200), true);
+  assert.deepEqual(f.displays().A.position, p(5, 5));
+
+  f.filter.ingest(tag(9.2, 9.1, 1_300), true);
+  assert.ok(f.displays().A.position!.x > 7);
+  assert.ok(f.displays().A.position!.x < 9.2);
+  f.filter.dispose();
+});
+
 test("configuration re-evaluates immediately, preserves an outside deadline and cleans up", () => {
   const f = fixture();
   f.filter.ingest(tag(1, 1, 1_000));

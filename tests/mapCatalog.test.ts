@@ -15,7 +15,9 @@ test("checked-in map catalog and live map config are valid", async () => {
   assert.equal(catalog.defaultMapId, "spor-koridor");
   assert.equal(catalog.liveTrackingMapId, "spor-koridor");
   assert.ok(catalog.maps.some((entry) => entry.id === "kat1-ortopedi" && entry.status === "active" && entry.liveTrackingEnabled));
-  assert.deepEqual(catalog.maps.find((entry) => entry.id === "spor-koridor")?.trackingZoneIds, ["zone-a", "uwb-floor-1", "spor-koridor"]);
+  const sportsCorridor = catalog.maps.find((entry) => entry.id === "spor-koridor");
+  assert.equal(sportsCorridor?.unitName, "spor");
+  assert.deepEqual(sportsCorridor?.trackingZoneIds, ["zone-a", "uwb-floor-1", "spor-koridor", "spor-2"]);
   assert.ok(catalog.maps.some((entry) => entry.status === "planned" && entry.configPath === null));
   const details = await service.getMapDetails(catalog.liveTrackingMapId);
   assert.equal(details.image.url, "/maps/spor-koridor/floor-plan.png");

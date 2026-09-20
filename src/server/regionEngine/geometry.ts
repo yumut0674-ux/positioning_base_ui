@@ -6,7 +6,7 @@ export interface DoorCrossingResult {
   readonly directionalMovementMeters: number; readonly evidenceWeight: number;
 }
 
-export function pointInPolygon(point: Point, region: CompiledRegion): boolean {
+export function pointInPolygon(point: Point, region: Pick<CompiledRegion, "bounds" | "polygon">): boolean {
   const { bounds, polygon } = region;
   if (point.x < bounds.minX || point.x > bounds.maxX || point.y < bounds.minY || point.y > bounds.maxY) return false;
   let inside = false;

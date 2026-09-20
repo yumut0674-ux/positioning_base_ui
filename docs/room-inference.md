@@ -47,14 +47,11 @@ Bir kapının örnek ek alanları (saha koordinatı değildir):
 
 `inwardNormal` bu odanın içine bakar ve derleyicide normalize edilir. `connectsTo` koridor için `corridor`, diğer oda için gerçek oda kimliğidir. İki oda bağlantısında iki tarafta yönleri doğru kapı tanımlayın. Açıklık, normal ve bağlantı eksikse yalnızca eski kapı noktası korunur; yönlü geçiş çıkarımı yapılmaz. Normal, bağlantı, sonlu koordinatlar, açıklık, duvar yakınlığı ve pozitif eşikler doğrulanır. Yaklaşım/geçiş bölgeleri açıklığın iki yanındaki yönlü şeritlerdir; açıklık dışındaki duvar geçiş sayılmaz.
 
-Oda alanları: `coverage: silent | intermittent | regular`, `expectedIntervalMs`, `wallBandMeters`, `sharedWallBandMeters`. Duvar bandı poligon kenarlarına uzaklıktan hesaplanır; ortak duvara yakın ölçüm daha düşük ağırlıktadır. Bölge panelinde alan türü/kapsama/eşikler ve kapı JSON düzenleyicisi bulunur; kaydetme sunucu doğrulamasından geçer.
+Oda alanları: `coverage: silent | intermittent | regular`, `expectedIntervalMs`, `wallBandMeters`, `sharedWallBandMeters` ve yalnız sessiz kapsamada kullanılan `silentEntryMaxDistanceMeters`. Duvar bandı poligon kenarlarına uzaklıktan hesaplanır; ortak duvara yakın ölçüm daha düşük ağırlıktadır. Bölge panelinde alan türü/kapsama/eşikler ve kapı JSON düzenleyicisi bulunur; kaydetme sunucu doğrulamasından geçer.
 
-Bu çalışma sırasında mevcut kullanıcı config'i değiştirilmedi. Yerel inceleme sonucu:
+Sessiz kapsama hem ölçüm kesintisine daha uzun tolerans verir hem de `silentEntryMaxDistanceMeters > 0` olduğunda son gerçek koridor ölçümünün en yakın uygun kapıya uzaklığından tahmini oda girişi üretebilir. Bu karar hareket yönü veya `approachDepthMeters` kullanmaz; `hypot(tag.x - door.x, tag.y - door.y)` ile dünya koordinatlarında hesaplanır. Gerçek kapı geçişi ölçümü değildir, `INFERRED_IN_REGION`/`estimated` olarak yayımlanır ve yanlış pozitif riski azami mesafeyle yönetilir. Tanımsız veya `0` değer davranışı kapatır; önerilen başlangıç 1,5 metredir. Güvenilir iç ölçüm ve normal yönlü geçiş güçlü kanıt olarak önceliklidir, uzun kesintide `LOCATION_LOST` korunur.
 
-- `config/regions.json`: `zone-91d9e84c` (oda 3), `zone-44b1bd94` (Oda 4) için kapı yok. Sürekli iç ölçümle doğrulama var; kapıyla giriş/çıkış tahmini için tanım gerekiyor.
-- `corridor-main` hareketli koridor olarak ele alınıyor.
-- `config/maps/kat1-ortopedi/regions.json`: `zone-91d9e84c` merkezinin kayıtlı poligonun dışında olduğu görüldü. Bu alternatif config kullanılırsa merkez düzeltilmeden çıkarıma alınmaz.
-- Harita kataloğu ile canlı motorun kullandığı `config/regions.json` seçimini sahada eşleştirin; bu çalışma koordinat veya kapı konumu kopyalamadı.
+Bu özellik için `config/regions.json` ve `config/maps/spor-koridor/regions.json` içindeki mevcut yedi sessiz odaya açıkça `silentEntryMaxDistanceMeters: 1.5` eklendi. `corridor-main` hareketli koridor olarak kalır. `config/maps/kat1-ortopedi/regions.json` içindeki düzenli kapsama odalarında yakınlık özelliği etkinleştirilmedi.
 
 ## Simülasyon
 

@@ -5,7 +5,7 @@ import { pointInPolygon, wallDistance } from "./geometry";
 import type { CoordinatePair, DoorInferenceSettings, RegionEntrance, RegionsConfig, ResolvedRoomSettings } from "@/src/features/regions/types/region.types";
 import { resolveDoorSettings, resolveGlobalSettings, resolveRoomSettings } from "../../features/regions/config/regionInferenceSettings";
 import embeddedRegionsConfig from "../../../config/regions.json";
-import type { CompiledRegion, CompiledRegionsConfig } from "./types";
+import type { CompiledCorridor, CompiledRegion, CompiledRegionsConfig } from "./types";
 
 const COUNTS = new Set(["entryConfirmationCount", "exitConfirmationCount", "maxTags", "historySize"]);
 const MULTIPLIERS = new Set(["relocationEvidenceDurationMultiplier", "outsideReleaseDurationMultiplier", "regularCoverageStaleMultiplier", "intermittentCoverageStaleMultiplier", "silentCoverageStaleMultiplier", "lostAfterStaleMultiplier"]);
@@ -20,6 +20,7 @@ function validateSettings(settings: Record<string, unknown>, label: string, allo
   for (const [key, value] of Object.entries(settings)) {
     if (value === undefined || key === "doorDefaults" || key === "coverage") continue;
     if (!allowSystem && (key === "maxTags" || key === "historySize" || key === "evidenceDurationMs")) throw new Error(`${label}/${key}: yalnızca global seviyede kullanılabilir`);
+    if (key === "silentEntryMaxDistanceMeters") { finite(value, `${label}/${key}`, 0, 20); continue; }
     if (typeof value !== "number") continue;
     if (COUNTS.has(key)) {
       if (!Number.isInteger(value) || value < 1 || value > (key === "maxTags" ? 100_000 : key === "historySize" ? 512 : 100)) throw new Error(`${label}/${key}: pozitif tam sayı gerekli`);
@@ -53,7 +54,7 @@ export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConf
   const historySize = global.historySize;
   const globalRoom = resolveRoomSettings(config.engine);
   validateResolved(globalRoom, "Global ayarlar", historySize);
-  const regions: CompiledRegion[] = []; const ids = new Set<string>(); const warnings: string[] = [];
+  const regions: CompiledRegion[] = []; const corridors: CompiledCorridor[] = []; const ids = new Set<string>(); const warnings: string[] = [];
   for (const source of config.regions) {
     if (!source.id?.trim() || ids.has(source.id)) throw new Error(`Geçersiz veya tekrar eden region id: ${source.id || "(boş)"}`);
     ids.add(source.id); const regionLabel = source.name?.trim() || source.id;
@@ -64,13 +65,17 @@ export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConf
     const area = Math.abs(polygon.reduce((sum: number, p: { readonly x: number; readonly y: number }, i: number) => { const q = polygon[(i + 1) % polygon.length]; return sum + p.x * q.y - q.x * p.y; }, 0)) / 2;
     if (area < 0.0001) throw new Error(`${regionLabel}: polygon alanı geçersiz`);
     const corridor = source.kind === "corridor" || (!source.kind && (/^corridor(?:-|$)/i.test(source.id) || /^koridor$/i.test(source.name)));
-    if (corridor) continue;
+    const bounds = { minX: Math.min(...polygon.map((p: { readonly x: number }) => p.x)), minY: Math.min(...polygon.map((p: { readonly y: number }) => p.y)), maxX: Math.max(...polygon.map((p: { readonly x: number }) => p.x)), maxY: Math.max(...polygon.map((p: { readonly y: number }) => p.y)) };
+    if (corridor) { corridors.push({ id: source.id, polygon, bounds }); continue; }
     if (!source.roomCenter) { warnings.push(`${regionLabel}: merkez yok; oda çıkarımından çıkarıldı`); continue; }
     if (!Number.isFinite(source.roomCenter.world.x) || !Number.isFinite(source.roomCenter.world.y)) throw new Error(`${regionLabel}: oda merkezi geçersiz`);
     validateSettings((source.inference ?? {}) as Record<string, unknown>, regionLabel, false);
     validateDoorSettings(source.inference?.doorDefaults, `${regionLabel}/kapı varsayılanları`);
     const settings = resolveRoomSettings(config.engine, source.inference, source);
     validateResolved(settings, regionLabel, historySize);
+    if (source.inference?.silentEntryMaxDistanceMeters !== undefined && settings.coverage !== "silent") {
+      warnings.push(`${regionLabel}: silentEntryMaxDistanceMeters yalnızca sessiz kapsamada kullanılır; bu odada yok sayıldı`);
+    }
     const doorIds = new Set<string>();
     const entrances = (source.entrances ?? []).map((entrance: RegionEntrance) => {
       const doorLabel = `${regionLabel}/${entrance.label || entrance.id}`;
@@ -93,8 +98,7 @@ export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConf
     const compiled: CompiledRegion = { id: source.id, name: source.name, coverage: settings.coverage, expectedIntervalMs: settings.expectedIntervalMs,
       wallBandMeters: settings.wallBandMeters, sharedWallBandMeters: settings.sharedWallBandMeters, settings, polygon,
       usesDoorPolicy: source.inference?.doorDefaults !== undefined || source.entrances.some((door: RegionEntrance) => door.inference !== undefined),
-      roomCenter: source.roomCenter.world, entrances,
-      bounds: { minX: Math.min(...polygon.map((p: { readonly x: number }) => p.x)), minY: Math.min(...polygon.map((p: { readonly y: number }) => p.y)), maxX: Math.max(...polygon.map((p: { readonly x: number }) => p.x)), maxY: Math.max(...polygon.map((p: { readonly y: number }) => p.y)) } };
+      roomCenter: source.roomCenter.world, entrances, bounds };
     if (!pointInPolygon(compiled.roomCenter, compiled)) { warnings.push(`${regionLabel}: merkez poligon dışında; oda çıkarımından çıkarıldı, merkez düzeltilmeli`); continue; }
     if (wallDistance(compiled.roomCenter, compiled) <= settings.wallBandMeters) warnings.push(`${regionLabel}: dar oda; güvenilir iç alan yetersiz, kapı kanıtı gerekebilir`);
     for (const door of entrances) {
@@ -103,7 +107,7 @@ export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConf
     }
     regions.push(compiled);
   }
-  return { version: createHash("sha256").update(JSON.stringify(config)).digest("hex").slice(0, 16), warnings, regions,
+  return { version: createHash("sha256").update(JSON.stringify(config)).digest("hex").slice(0, 16), warnings, regions, corridors,
     rules: { ...globalRoom, maxTags: global.maxTags, historySize } };
 }
 

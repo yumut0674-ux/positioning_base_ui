@@ -2,7 +2,7 @@ import type { RegionsConfig } from "@/src/features/regions/types/region.types";
 import { trackingBuffer, type TrackingPosition } from "../trackingBuffer";
 import { compileRegionsConfig, loadRegionsConfigForMap } from "./configLoader";
 import { ProcessedPositionServer } from "./ProcessedPositionServer";
-import { RegionPositionEngine } from "./RegionPositionEngine";
+import { RegionPositionEngine, ROOM_ENGINE_VERSION } from "./RegionPositionEngine";
 import { getRegionEngineRuntimeConfig } from "./runtimeConfig";
 import type { CompiledRegionsConfig, RegionEngineStatus } from "./types";
 import { logger } from "../logger";
@@ -68,7 +68,7 @@ export class RegionEngineController {
   public status(): RegionEngineStatus {
     const statuses = [...this.engines.entries()].map(([mapId, managed]) => [mapId, managed.engine.getStatus(this.runtime.rawPort, this.runtime.processedPort), managed] as const);
     return {
-      enabled: this.enabled, rawPort: this.runtime.rawPort, processedPort: this.runtime.processedPort,
+      enabled: this.enabled, engineVersion: ROOM_ENGINE_VERSION, rawPort: this.runtime.rawPort, processedPort: this.runtime.processedPort,
       activeVehicleCount: statuses.reduce((sum, [, status]) => sum + status.activeVehicleCount, 0),
       vehiclesInRegions: statuses.reduce((sum, [, status]) => sum + status.vehiclesInRegions, 0),
       configLoaded: statuses.length > 0,

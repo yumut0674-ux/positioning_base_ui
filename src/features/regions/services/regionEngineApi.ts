@@ -14,6 +14,9 @@ export interface RegionEngineStatusResponse {
     readonly doorId: string | null; readonly doorDirection: "entry" | "exit" | null; readonly doorEvidenceMode: string | null;
     readonly collectedDurationMs: number; readonly requiredDurationMs: number; readonly collectedMeasurements: number; readonly requiredMeasurements: number;
     readonly lastMeasurementQuality: number | null; readonly doorEvidenceRemainingMs: number | null;
+    readonly silentDoorCandidateRegionId: string | null; readonly silentDoorCandidateDoorId: string | null;
+    readonly silentDoorDistanceMeters: number | null; readonly silentDoorObservedAt: number | null;
+    readonly silentDoorCandidateSource: "silent-door-proximity" | null;
     readonly score: { readonly base: number; readonly duration: number; readonly measurements: number; readonly door: number; readonly total: number };
     readonly reasons: readonly string[];
   }[];

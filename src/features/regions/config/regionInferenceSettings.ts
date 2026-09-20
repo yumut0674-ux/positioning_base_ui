@@ -41,12 +41,13 @@ export function resolveGlobalSettings(input?: Partial<GlobalRegionEngineSettings
 export function resolveRoomSettings(globalInput?: Partial<GlobalRegionEngineSettings>, roomInput?: RoomInferenceSettings,
   legacyRoom?: Pick<RegionDefinition, "coverage" | "expectedIntervalMs" | "wallBandMeters" | "sharedWallBandMeters">): ResolvedRoomSettings {
   const global = resolveGlobalSettings(globalInput); const room = roomInput ?? {};
-  const { doorDefaults: roomDoors, coverage, wallBandMeters, sharedWallBandMeters, ...overrides } = room;
+  const { doorDefaults: roomDoors, coverage, wallBandMeters, sharedWallBandMeters, silentEntryMaxDistanceMeters, ...overrides } = room;
   const resolved = { ...global, ...overrides,
     coverage: coverage ?? legacyRoom?.coverage ?? "regular",
     expectedIntervalMs: room.expectedIntervalMs ?? legacyRoom?.expectedIntervalMs ?? global.expectedIntervalMs,
     wallBandMeters: wallBandMeters ?? legacyRoom?.wallBandMeters ?? 0.35,
     sharedWallBandMeters: sharedWallBandMeters ?? legacyRoom?.sharedWallBandMeters ?? 0.65,
+    silentEntryMaxDistanceMeters: silentEntryMaxDistanceMeters ?? 0,
   };
   return { ...resolved, doorDefaults: { ...DEFAULT_DOOR_INFERENCE_SETTINGS, ...global.doorDefaults,
     entryConfidenceBonus: roomDoors?.entryConfidenceBonus ?? resolved.doorEntryBonus,

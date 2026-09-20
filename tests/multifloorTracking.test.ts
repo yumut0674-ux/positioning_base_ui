@@ -7,10 +7,14 @@ import { RegionEngineController } from "../src/server/regionEngine/controller";
 import type { TrackingPosition } from "../src/server/trackingBuffer";
 import { cleanRegionsConfig, getMapRegions } from "../app/api/regions/route";
 import { DEFAULT_REGIONS_CONFIG } from "../src/features/regions/config/defaultRegionsConfig";
-import { regionsConfigPathForMap } from "../src/server/regionEngine/configLoader";
+import type { RegionsConfig } from "../src/features/regions/types/region.types";
+import { compileRegionsConfig, regionsConfigPathForMap } from "../src/server/regionEngine/configLoader";
+import { RegionPositionEngine, ROOM_ENGINE_VERSION } from "../src/server/regionEngine/RegionPositionEngine";
+import { trackingBuffer } from "../src/server/trackingBuffer";
 import { SseTrackingGateway } from "../src/features/tracking/services/TrackingGateway";
 import type { MapRepository } from "../src/server/maps/mapRepository";
 import type { MapCatalog, MapDetails } from "../src/server/maps/map.types";
+import { scenarioConfig } from "../test_api/room_scenarios.js";
 
 const catalog: MapCatalog = {
   version: 1, defaultMapId: "map-a", liveTrackingMapId: "map-a",
@@ -92,6 +96,29 @@ test("region engine manager isolates maps, clears the old map and rejects a dela
   assert.deepEqual(ingestedA.map((item) => item.tagCode), ["TAG-1"]);
   assert.deepEqual(ingestedB.map((item) => item.tagCode), ["TAG-2", "TAG-1"]);
   assert.deepEqual(removedA, ["TAG-1"]);
+});
+
+test("runtime controller installs only RegionPositionEngine and exposes the active engine version", () => {
+  const controller=new RegionEngineController();
+  const internal=controller as unknown as {
+    install:(mapId:string,config:ReturnType<typeof compileRegionsConfig>)=>void;
+    engines:Map<string,{engine:RegionPositionEngine;warnings:readonly string[]}>;
+  };
+  internal.install("simulation-reference",compileRegionsConfig(scenarioConfig() as RegionsConfig));
+  try {
+    assert.ok(internal.engines.get("simulation-reference")!.engine instanceof RegionPositionEngine);
+    assert.equal(controller.status().engineVersion,ROOM_ENGINE_VERSION);
+    assert.equal(trackingBuffer.listenerCount("position"),1);
+  } finally {internal.engines.get("simulation-reference")!.engine.disable();}
+});
+
+test("controller reload applies a UI-compiled config to the existing map engine without installing a parallel engine", () => {
+  const controller=new RegionEngineController();const reloads:ReturnType<typeof compileRegionsConfig>[]=[];
+  const existing={reload:(config:ReturnType<typeof compileRegionsConfig>)=>reloads.push(config)} as unknown as RegionPositionEngine;
+  const internal=controller as unknown as {enabled:boolean;engines:Map<string,{engine:RegionPositionEngine;warnings:readonly string[]}>};
+  internal.enabled=true;internal.engines.set("simulation-reference",{engine:existing,warnings:[]});
+  const compiled=compileRegionsConfig(scenarioConfig() as RegionsConfig);controller.reloadCompiledConfig(compiled,"simulation-reference");
+  assert.deepEqual(reloads,[compiled]);assert.equal(internal.engines.size,1);assert.equal(internal.engines.get("simulation-reference")!.engine,existing);
 });
 
 test("map-specific region config rejects URL/config mismatches and path traversal", async () => {

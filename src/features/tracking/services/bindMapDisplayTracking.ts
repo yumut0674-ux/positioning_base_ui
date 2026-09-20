@@ -19,7 +19,11 @@ export function bindMapDisplayTracking(filter: MapDisplayFilter, engineEnabled: 
     }
     const candidates = Object.values(source).filter((tag) => tag.mapId === state.activeMapId && (!engineEnabled || !!tag.regionInference));
     filter.retain(new Set(candidates.map((tag) => tag.id)));
-    for (const tag of candidates) filter.ingest(tag, !engineEnabled, reconfigure);
+    for (const tag of candidates) {
+      // REGION_CENTER bir gosterim capasi oldugu icin tam konumunda kalir;
+      // ham/olculmus koordinatlar ise her veri kaynaginda ayni filtreden gecer.
+      filter.ingest(tag, tag.positionSource !== "REGION_CENTER", reconfigure);
+    }
   };
   sync();
   return useIpsStore.subscribe(sync);

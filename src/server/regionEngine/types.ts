@@ -33,10 +33,17 @@ export interface CompiledRegion {
   readonly bounds: { readonly minX: number; readonly minY: number; readonly maxX: number; readonly maxY: number };
 }
 
+export interface CompiledCorridor {
+  readonly id: string;
+  readonly polygon: readonly { readonly x: number; readonly y: number }[];
+  readonly bounds: { readonly minX: number; readonly minY: number; readonly maxX: number; readonly maxY: number };
+}
+
 export interface CompiledRegionsConfig {
   readonly version?: string;
   readonly warnings?: readonly string[];
   readonly regions: readonly CompiledRegion[];
+  readonly corridors: readonly CompiledCorridor[];
   readonly rules: RegionEngineRules;
 }
 
@@ -78,8 +85,17 @@ export interface VehicleRegionStatus {
   exitConfirmationCount: number;
 }
 
+export interface SilentDoorProximityCandidate {
+  readonly regionId: string;
+  readonly doorId: string;
+  readonly distanceMeters: number;
+  readonly observedAt: number;
+  readonly source: "silent-door-proximity";
+}
+
 export interface RegionEngineStatus {
   readonly enabled: boolean;
+  readonly engineVersion?: string;
   readonly rawPort: number;
   readonly processedPort: number;
   readonly activeVehicleCount: number;
@@ -106,5 +122,8 @@ export interface RegionVehicleDiagnostic {
   readonly doorEvidenceMode: string | null; readonly collectedDurationMs: number; readonly requiredDurationMs: number;
   readonly collectedMeasurements: number; readonly requiredMeasurements: number; readonly lastMeasurementQuality: number | null;
   readonly doorEvidenceRemainingMs: number | null; readonly score: EvidenceScoreComponents;
+  readonly silentDoorCandidateRegionId: string | null; readonly silentDoorCandidateDoorId: string | null;
+  readonly silentDoorDistanceMeters: number | null; readonly silentDoorObservedAt: number | null;
+  readonly silentDoorCandidateSource: "silent-door-proximity" | null;
   readonly reasons: readonly string[]; readonly configVersion?: string;
 }

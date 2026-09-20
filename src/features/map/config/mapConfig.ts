@@ -8,7 +8,7 @@ import type { Size2D } from "@/src/shared/types/geometry";
 
 export const MAP_FLOOR_PLAN: FloorPlanDefinition = {
   id: "spor-koridor",
-  name: "spor_koridor",
+  name: "spor",
   building: "Spor Tesisi",
   level: "Spor Koridoru",
   imageUrl: "/maps/spor-koridor/floor-plan.png",

@@ -265,19 +265,20 @@
       "kind": "room",
       "expectedIntervalMs": 1000,
       "inference": {
-        "coverage": "silent"
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.5
       },
       "entrances": [
         {
           "pixel": {
-            "x": 1583.5,
-            "y": 1447
+            "x": 1402.8,
+            "y": 1446.98
           },
           "world": {
-            "x": 6.790877,
-            "y": 2.536785
+            "x": 5.2,
+            "y": 2.537
           },
-          "widthMeters": 1.1,
+          "widthMeters": 1.4,
           "inwardNormal": {
             "x": 0,
             "y": 1
@@ -350,19 +351,20 @@
       "kind": "room",
       "expectedIntervalMs": 1000,
       "inference": {
-        "coverage": "silent"
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.5
       },
       "entrances": [
         {
           "pixel": {
-            "x": 2353.5,
-            "y": 1447
+            "x": 2402.35,
+            "y": 1446.98
           },
           "world": {
-            "x": 13.569957,
-            "y": 2.536785
+            "x": 14,
+            "y": 2.537
           },
-          "widthMeters": 1.1,
+          "widthMeters": 1.9,
           "inwardNormal": {
             "x": 0,
             "y": 1
@@ -435,19 +437,20 @@
       "kind": "room",
       "expectedIntervalMs": 1000,
       "inference": {
-        "coverage": "silent"
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.5
       },
       "entrances": [
         {
           "pixel": {
             "x": 812.16,
-            "y": 1475.57
+            "y": 1428.46
           },
           "world": {
             "x": 0,
-            "y": 2.285254
+            "y": 2.7
           },
-          "widthMeters": 1.1,
+          "widthMeters": 1,
           "inwardNormal": {
             "x": -1,
             "y": 0
@@ -520,19 +523,20 @@
       "kind": "room",
       "expectedIntervalMs": 1000,
       "inference": {
-        "coverage": "silent"
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.5
       },
       "entrances": [
         {
           "pixel": {
-            "x": 2981,
-            "y": 1447
+            "x": 3049.78,
+            "y": 1446.98
           },
           "world": {
-            "x": 19.094467,
-            "y": 2.536785
+            "x": 19.7,
+            "y": 2.537
           },
-          "widthMeters": 1.1,
+          "widthMeters": 3,
           "inwardNormal": {
             "x": 0,
             "y": 1
@@ -605,19 +609,20 @@
       "kind": "room",
       "expectedIntervalMs": 1000,
       "inference": {
-        "coverage": "silent"
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.5
       },
       "entrances": [
         {
           "pixel": {
-            "x": 1097,
+            "x": 1130.2,
             "y": 1739
           },
           "world": {
-            "x": 2.507731,
-            "y": -0.033983
+            "x": 2.8,
+            "y": -0.034
           },
-          "widthMeters": 1.1,
+          "widthMeters": 1,
           "inwardNormal": {
             "x": 0,
             "y": -1
@@ -690,19 +695,20 @@
       "kind": "room",
       "expectedIntervalMs": 1000,
       "inference": {
-        "coverage": "silent"
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.5
       },
       "entrances": [
         {
           "pixel": {
-            "x": 1762.5,
+            "x": 2084.31,
             "y": 1739
           },
           "world": {
-            "x": 8.366793,
-            "y": -0.033983
+            "x": 11.2,
+            "y": -0.034
           },
-          "widthMeters": 1.1,
+          "widthMeters": 1,
           "inwardNormal": {
             "x": 0,
             "y": -1
@@ -775,19 +781,20 @@
       "kind": "room",
       "expectedIntervalMs": 1000,
       "inference": {
-        "coverage": "silent"
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.5
       },
       "entrances": [
         {
           "pixel": {
-            "x": 2484.5,
+            "x": 2254.69,
             "y": 1739
           },
           "world": {
-            "x": 14.723281,
-            "y": -0.033983
+            "x": 12.7,
+            "y": -0.034
           },
-          "widthMeters": 1.1,
+          "widthMeters": 1,
           "inwardNormal": {
             "x": 0,
             "y": -1

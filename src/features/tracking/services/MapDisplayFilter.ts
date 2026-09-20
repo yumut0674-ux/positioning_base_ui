@@ -2,6 +2,7 @@ import type { Point2D } from "@/src/shared/types/geometry";
 import type { TrackedTag } from "../types/tracking.types";
 import { PositionAnimationController } from "./PositionAnimationController";
 import { inDisplayArea, segmentInDisplayArea, type DisplayPolygon } from "./displayArea";
+import { AdaptivePositionFilter } from "./positionFilters";
 
 export interface MapTagDisplay {
   readonly visible: boolean;
@@ -14,6 +15,7 @@ interface State {
   outsideSince?: number;
   display: MapTagDisplay;
   smooth: boolean;
+  stabilizer: AdaptivePositionFilter;
 }
 interface Clock {
   now(): number;
@@ -60,7 +62,7 @@ export class MapDisplayFilter {
         && (!candidate.publishedAt || (state.candidate.publishedAt && candidate.publishedAt <= state.candidate.publishedAt))) return;
     }
     if (!state) {
-      state = { candidate, smooth, display: { visible: false, reason: "outside" } };
+      state = { candidate, smooth, stabilizer: new AdaptivePositionFilter(), display: { visible: false, reason: "outside" } };
       this.states.set(candidate.id, state);
     } else { state.candidate = candidate; state.smooth = smooth; }
     this.evaluate(state, force);
@@ -89,12 +91,12 @@ export class MapDisplayFilter {
     if (inDisplayArea(tag, this.polygons)) {
       const resume = !state.display.visible || state.outsideSince !== undefined;
       let point: Point2D = { x: tag.x, y: tag.y };
-      // Preserve the existing RAW smoothing only along a valid interior path.
+      // Smooth only presentation coordinates and only along a valid interior
+      // path. Room centres and re-entry points must remain exact.
       if (state.smooth && state.lastValid && !resume && !snap
         && segmentInDisplayArea(state.lastValid, point, this.polygons)) {
-        point = { x: state.lastValid.x + (point.x - state.lastValid.x) * 0.42,
-          y: state.lastValid.y + (point.y - state.lastValid.y) * 0.42 };
-      }
+        point = state.stabilizer.next(state.lastValid, point, tag.timestamp);
+      } else state.stabilizer.reset(point, tag.timestamp);
       if (resume || snap) this.animation.remove(tag.id);
       this.animation.ingest(tag.id, { ...point, timestamp: tag.timestamp, receivedAt: now,
         measurementTimestamp: tag.timestamp, positionSource: tag.positionSource ?? "RAW",

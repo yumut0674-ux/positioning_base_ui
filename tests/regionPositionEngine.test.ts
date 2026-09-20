@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import test from "node:test";
-import { RegionPositionEngine } from "../src/server/regionEngine/RegionPositionEngine";
+import { RegionPositionEngine, ROOM_ENGINE_VERSION } from "../src/server/regionEngine/RegionPositionEngine";
 import { compileRegionsConfig } from "../src/server/regionEngine/configLoader";
 import type { RegionsConfig } from "../src/features/regions/types/region.types";
 import type { ProcessedPosition } from "../src/server/regionEngine/types";
@@ -20,6 +21,27 @@ function setup(overrides: RegionsConfig["engine"]={}) {
     tick(t:number){now=epoch+t;engine.tick();return published.at(-1)!;},
     enter(){this.point(0,3,2);this.point(1000,3,2.5);return this.point(2000,3,3)!;}
   };
+}
+function setupConfig(config: RegionsConfig) {
+  let now=epoch;const published:ProcessedPosition[]=[];
+  const engine=new RegionPositionEngine(p=>published.push(p),250,()=>now,false);
+  engine.enable(compileRegionsConfig(config));
+  return {engine,published,config,
+    point(t:number,x:number,y:number,tagCode="T",quality?:number){now=epoch+t;return engine.ingest({tagCode,x,y,timestamp:new Date(now).toISOString(),quality,mapId:config.map.mapId});},
+    tick(t:number){now=epoch+t;engine.tick();return published.at(-1)!;}
+  };
+}
+function sportsCorridorConfig(): RegionsConfig {
+  return JSON.parse(readFileSync(new URL("../config/maps/spor-koridor/regions.json",import.meta.url),"utf8")) as RegionsConfig;
+}
+function silentProximityConfig(base: RegionsConfig, distance = 1.5): RegionsConfig {
+  return { ...base, regions: base.regions.map(region => ({ ...region, coverage: "silent" as const,
+    inference: { ...region.inference, coverage: "silent" as const, silentEntryMaxDistanceMeters: distance } })) };
+}
+function requiredDoorConfig(base: RegionsConfig, coverage: "silent" | "regular", distance = 1.5): RegionsConfig {
+  return { ...base, regions: base.regions.map(region => ({ ...region, coverage,
+    inference: { ...region.inference, coverage, silentEntryMaxDistanceMeters: coverage === "silent" ? distance : undefined,
+      doorDefaults: { ...region.inference?.doorDefaults, evidenceMode: "required" as const } } })) };
 }
 test("disabled engine does not mutate input",()=>{const s=setup();s.engine.disable();assert.equal(s.point(0,1,1),undefined);});
 test("time and independent measurements are both required, even with count=1",()=>{
@@ -168,4 +190,225 @@ test("sustained corridor measurements after a long gap release an old room", () 
   s.point(46000,7,-1);s.point(47000,7,-1);s.point(48000,7,-1);
   const p=s.point(49000,7,-1)!;
   assert.equal(p.regionInference.state,"TRACKING_OUTSIDE");assert.equal(p.regionInference.regionId,null);assert.equal(p.regionInference.lastKnownRegionId,"A");
+});
+
+test("silent door proximity infers an estimated room from one corridor measurement and later becomes lost", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(silentProximityConfig(s.config)));
+  const measured=s.point(0,3,-1)!;
+  assert.equal(measured.regionInference.regionId,null);
+  assert.deepEqual(s.engine.getVehicleState("T")!.silentDoorCandidate,{regionId:"A",doorId:"door-0",distanceMeters:1,observedAt:epoch,source:"silent-door-proximity"});
+  const inferred=s.tick(8000);
+  assert.equal(inferred.regionInference.state,"INFERRED_IN_REGION");assert.equal(inferred.regionInference.regionId,"A");
+  assert.equal(inferred.regionInference.measurementKind,"estimated");assert.equal(inferred.positionSource,"REGION_CENTER");
+  assert.match(inferred.regionInference.reasons!.join(),/en yakın kapıya göre tahmini oda atandı \(door-0, 1\.00 m\)/);
+  const diagnostic=s.engine.getStatus(3000,3001).diagnostics![0];
+  assert.equal(diagnostic.silentDoorCandidateDoorId,"door-0");assert.equal(diagnostic.silentDoorDistanceMeters,1);
+  assert.equal(s.tick(40000).regionInference.state,"LOCATION_LOST");
+});
+
+test("silent door proximity enforces distance and deterministically selects the nearest then first equal door", () => {
+  const atLimit=setup();atLimit.engine.reload(compileRegionsConfig(silentProximityConfig(atLimit.config)));
+  atLimit.point(0,3,-1.5);assert.equal(atLimit.engine.getVehicleState("T")!.silentDoorCandidate?.regionId,"A");
+
+  const tooFar=setup();tooFar.engine.reload(compileRegionsConfig(silentProximityConfig(tooFar.config)));
+  tooFar.point(0,3,-1.51);assert.equal(tooFar.engine.getVehicleState("T")!.silentDoorCandidate,null);
+  assert.equal(tooFar.tick(8000).regionInference.regionId,null);
+
+  const nearest=setup();nearest.engine.reload(compileRegionsConfig(silentProximityConfig(nearest.config,4)));
+  nearest.point(0,8.5,-1);assert.equal(nearest.engine.getVehicleState("T")!.silentDoorCandidate?.regionId,"B");
+  assert.equal(nearest.tick(8000).regionInference.regionId,"B");
+
+  const tied=setup();tied.engine.reload(compileRegionsConfig(silentProximityConfig(tied.config,3.2)));
+  tied.point(0,6,-1);assert.equal(tied.engine.getVehicleState("T")!.silentDoorCandidate?.regionId,"A");
+  assert.equal(tied.tick(8000).regionInference.regionId,"A");
+});
+
+test("silent door proximity needs neither movement history nor movement toward the door", () => {
+  const single=setup();single.engine.reload(compileRegionsConfig(silentProximityConfig(single.config)));
+  single.point(0,3,-1);assert.equal(single.engine.getVehicleState("T")!.silentDoorCandidate?.doorId,"door-0");
+
+  const away=setup();away.engine.reload(compileRegionsConfig(silentProximityConfig(away.config)));
+  away.point(0,3,-.5);away.point(1000,3,-1);assert.equal(away.tick(9000).regionInference.regionId,"A");
+
+  const parallel=setup();parallel.engine.reload(compileRegionsConfig(silentProximityConfig(parallel.config)));
+  parallel.point(0,2.5,-1);parallel.point(1000,3,-1);assert.equal(parallel.tick(9000).regionInference.regionId,"A");
+});
+
+test("each accepted corridor measurement replaces or clears the silent door candidate", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(silentProximityConfig(s.config)));
+  s.point(0,3,-1);assert.equal(s.engine.getVehicleState("T")!.silentDoorCandidate?.regionId,"A");
+  s.point(2000,9,-1);assert.equal(s.engine.getVehicleState("T")!.silentDoorCandidate?.regionId,"B");
+  s.point(4000,6,-3);assert.equal(s.engine.getVehicleState("T")!.silentDoorCandidate,null);
+});
+
+test("configured corridor geometry prevents nearby non-corridor positions from becoming candidates", () => {
+  const s=setup();const corridor={...s.config.regions[0],id:"corridor-far",name:"Uzak koridor",kind:"corridor" as const,roomCenter:null,entrances:[]};
+  const config=silentProximityConfig({...s.config,regions:[corridor,...s.config.regions]});
+  const compiled=compileRegionsConfig(config);assert.equal(compiled.corridors.length,1);s.engine.reload(compiled);
+  s.point(0,3,-1);assert.equal(s.engine.getVehicleState("T")!.silentDoorCandidate,null);
+});
+
+test("regular and intermittent rooms and disabled proximity settings preserve existing behavior", () => {
+  for(const coverage of ["regular","intermittent"] as const){const s=setup();const config={...s.config,regions:s.config.regions.map(region=>({...region,coverage,inference:{...region.inference,coverage,silentEntryMaxDistanceMeters:1.5}}))};
+    s.engine.reload(compileRegionsConfig(config));s.point(0,3,-1);assert.equal(s.engine.getVehicleState("T")!.silentDoorCandidate,null);assert.equal(s.tick(8000).regionInference.regionId,null);}
+  for(const distance of [0,undefined]){const s=setup();const config={...s.config,regions:s.config.regions.map(region=>({...region,coverage:"silent" as const,inference:{...region.inference,coverage:"silent" as const,silentEntryMaxDistanceMeters:distance}}))};
+    s.engine.reload(compileRegionsConfig(config));s.point(0,3,-1);assert.equal(s.engine.getVehicleState("T")!.silentDoorCandidate,null);assert.equal(s.tick(8000).regionInference.regionId,null);}
+});
+
+test("ineligible doors never become silent proximity candidates", () => {
+  const cases=[{enabled:false},{direction:"exit-only" as const},{evidenceMode:"ignored" as const},{allowEstimatedEntryAfterSignalLoss:false}];
+  for(const inference of cases){const s=setup();const base=silentProximityConfig(s.config);const config={...base,regions:base.regions.map((region,index)=>index===0?{...region,entrances:region.entrances.map(door=>({...door,inference}))}:region)};
+    s.engine.reload(compileRegionsConfig(config));s.point(0,3,-1);assert.equal(s.engine.getVehicleState("T")!.silentDoorCandidate,null);assert.equal(s.tick(8000).regionInference.regionId,null);}
+});
+
+test("real inside evidence supersedes a prior proximity-only inferred room", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(silentProximityConfig(s.config)));
+  s.point(0,3,-1);assert.equal(s.tick(8000).regionInference.regionId,"A");
+  const firstInside=s.point(9000,9,3)!;assert.equal(firstInside.regionInference.state,"INFERRED_IN_REGION");assert.equal(firstInside.regionInference.regionId,"A");
+  assert.equal(firstInside.regionInference.candidateRegionId,"B");
+  s.point(10000,9,3);s.point(11000,9,3);const confirmed=s.point(12000,9,3)!;
+  assert.equal(confirmed.regionInference.state,"IN_REGION");assert.equal(confirmed.regionInference.regionId,"B");assert.equal(confirmed.regionInference.measurementKind,"measured");
+});
+
+test("reliable silent-room evidence supersedes the corridor proximity candidate without using crossing direction", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(silentProximityConfig(s.config)));
+  s.point(0,3,-.5);s.point(1000,3,.6);
+  assert.equal(s.engine.getVehicleState("T")!.silentDoorCandidate,null);
+  const inferred=s.tick(9000);
+  assert.equal(inferred.regionInference.regionId,"A");assert.match(inferred.regionInference.reasons!.join(),/Sessiz oda içinde güvenilir ölçüm/);
+  assert.equal(s.engine.getVehicleState("T")!.silentDoorInferenceActive,false);
+});
+
+test("scenario A: reliable silent-room measurements confirm entry without a door crossing", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
+  assert.equal(s.point(0,3,3)!.regionInference.state,"ENTRY_CANDIDATE");
+  const confirmed=s.point(1600,3,3)!;
+  assert.equal(confirmed.regionInference.state,"IN_REGION");assert.equal(confirmed.regionInference.regionId,"A");
+  assert.equal(confirmed.positionSource,"REGION_CENTER");assert.equal(confirmed.regionInference.measurementKind,"measured");
+  assert.equal(confirmed.regionInference.confidence,.85);assert.equal(confirmed.engineVersion,ROOM_ENGINE_VERSION);
+  assert.match(confirmed.regionInference.reasons!.join(),/Sessiz odada sürekli güvenilir iç ölçümler doğrulandı; kapı kanıtı aranmadı/);
+  assert.doesNotMatch(confirmed.regionInference.reasons!.join(),/Zorunlu kapı/);
+});
+
+test("scenario B: the real Room 3 config confirms a long reliable inside replay without a door crossing", () => {
+  const config=sportsCorridorConfig();const room=config.regions.find(region=>region.id==="room-03")!;const center=room.roomCenter!.world;
+  const s=setupConfig(config);
+  s.point(0,-.05,2.7);s.point(1000,-.1,2.7);
+  let result:ProcessedPosition|undefined,confirmed:ProcessedPosition|undefined;
+  for(let t=2000;t<=6000;t+=1000){result=s.point(t,center.x,center.y);if(!confirmed&&result?.regionInference.state==="IN_REGION")confirmed=result;}
+  assert.equal(s.engine.getVehicleState("T")!.crossing,null);
+  assert.equal(result!.regionInference.state,"IN_REGION");assert.equal(result!.regionInference.regionId,"room-03");
+  assert.match(confirmed!.regionInference.reasons!.join(),/kapı kanıtı aranmadı/);
+});
+
+test("scenario C: the real Room 5 config confirms fourteen reliable inside samples without a door crossing", () => {
+  const config=sportsCorridorConfig();const room=config.regions.find(region=>region.id==="room-05")!;const center=room.roomCenter!.world;
+  const s=setupConfig(config);let result:ProcessedPosition|undefined;
+  for(let index=0;index<14;index++) result=s.point(index*1000,center.x,center.y);
+  assert.equal(s.engine.getVehicleState("T")!.crossing,null);
+  assert.equal(result!.regionInference.state,"IN_REGION");assert.equal(result!.regionInference.regionId,"room-05");
+  assert.doesNotMatch(result!.regionInference.reasons!.join(),/Zorunlu kapı girişi gözlenmedi/);
+});
+
+test("scenario B: one reliable silent-room measurement survives signal loss as a nonzero inference", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
+  const measured=s.point(0,3,3)!;assert.equal(measured.regionInference.state,"ENTRY_CANDIDATE");
+  const inferred=s.tick(8000);
+  assert.equal(inferred.regionInference.state,"INFERRED_IN_REGION");assert.equal(inferred.regionInference.regionId,"A");
+  assert.ok(inferred.regionInference.confidence!>0);assert.ok(inferred.regionInference.confidence!<.85);
+  assert.match(inferred.regionInference.reasons!.join(),/Sessiz oda içinde güvenilir ölçüm sonrası sinyal kesildi/);
+});
+
+test("scenario C: a reliable corridor point near a silent door infers entry without motion evidence", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
+  s.point(0,3,-1);
+  const inferred=s.tick(8000);
+  assert.equal(inferred.regionInference.state,"INFERRED_IN_REGION");assert.equal(inferred.regionInference.regionId,"A");
+  assert.ok(inferred.regionInference.confidence!>0);assert.ok(inferred.regionInference.confidence!<.85);
+  assert.match(inferred.regionInference.reasons!.join(),/door-0, 1\.00 m/);
+});
+
+test("silent-room raw evidence produces a stronger bounded inference than corridor proximity alone", () => {
+  const inside=setup();inside.engine.reload(compileRegionsConfig(requiredDoorConfig(inside.config,"silent")));
+  inside.point(0,3,3);const insideInference=inside.tick(8000);
+  const corridor=setup();corridor.engine.reload(compileRegionsConfig(requiredDoorConfig(corridor.config,"silent")));
+  corridor.point(0,3,-1);const corridorInference=corridor.tick(8000);
+  assert.ok(insideInference.regionInference.confidence!>corridorInference.regionInference.confidence!);
+  assert.ok(insideInference.regionInference.confidence!<=.65);assert.ok(corridorInference.regionInference.confidence!<=.65);
+});
+
+test("scenario D: corridor signal loss away from every silent door becomes location lost", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
+  s.point(0,6,-3);
+  const lost=s.tick(8000);
+  assert.equal(lost.regionInference.state,"LOCATION_LOST");assert.equal(lost.regionInference.regionId,null);
+});
+
+test("scenario E: data returning inside a proximity-inferred room keeps and confirms that room", () => {
+  const reliable=setup();reliable.engine.reload(compileRegionsConfig(requiredDoorConfig(reliable.config,"silent")));
+  reliable.point(0,3,-1);reliable.tick(8000);
+  const confirmed=reliable.point(9000,3,3)!;
+  assert.equal(confirmed.regionInference.state,"IN_REGION");assert.equal(confirmed.regionInference.regionId,"A");
+
+  const wall=setup();wall.engine.reload(compileRegionsConfig(requiredDoorConfig(wall.config,"silent")));
+  wall.point(0,3,-1);const inferred=wall.tick(8000);
+  const retained=wall.point(9000,3,.1)!;
+  assert.equal(retained.regionInference.state,"INFERRED_IN_REGION");assert.equal(retained.regionInference.regionId,"A");
+  assert.equal(retained.regionInference.confidence,inferred.regionInference.confidence);
+});
+
+test("scenario F: seven reliable points confirm a required-door silent room without rejection", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
+  let result: ProcessedPosition | undefined;
+  for(let t=0;t<=6000;t+=1000) result=s.point(t,3,3);
+  assert.equal(result!.regionInference.state,"IN_REGION");assert.equal(result!.regionInference.regionId,"A");
+  assert.doesNotMatch(result!.regionInference.reasons!.join(),/Zorunlu kapı girişi gözlenmedi/);
+});
+
+test("scenario G: one wall-band sample does not clear a proximity-inferred silent room", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
+  s.point(0,3,-1);s.tick(8000);
+  const retained=s.point(9000,3,.1)!;
+  assert.equal(retained.regionInference.state,"INFERRED_IN_REGION");assert.equal(retained.regionInference.regionId,"A");
+});
+
+test("scenario H: proximity inference chooses the nearest door without a movement vector", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent",4)));
+  s.point(0,5.8,-1);
+  assert.equal(s.engine.getVehicleState("T")!.silentDoorCandidate?.regionId,"A");
+  assert.equal(s.tick(8000).regionInference.regionId,"A");
+});
+
+test("scenario G: a room-specific manual threshold change takes effect only after config reload", () => {
+  const s=setup();const initial=silentProximityConfig(s.config,1.5);s.engine.reload(compileRegionsConfig(initial));
+  s.point(0,3,-2);assert.equal(s.tick(8000).regionInference.state,"LOCATION_LOST");
+  const updated={...initial,regions:initial.regions.map(region=>region.id==="A"
+    ? {...region,inference:{...region.inference,silentEntryMaxDistanceMeters:2.2}}:region)};
+  const compiled=compileRegionsConfig(updated);s.engine.reload(compiled);
+  assert.equal(compiled.regions.find(region=>region.id==="A")!.settings.silentEntryMaxDistanceMeters,2.2);
+  assert.equal(compiled.regions.find(region=>region.id==="B")!.settings.silentEntryMaxDistanceMeters,1.5);
+  s.point(9000,3,-2);const inferred=s.tick(17000);
+  assert.equal(inferred.regionInference.state,"INFERRED_IN_REGION");assert.equal(inferred.regionInference.regionId,"A");
+});
+
+test("scenario I: one impossible-speed packet is rejected without clearing a confirmed silent room", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
+  s.point(0,3,3);s.point(1000,3,3);const confirmed=s.point(2000,3,3)!;
+  const count=s.engine.getVehicleState("T")!.insideConfirmationCount;
+  const anomaly=s.point(2100,100,100)!;const state=s.engine.getVehicleState("T")!;
+  assert.equal(confirmed.regionInference.state,"IN_REGION");assert.equal(anomaly.regionInference.state,"INFERRED_IN_REGION");
+  assert.equal(anomaly.regionInference.regionId,"A");assert.equal(state.activeRegionId,"A");
+  assert.equal(state.insideConfirmationCount,count);assert.equal(state.history.at(-1)!.weight,0);
+  assert.match(anomaly.regionInference.reasons!.join(),/Hız sınırını aşan ölçüm/);
+});
+
+test("scenario J: required-door regular and intermittent rooms retain their existing entry policy", () => {
+  for(const coverage of ["regular","intermittent"] as const){
+    const s=setup();const config={...s.config,regions:s.config.regions.map(region=>({...region,coverage,inference:{...region.inference,coverage,
+      doorDefaults:{...region.inference?.doorDefaults,evidenceMode:"required" as const}}}))};
+    s.engine.reload(compileRegionsConfig(config));let result:ProcessedPosition|undefined;
+    for(let t=0;t<=6000;t+=1000) result=s.point(t,3,3);
+    assert.equal(result!.regionInference.state,"ENTRY_CANDIDATE");assert.equal(result!.regionInference.regionId,null);
+    assert.match(result!.regionInference.reasons!.join(),/Zorunlu kapı girişi gözlenmedi/);
+  }
 });

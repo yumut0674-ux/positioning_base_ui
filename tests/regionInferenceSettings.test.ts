@@ -23,6 +23,8 @@ test("global, room and door settings resolve in priority order without mutating 
   assert.equal(resolveDoorSettings(resolvedRoom).entryEvidenceWeight, 3);
   assert.equal(resolveRoomSettings(global).entryEvidenceDurationMs, 2000);
   assert.equal(resolveGlobalSettings().entryEvidenceDurationMs, 1500);
+  assert.equal(resolveRoomSettings(global).silentEntryMaxDistanceMeters, 0);
+  assert.equal(resolveRoomSettings(global, { silentEntryMaxDistanceMeters: 1.5 }).silentEntryMaxDistanceMeters, 1.5);
   assert.equal(JSON.stringify({ global, room, door }), snapshot);
 });
 
@@ -37,12 +39,27 @@ test("legacy evidenceDurationMs maps to entry and exit and legacy config compile
 test("cleaner preserves room and door overrides and rejects unknown fields", () => {
   const original = scenarioConfig() as RegionsConfig;
   const input = { ...original, engine: { ...original.engine, baseScore: .2 }, regions: original.regions.map((room, index) => ({ ...room,
-    inference: { entryEvidenceDurationMs: 2000 + index }, entrances: room.entrances.map(door => ({ ...door, inference: { evidenceMode: "required" as const } })) })) };
+    inference: { entryEvidenceDurationMs: 2000 + index, silentEntryMaxDistanceMeters: 1.5 }, entrances: room.entrances.map(door => ({ ...door, inference: { evidenceMode: "required" as const } })) })) };
   const clean = cleanRegionsConfig(input);
   assert.equal(clean.regions[0].inference?.entryEvidenceDurationMs, 2000);
+  assert.equal(clean.regions[0].inference?.silentEntryMaxDistanceMeters, 1.5);
   assert.equal(clean.regions[0].entrances[0].inference?.evidenceMode, "required");
   assert.throws(() => cleanRegionsConfig({ ...input, engine: { ...input.engine, surprise: 1 } }), /bilinmeyen alan/);
   assert.throws(() => compileRegionsConfig({ ...input, regions: input.regions.map(room => ({ ...room, entrances: room.entrances.map(door => ({ ...door, inference: { evidenceMode: "required", direction: "entry-only" } })) })) } as RegionsConfig), /required kapı/);
+});
+
+test("silent proximity distance validates its finite 0..20 metre range and warns outside silent coverage", () => {
+  const base=scenarioConfig() as RegionsConfig;
+  const withDistance=(value:number,coverage:"silent"|"regular"="silent")=>({...base,regions:base.regions.map(room=>({...room,coverage,inference:{...room.inference,coverage,silentEntryMaxDistanceMeters:value}}))}) as RegionsConfig;
+  assert.doesNotThrow(()=>compileRegionsConfig(withDistance(0)));
+  assert.doesNotThrow(()=>compileRegionsConfig(withDistance(20)));
+  assert.throws(()=>compileRegionsConfig(withDistance(-.01)),/silentEntryMaxDistanceMeters: geçersiz değer/);
+  assert.throws(()=>compileRegionsConfig(withDistance(20.01)),/silentEntryMaxDistanceMeters: geçersiz değer/);
+  assert.throws(()=>compileRegionsConfig(withDistance(Number.NaN)),/silentEntryMaxDistanceMeters: geçersiz değer/);
+  assert.throws(()=>compileRegionsConfig(withDistance(null as unknown as number)),/silentEntryMaxDistanceMeters: geçersiz değer/);
+  assert.throws(()=>compileRegionsConfig(withDistance("1.5" as unknown as number)),/silentEntryMaxDistanceMeters: geçersiz değer/);
+  const warnings=compileRegionsConfig(withDistance(1.5,"regular")).warnings ?? [];
+  assert.equal(warnings.length,base.regions.length);assert.ok(warnings.every(message=>message.includes("yalnızca sessiz kapsamada kullanılır")));
 });
 
 test("validation endpoint compiles without writing the config file", async () => {

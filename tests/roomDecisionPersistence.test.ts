@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { PostgresRoomDecisionRepository } from "../src/server/location/roomDecisionRepository";
 import { queryPostgres } from "../src/server/postgresClient";
-import { RegionPositionEngine } from "../src/server/regionEngine/RegionPositionEngine";
+import { RegionPositionEngine, ROOM_ENGINE_VERSION } from "../src/server/regionEngine/RegionPositionEngine";
 import { compileRegionsConfig } from "../src/server/regionEngine/configLoader";
 import { scenarioConfig } from "../test_api/room_scenarios.js";
 import type { RegionsConfig } from "../src/features/regions/types/region.types";
@@ -32,6 +32,8 @@ test("decision queue stores raw decisions and state changes, deduplicates synthe
     await repo.flush();assert.equal(repo.status().queueSize,0);
     assert.ok(sql.at(-1)!.includes("ON CONFLICT (event_id) DO NOTHING"));
     assert.ok(sql.at(-1)!.includes("map_id,zone_id,payload"));
+    assert.ok(sql.at(-1)!.includes("engine_version"));assert.ok(sql.at(-1)!.includes(`'${ROOM_ENGINE_VERSION}'`));
+    assert.ok(events.every(event=>event.engineVersion===ROOM_ENGINE_VERSION));
     assert.equal(events.at(-1)?.mapId,"map-a");assert.equal(events.at(-1)?.sourceZoneId,"zone-a");
     assert.ok(!sql.at(-1)!.includes("INSERT INTO tag_location_history"));
   } finally {repo.stop();}

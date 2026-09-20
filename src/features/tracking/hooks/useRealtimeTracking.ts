@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { fetchAnchors } from "@/src/features/map/services/anchorApi";
 import { SseTrackingGateway } from "../services/TrackingGateway";
-import { ExponentialMovingAverageFilter } from "../services/positionFilters";
 import { fetchTags, type TagDefinition } from "../services/tagApi";
 import {
   fetchRegionEngineStatus, processedStreamUrl, REGION_ENGINE_STATUS_CHANGED_EVENT,
@@ -41,7 +40,6 @@ export function useRealtimeTracking(): PositionAnimationController {
     () => engineEnabled ? new SseTrackingGateway(processedStreamUrl()) : null,
     [engineEnabled],
   );
-  const filter = useMemo(() => new ExponentialMovingAverageFilter(), []);
   const displayNames = useRef(new Map<string, string>());
   const engineStatusRevision = useRef(0);
   const positionAnimation = useMemo(
@@ -179,13 +177,8 @@ export function useRealtimeTracking(): PositionAnimationController {
       if (observed.mapId === null) upsertTag(observed);
       return;
     }
-    const current = useIpsStore.getState().tags[tagId];
-    if (!current) {
-      return upsertTag(observed);
-    }
-    const position = current.mapId === incoming.mapId ? filter.next(current, incoming) : incoming;
-    upsertTag({ ...observed, ...position });
-  }), [engineEnabled, filter, observeTag, positionAnimation, rawGateway, upsertTag]);
+    upsertTag(observed);
+  }), [engineEnabled, observeTag, rawGateway, upsertTag]);
 
   useEffect(() => {
     if (!processedGateway) return;
@@ -207,10 +200,9 @@ export function useRealtimeTracking(): PositionAnimationController {
         x: incoming.x,
         y: incoming.y,
       };
-      const position = current && !incoming.positionSource ? filter.next(current, incoming) : incoming;
-      upsertTag({ ...next, ...position, regionInference: incoming.regionInference, rawPosition: incoming.rawPosition, positionSource: incoming.positionSource, publishedAt: incoming.publishedAt, lastRawDataTimestamp: incoming.lastRawDataTimestamp, timestamp: incoming.lastRawDataTimestamp ? Date.parse(incoming.lastRawDataTimestamp) : incoming.timestamp });
+      upsertTag({ ...next, regionInference: incoming.regionInference, rawPosition: incoming.rawPosition, positionSource: incoming.positionSource, publishedAt: incoming.publishedAt, lastRawDataTimestamp: incoming.lastRawDataTimestamp, timestamp: incoming.lastRawDataTimestamp ? Date.parse(incoming.lastRawDataTimestamp) : incoming.timestamp });
     });
-  }, [filter, positionAnimation, processedGateway, upsertTag]);
+  }, [processedGateway, upsertTag]);
 
   useEffect(() => {
     const timer = window.setInterval(() => refreshTagActivity(), 1_000);

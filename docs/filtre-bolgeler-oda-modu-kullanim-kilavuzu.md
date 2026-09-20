@@ -149,7 +149,11 @@ Arayüzde “Ölçülen”, “Tahmin edilen”, “Belirsiz · oda adayı” ve
 
 ### Veri kesilirse
 
-Doğrulanmış oda önce tahmin olarak korunur, uzun kesintide belirsiz olur. Daha önce yönlü kapı geçişi ve güçlü iç ölçüm varsa kısa kesinti sırasında tahmini oda üretilebilir. Yalnızca veri kesilmesi oda girişini doğrulamaz.
+Doğrulanmış oda önce tahmin olarak korunur, uzun kesintide belirsiz olur. Daha önce yönlü kapı geçişi ve güçlü iç ölçüm varsa kısa kesinti sırasında tahmini oda üretilebilir.
+
+Sessiz kapsamanın ayrıca isteğe bağlı bir kapı yakınlığı davranışı vardır. Oda bazındaki **Sessiz oda kapı yakınlık mesafesi (m)** (`silentEntryMaxDistanceMeters`) 0'dan büyükse motor, tag'in son geçerli koridor ölçümüyle bütün uygun sessiz oda kapıları arasındaki Öklid mesafesini karşılaştırır. Sinyal kesildiğinde en yakın uygun kapının odasını `INFERRED_IN_REGION` ve `estimated` olarak yayımlar. Hareket yönü aranmaz; tek koridor ölçümü yeterlidir. Bu gerçek bir kapı geçişi ölçümü değildir. Yanlış pozitif riskini azaltmak için mesafeyi mümkün olduğunca dar tutun; boş veya `0` özellik kapalı demektir. Önerilen başlangıç değeri 1,5 metredir.
+
+Bu yakınlık kuralı yalnız etkin, girişe izin veren, yok sayılmayan ve kesinti sonrası tahmini giriş izni açık kapılarda çalışır. Yeni gerçek ölçüm daha yakın başka kapı gösterirse aday değişir; bütün kapılardan uzaksa temizlenir. Güvenilir iç ölçüm ve normal yönlü kapı geçişi daha güçlü kanıt olarak önceliklidir. Uzun kesintide yine `LOCATION_LOST` uygulanır. Düzenli ve aralıklı odalar bu kuraldan etkilenmez.
 
 Kapsama profili kesintiye ne kadar tolerans gösterileceğini etkiler:
 
@@ -235,8 +239,9 @@ Oda merkezi içeren geçişler de doğrudan uygulanır; merkezler arasında fizi
 | `engine.lostAfterMs` | 30.000 ms | Temel belirsizlik eşiği; kapsama profili uzatabilir. |
 | Bölge `wallBandMeters` | 0,35 m | Duvara yakın ölçümlerin düşük ağırlık aldığı bant. |
 | Bölge `sharedWallBandMeters` | 0,65 m | Başka odaya yakın duvar çevresindeki bant. |
+| Bölge `silentEntryMaxDistanceMeters` | Kapalı; önerilen 1,5 m | Yalnız sessiz odada kapı yakınlığından tahmini giriş mesafesi; 0 kapatır. |
 
-Oda bazındaki **Beklenen ölçüm aralığı**, **Duvar bandı** ve **Ortak duvar bandı** panelden değiştirilebilir. Genel `engine` eşikleri JSON yapılandırmasındadır. `quality` verilmezse motor 1 kabul eder; 0,25 altındaki kaliteyi kanıt saymaz. Güçlü kanıt için ağırlığın en az 0,5 olması gerekir; dolayısıyla 0,25 kaliteyi aşmak tek başına güçlü kanıt üretmez.
+Oda bazındaki **Beklenen ölçüm aralığı**, **Duvar bandı**, **Ortak duvar bandı** ve sessiz kapsama seçiliyken **Sessiz oda kapı yakınlık mesafesi (m)** panelden değiştirilebilir. Genel `engine` eşikleri JSON yapılandırmasındadır. `quality` verilmezse motor 1 kabul eder; 0,25 altındaki kaliteyi kanıt saymaz. Güçlü kanıt için ağırlığın en az 0,5 olması gerekir; dolayısıyla 0,25 kaliteyi aşmak tek başına güçlü kanıt üretmez.
 
 Dar odada duvar bandı çok büyükse güvenilir iç alan kalmayabilir. Eşikleri küçültmek tespiti hızlandırabilir ancak duvar yakınındaki yanlış oda kararlarını artırabilir. Varsayılan süreler ve mesafeler gerçek sahada doğrulanmış garantiler değildir.
 
