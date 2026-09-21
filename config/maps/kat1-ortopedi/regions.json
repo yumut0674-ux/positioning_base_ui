@@ -5,7 +5,8 @@
   "engine": {
     "entryConfirmationCount": 2,
     "exitConfirmationCount": 2,
-    "exitMarginMeters": 0.5
+    "exitMarginMeters": 0.5,
+    "maximumSpeedMetersPerSecond": 4.5
   },
   "map": {
     "source": "system",
@@ -127,7 +128,7 @@
       "kind": "room",
       "entrances": [],
       "inference": {
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -287,7 +288,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -388,7 +389,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -489,7 +490,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -590,7 +591,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -691,7 +692,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -792,7 +793,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -893,7 +894,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -994,7 +995,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -1095,7 +1096,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -1196,7 +1197,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -1297,7 +1298,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -1398,7 +1399,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -1499,7 +1500,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     },
     {
@@ -1600,7 +1601,7 @@
         },
         "relocationEvidenceDurationMultiplier": 1.4,
         "outsideReleaseDurationMultiplier": 1.4,
-        "maximumSpeedMetersPerSecond": 3
+        "maximumSpeedMetersPerSecond": 4.5
       }
     }
   ]

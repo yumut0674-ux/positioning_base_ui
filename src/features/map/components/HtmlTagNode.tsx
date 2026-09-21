@@ -49,7 +49,7 @@ function HtmlTagNodeComponent({ tag, transform, positionAnimation, selected, onS
             aria-hidden="true"
           />
         )}
-        <span className={styles.label}>{tag.id}{uncertain ? " · Belirsiz" : estimated ? " · Tahmin" : ""}</span>
+        <span className={styles.label}>{tag.name}</span>
       </button>
     </div>
   );

@@ -34,6 +34,9 @@ function setupConfig(config: RegionsConfig) {
 function sportsCorridorConfig(): RegionsConfig {
   return JSON.parse(readFileSync(new URL("../config/maps/spor-koridor/regions.json",import.meta.url),"utf8")) as RegionsConfig;
 }
+function orthopedicsConfig(): RegionsConfig {
+  return JSON.parse(readFileSync(new URL("../config/maps/kat1-ortopedi/regions.json",import.meta.url),"utf8")) as RegionsConfig;
+}
 type September21Fixture = { readonly tagCode:string; readonly mapId:string; readonly positions:readonly (readonly [string,number,number,string|null])[] };
 function september21Fixture(): September21Fixture {
   return JSON.parse(readFileSync(new URL("./fixtures/september21SporKoridorRoute.json",import.meta.url),"utf8")) as September21Fixture;
@@ -48,6 +51,23 @@ function requiredDoorConfig(base: RegionsConfig, coverage: "silent" | "regular" 
       doorDefaults: { ...region.inference?.doorDefaults, evidenceMode: "required" as const } } })) };
 }
 test("disabled engine does not mutate input",()=>{const s=setup();s.engine.disable();assert.equal(s.point(0,1,1),undefined);});
+test("kat1-ortopedi uses 4.5 m/s globally and for every effective region setting",()=>{
+  const compiled=compileRegionsConfig(orthopedicsConfig());
+  assert.equal(compiled.rules.maximumSpeedMetersPerSecond,4.5);
+  assert.ok(compiled.regions.length>0);
+  assert.ok(compiled.regions.every(region=>region.settings.maximumSpeedMetersPerSecond===4.5));
+});
+test("kat1-ortopedi accepts a reasonable 4.5 m/s step and rejects a jump beyond speed plus tolerance",()=>{
+  const s=setupConfig(orthopedicsConfig());
+  s.point(0,-10,-10);
+  const atLimit=s.point(1000,-5.5,-10)!;
+  assert.notEqual(atLimit.decisionTrace?.eventType,"MEASUREMENT_REJECTED");
+  const rejected=s.point(2000,0,-10)!;
+  assert.equal(rejected.decisionTrace?.eventType,"MEASUREMENT_REJECTED");
+  assert.ok(rejected.decisionTrace?.reasons.some(reason=>reason.code==="MEASUREMENT_REJECTED_BY_SPEED"));
+  assert.equal(s.engine.getVehicleState("T")!.lastRawPosition.x,-5.5);
+  assert.equal(s.engine.getVehicleState("T")!.lastRawDataTimestamp,epoch+1000);
+});
 test("time and independent measurements are both required, even with count=1",()=>{
   const s=setup({entryConfirmationCount:1});
   assert.equal(s.point(0,3,3)?.regionInference.state,"ENTRY_CANDIDATE");

@@ -240,6 +240,20 @@ test("disabled animation still times out and synthetic RAW publications retain m
   assert.equal(f.animation.getState("A"), undefined);
 });
 
+test("newer synthetic decisions for one measurement do not add physical route samples", () => {
+  const f = fixture();
+  f.filter.ingest(tag(1, 1, 3_000));
+  const initialSamples = f.animation.getState("A")!.samples.length;
+  f.advance(10_000);
+  f.filter.ingest({ ...tag(1, 1, 3_000), publishedAt: new Date(10_000).toISOString(),
+    regionInference: { enabled: true, state: "INFERRED_IN_REGION", regionId: "room-06", measurementKind: "estimated" } });
+  f.filter.ingest({ ...tag(1, 1, 3_000), publishedAt: new Date(11_000).toISOString(),
+    regionInference: { enabled: true, state: "LOCATION_LOST", regionId: null, measurementKind: "uncertain" } });
+  assert.equal(f.animation.getState("A")!.samples.length, initialSamples);
+  assert.equal(f.animation.getState("A")!.stale, true);
+  f.filter.dispose();
+});
+
 test("hidden tag stays in the list with visibility explanation and real activity", () => {
   const html = renderToStaticMarkup(createElement(TagInformationPanelContent, {
     tags: [tag(15, 15, 1_000)], recentTagIds: [], locationDuration: "", onSelectTag: () => {}, onOpenHistory: () => {},
@@ -248,6 +262,18 @@ test("hidden tag stays in the list with visibility explanation and real activity
   assert.match(html, /Alan dışında · haritada gizli/);
   assert.match(html, /CANLI/);
   assert.match(html, /role="option"/);
+});
+
+test("tag panel renders the accepted inferred Room 6 decision", () => {
+  const inferred = { ...tag(8, -1, 3_000), publishedAt: new Date(6_000).toISOString(),
+    positionSource: "REGION_CENTER" as const,
+    regionInference: { enabled: true, state: "INFERRED_IN_REGION", regionId: "room-06", regionName: "Oda 6", measurementKind: "estimated" as const } };
+  const html = renderToStaticMarkup(createElement(TagInformationPanelContent, {
+    tags: [inferred], selectedTag: inferred, recentTagIds: [], locationAddress: "Oda 6 · Tahmin edilen", locationDuration: "Bu alanda 0 dk 3 sn",
+    onSelectTag: () => {}, onOpenHistory: () => {},
+  }));
+  assert.match(html, /Oda 6 · Tahmin edilen/);
+  assert.match(html, /KONUM ADRESİ/);
 });
 
 test("display wait configuration defaults to 2000 ms and validates persisted values", () => {

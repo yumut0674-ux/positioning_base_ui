@@ -186,7 +186,6 @@ export function useRealtimeTracking(): PositionAnimationController {
       const tagId = incoming.id.toUpperCase();
       const name = displayNames.current.get(tagId) || tagId;
       const current = useIpsStore.getState().tags[tagId];
-      if (incoming.publishedAt && current?.publishedAt && Date.parse(incoming.publishedAt) < Date.parse(current.publishedAt)) return;
       const measuredAt = incoming.lastRawDataTimestamp ? Date.parse(incoming.lastRawDataTimestamp) : incoming.timestamp;
       const next = {
         mapId: incoming.mapId,

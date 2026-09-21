@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 import { MAP_CALIBRATION } from "../src/features/map/config/mapConfig";
 import { CoordinateTransformService } from "../src/features/map/services/CoordinateTransformService";
 import {
@@ -9,6 +11,13 @@ import {
 } from "../src/features/map/services/htmlTagOverlay";
 import { PositionAnimationController } from "../src/features/tracking/services/PositionAnimationController";
 import { DEFAULT_POSITION_ANIMATION_CONFIG } from "../src/features/tracking/config/positionAnimationConfig";
+
+test("live-map tag label uses the display name instead of the hardware id", () => {
+  const source = readFileSync(path.join(process.cwd(), "src/features/map/components/HtmlTagNode.tsx"), "utf8");
+  assert.match(source, /className=\{styles\.label\}>\{tag\.name\}/);
+  assert.doesNotMatch(source, /className=\{styles\.label\}>\{tag\.id\}/);
+  assert.doesNotMatch(source, /· Belirsiz|· Tahmin/);
+});
 
 test("HTML tag overlay uses the same translation and scale as the Konva viewport", () => {
   assert.equal(

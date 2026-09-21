@@ -7,6 +7,7 @@ import type { RegionsConfig } from "@/src/features/regions/types/region.types";
 import { addRecentTagId, nextTagLocationEntry, type TagLocationEntry } from "@/src/features/tracking/services/tagPanelState";
 import { MAP_TAG_FOCUS_SCALE } from "@/src/features/map/config/mapConfig";
 import type { MapTagDisplay } from "@/src/features/tracking/services/MapDisplayFilter";
+import { shouldAcceptTagUpdate } from "@/src/features/tracking/services/tagUpdateOrdering";
 import {
   DEFAULT_TAG_TRAIL_SETTINGS,
   normalizeTagTrailDuration,
@@ -136,7 +137,7 @@ export const useIpsStore = create<IpsState>((set) => ({
   toggleLayer: (layer) => set((state) => ({ layers: { ...state.layers, [layer]: !state.layers[layer] } })),
   upsertTag: (tag) => set((state) => {
     const current = state.tags[tag.id];
-    if (current && tag.timestamp <= current.timestamp) return state;
+    if (current && !shouldAcceptTagUpdate(current, tag)) return state;
     const followedMapId = state.selectedTagId === tag.id && tag.mapId && tag.mapId !== state.activeMapId ? tag.mapId : state.activeMapId;
     return {
     tags: boundedRecord({ ...state.tags, [tag.id]: tag }),

@@ -3,6 +3,7 @@ import type { TrackedTag } from "../types/tracking.types";
 import { PositionAnimationController } from "./PositionAnimationController";
 import { inDisplayArea, segmentInDisplayArea, type DisplayPolygon } from "./displayArea";
 import { AdaptivePositionFilter } from "./positionFilters";
+import { shouldAcceptTagUpdate } from "./tagUpdateOrdering";
 
 export interface MapTagDisplay {
   readonly visible: boolean;
@@ -56,11 +57,7 @@ export class MapDisplayFilter {
   public ingest(candidate: TrackedTag, smooth = false, force = false): void {
     if (this.mapId && candidate.mapId !== this.mapId) return;
     let state = this.states.get(candidate.id);
-    if (state && !force) {
-      if (candidate.timestamp < state.candidate.timestamp) return;
-      if (candidate.timestamp === state.candidate.timestamp
-        && (!candidate.publishedAt || (state.candidate.publishedAt && candidate.publishedAt <= state.candidate.publishedAt))) return;
-    }
+    if (state && !force && !shouldAcceptTagUpdate(state.candidate, candidate)) return;
     if (!state) {
       state = { candidate, smooth, stabilizer: new AdaptivePositionFilter(), display: { visible: false, reason: "outside" } };
       this.states.set(candidate.id, state);

@@ -64,7 +64,7 @@ test("store follows only the selected tag across maps and rejects delayed old-fl
     assert.equal(useIpsStore.getState().activeMapId, "map-a");
     useIpsStore.getState().upsertTag({ ...base, id: "SELECTED", timestamp: 2_000, mapId: "map-b" });
     assert.equal(useIpsStore.getState().activeMapId, "map-b");
-    useIpsStore.getState().upsertTag({ ...base, id: "SELECTED", timestamp: 1_500, mapId: "map-a" });
+    useIpsStore.getState().upsertTag({ ...base, id: "SELECTED", timestamp: 1_500, mapId: "map-a", publishedAt: "2026-01-01T00:00:10Z" });
     assert.equal(useIpsStore.getState().tags.SELECTED.mapId, "map-b");
     assert.equal(useIpsStore.getState().activeMapId, "map-b");
   } finally { useIpsStore.setState(original, true); }

@@ -27,7 +27,7 @@
     "minimumHardwareQuality": 0.25,
     "reliableEvidenceWeight": 0.5,
     "wallEvidenceWeight": 0.1,
-    "maximumSpeedMetersPerSecond": 3,
+    "maximumSpeedMetersPerSecond": 5.2,
     "movementToleranceMeters": 0.25,
     "lostAfterMs": 60000,
     "relocationAfterMs": 15000,
@@ -268,7 +268,8 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.5
+        "silentEntryMaxDistanceMeters": 1.5,
+        "maximumSpeedMetersPerSecond": 6
       },
       "entrances": [
         {
@@ -354,7 +355,8 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.5
+        "silentEntryMaxDistanceMeters": 1.5,
+        "maximumSpeedMetersPerSecond": 6
       },
       "entrances": [
         {
@@ -440,7 +442,8 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.5
+        "silentEntryMaxDistanceMeters": 1.5,
+        "maximumSpeedMetersPerSecond": 6
       },
       "entrances": [
         {
@@ -526,7 +529,8 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.5
+        "silentEntryMaxDistanceMeters": 1.5,
+        "maximumSpeedMetersPerSecond": 6
       },
       "entrances": [
         {
@@ -612,7 +616,8 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.5
+        "silentEntryMaxDistanceMeters": 1.5,
+        "maximumSpeedMetersPerSecond": 6
       },
       "entrances": [
         {
@@ -698,7 +703,8 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 2
+        "silentEntryMaxDistanceMeters": 2.5,
+        "maximumSpeedMetersPerSecond": 6
       },
       "entrances": [
         {
@@ -784,7 +790,8 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.5
+        "silentEntryMaxDistanceMeters": 1.5,
+        "maximumSpeedMetersPerSecond": 6
       },
       "entrances": [
         {

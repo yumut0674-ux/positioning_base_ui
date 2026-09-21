@@ -13,7 +13,7 @@
     "start:share": "node scripts/start-share.mjs",
     "test": "npm run build && node --test tests/rendered-html.test.mjs",
     "test:mcp": "node --import tsx --test tests/mcp/all.test.ts",
-    "test:tracking": "node --import tsx --test tests/trackingIngest.test.ts tests/regionPositionEngine.test.ts tests/processedPositionServer.test.ts tests/regionEngineApi.test.ts tests/positionAnimationController.test.ts tests/positionFilters.test.ts tests/demoSharing.test.ts tests/tagSimulator.test.mjs tests/legacyRegionPositionEngine.test.ts tests/roomDecisionPersistence.test.ts",
+    "test:tracking": "node --import tsx --test tests/trackingIngest.test.ts tests/regionPositionEngine.test.ts tests/processedPositionServer.test.ts tests/regionEngineApi.test.ts tests/positionAnimationController.test.ts tests/positionFilters.test.ts tests/tagUpdateOrdering.test.ts tests/demoSharing.test.ts tests/tagSimulator.test.mjs tests/legacyRegionPositionEngine.test.ts tests/roomDecisionPersistence.test.ts",
     "test:maps": "node --import tsx --test tests/mapCatalog.test.ts tests/mapSelection.test.ts tests/mapViewportConfig.test.ts tests/mapRegionGeometry.test.ts tests/htmlTagOverlay.test.ts tests/mapDisplayFilter.test.ts tests/regionRawTagLayer.test.ts tests/multifloorTracking.test.ts tests/tagTrail.test.ts tests/tagManagementPanel.test.ts",
     "test:mcp:integration": "node --import tsx --test tests/mcp/integration.test.ts",
     "test:ai": "node --import tsx tests/ai-evaluation/runner/run-evaluation.ts",
