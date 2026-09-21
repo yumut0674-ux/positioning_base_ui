@@ -3,15 +3,17 @@ import type { PositionAnimationConfig } from "../types/tracking.types";
 export const DEFAULT_POSITION_ANIMATION_CONFIG: PositionAnimationConfig = {
   enabled: true,
   mode: "buffered_interpolation",
-  interpolationDelayMs: 3_000, // Konumları 3 sn geriden oynatarak mobil ağ gecikmesi ve paket dalgalanmalarını yumuşatır.
-  maximumBufferSize: 10,
+  interpolationDelayMs: 4_500, // Biraz daha fazla gecikme pahasina paket dalgalanmalarini gorunur harekete donusturmez.
+  maximumBufferSize: 16,
   maximumSegmentDurationMs: 2_500,
-  maximumExtrapolationMs: 250,
+  maximumExtrapolationMs: 0,
   stalePositionTimeoutMs: 4_000,
   teleportDistanceMeters: 6,
-  teleportAnimationDurationMs: 300,
-  regionTransitionDurationMs: 500,
-  easing: "linear",
+  teleportAnimationDurationMs: 1_500,
+  regionTransitionDurationMs: 2_000,
+  maximumVisualSpeedMetersPerSecond: 1.2,
+  maximumTransitionDurationMs: 8_000,
+  easing: "ease_in_out",
 };
 
 export const POSITION_ANIMATION_CONFIG_CHANGED_EVENT = "position-animation-config-changed";
@@ -43,8 +45,8 @@ export function resolvePositionAnimationConfig(value: unknown): PositionAnimatio
   if (input.mode !== undefined && input.mode !== "buffered_interpolation") {
     throw new Error('positionAnimation.mode "buffered_interpolation" olmalıdır');
   }
-  if (input.easing !== undefined && input.easing !== "linear") {
-    throw new Error('positionAnimation.easing "linear" olmalıdır');
+  if (input.easing !== undefined && input.easing !== "linear" && input.easing !== "ease_in_out") {
+    throw new Error('positionAnimation.easing "linear" veya "ease_in_out" olmalıdır');
   }
 
   return {
@@ -58,6 +60,8 @@ export function resolvePositionAnimationConfig(value: unknown): PositionAnimatio
     teleportDistanceMeters: finiteInRange(input.teleportDistanceMeters, DEFAULT_POSITION_ANIMATION_CONFIG.teleportDistanceMeters, "teleportDistanceMeters", 0, 100_000, false),
     teleportAnimationDurationMs: finiteInRange(input.teleportAnimationDurationMs, DEFAULT_POSITION_ANIMATION_CONFIG.teleportAnimationDurationMs, "teleportAnimationDurationMs", 0, 60_000),
     regionTransitionDurationMs: finiteInRange(input.regionTransitionDurationMs, DEFAULT_POSITION_ANIMATION_CONFIG.regionTransitionDurationMs, "regionTransitionDurationMs", 0, 60_000),
+    maximumVisualSpeedMetersPerSecond: finiteInRange(input.maximumVisualSpeedMetersPerSecond, DEFAULT_POSITION_ANIMATION_CONFIG.maximumVisualSpeedMetersPerSecond, "maximumVisualSpeedMetersPerSecond", 0.05, 100, false),
+    maximumTransitionDurationMs: finiteInRange(input.maximumTransitionDurationMs, DEFAULT_POSITION_ANIMATION_CONFIG.maximumTransitionDurationMs, "maximumTransitionDurationMs", 1, 60_000),
     easing: input.easing ?? DEFAULT_POSITION_ANIMATION_CONFIG.easing,
   };
 }

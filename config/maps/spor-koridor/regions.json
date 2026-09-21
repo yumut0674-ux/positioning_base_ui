@@ -92,15 +92,17 @@
   "positionAnimation": {
     "enabled": true,
     "mode": "buffered_interpolation",
-    "interpolationDelayMs": 3000,
-    "maximumBufferSize": 10,
+    "interpolationDelayMs": 4500,
+    "maximumBufferSize": 16,
     "maximumSegmentDurationMs": 2500,
-    "maximumExtrapolationMs": 250,
+    "maximumExtrapolationMs": 0,
     "stalePositionTimeoutMs": 4000,
     "teleportDistanceMeters": 6,
-    "teleportAnimationDurationMs": 300,
-    "regionTransitionDurationMs": 500,
-    "easing": "linear"
+    "teleportAnimationDurationMs": 1500,
+    "regionTransitionDurationMs": 2000,
+    "maximumVisualSpeedMetersPerSecond": 1.2,
+    "maximumTransitionDurationMs": 8000,
+    "easing": "ease_in_out"
   },
   "regions": [
     {

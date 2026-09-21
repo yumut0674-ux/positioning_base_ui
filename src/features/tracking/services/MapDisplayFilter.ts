@@ -97,7 +97,6 @@ export class MapDisplayFilter {
         && segmentInDisplayArea(state.lastValid, point, this.polygons)) {
         point = state.stabilizer.next(state.lastValid, point, tag.timestamp);
       } else state.stabilizer.reset(point, tag.timestamp);
-      if (resume || snap) this.animation.remove(tag.id);
       this.animation.ingest(tag.id, { ...point, timestamp: tag.timestamp, receivedAt: now,
         measurementTimestamp: tag.timestamp, positionSource: tag.positionSource ?? "RAW",
         regionId: tag.regionInference?.regionId });
@@ -116,7 +115,7 @@ export class MapDisplayFilter {
       if (snap && state.lastValid) this.animation.ingest(tag.id, { ...state.lastValid,
         timestamp: tag.timestamp, measurementTimestamp: tag.timestamp, receivedAt: now });
       this.animation.hold(tag.id, tag.timestamp, now);
-    } else this.animation.remove(tag.id);
+    } else this.animation.hold(tag.id, tag.timestamp, now);
   }
 
   private publish(): void {

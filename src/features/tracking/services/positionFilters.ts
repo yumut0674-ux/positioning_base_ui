@@ -22,8 +22,8 @@ export interface AdaptivePositionFilterConfig {
 
 export const DEFAULT_ADAPTIVE_POSITION_FILTER_CONFIG: AdaptivePositionFilterConfig = {
   jitterRadiusMeters: 0.18,
-  smoothingAlpha: 0.32,
-  movingAlpha: 0.68,
+  smoothingAlpha: 0.28,
+  movingAlpha: 0.42,
   movingDistanceMeters: 1.5,
   maximumSpeedMetersPerSecond: 4.5,
   outlierMinimumDistanceMeters: 1.2,

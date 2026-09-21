@@ -59,7 +59,9 @@ export interface PositionAnimationConfig {
   readonly teleportDistanceMeters: number;
   readonly teleportAnimationDurationMs: number;
   readonly regionTransitionDurationMs: number;
-  readonly easing: "linear";
+  readonly maximumVisualSpeedMetersPerSecond: number;
+  readonly maximumTransitionDurationMs: number;
+  readonly easing: "linear" | "ease_in_out";
 }
 
 export interface PositionSample extends Point2D {

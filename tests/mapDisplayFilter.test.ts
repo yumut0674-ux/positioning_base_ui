@@ -56,7 +56,7 @@ test("short outside spike holds last valid point, rejects the sample, and resume
   f.filter.dispose();
 });
 
-test("one outside measurement followed by silence hides at the deadline and re-entry snaps", () => {
+test("one outside measurement followed by silence hides at the deadline and re-entry keeps the last rendered point", () => {
   const f = fixture();
   f.filter.ingest(tag(1, 1, 1_000));
   f.filter.ingest(tag(11, 1, 1_001));
@@ -64,10 +64,10 @@ test("one outside measurement followed by silence hides at the deadline and re-e
   assert.equal(f.displays().A.visible, true);
   f.advance(3_000);
   assert.equal(f.displays().A.visible, false);
-  assert.equal(f.animation.getState("A"), undefined);
+  assert.equal(f.animation.getState("A")?.renderedX, 1);
   f.filter.ingest(tag(9, 9, 3_000));
   assert.equal(f.displays().A.visible, true);
-  assert.equal(f.animation.getState("A")?.renderedX, 9);
+  assert.equal(f.animation.getState("A")?.renderedX, 1);
   assert.equal(f.animation.getState("A")?.samples.length, 1);
   f.filter.dispose();
 });
@@ -116,14 +116,14 @@ test("boundaries, adjacent/overlapping polygons, narrow gaps and L corridors", (
   assert.equal(segmentInDisplayArea(p(1, 5), p(19, 5), [square, right.map(({ x, y }) => p(x + 0.00001, y))]), false);
 });
 
-test("unsafe L corridor animation snaps; queued motion and extrapolation stay inside", () => {
+test("unsafe L corridor animation holds instead of snapping; queued motion stays inside", () => {
   const f = fixture();
   f.filter.configure([elbow], 2_000);
   const rendered: { x: number; y: number }[] = [];
   f.animation.attach("A", { render: (x, y) => { rendered.push(p(x, y)); } });
   f.filter.ingest(tag(1, 5, 1_000));
   f.filter.ingest(tag(5, 1, 2_000), true);
-  assert.equal(f.animation.getState("A")?.renderedX, 5);
+  assert.equal(f.animation.getState("A")?.renderedX, 1);
   f.filter.ingest(tag(6, 1, 2_100));
   for (let time = 2_000; time <= 4_000; time += 10) f.animation.update(time);
   assert.ok(rendered.every((point) => inDisplayArea(point, [elbow])));
@@ -144,7 +144,7 @@ test("RAW map presentation suppresses jitter and requires confirmation for a sud
   assert.deepEqual(f.displays().A.position, p(5, 5));
 
   f.filter.ingest(tag(9.2, 9.1, 1_300), true);
-  assert.ok(f.displays().A.position!.x > 7);
+  assert.ok(f.displays().A.position!.x > 6);
   assert.ok(f.displays().A.position!.x < 9.2);
   f.filter.dispose();
 });
@@ -212,13 +212,14 @@ test("store binding switches RAW/engine coordinates and maps without modifying m
   } finally { f.filter.dispose(); useIpsStore.setState(original, true); }
 });
 
-test("a jump into another valid region remains visible and bypasses a gap without an animation", () => {
+test("a jump into a disconnected valid region updates the target without teleporting the marker", () => {
   const f = fixture();
   f.filter.configure([square, square.map(({ x, y }) => p(x + 20, y))], 2_000);
   f.filter.ingest(tag(5, 5, 1_000), true);
   f.filter.ingest(tag(25, 5, 2_000), true);
   assert.deepEqual(f.displays().A, { visible: true, position: p(25, 5) });
-  assert.equal(f.animation.getState("A")?.renderedX, 25);
+  assert.equal(f.animation.getState("A")?.renderedX, 5);
+  assert.ok(f.animation.getState("A")?.samples.some((sample) => sample.x === 25));
   assert.equal(f.timers.size, 0);
   f.filter.dispose();
 });

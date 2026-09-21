@@ -47,6 +47,11 @@ function samePosition(a: PositionSample, b: PositionSample): boolean {
   return a.x === b.x && a.y === b.y;
 }
 
+function easedProgress(progress: number, easing: PositionAnimationConfig["easing"]): number {
+  if (easing === "linear") return progress;
+  return progress * progress * (3 - 2 * progress);
+}
+
 export class PositionAnimationController {
   private displayArea: readonly DisplayPolygon[] | undefined;
   private readonly states = new Map<string, InternalTagAnimationState>();
@@ -141,19 +146,26 @@ export class PositionAnimationController {
     if (this.displayArea && (!segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, sample, this.displayArea)
       || (latest && !segmentInDisplayArea(latest, sample, this.displayArea)))) {
       state.samples = [sample];
-      state.transition = undefined;
       state.lastReceivedAt = incoming.measurementTimestamp ?? receivedAt;
       state.stale = receivedAt - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
-      this.apply(state, sample.x, sample.y, receivedAt);
+      if (this.config.enabled) this.startTransition(state, sample, receivedAt, this.transitionDuration(state, sample, this.config.teleportAnimationDurationMs));
+      else this.apply(state, sample.x, sample.y, receivedAt);
       return;
     }
     if (latest && sample.timestamp < latest.timestamp && (sample.positionSource === "REGION_CENTER" || latest.positionSource === "REGION_CENTER")) return;
-    // Room coordinates are display anchors. Snap without inventing a wall-crossing route.
+    // Room coordinates are display anchors, but changing anchors must still be a
+    // visible, bounded transition. Repeated heartbeats at the same centre do not
+    // restart the transition.
     if (sample.positionSource === "REGION_CENTER" || latest?.positionSource === "REGION_CENTER") {
       state.lastReceivedAt = incoming.measurementTimestamp ?? receivedAt;
-      state.samples = [sample]; state.transition = undefined;
       state.stale = receivedAt - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
-      this.apply(state, sample.x, sample.y, receivedAt);
+      if (latest && samePosition(latest, sample)) {
+        state.samples = [sample];
+        return;
+      }
+      state.samples = [sample];
+      if (this.config.enabled) this.startTransition(state, sample, receivedAt, this.transitionDuration(state, sample, this.config.regionTransitionDurationMs));
+      else this.apply(state, sample.x, sample.y, receivedAt);
       return;
     }
     if (state.samples.some((item) => item.timestamp === sample.timestamp && samePosition(item, sample))) {
@@ -185,7 +197,7 @@ export class PositionAnimationController {
       const duration = sample.timestamp - previous.timestamp;
       if (duration > this.config.maximumSegmentDurationMs || distance(previous, sample) > this.config.teleportDistanceMeters) {
         state.samples = [sample];
-        this.startTransition(state, sample, receivedAt, this.config.teleportAnimationDurationMs);
+        this.startTransition(state, sample, receivedAt, this.transitionDuration(state, sample, this.config.teleportAnimationDurationMs));
         return;
       }
     }
@@ -209,9 +221,10 @@ export class PositionAnimationController {
 
       if (state.transition) {
         const transition = state.transition;
-        const progress = transition.durationMs === 0
+        const linearProgress = transition.durationMs === 0
           ? 1
           : clamp((now - transition.startedAt) / transition.durationMs, 0, 1);
+        const progress = easedProgress(linearProgress, this.config.easing);
         this.apply(
           state,
           transition.fromX + (transition.toX - transition.fromX) * progress,
@@ -219,7 +232,7 @@ export class PositionAnimationController {
           now,
           wasStale,
         );
-        if (progress >= 1) state.transition = undefined;
+        if (linearProgress >= 1) state.transition = undefined;
         state.lastRenderTime = Math.max(state.lastRenderTime, renderTime);
         this.discardRenderedHistory(state, renderTime);
         continue;
@@ -291,14 +304,23 @@ export class PositionAnimationController {
     now: number,
     previousStale = state.stale,
   ): void {
+    if (this.config.enabled) {
+      const requestedDistance = distance({ x: state.renderedX, y: state.renderedY }, { x, y });
+      const elapsedMs = Math.max(0, Math.min(100, now - state.lastRenderedAt));
+      const maximumStep = this.config.maximumVisualSpeedMetersPerSecond * (elapsedMs / 1_000);
+      if (requestedDistance > maximumStep && maximumStep > 0) {
+        const ratio = maximumStep / requestedDistance;
+        x = state.renderedX + (x - state.renderedX) * ratio;
+        y = state.renderedY + (y - state.renderedY) * ratio;
+      } else if (requestedDistance > 0 && maximumStep === 0) {
+        return;
+      }
+    }
     if (this.displayArea && (!inDisplayArea({ x, y }, this.displayArea)
       || !segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, { x, y }, this.displayArea))) {
-      const latest = state.samples.at(-1);
-      if (!latest || !inDisplayArea(latest, this.displayArea)) return;
-      x = latest.x;
-      y = latest.y;
-      state.samples = [latest];
-      state.transition = undefined;
+      // A non-routable relocation must never become a visible teleport. Keep the
+      // last safe point until an interior sample supplies a traversable path.
+      return;
     }
     const changed = x !== state.renderedX || y !== state.renderedY || previousStale !== state.stale;
     state.renderedX = x;
@@ -321,6 +343,22 @@ export class PositionAnimationController {
       startedAt: now,
       durationMs,
     };
+  }
+
+  private transitionDuration(
+    state: InternalTagAnimationState,
+    destination: PositionSample,
+    minimumDurationMs: number,
+  ): number {
+    const speedDuration = distance(
+      { x: state.renderedX, y: state.renderedY },
+      destination,
+    ) / this.config.maximumVisualSpeedMetersPerSecond * 1_000;
+    return clamp(
+      Math.max(minimumDurationMs, speedDuration),
+      minimumDurationMs,
+      this.config.maximumTransitionDurationMs,
+    );
   }
 
   private discardRenderedHistory(state: InternalTagAnimationState, renderTime: number): void {

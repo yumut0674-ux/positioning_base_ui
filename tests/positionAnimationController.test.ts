@@ -7,7 +7,12 @@ import {
 } from "../src/features/tracking/services/PositionAnimationController";
 
 function controller(overrides: Partial<typeof DEFAULT_POSITION_ANIMATION_CONFIG> = {}) {
-  return new PositionAnimationController({ ...DEFAULT_POSITION_ANIMATION_CONFIG, ...overrides });
+  return new PositionAnimationController({
+    ...DEFAULT_POSITION_ANIMATION_CONFIG,
+    maximumVisualSpeedMetersPerSecond: 1_000,
+    easing: "linear",
+    ...overrides,
+  });
 }
 
 function recorder() {
@@ -69,8 +74,30 @@ test("out-of-order rendered samples and exact duplicates cannot move a tag backw
   animation.ingest("TAG-1", { x: 0.2, y: 0, timestamp: 1_200, receivedAt: 2_100 });
   animation.ingest("TAG-1", { x: 2, y: 0, timestamp: 2_000, receivedAt: 2_200 });
   animation.update(1_600);
-  assert.equal(output.latest().x, 1.2);
+  assert.equal(output.latest().x, 1);
   assert.equal(animation.getState("TAG-1")?.samples.length, 2);
+});
+
+test("production speed limit prevents both large jumps and long-frame catch-up jumps", () => {
+  const animation = new PositionAnimationController({
+    ...DEFAULT_POSITION_ANIMATION_CONFIG,
+    interpolationDelayMs: 0,
+  });
+  const output = recorder();
+  animation.ingest("TAG-1", { x: 0, y: 0, timestamp: 1_000, receivedAt: 1_000 });
+  animation.attach("TAG-1", output.renderer);
+  animation.ingest("TAG-1", { x: 10, y: 0, timestamp: 1_500, receivedAt: 1_500 });
+
+  animation.update(5_000);
+  assert.ok(output.latest().x <= 0.120_001);
+
+  let previous = output.latest().x;
+  for (let time = 5_016; time <= 6_016; time += 16) {
+    animation.update(time);
+    assert.ok(output.latest().x - previous <= 1.2 * 0.016 + 1e-9);
+    previous = output.latest().x;
+  }
+  assert.ok(output.latest().x < 1.4);
 });
 
 test("extrapolation is velocity based, capped, and then holds the last projected point", () => {
@@ -85,7 +112,7 @@ test("extrapolation is velocity based, capped, and then holds the last projected
   assert.equal(output.latest().x, 1.5);
 });
 
-test("REGION_CENTER snaps to its exact centre, ignores repeats, and never extrapolates", () => {
+test("REGION_CENTER eases toward its exact centre, ignores repeats, and never extrapolates", () => {
   const animation = controller({
     interpolationDelayMs: 0,
     regionTransitionDurationMs: 500,
@@ -99,14 +126,14 @@ test("REGION_CENTER snaps to its exact centre, ignores repeats, and never extrap
     positionSource: "REGION_CENTER", regionId: "room-a",
   });
   animation.update(2_250);
-  assert.equal(output.latest().x, 10);
+  assert.equal(output.latest().x, 5);
 
   animation.ingest("TAG-1", {
     x: 10, y: 0, timestamp: 2_250, receivedAt: 2_250,
     positionSource: "REGION_CENTER", regionId: "room-a",
   });
   animation.update(2_375);
-  assert.equal(output.latest().x, 10);
+  assert.equal(output.latest().x, 7.5);
   animation.update(2_500);
   assert.equal(output.latest().x, 10);
   animation.update(5_000);
@@ -123,7 +150,7 @@ test("RAW after REGION_CENTER changes without a wall-crossing route, then resume
   animation.attach("TAG-1", output.renderer);
   animation.ingest("TAG-1", { x: 6, y: 5, timestamp: 2_000, receivedAt: 2_000, positionSource: "RAW" });
   animation.update(2_250);
-  assert.equal(output.latest().x, 6);
+  assert.equal(output.latest().x, 5.5);
   animation.update(2_500);
   assert.equal(output.latest().x, 6);
 

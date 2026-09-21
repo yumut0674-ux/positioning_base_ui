@@ -23,7 +23,7 @@ test("normal movement is smoothed while larger real movement catches up faster",
   const fast = filter.next(slow, p(2, 0), 3_000);
 
   assert.ok(slow.x > 0.15 && slow.x < 0.3);
-  assert.ok(fast.x > 1.2 && fast.x < 1.5);
+  assert.ok(fast.x > 0.8 && fast.x < 1.1);
   assert.equal(slow.y, 0);
   assert.equal(fast.y, 0);
 });
@@ -47,7 +47,7 @@ test("two nearby fast measurements confirm real relocation without snapping", ()
   const confirmed = filter.next(held, p(5.4, 0.2), 1_200);
 
   assert.deepEqual(held, p(0, 0));
-  assert.ok(confirmed.x > 3 && confirmed.x < 5.4);
+  assert.ok(confirmed.x > 2 && confirmed.x < 3);
   assert.ok(confirmed.y > 0 && confirmed.y < 0.2);
 });
 
@@ -57,5 +57,5 @@ test("long measurement gaps are accepted as unknown movement, not rejected as sp
 
   const result = filter.next(p(0, 0), p(5, 0), 4_000);
 
-  assert.ok(result.x > 3 && result.x < 5);
+  assert.ok(result.x > 2 && result.x < 3);
 });
