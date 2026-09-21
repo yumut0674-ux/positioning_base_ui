@@ -394,12 +394,26 @@ test("scenario G: a room-specific manual threshold change takes effect only afte
 test("scenario I: one impossible-speed packet is rejected without clearing a confirmed silent room", () => {
   const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
   s.point(0,3,3);s.point(1000,3,3);const confirmed=s.point(2000,3,3)!;
-  const count=s.engine.getVehicleState("T")!.insideConfirmationCount;
+  const before=s.engine.getVehicleState("T")!;const count=before.insideConfirmationCount;const evidenceCount=before.history.length;
   const anomaly=s.point(2100,100,100)!;const state=s.engine.getVehicleState("T")!;
   assert.equal(confirmed.regionInference.state,"IN_REGION");assert.equal(anomaly.regionInference.state,"INFERRED_IN_REGION");
   assert.equal(anomaly.regionInference.regionId,"A");assert.equal(state.activeRegionId,"A");
-  assert.equal(state.insideConfirmationCount,count);assert.equal(state.history.at(-1)!.weight,0);
+  assert.equal(state.insideConfirmationCount,count);assert.equal(state.history.length,evidenceCount);
+  assert.equal(anomaly.rawPosition?.timestamp,confirmed.rawPosition?.timestamp);assert.equal(anomaly.lastRawDataTimestamp,confirmed.lastRawDataTimestamp);
   assert.match(anomaly.regionInference.reasons!.join(),/Hız sınırını aşan ölçüm/);
+  const recovered=s.point(2200,3,3)!;
+  assert.equal(recovered.regionInference.state,"IN_REGION");assert.equal(recovered.rawPosition?.timestamp,new Date(epoch+2200).toISOString());
+});
+
+test("a rejected low-quality packet does not postpone the accepted sample stale deadline", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
+  s.point(0,3,3);s.point(1000,3,3);const confirmed=s.point(2000,3,3)!;
+  const rejected=s.point(9000,3,3,"T",0)!;
+  assert.equal(rejected.rawPosition?.timestamp,confirmed.rawPosition?.timestamp);
+  assert.equal(rejected.lastRawDataTimestamp,confirmed.lastRawDataTimestamp);
+  const stale=s.tick(10001);
+  assert.equal(stale.regionInference.state,"INFERRED_IN_REGION");assert.equal(stale.regionInference.regionId,"A");
+  assert.equal(stale.lastRawDataTimestamp,confirmed.lastRawDataTimestamp);
 });
 
 test("scenario J: required-door regular and intermittent rooms retain their existing entry policy", () => {
@@ -411,4 +425,64 @@ test("scenario J: required-door regular and intermittent rooms retain their exis
     assert.equal(result!.regionInference.state,"ENTRY_CANDIDATE");assert.equal(result!.regionInference.regionId,null);
     assert.match(result!.regionInference.reasons!.join(),/Zorunlu kapı girişi gözlenmedi/);
   }
+});
+
+test("decision trace explains silent-door inference and far-corridor loss without changing the decision", () => {
+  const near=setup();near.engine.reload(compileRegionsConfig(silentProximityConfig(near.config)));
+  const measured=near.point(0,3,-1)!;const inferred=near.tick(8000);
+  assert.equal(measured.decisionTrace?.eventType,"MEASUREMENT_ACCEPTED");
+  assert.equal(inferred.regionInference.regionId,"A");assert.equal(inferred.decisionTrace?.eventType,"ROOM_INFERRED");
+  assert.equal(inferred.decisionTrace?.previousState,"TRACKING_OUTSIDE");
+  assert.equal(inferred.decisionTrace?.evidence?.doorId,"door-0");assert.equal(inferred.decisionTrace?.evidence?.doorDistanceMeters,1);
+  assert.equal(inferred.decisionTrace?.evidence?.allowedDoorDistanceMeters,1.5);assert.equal(inferred.decisionTrace?.input.signalGapMs,8000);
+  assert.equal(inferred.decisionTrace?.evidence?.lastReliableLocation?.x,3);
+  assert.ok(inferred.decisionTrace?.reasons.some(reason=>reason.code==="SIGNAL_LOST_NEAR_SILENT_ROOM_DOOR"));
+
+  const far=setup();far.engine.reload(compileRegionsConfig(silentProximityConfig(far.config)));far.point(0,6,-3);const lost=far.tick(8000);
+  assert.equal(lost.decisionTrace?.eventType,"LOCATION_LOST");assert.ok(lost.decisionTrace?.reasons.some(reason=>reason.code==="NO_SUITABLE_DOOR_NEARBY"));
+  assert.equal(lost.decisionTrace?.evidence?.doorDistanceMeters,undefined);
+});
+
+test("decision trace snapshots entry evidence, required-door rejection, door crossing and exit", () => {
+  const silent=setup();silent.engine.reload(compileRegionsConfig(requiredDoorConfig(silent.config,"silent")));
+  silent.point(0,3,3);const confirmed=silent.point(1600,3,3)!;
+  assert.equal(confirmed.decisionTrace?.eventType,"ROOM_CONFIRMED");
+  assert.equal(confirmed.decisionTrace?.evidence?.collectedMeasurements,2);assert.equal(confirmed.decisionTrace?.evidence?.requiredMeasurements,2);
+  assert.equal(confirmed.decisionTrace?.evidence?.collectedDurationMs,1600);assert.equal(confirmed.decisionTrace?.evidence?.requiredDurationMs,1500);
+  assert.ok((confirmed.decisionTrace?.evidence?.score?.total??0)>0);assert.ok(confirmed.decisionTrace?.reasons.some(reason=>reason.code==="CONTINUOUS_INSIDE_EVIDENCE_CONFIRMED"));
+
+  const required=setup();required.engine.reload(compileRegionsConfig(requiredDoorConfig(required.config,"regular")));
+  let pending:ProcessedPosition|undefined;for(let t=0;t<=6000;t+=1000)pending=required.point(t,3,3);
+  assert.equal(pending!.decisionTrace?.eventType,"ENTRY_CANDIDATE");assert.ok(pending!.decisionTrace?.reasons.some(reason=>reason.code==="REQUIRED_DOOR_EVIDENCE_MISSING"));
+  assert.ok((pending!.decisionTrace?.evidence?.collectedMeasurements??0)>0);
+
+  const crossing=setup();crossing.point(0,3,-.5);const crossed=crossing.point(1000,3,.6)!;
+  assert.equal(crossed.decisionTrace?.evidence?.doorId,"door-0");assert.equal(crossed.decisionTrace?.eventType,"ENTRY_CANDIDATE");
+
+  const exiting=setup();exiting.enter();exiting.point(3000,3,1);exiting.point(4000,3,.4);exiting.point(5000,3,-.4);
+  const exitCandidate=exiting.point(6000,3,-1)!;const exited=exiting.point(7000,4,-1)!;
+  assert.equal(exitCandidate.decisionTrace?.eventType,"EXIT_CANDIDATE");assert.equal(exited.decisionTrace?.eventType,"ROOM_EXITED");
+});
+
+test("decision trace classifies rejected measurements, long loss and config reload", () => {
+  const speed=setup();speed.enter();const speedRejected=speed.point(2100,100,100)!;
+  assert.equal(speedRejected.decisionTrace?.eventType,"MEASUREMENT_REJECTED");assert.equal(speedRejected.decisionTrace?.previousState,"IN_REGION");
+  assert.ok(speedRejected.decisionTrace?.reasons.some(reason=>reason.code==="MEASUREMENT_REJECTED_BY_SPEED"));
+
+  const quality=setup();quality.enter();const qualityRejected=quality.point(3000,3,3,"T",0)!;
+  assert.ok(qualityRejected.decisionTrace?.reasons.some(reason=>reason.code==="MEASUREMENT_REJECTED_BY_QUALITY"));
+
+  const stale=setup();stale.enter();stale.tick(30000);stale.engine.ingest({tagCode:"T",x:3,y:3,timestamp:new Date(epoch+3000).toISOString()});
+  assert.ok(stale.published.at(-1)!.decisionTrace?.reasons.some(reason=>reason.code==="MEASUREMENT_REJECTED_AS_STALE"));
+  const lost=stale.tick(40000);assert.equal(lost.decisionTrace?.eventType,"LOCATION_LOST");assert.ok(lost.decisionTrace?.reasons.some(reason=>reason.code==="LONG_SIGNAL_LOSS"));
+
+  const reloaded=setup();reloaded.point(0,3,3);reloaded.engine.reload(compileRegionsConfig(reloaded.config));
+  assert.equal(reloaded.published.at(-1)!.decisionTrace?.eventType,"CONFIG_RELOADED");assert.equal(reloaded.published.at(-1)!.decisionTrace?.trigger,"config_reload");
+});
+
+test("decision trace is an additive output and the established processed-position contract stays intact", () => {
+  const s=setup();const position=s.point(0,3,-1)!;const {decisionTrace,...legacy}=position;
+  assert.ok(decisionTrace);assert.deepEqual({tagCode:legacy.tagCode,x:legacy.x,y:legacy.y,timestamp:legacy.timestamp,mapId:legacy.mapId,positionSource:legacy.positionSource,state:legacy.regionInference.state,regionId:legacy.regionInference.regionId,candidateRegionId:legacy.regionInference.candidateRegionId,measurementKind:legacy.regionInference.measurementKind,confidence:legacy.regionInference.confidence,reasons:legacy.regionInference.reasons},
+    {tagCode:"T",x:3,y:-1,timestamp:new Date(epoch).toISOString(),mapId:"map-a",positionSource:"RAW",state:"TRACKING_OUTSIDE",regionId:null,candidateRegionId:null,measurementKind:"measured",confidence:0,reasons:["Ölçülen koridor konumu; oda giriş kanıtı yok"]});
+  assert.ok(!("decisionTrace" in legacy));
 });

@@ -384,12 +384,12 @@
       "polygon": [
         {
           "pixel": {
-            "x": 582,
-            "y": 1216
+            "x": 433.51,
+            "y": 1211.45
           },
           "world": {
-            "x": -2.026329,
-            "y": 4.570509
+            "x": -3.334,
+            "y": 4.611
           }
         },
         {
@@ -404,22 +404,22 @@
         },
         {
           "pixel": {
-            "x": 812.16,
-            "y": 1735.14
+            "x": 809.13,
+            "y": 1742.72
           },
           "world": {
-            "x": 0,
-            "y": 0
+            "x": -0.027,
+            "y": -0.067
           }
         },
         {
           "pixel": {
-            "x": 582,
-            "y": 1735.14
+            "x": 445.95,
+            "y": 1880.09
           },
           "world": {
-            "x": -2.026329,
-            "y": 0
+            "x": -3.224,
+            "y": -1.276
           }
         }
       ],
@@ -696,7 +696,7 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.5
+        "silentEntryMaxDistanceMeters": 2
       },
       "entrances": [
         {

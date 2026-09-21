@@ -5,7 +5,7 @@ import { BarChart3, Boxes, Building2, Crosshair, Headset, Hexagon, Map, RadioTow
 
 const SIDEBAR_COLLAPSED_STORAGE_KEY = "ips-sidebar-collapsed";
 
-export type WorkspaceView = "map" | "tags" | "anchors" | "regions" | "history" | "support";
+export type WorkspaceView = "map" | "tags" | "anchors" | "regions" | "history" | "support" | "analyses";
 
 const NAVIGATION: ReadonlyArray<{ readonly label: string; readonly view: WorkspaceView; readonly icon: typeof Map }> = [
   { label: "Canlı Harita", view: "map", icon: Map },
@@ -16,7 +16,7 @@ const NAVIGATION: ReadonlyArray<{ readonly label: string; readonly view: Workspa
   { label: "Destek ve İletişim", view: "support", icon: Headset },
 ];
 
-const REVIEW_NAVIGATION = [{ label: "Analizler", icon: BarChart3 }];
+const REVIEW_NAVIGATION: ReadonlyArray<{ readonly label: string; readonly view: WorkspaceView; readonly icon: typeof Map }> = [{ label: "Analizler", view: "analyses", icon: BarChart3 }];
 
 interface AppSidebarProps {
   readonly activeView: WorkspaceView;
@@ -62,7 +62,7 @@ export function AppSidebar({ activeView, collapsed, mobileOpen, onMobileClose, o
         <small>YÖNET</small>
         {NAVIGATION.slice(1).map(({ label, view, icon: Icon }) => <button key={view} className={activeView === view ? "active" : ""} onClick={() => onViewChange(view)} aria-label={label} title={label}><Icon size={17} /><span>{label}</span></button>)}
         <small>İNCELE</small>
-        {REVIEW_NAVIGATION.map(({ label, icon: Icon }) => <button key={label} aria-label={label} title={label}><Icon size={17} /><span>{label}</span></button>)}
+        {REVIEW_NAVIGATION.map(({ label, view, icon: Icon }) => <button key={view} className={activeView === view ? "active" : ""} onClick={() => onViewChange(view)} aria-label={label} title={label}><Icon size={17} /><span>{label}</span></button>)}
       </nav>
       <div className="sidebar-footer">
         <button><Building2 size={17} /><span>Saha ayarları</span></button>

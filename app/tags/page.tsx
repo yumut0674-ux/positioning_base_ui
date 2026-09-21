@@ -1,12 +1,18 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { Boxes, CheckCircle2, Loader2, Pencil, Plus, Search, ShieldCheck, Trash2, TriangleAlert, X } from "lucide-react";
-import { FormEvent, useMemo, useState } from "react";
+import { Boxes, CheckCircle2, Loader2, Pencil, Plus, Route, Search, ShieldCheck, Trash2, TriangleAlert, X } from "lucide-react";
+import { FormEvent, useId, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { deleteTag, saveTag, type TagDefinition } from "@/src/features/tracking/services/tagApi";
 import { useRealtimeTracking } from "@/src/features/tracking/hooks/useRealtimeTracking";
+import { useTagTrailSettingsStorage } from "@/src/features/tracking/hooks/useTagTrailSettingsStorage";
+import {
+  TAG_TRAIL_DURATION_STEP_MS,
+  TAG_TRAIL_MAX_DURATION_MS,
+  TAG_TRAIL_MIN_DURATION_MS,
+} from "@/src/features/tracking/services/tagTrailSettings";
 import styles from "../anchors/anchors.module.css";
 
 const EMPTY_TAG: TagDefinition = { id: "", displayName: "", status: "active" };
@@ -16,6 +22,42 @@ const LIVE_STATUS_OPTIONS = ["active", "offline"];
 function statusLabel(status: string) { return status === "active" ? "Aktif" : "Pasif"; }
 function statusClass(status: string) { return status === "active" ? "good" : "offline"; }
 function Status({ status }: { readonly status: string }) { return <span className={`${styles.status} ${styles[statusClass(status)]}`}><i />{statusLabel(status)}</span>; }
+
+function TagTrailSettingsCard() {
+  const titleId = useId();
+  const settings = useIpsStore((state) => state.tagTrailSettings);
+  const setEnabled = useIpsStore((state) => state.setTagTrailEnabled);
+  const setDuration = useIpsStore((state) => state.setTagTrailDuration);
+  const durationSeconds = settings.durationMs / 1_000;
+
+  return <section className={styles.trailSettings} aria-labelledby={titleId}>
+    <span className={styles.trailSettingsIcon}><Route size={20} /></span>
+    <div className={styles.trailSettingsCopy}><small>CANLI HARİTA AYARI</small><strong id={titleId}>Tag hareket kuyruğu</strong><p>Canlı haritadaki tüm görünür tagların son hareketlerini gösterir.</p></div>
+    <div className={styles.trailSettingsControls}>
+      <button
+        type="button"
+        className={`${styles.trailSwitch} ${settings.enabled ? styles.trailSwitchActive : ""}`}
+        role="switch"
+        aria-checked={settings.enabled}
+        aria-label="Tag hareket kuyruğunu aç veya kapat"
+        onClick={() => setEnabled(!settings.enabled)}
+      ><span />{settings.enabled ? "Açık" : "Kapalı"}</button>
+      <label className={!settings.enabled ? styles.trailDurationDisabled : ""}>
+        <span>Kuyruk süresi <output>{durationSeconds} saniye</output></span>
+        <input
+          type="range"
+          min={TAG_TRAIL_MIN_DURATION_MS}
+          max={TAG_TRAIL_MAX_DURATION_MS}
+          step={TAG_TRAIL_DURATION_STEP_MS}
+          value={settings.durationMs}
+          disabled={!settings.enabled}
+          aria-label="Tag hareket kuyruğu süresi"
+          onChange={(event) => setDuration(Number(event.target.value))}
+        />
+      </label>
+    </div>
+  </section>;
+}
 
 export function TagManagementPanel({ embedded = false }: { readonly embedded?: boolean }) {
   const tagDefinitions = useIpsStore((state) => state.tagDefinitions);
@@ -81,6 +123,8 @@ export function TagManagementPanel({ embedded = false }: { readonly embedded?: b
         <div className={styles.metric}><span className={styles.metricIcon}><ShieldCheck size={19} /></span><div><small>KAYITSIZ</small><strong>{unknownTags.length}</strong><em>Yalnızca canlı akışta</em></div></div>
       </section>
 
+      <TagTrailSettingsCard />
+
       <section className={styles.tableCard}>
         <div className={styles.toolbar}><div className={styles.search}><Search size={17} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Takip etiketi kodu veya görünen isim ara…" aria-label="Takip etiketi ara" /></div><label className={styles.filter}><span>Canlı durum</span><select value={filter} onChange={(event) => setFilter(event.target.value)}><option value="all">Tümü</option>{LIVE_STATUS_OPTIONS.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label></div>
         {error && <div className={styles.error}><TriangleAlert size={16} /> {error}</div>}
@@ -100,5 +144,6 @@ export function TagManagementPanel({ embedded = false }: { readonly embedded?: b
 
 export default function TagsPage() {
   useRealtimeTracking();
+  useTagTrailSettingsStorage();
   return <TagManagementPanel />;
 }

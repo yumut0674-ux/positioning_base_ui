@@ -21,6 +21,8 @@ import { GekonAiWidget, type GekonAiContext } from "@/src/features/assistant/com
 import { resolveLocation } from "@/src/features/map/services/LocationResolverService";
 import { fetchMapCatalog, fetchMapDetails } from "@/src/features/map/services/mapApi";
 import { isSelectableMap, persistActiveMapId, readStoredMapId, resolveInitialMapId, shouldShowLiveTracking } from "@/src/features/map/services/mapSelection";
+import { useTagTrailSettingsStorage } from "@/src/features/tracking/hooks/useTagTrailSettingsStorage";
+import { DecisionLogsPanel } from "@/src/features/decisionLogs/components/DecisionLogsPanel";
 
 const RouteHistoryPanel = dynamic(
   () => import("@/src/features/history/components/RouteHistoryPanel").then((module) => module.RouteHistoryPanel),
@@ -63,6 +65,7 @@ function LiveMapWorkspace({
 }: LiveMapWorkspaceProps) {
   const { collapsed: sidebarCollapsed, toggleCollapsed: toggleSidebar } = useSidebarCollapse();
   const positionAnimation = useRealtimeTracking();
+  useTagTrailSettingsStorage();
   const showLayersPanel = useIpsStore((state) => state.showLayersPanel);
   const toggleLayersPanel = useIpsStore((state) => state.toggleLayersPanel);
   const measurementEnabled = useIpsStore((state) => state.measurement.enabled);
@@ -210,7 +213,7 @@ function LiveMapWorkspace({
       {mobileMenuOpen && <button type="button" className="mobile-sidebar-backdrop" aria-label="Menüyü kapat" onClick={() => setMobileMenuOpen(false)} />}
       <AppSidebar activeView={activeView} collapsed={sidebarCollapsed} mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} onViewChange={handleSidebarViewChange} />
       <main className="workspace">
-        {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : activeView === "history" ? null : <>
+        {activeView === "anchors" ? <AnchorManagementPanel embedded /> : activeView === "tags" ? <TagManagementPanel embedded /> : activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : activeView === "analyses" ? <DecisionLogsPanel /> : activeView === "history" ? null : <>
           <div className="workspace-heading live-map-heading">
             <div className="workspace-heading-content">
               <span>{liveTrackingVisible ? "CANLI OPERASYONLAR" : "HARİTA GÖRÜNÜMÜ"} / {(activeMap?.floorLabel ?? "HARİTA").toUpperCase()}</span>

@@ -108,8 +108,23 @@ test("runtime controller installs only RegionPositionEngine and exposes the acti
   try {
     assert.ok(internal.engines.get("simulation-reference")!.engine instanceof RegionPositionEngine);
     assert.equal(controller.status().engineVersion,ROOM_ENGINE_VERSION);
+    assert.equal(controller.status().maps?.["simulation-reference"]?.engineVersion,ROOM_ENGINE_VERSION);
     assert.equal(trackingBuffer.listenerCount("position"),1);
   } finally {internal.engines.get("simulation-reference")!.engine.disable();}
+});
+
+test("hot reload retires a stale global controller and retains exactly one tracking listener", async () => {
+  const stale=globalThis.__uwbRegionEngineControllerRegistration!;
+  globalThis.__uwbRegionEngineControllerRegistration={...stale,version:"room-evidence-4"};
+  const hotModule=await import(`${new URL("../src/server/regionEngine/controller.ts",import.meta.url).href}?hot-reload=${Date.now()}`);
+  const current=globalThis.__uwbRegionEngineControllerRegistration!;
+  assert.notEqual(current.controller,stale.controller);
+  assert.equal(stale.controller.isDisposed(),true);
+  assert.equal(current.version,ROOM_ENGINE_VERSION);
+  assert.equal(current.controller.status().engineVersion,ROOM_ENGINE_VERSION);
+  assert.equal(trackingBuffer.listenerCount("position"),1);
+  assert.equal(hotModule.installGlobalRegionEngineController(),current.controller);
+  assert.equal(trackingBuffer.listenerCount("position"),1);
 });
 
 test("controller reload applies a UI-compiled config to the existing map engine without installing a parallel engine", () => {

@@ -9,6 +9,65 @@ export type VehicleRegionState =
   | "EXIT_CANDIDATE"
   | "LOCATION_LOST";
 
+export type DecisionEventType =
+  | "MEASUREMENT_ACCEPTED"
+  | "MEASUREMENT_REJECTED"
+  | "ENTRY_CANDIDATE"
+  | "ROOM_CONFIRMED"
+  | "ROOM_INFERRED"
+  | "EXIT_CANDIDATE"
+  | "ROOM_EXITED"
+  | "LOCATION_LOST"
+  | "CONFIG_RELOADED";
+
+export type DecisionSeverity = "info" | "warning" | "error";
+
+export interface DecisionTraceReason {
+  readonly code: string;
+  readonly message: string;
+}
+
+export interface DecisionTrace {
+  readonly eventType: DecisionEventType;
+  readonly severity: DecisionSeverity;
+  readonly previousState?: VehicleRegionState;
+  readonly nextState: VehicleRegionState;
+  readonly trigger: "measurement" | "timer" | "config_reload";
+  readonly input: {
+    readonly measuredAt: string;
+    readonly receivedAt?: string;
+    readonly x: number;
+    readonly y: number;
+    readonly quality?: number;
+    readonly signalGapMs?: number;
+  };
+  readonly evidence?: {
+    readonly doorId?: string;
+    readonly doorDistanceMeters?: number;
+    readonly allowedDoorDistanceMeters?: number;
+    readonly collectedMeasurements?: number;
+    readonly requiredMeasurements?: number;
+    readonly collectedDurationMs?: number;
+    readonly requiredDurationMs?: number;
+    readonly lastReliableLocation?: {
+      readonly x: number;
+      readonly y: number;
+      readonly measuredAt: string;
+      readonly kind?: "room" | "corridor";
+      readonly regionId?: string;
+    };
+    readonly score?: EvidenceScoreComponents;
+  };
+  readonly outcome: {
+    readonly regionId?: string;
+    readonly regionName?: string;
+    readonly candidateRegionId?: string;
+    readonly confidence?: number;
+    readonly measurementKind?: "measured" | "estimated" | "uncertain";
+  };
+  readonly reasons: readonly DecisionTraceReason[];
+}
+
 export type RegionEngineRules = ResolvedRoomSettings & { readonly maxTags: number; readonly historySize: number };
 
 export interface CompiledDoor {
@@ -53,6 +112,7 @@ export interface ProcessedPosition extends TrackingPosition {
   readonly engineVersion?: string;
   readonly configVersion?: string;
   readonly synthetic?: boolean;
+  readonly decisionTrace?: DecisionTrace;
   readonly positionSource: "RAW" | "REGION_CENTER";
   readonly regionInference: {
     readonly enabled: true;
@@ -108,6 +168,7 @@ export interface RegionEngineStatus {
     readonly activeVehicleCount: number;
     readonly vehiclesInRegions: number;
     readonly configLoaded: boolean;
+    readonly engineVersion: string;
     readonly configVersion?: string;
     readonly warnings?: readonly string[];
   }>>;

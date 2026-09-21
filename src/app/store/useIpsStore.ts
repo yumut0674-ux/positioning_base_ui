@@ -7,6 +7,12 @@ import type { RegionsConfig } from "@/src/features/regions/types/region.types";
 import { addRecentTagId, nextTagLocationEntry, type TagLocationEntry } from "@/src/features/tracking/services/tagPanelState";
 import { MAP_TAG_FOCUS_SCALE } from "@/src/features/map/config/mapConfig";
 import type { MapTagDisplay } from "@/src/features/tracking/services/MapDisplayFilter";
+import {
+  DEFAULT_TAG_TRAIL_SETTINGS,
+  normalizeTagTrailDuration,
+  resolveTagTrailSettings,
+  type TagTrailSettings,
+} from "@/src/features/tracking/services/tagTrailSettings";
 
 function boundedRecord<T>(record: Record<string,T>): Record<string,T> {
   const keys=Object.keys(record);
@@ -43,6 +49,7 @@ interface IpsState {
   readonly mapFocusScale: number | null;
   readonly mapFitRequest: number;
   readonly mapTransitionNotice: string | null;
+  readonly tagTrailSettings: TagTrailSettings;
   setActiveMapId: (mapId: string) => void;
   markMapReady: (mapId: string) => void;
   selectTagOnMap: (tagId: string, mapId: string) => void;
@@ -63,6 +70,9 @@ interface IpsState {
   cancelMeasurement: () => void;
   requestMapFocus: () => void;
   requestMapFit: () => void;
+  hydrateTagTrailSettings: (settings: unknown) => void;
+  setTagTrailEnabled: (enabled: boolean) => void;
+  setTagTrailDuration: (durationMs: number) => void;
 }
 
 export const useIpsStore = create<IpsState>((set) => ({
@@ -98,6 +108,7 @@ export const useIpsStore = create<IpsState>((set) => ({
   mapFocusScale: null,
   mapFitRequest: 0,
   mapTransitionNotice: null,
+  tagTrailSettings: DEFAULT_TAG_TRAIL_SETTINGS,
   setActiveMapId: (activeMapId) => set((state) => state.activeMapId === activeMapId
     ? state
     : { activeMapId, regionsConfig: state.regionsConfigByMapId[activeMapId] ?? null, readyMapId: null, pendingTagFocusId: null, mapFocusScale: null, mapTagDisplays: {}, mapTransitionNotice: null }),
@@ -191,4 +202,11 @@ export const useIpsStore = create<IpsState>((set) => ({
   cancelMeasurement: () => set({ measurement: { enabled: false, start: null, end: null } }),
   requestMapFocus: () => set((state) => ({ mapFocusRequest: state.mapFocusRequest + 1, mapFocusScale: null })),
   requestMapFit: () => set((state) => ({ mapFitRequest: state.mapFitRequest + 1 })),
+  hydrateTagTrailSettings: (settings) => set({ tagTrailSettings: resolveTagTrailSettings(settings) }),
+  setTagTrailEnabled: (enabled) => set((state) => ({
+    tagTrailSettings: { ...state.tagTrailSettings, enabled },
+  })),
+  setTagTrailDuration: (durationMs) => set((state) => ({
+    tagTrailSettings: { ...state.tagTrailSettings, durationMs: normalizeTagTrailDuration(durationMs) },
+  })),
 }));

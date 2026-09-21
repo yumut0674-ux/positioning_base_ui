@@ -50,6 +50,7 @@ test("selected tracking-label panel presents a defined region instead of X/Y coo
   assert.match(html, /Takip Etiketleri/);
   assert.match(html, /Son görüntülenenler/i);
   assert.match(html, /Bu alanda 18 dk 42 sn/);
+  assert.doesNotMatch(html, /Hareket kuyruğu|Kuyruk süresi/);
   assert.doesNotMatch(html, /X KONUMU|Y KONUMU|metre/);
   assert.doesNotMatch(html, /Son hareketlilik|SON 30 SN|Son hareket sinyali/);
 });
@@ -85,5 +86,6 @@ test("mobile tracking-label panel includes the map reveal action without technic
 
   assert.match(html, /Haritada göster/);
   assert.match(html, /Rota geçmişini aç/);
+  assert.doesNotMatch(html, /Tag hareket kuyruğunu aç veya kapat/);
   assert.doesNotMatch(html, /X KONUMU|Y KONUMU|metre/);
 });

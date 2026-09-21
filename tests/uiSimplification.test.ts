@@ -30,12 +30,18 @@ test("sidebar uses explicit views without the alarms entry or badge", () => {
   assert.match(html, /Referans İstasyonları/);
   assert.match(html, /aria-label="Canlı Harita"/);
   assert.match(html, /aria-label="Oda\/Bölge"/);
+  assert.match(html, /aria-label="Analizler"/);
+});
+
+test("existing analyses navigation opens through the active workspace style",()=>{
+  let selected="";const html=renderToStaticMarkup(createElement(AppSidebar,{activeView:"analyses",collapsed:false,mobileOpen:false,onMobileClose:()=>{},onViewChange:view=>{selected=view;}}));
+  assert.match(html,/class="active"[^>]*aria-label="Analizler"/);assert.equal(selected,"");
 });
 
 test("status strip keeps tracking-label count, FPS, and clock only", () => {
   const html = renderToStaticMarkup(createElement(StatusStrip));
 
-  assert.match(html, /TAKİP ETİKETİ AKIŞTA/);
+  assert.match(html, /AKTİF KATTA \/ .*AKIŞTA/);
   assert.match(html, /GÖRÜNTÜLEME/);
   assert.match(html, /UTC\+3/);
   assert.doesNotMatch(html, /SİMÜLASYON BAĞLANTISI|24 ms gecikme|SON EŞİTLEME|ŞİMDİ/);
