@@ -156,6 +156,8 @@ export interface SilentDoorProximityCandidate {
 export interface RegionEngineStatus {
   readonly enabled: boolean;
   readonly engineVersion?: string;
+  readonly controllerRevision?: string;
+  readonly regionEngineListenerCount?: number;
   readonly rawPort: number;
   readonly processedPort: number;
   readonly activeVehicleCount: number;

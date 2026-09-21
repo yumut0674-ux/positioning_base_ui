@@ -128,7 +128,7 @@ Kararda şunlar değerlendirilir:
 
 Varsayılan giriş için **en az iki güçlü ölçüm ve bu ölçümler arasında en az 1.500 ms** gerekir. Bir saniyede bir ölçüm gelen örnekte 0., 1. ve 2. saniyedeki üç ölçümle koşul sağlanabilir. Bu yüzden “iki paket geldi, oda kesinleşti” kuralı doğru değildir. Gecikme, duvar yakınlığı veya kayıp paketler süreyi uzatabilir.
 
-İlk kez bir odanın içinde görülen tag, kapı geçmişi olmadan da tutarlı iç ölçümlerle doğrulanabilir. Kapı yokken de oda tespiti bu yolla çalışır. Ancak atanmış odadan normal çıkışı hızla doğrulamak için kapı geometrisi önemlidir; kapı gözlenmezse önceki oda korunabilir ve yeniden konumlanma gecikebilir.
+İlk kez bir odanın içinde görülen tag, kapı geçmişi olmadan da tutarlı iç ölçümlerle doğrulanabilir. Kapı yokken de oda tespiti bu yolla çalışır. Silent odalarda hız/gecikme/kalite filtrelerinden geçmiş, koridor poligonu içinde ve oda duvarından `exitMarginMeters` kadar uzaktaki sürekli ölçümler çıkışı kapı geçişi olmadan doğrular. Kapı geçişi yalnız ek skor kanıtıdır. Regular/intermittent odaların required/preferred politikaları değişmez.
 
 Üst üste gelen oda çokgenleri de sorun yaratır: Nokta birden fazla odaya düşerse tek bir oda adayı seçilmez. Bu nedenle komşu oda sınırlarını gereksiz yere örtüştürmeyin.
 
@@ -245,7 +245,7 @@ Oda bazındaki **Beklenen ölçüm aralığı**, **Duvar bandı**, **Ortak duvar
 
 Dar odada duvar bandı çok büyükse güvenilir iç alan kalmayabilir. Eşikleri küçültmek tespiti hızlandırabilir ancak duvar yakınındaki yanlış oda kararlarını artırabilir. Varsayılan süreler ve mesafeler gerçek sahada doğrulanmış garantiler değildir.
 
-**Sürüm notu:** Eski belgelerdeki `inference / shadow / legacy` seçimi mevcut panelde bulunmuyor. Güncel denetleyici `RegionPositionEngine` kullanıyor; kayıt API'si eski `engine.mode` alanını çıkarıyor. Ayrıca `exitMarginMeters` mevcut JSON'da bulunsa da güncel kanıt motorunda çıkış kararına uygulanmıyor. Bu alanı değiştirerek mevcut motorun çıkış davranışını ayarlamayı beklemeyin.
+**Sürüm notu:** Eski belgelerdeki `inference / shadow / legacy` seçimi mevcut panelde bulunmuyor. Güncel denetleyici yalnız `RegionPositionEngine` kullanıyor; kayıt API'si eski `engine.mode` alanını çıkarıyor. `exitMarginMeters`, silent oda çıkışında güvenilir koridor kanıtının oda duvarından bulunması gereken asgari uzaklıktır.
 
 ## 10. Bu projede şu anda neler tanımlı?
 

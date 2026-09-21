@@ -10,7 +10,7 @@ Durumlar: `TRACKING_OUTSIDE`, `ENTRY_CANDIDATE`, `IN_REGION`, `INFERRED_IN_REGIO
 
 Kapıya paralel hareket/kesinti veya yalnızca yaklaşma giriş sayılmaz. Yönlü kapı geçişi ile güvenilir iç ölçümden sonra kesinti tahmini oda üretebilir. Kesinti güveni artırmaz. Doğrulanmış oda kesintide tahmine, daha sonra belirsizliğe geçer. Genel akış durması kendi başına giriş kanıtı değildir.
 
-Komşu oda sıçraması kapı çıkışı olmadan kısa süre içinde atamayı değiştirmez. Kapı çıkışı ve dış ölçüm sürekliliği oda kilidini kaldırır. Uzun aradan sonra güçlü iç ölçümler daha uzun kanıt süresiyle yeniden konumlandırır. Sürekli çelişkili ölçümlerde de destek süresi aşılınca belirsizliğe ve yeniden konumlanmaya izin verilir. İlk kez odada görülen tag için kapı geçmişi zorunlu değildir.
+Komşu oda sıçraması kapı çıkışı olmadan kısa süre içinde atamayı değiştirmez. Silent odalarda güvenilir ve kesintisiz koridor ölçümleri, sayı/süre/çıkış payı koşullarıyla kapı geçişi olmadan oda kilidini kaldırır; kapı yalnız ek kanıttır. Regular/intermittent odaların required/preferred kapı politikaları korunur. Uzun aradan sonra güçlü iç ölçümler daha uzun kanıt süresiyle yeniden konumlandırır. Sürekli çelişkili ölçümlerde de destek süresi aşılınca belirsizliğe ve yeniden konumlanmaya izin verilir. İlk kez odada görülen tag için kapı geçmişi zorunlu değildir.
 
 ## Veri sözleşmesi ve kalıcılık
 

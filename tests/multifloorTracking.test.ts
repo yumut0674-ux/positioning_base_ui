@@ -3,7 +3,7 @@ import test from "node:test";
 import { useIpsStore } from "../src/app/store/useIpsStore";
 import { buildLocationTimeline, routeDistanceByMap, segmentRouteByMap } from "../src/features/map/services/RouteTimelineService";
 import { ZoneMapResolver } from "../src/server/maps/zoneMapResolver";
-import { RegionEngineController } from "../src/server/regionEngine/controller";
+import { REGION_ENGINE_CONTROLLER_REVISION, RegionEngineController } from "../src/server/regionEngine/controller";
 import type { TrackingPosition } from "../src/server/trackingBuffer";
 import { cleanRegionsConfig, getMapRegions } from "../app/api/regions/route";
 import { DEFAULT_REGIONS_CONFIG } from "../src/features/regions/config/defaultRegionsConfig";
@@ -108,6 +108,8 @@ test("runtime controller installs only RegionPositionEngine and exposes the acti
   try {
     assert.ok(internal.engines.get("simulation-reference")!.engine instanceof RegionPositionEngine);
     assert.equal(controller.status().engineVersion,ROOM_ENGINE_VERSION);
+    assert.equal(controller.status().controllerRevision,REGION_ENGINE_CONTROLLER_REVISION);
+    assert.equal(controller.status().regionEngineListenerCount,1);
     assert.equal(controller.status().maps?.["simulation-reference"]?.engineVersion,ROOM_ENGINE_VERSION);
     assert.equal(trackingBuffer.listenerCount("position"),1);
   } finally {internal.engines.get("simulation-reference")!.engine.disable();}
@@ -115,16 +117,31 @@ test("runtime controller installs only RegionPositionEngine and exposes the acti
 
 test("hot reload retires a stale global controller and retains exactly one tracking listener", async () => {
   const stale=globalThis.__uwbRegionEngineControllerRegistration!;
-  globalThis.__uwbRegionEngineControllerRegistration={...stale,version:"room-evidence-4"};
+  globalThis.__uwbRegionEngineControllerRegistration={...stale,version:ROOM_ENGINE_VERSION,revision:"stale-controller-revision"};
   const hotModule=await import(`${new URL("../src/server/regionEngine/controller.ts",import.meta.url).href}?hot-reload=${Date.now()}`);
   const current=globalThis.__uwbRegionEngineControllerRegistration!;
   assert.notEqual(current.controller,stale.controller);
   assert.equal(stale.controller.isDisposed(),true);
   assert.equal(current.version,ROOM_ENGINE_VERSION);
+  assert.equal(current.revision,REGION_ENGINE_CONTROLLER_REVISION);
   assert.equal(current.controller.status().engineVersion,ROOM_ENGINE_VERSION);
   assert.equal(trackingBuffer.listenerCount("position"),1);
   assert.equal(hotModule.installGlobalRegionEngineController(),current.controller);
   assert.equal(trackingBuffer.listenerCount("position"),1);
+});
+
+test("hot replacement restores an enabled controller only after retirement completes", async () => {
+  const stale=globalThis.__uwbRegionEngineControllerRegistration!;
+  (stale.controller as unknown as {enabled:boolean}).enabled=true;
+  globalThis.__uwbRegionEngineControllerRegistration={...stale,version:ROOM_ENGINE_VERSION,revision:"enabled-stale-revision"};
+  await import(`${new URL("../src/server/regionEngine/controller.ts",import.meta.url).href}?enabled-hot-reload=${Date.now()}`);
+  const current=globalThis.__uwbRegionEngineControllerRegistration!;
+  for(let attempt=0;attempt<100&&!current.controller.isEnabled();attempt++)await new Promise(resolve=>setTimeout(resolve,20));
+  try {
+    assert.notEqual(current.controller,stale.controller);assert.equal(stale.controller.isDisposed(),true);
+    assert.equal(current.controller.isEnabled(),true);assert.equal(current.controller.status().maps?.["spor-koridor"]?.configLoaded,true);
+    assert.equal(current.revision,REGION_ENGINE_CONTROLLER_REVISION);assert.equal(trackingBuffer.listenerCount("position"),1);
+  } finally {await current.controller.dispose();}
 });
 
 test("controller reload applies a UI-compiled config to the existing map engine without installing a parallel engine", () => {

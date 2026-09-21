@@ -34,11 +34,15 @@ function setupConfig(config: RegionsConfig) {
 function sportsCorridorConfig(): RegionsConfig {
   return JSON.parse(readFileSync(new URL("../config/maps/spor-koridor/regions.json",import.meta.url),"utf8")) as RegionsConfig;
 }
+type September21Fixture = { readonly tagCode:string; readonly mapId:string; readonly positions:readonly (readonly [string,number,number,string|null])[] };
+function september21Fixture(): September21Fixture {
+  return JSON.parse(readFileSync(new URL("./fixtures/september21SporKoridorRoute.json",import.meta.url),"utf8")) as September21Fixture;
+}
 function silentProximityConfig(base: RegionsConfig, distance = 1.5): RegionsConfig {
   return { ...base, regions: base.regions.map(region => ({ ...region, coverage: "silent" as const,
     inference: { ...region.inference, coverage: "silent" as const, silentEntryMaxDistanceMeters: distance } })) };
 }
-function requiredDoorConfig(base: RegionsConfig, coverage: "silent" | "regular", distance = 1.5): RegionsConfig {
+function requiredDoorConfig(base: RegionsConfig, coverage: "silent" | "regular" | "intermittent", distance = 1.5): RegionsConfig {
   return { ...base, regions: base.regions.map(region => ({ ...region, coverage,
     inference: { ...region.inference, coverage, silentEntryMaxDistanceMeters: coverage === "silent" ? distance : undefined,
       doorDefaults: { ...region.inference?.doorDefaults, evidenceMode: "required" as const } } })) };
@@ -425,6 +429,93 @@ test("scenario J: required-door regular and intermittent rooms retain their exis
     assert.equal(result!.regionInference.state,"ENTRY_CANDIDATE");assert.equal(result!.regionInference.regionId,null);
     assert.match(result!.regionInference.reasons!.join(),/Zorunlu kapı girişi gözlenmedi/);
   }
+});
+
+test("silent room exit needs continuous reliable corridor count and duration, not a required door", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
+  s.point(0,3,3);s.point(1000,3,3);s.point(2000,3,3);s.point(3000,3,1);
+  const first=s.point(4000,3,-.6)!;
+  assert.equal(first.regionInference.state,"EXIT_CANDIDATE");assert.equal(s.engine.getVehicleState("T")!.exitConfirmationCount,1);
+  const second=s.point(4500,3,-.8)!;
+  assert.equal(second.regionInference.state,"EXIT_CANDIDATE");assert.equal(s.engine.getVehicleState("T")!.exitConfirmationCount,2);
+  const weakWall=s.point(6000,3,-.1)!;assert.equal(weakWall.regionInference.state,"EXIT_CANDIDATE");
+  assert.equal(s.engine.getVehicleState("T")!.exitConfirmationCount,2);
+  const exited=s.point(6500,3,-1)!;
+  assert.equal(exited.regionInference.state,"TRACKING_OUTSIDE");assert.equal(exited.regionInference.regionId,null);
+  assert.equal(exited.positionSource,"RAW");assert.deepEqual([exited.x,exited.y],[3,-1]);
+  assert.match(exited.regionInference.reasons!.join(),/Sessiz odadan sürekli güvenilir koridor ölçümleriyle çıkış doğrulandı; kapı geçişi aranmadı/);
+  const state=s.engine.getVehicleState("T")!;assert.equal(state.exitConfirmationCount,0);assert.equal(state.candidateRegionId,null);
+  assert.deepEqual(state.lastReliableLocation,{kind:"corridor"});assert.equal(state.lastKnown,"A");
+});
+
+test("one corridor jump is cancelled by reliable room data and timer publications add no exit evidence", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
+  s.point(0,3,3);s.point(1000,3,3);s.point(2000,3,3);s.point(3000,3,1);s.point(4000,3,-.6);
+  const before=s.engine.getVehicleState("T")!.exitConfirmationCount;s.tick(4200);s.tick(4400);
+  assert.equal(s.engine.getVehicleState("T")!.exitConfirmationCount,before);
+  const retained=s.point(5000,3,2)!;
+  assert.equal(retained.regionInference.state,"IN_REGION");assert.equal(retained.regionInference.regionId,"A");
+  assert.equal(s.engine.getVehicleState("T")!.exitConfirmationCount,0);
+});
+
+test("silent exit evidence resets after maxEvidenceGapMs and rejected packets never increment it", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
+  s.point(0,3,3);s.point(1000,3,3);s.point(2000,3,3);s.point(3000,3,1);s.point(4000,3,-.6);
+  const rejected=s.point(4100,100,100)!;assert.match(rejected.regionInference.reasons!.join(),/Hız sınırını/);
+  assert.equal(s.engine.getVehicleState("T")!.exitConfirmationCount,1);
+  const lowQuality=s.point(4200,3,-.7,"T",.1)!;assert.match(lowQuality.regionInference.reasons!.join(),/Düşük donanım/);
+  assert.equal(s.engine.getVehicleState("T")!.exitConfirmationCount,1);
+  const restarted=s.point(8500,3,-.8)!;
+  assert.equal(restarted.regionInference.state,"EXIT_CANDIDATE");assert.equal(s.engine.getVehicleState("T")!.exitConfirmationCount,1);
+  const stillPending=s.point(9000,3,-1)!;assert.equal(stillPending.regionInference.state,"EXIT_CANDIDATE");
+});
+
+test("required-door regular and intermittent rooms still cannot exit through corridor evidence alone", () => {
+  for(const coverage of ["regular","intermittent"] as const){
+    const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
+    s.point(0,3,3);s.point(1000,3,3);s.point(2000,3,3);
+    s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,coverage)));
+    s.point(3000,3,3);s.point(4000,1,1);let result:ProcessedPosition|undefined;
+    for(let t=5000;t<=9000;t+=1000)result=s.point(t,1,-1);
+    assert.equal(result!.regionInference.regionId,"A");assert.notEqual(result!.regionInference.state,"TRACKING_OUTSIDE");
+    assert.match(result!.regionInference.reasons!.join(),/Zorunlu kapı çıkışı gözlenmedi/);
+  }
+});
+
+test("after a doorless silent exit, dropout near another silent door infers that room by Euclidean distance", () => {
+  const s=setup();s.engine.reload(compileRegionsConfig(requiredDoorConfig(s.config,"silent")));
+  s.point(0,3,3);s.point(1000,3,3);s.point(2000,3,3);s.point(3000,3,1);s.point(4000,3,-.6);s.point(5000,3,-.8);s.point(5600,3,-1);
+  s.point(6500,5,-1);s.point(7500,7,-1);s.point(8500,9,-1);
+  const inferred=s.tick(16500);assert.equal(inferred.regionInference.state,"INFERRED_IN_REGION");assert.equal(inferred.regionInference.regionId,"B");
+
+  const far=setup();far.engine.reload(compileRegionsConfig(requiredDoorConfig(far.config,"silent")));far.point(0,6,-3);
+  const lost=far.tick(8000);assert.equal(lost.regionInference.state,"LOCATION_LOST");assert.equal(lost.regionInference.regionId,null);
+});
+
+test("21 September 2026 real route exits Rooms 3 and 5 without doors and infers Room 6 at the recorded cutoff", () => {
+  const fixture=september21Fixture();const config=sportsCorridorConfig();let now=Date.parse(fixture.positions[0][0]);
+  const published:ProcessedPosition[]=[];const engine=new RegionPositionEngine(position=>published.push(position),250,()=>now,false);
+  engine.enable(compileRegionsConfig(config));
+  const cutoff="2026-09-21T09:49:31.785Z";let speedRejectedExitCount=-1;
+  for(const [timestamp,x,y,receivedAt] of fixture.positions){
+    if(timestamp>cutoff)break;now=Date.parse(receivedAt??timestamp);
+    const before=engine.getVehicleState(fixture.tagCode)?.exitConfirmationCount??0;
+    const result=engine.ingest({tagCode:fixture.tagCode,mapId:fixture.mapId,timestamp,receivedAt:receivedAt??undefined,x,y});
+    if(result?.decisionTrace?.reasons.some(reason=>reason.code==="MEASUREMENT_REJECTED_BY_SPEED")) {
+      speedRejectedExitCount=engine.getVehicleState(fixture.tagCode)!.exitConfirmationCount;assert.equal(speedRejectedExitCount,before);
+    }
+  }
+  const confirmations=published.filter(position=>position.decisionTrace?.eventType==="ROOM_CONFIRMED").map(position=>position.regionInference.regionId);
+  assert.ok(confirmations.includes("room-03"));assert.ok(confirmations.includes("room-05"));assert.ok(speedRejectedExitCount>=0);
+  const exits=published.filter(position=>position.decisionTrace?.eventType==="ROOM_EXITED");
+  assert.ok(exits.some(position=>position.regionInference.lastKnownRegionId==="room-03"));
+  assert.ok(exits.some(position=>position.regionInference.lastKnownRegionId==="room-05"));
+  const state=engine.getVehicleState(fixture.tagCode)!;
+  assert.equal(state.activeRegionId,null);assert.equal(state.lastReliableLocation?.kind,"corridor");
+  assert.equal(state.silentDoorCandidate?.regionId,"room-06");assert.ok(Math.abs(state.silentDoorCandidate!.distanceMeters-.088)<.005);
+  now=Date.parse(cutoff)+4_000;engine.tick();const inferred=published.at(-1)!;
+  assert.equal(inferred.regionInference.state,"INFERRED_IN_REGION");assert.equal(inferred.regionInference.regionId,"room-06");
+  assert.equal(inferred.engineVersion,"room-evidence-6");
 });
 
 test("decision trace explains silent-door inference and far-corridor loss without changing the decision", () => {

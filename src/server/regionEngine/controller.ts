@@ -12,11 +12,13 @@ import { mapRepository } from "../maps/mapRepository";
 interface ManagedEngine { readonly engine: RegionPositionEngine; warnings: readonly string[] }
 interface RegionEngineGlobalRegistration {
   readonly version: string;
+  readonly revision?: string;
   readonly controller: RegionEngineController;
   readonly listener: (position: TrackingPosition) => void;
 }
 
 const POSITION_LISTENER_MARK = Symbol.for("uwb.regionEngine.positionListener");
+export const REGION_ENGINE_CONTROLLER_REVISION = "region-controller-2";
 type MarkedPositionListener = ((position: TrackingPosition) => void) & { [POSITION_LISTENER_MARK]?: boolean };
 
 /** Isolates inference and vehicle state by application map. */
@@ -104,6 +106,8 @@ export class RegionEngineController {
     const statuses = [...this.engines.entries()].map(([mapId, managed]) => [mapId, managed.engine.getStatus(this.runtime.rawPort, this.runtime.processedPort), managed] as const);
     return {
       enabled: this.enabled, engineVersion: ROOM_ENGINE_VERSION, rawPort: this.runtime.rawPort, processedPort: this.runtime.processedPort,
+      controllerRevision: REGION_ENGINE_CONTROLLER_REVISION,
+      regionEngineListenerCount: trackingBuffer.rawListeners("position").filter(isRegionEngineListener).length,
       activeVehicleCount: statuses.reduce((sum, [, status]) => sum + status.activeVehicleCount, 0),
       vehiclesInRegions: statuses.reduce((sum, [, status]) => sum + status.vehiclesInRegions, 0),
       configLoaded: statuses.length > 0,
@@ -146,6 +150,7 @@ function retireController(controller: RegionEngineController | undefined): Promi
 export function installGlobalRegionEngineController(): RegionEngineController {
   const registered = globalThis.__uwbRegionEngineControllerRegistration;
   if (registered?.version === ROOM_ENGINE_VERSION
+    && registered.revision === REGION_ENGINE_CONTROLLER_REVISION
     && registered.controller.engineVersion === ROOM_ENGINE_VERSION
     && !registered.controller.isDisposed()) {
     removeRegionEngineListeners(registered.listener as MarkedPositionListener);
@@ -156,13 +161,15 @@ export function installGlobalRegionEngineController(): RegionEngineController {
 
   removeRegionEngineListeners();
   const staleController = registered?.controller ?? globalThis.__uwbRegionEngineController;
+  const restoreEnabled = staleController?.isEnabled() ?? false;
   const retirement = retireController(staleController);
   const controller = new RegionEngineController(retirement);
   const listener: MarkedPositionListener = (position) => controller.ingest(position);
   listener[POSITION_LISTENER_MARK] = true;
   trackingBuffer.on("position", listener);
-  globalThis.__uwbRegionEngineControllerRegistration = { version: ROOM_ENGINE_VERSION, controller, listener };
+  globalThis.__uwbRegionEngineControllerRegistration = { version: ROOM_ENGINE_VERSION, revision: REGION_ENGINE_CONTROLLER_REVISION, controller, listener };
   globalThis.__uwbRegionEngineController = controller;
+  if (restoreEnabled) void controller.setEnabled(true).catch((error) => logger.error("region_engine.replacement_enable_failed", error));
   return controller;
 }
 
