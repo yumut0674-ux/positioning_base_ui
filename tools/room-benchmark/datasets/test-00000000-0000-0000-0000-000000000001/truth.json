@@ -1,0 +1,31 @@
+{
+  "testId": "test-00000000-0000-0000-0000-000000000001",
+  "timezone": "Europe/Istanbul",
+  "revision": 1,
+  "revisionReason": "Anonim deterministik fixture",
+  "test": {
+    "from": "2026-09-24T10:00:05.000Z",
+    "to": "2026-09-24T10:00:25.000Z"
+  },
+  "visits": [
+    {
+      "roomId": "room-03",
+      "from": "2026-09-24T10:00:07.000Z",
+      "to": "2026-09-24T10:00:13.500Z"
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-09-24T10:00:17.000Z",
+      "to": "2026-09-24T10:00:24.000Z"
+    }
+  ],
+  "groups": [
+    {
+      "id": "example-route",
+      "tagCodes": [
+        "ANON-A",
+        "ANON-B"
+      ]
+    }
+  ]
+}

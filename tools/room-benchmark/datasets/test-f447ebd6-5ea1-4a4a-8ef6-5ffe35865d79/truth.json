@@ -1,0 +1,39 @@
+{
+  "testId": "test-f447ebd6-5ea1-4a4a-8ef6-5ffe35865d79",
+  "timezone": "Europe/Istanbul",
+  "revision": 2,
+  "revisionReason": "2026-09-25 kullanıcı doğrulaması: bu testte D95660981D60BDA1 taşındı",
+  "test": {
+    "from": "2026-09-24T10:38:11.784Z",
+    "to": "2026-09-24T10:42:08.296Z"
+  },
+  "visits": [
+    {
+      "roomId": "room-03",
+      "from": "2026-09-24T10:38:28.059Z",
+      "to": "2026-09-24T10:39:04.182Z"
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-09-24T10:39:08.005Z",
+      "to": "2026-09-24T10:39:43.126Z"
+    },
+    {
+      "roomId": "room-06",
+      "from": "2026-09-24T10:39:59.084Z",
+      "to": "2026-09-24T10:40:35.395Z"
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-09-24T10:40:43.937Z",
+      "to": "2026-09-24T10:41:20.020Z"
+    },
+    {
+      "roomId": "room-03",
+      "from": "2026-09-24T10:41:24.556Z",
+      "to": "2026-09-24T10:42:03.034Z"
+    }
+  ],
+  "groups": [{"id":"saha-rotasi","tagCodes":["D95660981D60BDA1"]}],
+  "note": "Yavaş yürüyüş"
+}

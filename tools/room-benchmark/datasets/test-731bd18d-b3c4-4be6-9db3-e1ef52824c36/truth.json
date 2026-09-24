@@ -1,0 +1,39 @@
+{
+  "testId": "test-731bd18d-b3c4-4be6-9db3-e1ef52824c36",
+  "timezone": "Europe/Istanbul",
+  "revision": 2,
+  "revisionReason": "2026-09-25 kullanıcı doğrulaması: bu testte D95660981D60BDA1 taşındı",
+  "test": {
+    "from": "2026-09-24T10:43:43.982Z",
+    "to": "2026-09-24T10:46:47.193Z"
+  },
+  "visits": [
+    {
+      "roomId": "room-03",
+      "from": "2026-09-24T10:44:00.763Z",
+      "to": "2026-09-24T10:44:28.189Z"
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-09-24T10:44:30.838Z",
+      "to": "2026-09-24T10:44:56.698Z"
+    },
+    {
+      "roomId": "room-06",
+      "from": "2026-09-24T10:45:01.349Z",
+      "to": "2026-09-24T10:45:30.305Z"
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-09-24T10:45:36.034Z",
+      "to": "2026-09-24T10:46:04.934Z"
+    },
+    {
+      "roomId": "room-03",
+      "from": "2026-09-24T10:46:07.302Z",
+      "to": "2026-09-24T10:46:34.847Z"
+    }
+  ],
+  "groups": [{"id":"saha-rotasi","tagCodes":["D95660981D60BDA1"]}],
+  "note": "Hızlı yürüyüş"
+}

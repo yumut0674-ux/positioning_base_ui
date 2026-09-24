@@ -1,0 +1,35 @@
+{
+  "testId": "test-a8b42398-1132-4081-80bd-459792fd73c5",
+  "timezone": "Europe/Istanbul",
+  "revision": 2,
+  "revisionReason": "Kullanıcının önceki görüşmede üç tag'ın birlikte taşındığı kaydı, DB aralığındaki üç aday tag ile eşleştirildi",
+  "test": {
+    "from": "2026-09-21T14:20:32.068Z",
+    "to": "2026-09-21T14:22:07.910Z"
+  },
+  "visits": [
+    {
+      "roomId": "room-03",
+      "from": "2026-09-21T14:20:36.643Z",
+      "to": "2026-09-21T14:20:58.469Z"
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-09-21T14:21:00.581Z",
+      "to": "2026-09-21T14:21:23.450Z"
+    },
+    {
+      "roomId": "room-06",
+      "from": "2026-09-21T14:21:30.699Z",
+      "to": "2026-09-21T14:21:58.420Z"
+    }
+  ],
+  "groups": [
+    {
+      "id": "birlikte-tasinan-rota",
+      "tagCodes": ["D95660981D60BDA1", "9A8FA14BB93426F1", "06F0623201E95CE8"],
+      "note": "Kullanıcı kaydı: üç tag birlikte taşındı; DB'de bu aralıkta yalnız bu üç tag var"
+    }
+  ],
+  "note": "Hızlı koridor yürüyüşü; üç tag birlikte taşındı"
+}

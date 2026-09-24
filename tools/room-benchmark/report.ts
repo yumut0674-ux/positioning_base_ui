@@ -1,0 +1,77 @@
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import type { Run } from './replay';
+import { round } from './model';
+const root=path.dirname(new URL(import.meta.url).pathname.replace(/^\/(?=[A-Za-z]:)/,''));
+const pct=(n:number,d:number)=>d?`${round(n*100/d)}%`:'—';
+const escape=(s:string)=>s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');
+function htmlBody(md:string):string {
+  let table=false;
+  const out:string[]=[];
+  for (const line of md.trimEnd().split('\n')) {
+    if (line.startsWith('|')) {
+      if (/^\|[-:| ]+\|$/.test(line)) continue;
+      if (!table) {out.push('<table>');table=true;}
+      const cells=line.slice(1,-1).split('|').map(c=>`<td>${escape(c.trim())}</td>`).join('');
+      out.push(`<tr>${cells}</tr>`);continue;
+    }
+    if(table){out.push('</table>');table=false;}
+    if(!line.trim())continue;
+    const level=line.match(/^(#{1,3}) /);
+    out.push(level?`<h${level[1].length}>${escape(line.slice(level[0].length))}</h${level[1].length}>`:`<p>${escape(line)}</p>`);
+  }
+  if(table)out.push('</table>');
+  return out.join('\n');
+}
+export function markdown(run:Run):string {
+  const m=run.metrics, out=[`# Oda benchmarkı: ${run.testId}`,'',
+    `Motor: ${run.engineVersion} · commit: ${run.git.commit} · kirli: ${run.git.dirty}`,
+    `Harita: ${run.config.context} · ${run.config.path} · configVersion ${run.config.version} · SHA-256 ${run.config.sha256}`,
+    `Veri: ${run.dataset.source} · SHA-256 ${run.dataset.sha256} · ${run.dataset.rowCount} satır · zamanlama ${run.dataset.timing}`,
+    `Truth: revizyon ${run.dataset.truthRevision} · SHA-256 ${run.dataset.truthSha256}`,
+    `Simülasyon: tick ${run.simulation.tickMs} ms, örnek ${run.simulation.sampleMs} ms, sınır toleransı ±${run.simulation.boundaryToleranceMs} ms; aynı anda önce tick, sonra DB id`,
+    `Replay edilen paket: ${run.dataset.rowCount}; üretilen motor kararı: ${run.decisions.length}`,
+    '',`Genel doğru durum (oda + koridor): ${m.successPercent===null?'puanlanmadı':m.successPercent+'%'}`,
+    `Yalnız gerçek oda aralıklarında doğru oda: ${m.roomOnlySuccessPercent===null?'puanlanmadı':m.roomOnlySuccessPercent+'%'} (doğrulanmış + tahmini; payda ${round(m.actualRoomMs/1000)} tag-saniye)`,
+    `Puanlanmayan tag'lar: ${run.unscoredTags.join(', ')||'yok'}`,
+    `Aday tag / paket sayısı: ${Object.entries(run.dataset.candidateTags).map(([tag,n])=>`${tag}: ${n}`).join(', ')}`,
+    `Eksik received_at: ${run.dataset.quality.missingReceivedAt}; eksik kalite: ${run.dataset.quality.missingQuality}; eksik koordinat: ${run.dataset.quality.missingCoordinates}; zaman anomalisi: ${run.dataset.quality.timingAnomalies}; büyük boşluk: ${run.dataset.quality.largeGaps.length}; reddedilen ölçüm: ${run.decisions.filter(d=>d.eventType==='MEASUREMENT_REJECTED').length}`,
+    '','## Oda / tag sonuçları','',
+    '| Tag | Oda | Katı doğrulanmış | Katı tahmini | Yanlış oda | Sınır toleranslı başarı |','|---|---|---:|---:|---:|---:|'];
+  if(m.successPercent===null) out.splice(out.indexOf('## Oda / tag sonuçları'),0,'Puanlama nedeni: truth.json içindeki groups boş veya doğrulanmış tag yok. Motor kararları üretildi; oda doğruluğu hesaplanmadı.','');
+  for(const [tag,v] of Object.entries(m.tags)) for(const [room,c] of Object.entries(v.rooms)) {
+    const t=v.roomsTolerant[room];
+    out.push(`| ${tag} | ${room} | ${round(c.correctConfirmedMs/1000)} s | ${round(c.correctInferredMs/1000)} s | ${round(c.wrongRoomMs/1000)} s | ${t?pct(t.correctConfirmedMs+t.correctInferredMs,t.totalMs):'—'} |`);
+  }
+  out.push('','## Ziyaretler','','| Tag | No | Oda | Kaçırıldı | Giriş gecikmesi | Çıkış gecikmesi |','|---|---:|---|---|---:|---:|');
+  for(const [tag,v] of Object.entries(m.tags)) for(const visit of v.visits as {index:number;roomId:string;missed:boolean;entryDelayMs:number|null;exitDelayMs:number|null}[])
+    out.push(`| ${tag} | ${visit.index} | ${visit.roomId} | ${visit.missed?'evet':'hayır'} | ${visit.entryDelayMs===null?'—':round(visit.entryDelayMs/1000)+' s'} | ${visit.exitDelayMs===null?'—':round(visit.exitDelayMs/1000)+' s'} |`);
+  out.push('','## Rota grupları','','| Grup | Taglar | Doğrulanmış s | Tahmini s | Kaçırılan ziyaret |','|---|---|---:|---:|---:|');
+  for(const group of m.groups) out.push(`| ${group.id} | ${group.tags.join(', ')} | ${round(group.strict.correctConfirmedMs/1000)} | ${round(group.strict.correctInferredMs/1000)} | ${group.missedVisits} |`);
+  out.push('','## Süreler','',m.successPercent===null?'Tag eşleşmesi doğrulanmadığı için süreler puanlanmadı.':`Koridorda yanlış oda: ${round(m.summary.corridorFalseRoomMs/1000)} s; yanlış oda: ${round(m.summary.wrongRoomMs/1000)} s; belirsiz/kayıp: ${round(m.summary.lostOrUncertainMs/1000)} s.`,
+    '',`Ölçümler/veri boşlukları, bütün kararlar ve kaçırılan ziyaret çizelgeleri report.json içindedir. ${run.dataset.caveat}`);
+  return out.join('\n')+'\n';
+}
+export async function writeReport(run:Run,runId?:string):Promise<string> {
+  const id=runId??`${run.testId}-${new Date().toISOString().replaceAll(':','-')}`;
+  if (!/^[a-zA-Z0-9_-]+$/.test(id)) throw new Error('Geçersiz run id');
+  const dir=path.join(root,'reports',id);await mkdir(path.join(root,'reports'),{recursive:true});await mkdir(dir,{recursive:false});
+  const md=markdown(run);
+  await writeFile(path.join(dir,'report.json'),JSON.stringify(run,null,2)+'\n',{flag:'wx'});
+  await writeFile(path.join(dir,'report.md'),md,{flag:'wx'});
+  await writeFile(path.join(dir,'report.html'),`<!doctype html><html lang="tr"><meta charset="utf-8"><title>Oda benchmarkı</title><style>body{font:16px system-ui;max-width:1100px;margin:40px auto;padding:0 20px;line-height:1.5}table{border-collapse:collapse;display:block;overflow:auto}td{padding:6px 10px;border:1px solid #bbb}tr:first-child{font-weight:700;background:#eee}</style>${htmlBody(md)}<p>Ayrıntılı kararlar: <a href="report.json">report.json</a></p></html>`);
+  return dir;
+}
+export async function readRun(file:string):Promise<Run> {return JSON.parse(await readFile(file,'utf8')) as Run;}
+export function compare(a:Run,b:Run):string {
+  const keys:[string,unknown,unknown][]=[['test',a.testId,b.testId],['veri',a.dataset.sha256,b.dataset.sha256],['truth revizyonu',a.dataset.truthRevision,b.dataset.truthRevision],['truth SHA',a.dataset.truthSha256,b.dataset.truthSha256],['config SHA',a.config.sha256,b.config.sha256],['tick',a.simulation.tickMs,b.simulation.tickMs],['örnekleme',a.simulation.sampleMs,b.simulation.sampleMs],['tolerans',a.simulation.boundaryToleranceMs,b.simulation.boundaryToleranceMs]];
+  const differences=keys.filter(([,x,y])=>x!==y).map(([key,x,y])=>`${key}: ${x} → ${y}`);
+  if(differences.length) throw new Error(`Farklı deneyler karşılaştırılamaz:\n${differences.join('\n')}`);
+  const out=[`# ${a.testId}: ${a.engineVersion} → ${b.engineVersion}`,'',`Commit: ${a.git.commit} → ${b.git.commit}`,'','| Oda | Eski doğru s | Yeni doğru s | Fark s | Eski yanlış s | Yeni yanlış s |','|---|---:|---:|---:|---:|---:|'];
+  for(const id of ['room-03','room-05','room-06']) {
+    const sum=(r:Run,key:'correctConfirmedMs'|'correctInferredMs'|'wrongRoomMs')=>Object.values(r.metrics.tags).reduce((n,v)=>n+(v.rooms[id]?.[key]??0),0)/1000;
+    const old=sum(a,'correctConfirmedMs')+sum(a,'correctInferredMs'),now=sum(b,'correctConfirmedMs')+sum(b,'correctInferredMs');
+    out.push(`| ${id} | ${round(old)} | ${round(now)} | ${round(now-old)} | ${round(sum(a,'wrongRoomMs'))} | ${round(sum(b,'wrongRoomMs'))} |`);
+  }
+  return out.join('\n')+'\n';
+}

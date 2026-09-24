@@ -1,0 +1,6 @@
+datasets/*/raw.jsonl
+datasets/*/manifest.json
+!datasets/test-00000000-0000-0000-0000-000000000001/raw.jsonl
+!datasets/test-00000000-0000-0000-0000-000000000001/manifest.json
+reports/
+!fixtures/

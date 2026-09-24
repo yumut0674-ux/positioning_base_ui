@@ -30,7 +30,7 @@
     "minimumHardwareQuality": 0.25,
     "reliableEvidenceWeight": 0.5,
     "wallEvidenceWeight": 0.1,
-    "maximumSpeedMetersPerSecond": 10,
+    "maximumSpeedMetersPerSecond": 14,
     "movementToleranceMeters": 0.25,
     "lostAfterMs": 60000,
     "relocationAfterMs": 15000,
