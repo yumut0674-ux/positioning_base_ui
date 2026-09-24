@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { crossesDoor, pointInPolygon, wallDistance, type DoorCrossingResult } from "./geometry";
 import type { CompiledDoor, CompiledRegion, CompiledRegionsConfig, DecisionEventType, DecisionSeverity, DecisionTrace, EvidenceScoreComponents, ProcessedPosition, RegionEngineStatus, RoomSwitchCandidate, RoomTransitionTrace, SilentDoorProximityCandidate, VehicleRegionState, VehicleRegionStatus } from "./types";
 
-export const ROOM_ENGINE_VERSION = "room-evidence-7";
+export const ROOM_ENGINE_VERSION = "room-evidence-8";
 interface Evidence { at: number; raw: TrackingPosition; room: string | null; weight: number }
 type ReliableLocation = { kind: "room"; regionId: string } | { kind: "corridor" } | null;
 interface State extends VehicleRegionStatus {
@@ -126,6 +126,16 @@ export class RegionPositionEngine {
     v.entryConfidence = this.inferredScore(inferred);
     v.reasons = [`Sessiz oda kapısına yakın koridor ölçümü sonrası sinyal kesildi; en yakın kapıya göre tahmini oda atandı (${candidate.doorId}, ${candidate.distanceMeters.toFixed(2)} m)`];
     return true;
+  }
+  private inferSilentRoomSample(v: State, target: CompiledRegion): void {
+    v.activeRegionId = target.id; v.lastKnown = target.id; v.candidateRegionId = null; v.state = "INFERRED_IN_REGION";
+    v.lastSupportAt = v.lastRawDataTimestamp; v.reliableRaw = v.observedReliableRaw;
+    v.relocation = false; v.silentDoorCandidate = null; v.silentDoorInferenceActive = false; v.dropoutInferenceActive = true;
+    v.crossing = null; v.exitCrossing = null; v.exitAt = 0; v.exitEvidenceLastAt = 0; v.exitConfirmationCount = 0;
+    v.insideConfirmationCount = 0; v.requiredDurationMs = 0; v.requiredMeasurements = 0; v.collectedDurationMs = 0; v.score = EMPTY_SCORE;
+    v.history = v.history.slice(-1); this.clearRoomSwitch(v);
+    v.entryConfidence = this.inferredScore(target, v.entryConfidence);
+    v.reasons = ["Farklı sessiz odada son güvenilir iç ölçümden sonra sinyal kesildi; son ölçülen oda tahmini atandı"];
   }
   private inferredScore(region: CompiledRegion, evidenceScore = 0): number {
     // Reuse the configured evidence base so a new inference does not inherit an uninitialised zero score.
@@ -318,6 +328,13 @@ export class RegionPositionEngine {
     const age = now - v.lastRawDataTimestamp, r = this.region(timeoutRegionId ?? null); if (age > Math.max(3_600_000, this.lostAfter(v, r) * 10)) { this.vehicles.delete(id); continue; }
     if (now - v.lastPublishedTimestamp < this.broadcastIntervalMs) continue;
     v.tracePreviousState = v.state; v.traceTrigger = "timer"; v.traceInput = undefined;
+    const lastRoomSample = v.lastReliableLocation?.kind === "room" ? this.region(v.lastReliableLocation.regionId) : undefined;
+    if (v.activeRegionId && lastRoomSample?.settings.coverage === "silent" && lastRoomSample.id !== v.activeRegionId
+      && v.candidateRegionId === lastRoomSample.id
+      && v.observedReliableRaw?.timestamp === v.lastRawPosition.timestamp
+      && age >= lastRoomSample.settings.maxEvidenceGapMs && age < this.lostAfter(v, r)) {
+      this.inferSilentRoomSample(v, lastRoomSample); this.send(v, true); continue;
+    }
     const roomSwitch = v.roomSwitchCandidate;
     if (roomSwitch && roomSwitch.confirmationCount >= 2 && now - roomSwitch.startedAt >= this.settings(this.region(roomSwitch.toRegionId)).roomSwitchUncertainAfterMs) {
       // Do not retain the old room indefinitely after contradictory, but insufficient,
@@ -362,6 +379,7 @@ export class RegionPositionEngine {
     else continue; this.send(v, true); } }
   private reasonCode(message: string): string {
     if (message.includes("Doğrudan güvenilir hedef oda ölçüm dizisi doğrulandı")) return "DIRECT_ROOM_SWITCH_CONFIRMED";
+    if (message.includes("Farklı sessiz odada son güvenilir iç ölçümden sonra sinyal kesildi")) return "TARGET_ROOM_SAMPLE_THEN_LOSS";
     if (message.includes("Hız sınırını")) return "MEASUREMENT_REJECTED_BY_SPEED";
     if (message.includes("Düşük donanım")) return "MEASUREMENT_REJECTED_BY_QUALITY";
     if (message.includes("Gecikmiş ölçüm")) return "MEASUREMENT_REJECTED_AS_STALE";

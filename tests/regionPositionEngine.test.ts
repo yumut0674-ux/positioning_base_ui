@@ -624,6 +624,56 @@ test("an active old room still yields to the nearest silent target-door cutoff w
   assert.equal(inferred.decisionTrace?.eventType,"ROOM_INFERRED");assert.ok(inferred.decisionTrace?.reasons.some(reason=>reason.code==="SIGNAL_LOST_NEAR_SILENT_ROOM_DOOR"));
 });
 
+test("one reliable sample inside another silent room followed by loss infers that room", () => {
+  const s=setup({maximumSpeedMetersPerSecond:10});s.engine.reload(compileRegionsConfig(silentProximityConfig(s.config)));s.enter();
+  const candidate=s.point(3000,9,3)!;
+  assert.equal(candidate.regionInference.regionId,"A");assert.equal(candidate.regionInference.candidateRegionId,"B");
+  assert.equal(s.engine.getVehicleState("T")!.roomSwitchCandidate?.confirmationCount,1);
+  const before=s.published.length;s.tick(6999);assert.equal(s.published.length,before);
+  const inferred=s.tick(7000);
+  assert.equal(inferred.synthetic,true);assert.equal(inferred.decisionTrace?.eventType,"ROOM_INFERRED");
+  assert.equal(inferred.regionInference.state,"INFERRED_IN_REGION");assert.equal(inferred.regionInference.regionId,"B");
+  assert.equal(inferred.regionInference.measurementKind,"estimated");assert.equal(inferred.positionSource,"REGION_CENTER");
+  assert.equal(inferred.lastRawDataTimestamp,candidate.lastRawDataTimestamp);
+  assert.ok(inferred.decisionTrace?.reasons.some(reason=>reason.code==="TARGET_ROOM_SAMPLE_THEN_LOSS"));
+  assert.equal(s.engine.getVehicleState("T")!.roomSwitchCandidate,null);
+});
+
+test("24 September fast field samples infer Room 6 during the recorded cutoff", () => {
+  const fixture=JSON.parse(readFileSync(new URL("./fixtures/september24RoomSampleDropout.json",import.meta.url),"utf8")) as {
+    mapId:string;positions:readonly (readonly [string,number,number])[];nextObservedAt:string;
+  };
+  const s=setupConfig(sportsCorridorConfig());
+  for(const [timestamp,x,y] of fixture.positions) s.point(Date.parse(timestamp)-epoch,x,y,"field-tag");
+  const last=fixture.positions.at(-1)![0];
+  assert.equal(s.engine.getVehicleState("field-tag")!.activeRegionId,"room-05");
+  assert.equal(s.engine.getVehicleState("field-tag")!.roomSwitchCandidate?.toRegionId,"room-06");
+  assert.ok(Date.parse(fixture.nextObservedAt)-Date.parse(last)>30_000);
+  const inferred=s.tick(Date.parse(last)-epoch+4_000);
+  assert.equal(inferred.regionInference.regionId,"room-06");assert.equal(inferred.regionInference.state,"INFERRED_IN_REGION");
+  assert.equal(inferred.decisionTrace?.eventType,"ROOM_INFERRED");assert.equal(inferred.engineVersion,ROOM_ENGINE_VERSION);
+  assert.equal(inferred.configVersion,compileRegionsConfig(s.config).version);
+});
+
+test("old room support and later corridor evidence prevent a one-sample target-room cutoff", () => {
+  const oldRoom=setup({maximumSpeedMetersPerSecond:10});oldRoom.engine.reload(compileRegionsConfig(silentProximityConfig(oldRoom.config)));
+  oldRoom.enter();oldRoom.point(3000,9,3);oldRoom.point(4000,3,3);
+  assert.equal(oldRoom.tick(8000).regionInference.regionId,"A");
+
+  const corridor=setup({maximumSpeedMetersPerSecond:10});corridor.engine.reload(compileRegionsConfig(silentProximityConfig(corridor.config)));
+  corridor.enter();corridor.point(3000,9,3);corridor.point(4000,6,-3);
+  assert.notEqual(corridor.tick(8000).regionInference.regionId,"B");
+});
+
+test("one-sample cutoff ignores rejected room points and does not bypass regular-room policy", () => {
+  const rejected=setup({maximumSpeedMetersPerSecond:10});rejected.engine.reload(compileRegionsConfig(silentProximityConfig(rejected.config)));
+  rejected.enter();assert.equal(rejected.point(3000,9,3,"T",.1)?.decisionTrace?.eventType,"MEASUREMENT_REJECTED");
+  assert.notEqual(rejected.tick(7000).regionInference.regionId,"B");
+
+  const regular=setup({maximumSpeedMetersPerSecond:10});regular.enter();regular.point(3000,9,3);
+  assert.notEqual(regular.tick(7000).regionInference.regionId,"B");
+});
+
 test("direct room switch is cancelled by old-room support, restarted for a different target, and ignores rejected packets", () => {
   const cancelled=setup({maximumSpeedMetersPerSecond:10});cancelled.enter();cancelled.point(3000,9,3);
   cancelled.point(4000,3,3);assert.equal(cancelled.engine.getVehicleState("T")!.roomSwitchCandidate,null);assert.equal(cancelled.engine.getVehicleState("T")!.activeRegionId,"A");
