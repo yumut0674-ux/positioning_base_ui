@@ -136,7 +136,9 @@ test("confirmed door exit releases centre, subsequent room entry succeeds",()=>{
   assert.equal(s.point(12000,9,3)?.regionInference.regionId,"B");
 });
 test("long blackout allows relocation without invented transition time",()=>{
-  const s=setup();s.enter();s.tick(45000);s.point(46000,9,3);s.point(47000,9,3);s.point(48000,9,3);
+  const s=setup();s.enter();s.tick(45000);s.point(46000,9,3);
+  assert.equal(s.engine.getVehicleState("T")!.requiredDurationMs,3000);
+  s.point(47000,9,3);s.point(48000,9,3);
   const p=s.point(49000,9,3)!;assert.equal(p.regionInference.regionId,"B");assert.match(p.regionInference.reasons!.join(),/geçiş zamanı bilinmiyor/);
 });
 test("old, duplicate, delayed and low quality packets add no confirmation evidence",()=>{
@@ -219,6 +221,26 @@ test("sustained corridor measurements after a long gap release an old room", () 
   s.point(46000,7,-1);s.point(47000,7,-1);s.point(48000,7,-1);
   const p=s.point(49000,7,-1)!;
   assert.equal(p.regionInference.state,"TRACKING_OUTSIDE");assert.equal(p.regionInference.regionId,null);assert.equal(p.regionInference.lastKnownRegionId,"A");
+});
+
+test("confirmed corridor exit clears relocation before the next room entry", () => {
+  const s=setup({ entryEvidenceDurationMs:1500, relocationEvidenceDurationMultiplier:2,
+    maximumSpeedMetersPerSecond:10 });
+  s.engine.reload(compileRegionsConfig(silentProximityConfig(s.config)));
+  s.enter();s.tick(45000);
+  assert.equal(s.engine.getVehicleState("T")!.relocation,true);
+  s.point(46000,3,-1);s.point(47000,3,-1);s.point(48000,3,-1);
+  const exited=s.point(49000,3,-1)!;
+  assert.equal(exited.regionInference.state,"TRACKING_OUTSIDE");
+  assert.ok(s.published.some(p=>p.decisionTrace?.eventType==="ROOM_EXITED"));
+  assert.equal(s.engine.getVehicleState("T")!.relocation,false);
+  const first=s.point(50000,9,2)!;
+  assert.equal(first.regionInference.state,"ENTRY_CANDIDATE");
+  assert.equal(s.engine.getVehicleState("T")!.requiredDurationMs,1500);
+  s.point(51000,9,2.5);
+  const confirmed=s.point(52557,9,3)!;
+  assert.equal(confirmed.regionInference.regionId,"B");
+  assert.equal(confirmed.decisionTrace?.eventType,"ROOM_CONFIRMED");
 });
 
 test("silent door proximity infers an estimated room from one corridor measurement and later becomes lost", () => {

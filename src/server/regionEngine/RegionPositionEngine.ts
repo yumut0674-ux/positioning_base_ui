@@ -263,7 +263,7 @@ export class RegionPositionEngine {
         v.score = this.calculateScore(active, v.collectedDurationMs, v.exitConfirmationCount, v.exitCrossing, "exit");
         const qualifyingCompletion = active.settings.coverage !== "silent" || silentCorridorEvidence;
         if (qualifyingCompletion && at - v.exitAt >= v.requiredDurationMs && v.exitConfirmationCount >= v.requiredMeasurements) {
-          v.activeRegionId = null; v.state = "TRACKING_OUTSIDE"; v.history = [v.history.at(-1)!]; v.candidateRegionId = null;
+          v.activeRegionId = null; v.relocation = false; v.state = "TRACKING_OUTSIDE"; v.history = [v.history.at(-1)!]; v.candidateRegionId = null;
           this.clearRoomSwitch(v);
           v.exitAt = 0; v.exitEvidenceLastAt = 0; v.exitConfirmationCount = 0; v.exitCrossing = null;
           v.requiredDurationMs = 0; v.requiredMeasurements = 0; v.collectedDurationMs = 0; v.score = EMPTY_SCORE;
