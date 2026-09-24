@@ -7,7 +7,7 @@ import { resolveDoorSettings, resolveGlobalSettings, resolveRoomSettings } from 
 import embeddedRegionsConfig from "../../../config/regions.json";
 import type { CompiledCorridor, CompiledRegion, CompiledRegionsConfig } from "./types";
 
-const COUNTS = new Set(["entryConfirmationCount", "exitConfirmationCount", "maxTags", "historySize"]);
+const COUNTS = new Set(["entryConfirmationCount", "exitConfirmationCount", "roomSwitchConfirmationCount", "maxTags", "historySize"]);
 const MULTIPLIERS = new Set(["relocationEvidenceDurationMultiplier", "outsideReleaseDurationMultiplier", "regularCoverageStaleMultiplier", "intermittentCoverageStaleMultiplier", "silentCoverageStaleMultiplier", "lostAfterStaleMultiplier"]);
 const SCORE_FIELDS = new Set(["baseScore", "maximumScore", "durationContributionMaximum", "measurementContributionPerSample", "measurementContributionMaximum", "doorEntryBonus", "doorExitBonus", "confirmedInsideScore", "inferredInsideMaximumScore", "invalidMeasurementMaximumScore", "minimumHardwareQuality", "reliableEvidenceWeight", "wallEvidenceWeight"]);
 
@@ -43,7 +43,9 @@ function validateDoorSettings(settings: Partial<DoorInferenceSettings> | undefin
 function validateResolved(settings: ResolvedRoomSettings, label: string, historySize: number): void {
   if (settings.entryEvidenceDurationMs > settings.evidenceWindowMs) throw new Error(`${label}: giriş kanıt süresi kanıt penceresini aşamaz`);
   if (settings.exitEvidenceDurationMs > settings.evidenceWindowMs) throw new Error(`${label}: çıkış kanıt süresi kanıt penceresini aşamaz`);
-  if (historySize < Math.max(settings.entryConfirmationCount, settings.exitConfirmationCount)) throw new Error(`${label}: geçmiş tamponu gereken doğrulama sayısından küçük olamaz`);
+  if (settings.roomSwitchEvidenceDurationMs > settings.evidenceWindowMs) throw new Error(`${label}: oda değişim kanıt süresi kanıt penceresini aşamaz`);
+  if (settings.roomSwitchUncertainAfterMs < settings.roomSwitchEvidenceDurationMs) throw new Error(`${label}: oda değişim belirsizlik eşiği kanıt süresinden küçük olamaz`);
+  if (historySize < Math.max(settings.entryConfirmationCount, settings.exitConfirmationCount, settings.roomSwitchConfirmationCount)) throw new Error(`${label}: geçmiş tamponu gereken doğrulama sayısından küçük olamaz`);
 }
 
 export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConfig {

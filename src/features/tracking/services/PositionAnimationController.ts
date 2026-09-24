@@ -6,10 +6,11 @@ import type {
 import { inDisplayArea, segmentInDisplayArea, type DisplayPolygon } from "./displayArea";
 
 export interface PositionRenderer {
-  render(x: number, y: number, stale: boolean): void;
+  render(x: number, y: number, stale: boolean, opacity: number): void;
 }
 
 interface Transition {
+  readonly kind: "normal-route" | "region-center-route";
   readonly fromX: number;
   readonly fromY: number;
   readonly toX: number;
@@ -18,11 +19,20 @@ interface Transition {
   readonly durationMs: number;
 }
 
-interface InternalTagAnimationState extends TagAnimationState {
+interface NonRoutableRegionRelocation {
+  readonly kind: "non-routable-region-relocation";
+  readonly destination: PositionSample;
+  readonly startedAt: number;
+  readonly durationMs: number;
+  snapped: boolean;
+}
+
+interface InternalTagAnimationState extends Omit<TagAnimationState, "transitionKind"> {
   lastReceivedAt: number;
   lastRenderTime: number;
   renderer?: PositionRenderer;
   transition?: Transition;
+  relocation?: NonRoutableRegionRelocation;
 }
 
 export interface IncomingAnimationPosition {
@@ -74,10 +84,12 @@ export class PositionAnimationController {
     if (!state || !latest) return;
     state.samples = [latest];
     state.transition = undefined;
+    state.relocation = undefined;
     state.lastReceivedAt = measurementTimestamp;
     const wasStale = state.stale;
     state.stale = now - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
     this.apply(state, latest.x, latest.y, now, wasStale);
+    this.applyOpacity(state, 1, now, state.stale);
   }
 
   public setConfig(config: PositionAnimationConfig, now = Date.now()): void {
@@ -86,9 +98,11 @@ export class PositionAnimationController {
     for (const state of this.states.values()) {
       const latest = state.samples.at(-1);
       state.transition = undefined;
+      state.relocation = undefined;
       if (!latest) continue;
       state.samples = [latest];
       this.apply(state, latest.x, latest.y, now);
+      this.applyOpacity(state, 1, now, state.stale);
     }
   }
 
@@ -101,7 +115,7 @@ export class PositionAnimationController {
     const state = this.states.get(tagId);
     if (state) {
       state.renderer = renderer;
-      renderer.render(state.renderedX, state.renderedY, state.stale);
+      renderer.render(state.renderedX, state.renderedY, state.stale, state.visualOpacity);
     }
     return () => {
       if (this.renderers.get(tagId) === renderer) this.renderers.delete(tagId);
@@ -133,26 +147,44 @@ export class PositionAnimationController {
         renderedY: sample.y,
         lastRenderedAt: receivedAt,
         stale: receivedAt - (incoming.measurementTimestamp ?? receivedAt) > this.config.stalePositionTimeoutMs,
+        visualOpacity: 1,
+        relocationSequence: 0,
         lastReceivedAt: incoming.measurementTimestamp ?? receivedAt,
         lastRenderTime: Number.NEGATIVE_INFINITY,
         renderer: this.renderers.get(tagId),
       };
       this.states.set(tagId, state);
-      state.renderer?.render(sample.x, sample.y, state.stale);
+      state.renderer?.render(sample.x, sample.y, state.stale, state.visualOpacity);
       return;
     }
 
     const latest = state.samples.at(-1);
-    if (this.displayArea && (!segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, sample, this.displayArea)
-      || (latest && !segmentInDisplayArea(latest, sample, this.displayArea)))) {
+    if (latest && sample.timestamp < latest.timestamp && (sample.positionSource === "REGION_CENTER" || latest.positionSource === "REGION_CENTER")) return;
+    if (latest && sample.positionSource === "REGION_CENTER" && latest.positionSource === "REGION_CENTER"
+      && latest.regionId === sample.regionId && samePosition(latest, sample)) {
+      state.lastReceivedAt = incoming.measurementTimestamp ?? receivedAt;
+      state.stale = receivedAt - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
+      state.samples = [sample];
+      return;
+    }
+    const renderedSegmentIsValid = !this.displayArea
+      || segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, sample, this.displayArea);
+    const queuedSegmentIsValid = !this.displayArea || !latest || segmentInDisplayArea(latest, sample, this.displayArea);
+    const isRegionCentreChange = sample.positionSource === "REGION_CENTER"
+      && latest?.positionSource === "REGION_CENTER"
+      && latest.regionId !== sample.regionId;
+    if (this.displayArea && (!renderedSegmentIsValid || !queuedSegmentIsValid)) {
       state.samples = [sample];
       state.lastReceivedAt = incoming.measurementTimestamp ?? receivedAt;
       state.stale = receivedAt - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
-      if (this.config.enabled) this.startTransition(state, sample, receivedAt, this.transitionDuration(state, sample, this.config.teleportAnimationDurationMs));
+      if (this.config.enabled && isRegionCentreChange) {
+        this.startNonRoutableRegionRelocation(state, sample, receivedAt);
+      } else if (this.config.enabled) {
+        this.startTransition(state, sample, receivedAt, this.transitionDuration(state, sample, this.config.teleportAnimationDurationMs), "normal-route");
+      }
       else this.apply(state, sample.x, sample.y, receivedAt);
       return;
     }
-    if (latest && sample.timestamp < latest.timestamp && (sample.positionSource === "REGION_CENTER" || latest.positionSource === "REGION_CENTER")) return;
     // Room coordinates are display anchors, but changing anchors must still be a
     // visible, bounded transition. Repeated heartbeats at the same centre do not
     // restart the transition.
@@ -164,7 +196,8 @@ export class PositionAnimationController {
         return;
       }
       state.samples = [sample];
-      if (this.config.enabled) this.startTransition(state, sample, receivedAt, this.transitionDuration(state, sample, this.config.regionTransitionDurationMs));
+      state.relocation = undefined;
+      if (this.config.enabled) this.startTransition(state, sample, receivedAt, this.transitionDuration(state, sample, this.config.regionTransitionDurationMs), "region-center-route");
       else this.apply(state, sample.x, sample.y, receivedAt);
       return;
     }
@@ -182,6 +215,7 @@ export class PositionAnimationController {
     if (!this.config.enabled) {
       state.samples = [sample];
       state.transition = undefined;
+      state.relocation = undefined;
       this.apply(state, sample.x, sample.y, receivedAt);
       return;
     }
@@ -197,7 +231,7 @@ export class PositionAnimationController {
       const duration = sample.timestamp - previous.timestamp;
       if (duration > this.config.maximumSegmentDurationMs || distance(previous, sample) > this.config.teleportDistanceMeters) {
         state.samples = [sample];
-        this.startTransition(state, sample, receivedAt, this.transitionDuration(state, sample, this.config.teleportAnimationDurationMs));
+        this.startTransition(state, sample, receivedAt, this.transitionDuration(state, sample, this.config.teleportAnimationDurationMs), "normal-route");
         return;
       }
     }
@@ -238,6 +272,12 @@ export class PositionAnimationController {
         continue;
       }
 
+      if (state.relocation) {
+        this.renderNonRoutableRegionRelocation(state, now, wasStale);
+        state.lastRenderTime = Math.max(state.lastRenderTime, renderTime);
+        continue;
+      }
+
       this.renderTimeline(state, renderTime, now, wasStale);
       state.lastRenderTime = Math.max(state.lastRenderTime, renderTime);
       this.discardRenderedHistory(state, renderTime);
@@ -245,7 +285,18 @@ export class PositionAnimationController {
   }
 
   public getState(tagId: string): Readonly<TagAnimationState> | undefined {
-    return this.states.get(tagId);
+    const state = this.states.get(tagId);
+    if (!state) return undefined;
+    return {
+      samples: state.samples,
+      renderedX: state.renderedX,
+      renderedY: state.renderedY,
+      lastRenderedAt: state.lastRenderedAt,
+      stale: state.stale,
+      visualOpacity: state.visualOpacity,
+      transitionKind: state.relocation?.kind ?? state.transition?.kind ?? null,
+      relocationSequence: state.relocationSequence,
+    };
   }
 
   private renderTimeline(state: InternalTagAnimationState, renderTime: number, now: number, wasStale: boolean): void {
@@ -326,7 +377,7 @@ export class PositionAnimationController {
     state.renderedX = x;
     state.renderedY = y;
     state.lastRenderedAt = now;
-    if (changed) state.renderer?.render(x, y, state.stale);
+    if (changed) state.renderer?.render(x, y, state.stale, state.visualOpacity);
   }
 
   private startTransition(
@@ -334,8 +385,12 @@ export class PositionAnimationController {
     destination: PositionSample,
     now: number,
     durationMs: number,
+    kind: Transition["kind"],
   ): void {
+    state.relocation = undefined;
+    state.visualOpacity = 1;
     state.transition = {
+      kind,
       fromX: state.renderedX,
       fromY: state.renderedY,
       toX: destination.x,
@@ -343,6 +398,58 @@ export class PositionAnimationController {
       startedAt: now,
       durationMs,
     };
+  }
+
+  private startNonRoutableRegionRelocation(
+    state: InternalTagAnimationState,
+    destination: PositionSample,
+    now: number,
+  ): void {
+    state.transition = undefined;
+    state.relocation = {
+      kind: "non-routable-region-relocation",
+      destination,
+      startedAt: now,
+      durationMs: clamp(this.config.regionTransitionDurationMs, 400, 800),
+      snapped: false,
+    };
+    state.visualOpacity = 1;
+  }
+
+  private renderNonRoutableRegionRelocation(
+    state: InternalTagAnimationState,
+    now: number,
+    wasStale: boolean,
+  ): void {
+    const relocation = state.relocation!;
+    const progress = relocation.durationMs === 0 ? 1 : clamp((now - relocation.startedAt) / relocation.durationMs, 0, 1);
+    if (progress < 0.5) {
+      this.applyOpacity(state, 1 - progress * 2, now, wasStale);
+      return;
+    }
+    if (!relocation.snapped) {
+      // The destination was validated by ingest(). This is the only controlled
+      // bypass of segment continuity: no intermediate spatial route is drawn.
+      state.renderedX = relocation.destination.x;
+      state.renderedY = relocation.destination.y;
+      state.lastRenderedAt = now;
+      state.relocationSequence += 1;
+      relocation.snapped = true;
+    }
+    this.applyOpacity(state, (progress - 0.5) * 2, now, wasStale);
+    if (progress >= 1) {
+      state.visualOpacity = 1;
+      state.samples = [relocation.destination];
+      state.relocation = undefined;
+    }
+  }
+
+  private applyOpacity(state: InternalTagAnimationState, opacity: number, now: number, previousStale: boolean): void {
+    const nextOpacity = clamp(opacity, 0, 1);
+    const changed = nextOpacity !== state.visualOpacity || previousStale !== state.stale;
+    state.visualOpacity = nextOpacity;
+    state.lastRenderedAt = now;
+    if (changed) state.renderer?.render(state.renderedX, state.renderedY, state.stale, state.visualOpacity);
   }
 
   private transitionDuration(

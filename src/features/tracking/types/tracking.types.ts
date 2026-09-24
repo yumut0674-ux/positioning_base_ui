@@ -78,6 +78,9 @@ export interface TagAnimationState {
   renderedY: number;
   lastRenderedAt: number;
   stale: boolean;
+  visualOpacity: number;
+  transitionKind: "normal-route" | "region-center-route" | "non-routable-region-relocation" | null;
+  relocationSequence: number;
 }
 
 export interface PositionFilter {

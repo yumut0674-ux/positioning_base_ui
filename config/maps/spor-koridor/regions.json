@@ -8,6 +8,9 @@
     "entryConfirmationCount": 2,
     "exitConfirmationCount": 2,
     "evidenceWindowMs": 12000,
+    "roomSwitchConfirmationCount": 3,
+    "roomSwitchEvidenceDurationMs": 1500,
+    "roomSwitchUncertainAfterMs": 10000,
     "maxEvidenceGapMs": 4000,
     "expectedIntervalMs": 1000,
     "relocationEvidenceDurationMultiplier": 2,
@@ -27,7 +30,7 @@
     "minimumHardwareQuality": 0.25,
     "reliableEvidenceWeight": 0.5,
     "wallEvidenceWeight": 0.1,
-    "maximumSpeedMetersPerSecond": 5.2,
+    "maximumSpeedMetersPerSecond": 10,
     "movementToleranceMeters": 0.25,
     "lostAfterMs": 60000,
     "relocationAfterMs": 15000,
@@ -268,8 +271,7 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.5,
-        "maximumSpeedMetersPerSecond": 6
+        "silentEntryMaxDistanceMeters": 1.5
       },
       "entrances": [
         {
@@ -355,8 +357,7 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.5,
-        "maximumSpeedMetersPerSecond": 6
+        "silentEntryMaxDistanceMeters": 1.5
       },
       "entrances": [
         {
@@ -388,12 +389,12 @@
       "polygon": [
         {
           "pixel": {
-            "x": 433.51,
-            "y": 1211.45
+            "x": 336.59,
+            "y": 1238.72
           },
           "world": {
-            "x": -3.334,
-            "y": 4.611
+            "x": -4.187,
+            "y": 4.37
           }
         },
         {
@@ -408,22 +409,22 @@
         },
         {
           "pixel": {
-            "x": 809.13,
-            "y": 1742.72
+            "x": 804.22,
+            "y": 2011.22
           },
           "world": {
-            "x": -0.027,
-            "y": -0.067
+            "x": -0.07,
+            "y": -2.431
           }
         },
         {
           "pixel": {
-            "x": 445.95,
-            "y": 1880.09
+            "x": 340.29,
+            "y": 2014.44
           },
           "world": {
-            "x": -3.224,
-            "y": -1.276
+            "x": -4.154,
+            "y": -2.459
           }
         }
       ],
@@ -442,8 +443,7 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.5,
-        "maximumSpeedMetersPerSecond": 6
+        "silentEntryMaxDistanceMeters": 2.5
       },
       "entrances": [
         {
@@ -529,8 +529,7 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.5,
-        "maximumSpeedMetersPerSecond": 6
+        "silentEntryMaxDistanceMeters": 1.5
       },
       "entrances": [
         {
@@ -616,8 +615,7 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.5,
-        "maximumSpeedMetersPerSecond": 6
+        "silentEntryMaxDistanceMeters": 2.5
       },
       "entrances": [
         {
@@ -703,8 +701,7 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 2.5,
-        "maximumSpeedMetersPerSecond": 6
+        "silentEntryMaxDistanceMeters": 2.5
       },
       "entrances": [
         {
@@ -790,8 +787,7 @@
       "expectedIntervalMs": 1000,
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.5,
-        "maximumSpeedMetersPerSecond": 6
+        "silentEntryMaxDistanceMeters": 1.5
       },
       "entrances": [
         {

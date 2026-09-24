@@ -5,6 +5,7 @@ import {
   PositionAnimationController,
   type PositionRenderer,
 } from "../src/features/tracking/services/PositionAnimationController";
+import { inDisplayArea, segmentInDisplayArea } from "../src/features/tracking/services/displayArea";
 
 function controller(overrides: Partial<typeof DEFAULT_POSITION_ANIMATION_CONFIG> = {}) {
   return new PositionAnimationController({
@@ -22,6 +23,76 @@ function recorder() {
   };
   return { positions, renderer, latest: () => positions.at(-1)! };
 }
+
+const room03Center = { x: -1.013164, y: 2.285254 };
+const room05Center = { x: 2.507731, y: -1.552673 };
+const boxAround = (point: { x: number; y: number }, radius = 0.45) => [
+  { x: point.x - radius, y: point.y - radius },
+  { x: point.x + radius, y: point.y - radius },
+  { x: point.x + radius, y: point.y + radius },
+  { x: point.x - radius, y: point.y + radius },
+];
+
+test("valid REGION_CENTER changes use the existing spatial transition", () => {
+  const animation = controller({ interpolationDelayMs: 0, regionTransitionDurationMs: 600 });
+  animation.setDisplayArea([[{ x: 0, y: 0 }, { x: 3, y: 0 }, { x: 3, y: 2 }, { x: 0, y: 2 }]]);
+  const output = recorder();
+  animation.ingest("T", { x: 0.5, y: 1, timestamp: 1_000, receivedAt: 1_000, positionSource: "REGION_CENTER", regionId: "A" });
+  animation.attach("T", output.renderer);
+  animation.ingest("T", { x: 2.5, y: 1, timestamp: 2_000, receivedAt: 2_000, positionSource: "REGION_CENTER", regionId: "B" });
+
+  assert.equal(animation.getState("T")?.transitionKind, "region-center-route");
+  animation.update(2_300);
+  assert.equal(output.latest().x, 1.5);
+  animation.update(2_600);
+  assert.deepEqual([output.latest().x, output.latest().y], [2.5, 1]);
+  assert.equal(animation.getState("T")?.transitionKind, null);
+});
+
+test("field room-03 to room-05 relocation fades, snaps, and finishes exactly at the target", () => {
+  const polygons = [boxAround(room03Center), boxAround(room05Center)];
+  assert.equal(inDisplayArea(room05Center, polygons), true);
+  assert.equal(segmentInDisplayArea(room03Center, room05Center, polygons), false);
+  const animation = controller({ interpolationDelayMs: 0, regionTransitionDurationMs: 600 });
+  animation.setDisplayArea(polygons);
+  const frames: { x: number; y: number; opacity: number }[] = [];
+  animation.attach("T", { render: (x, y, _stale, opacity) => frames.push({ x, y, opacity }) });
+  animation.ingest("T", { ...room03Center, timestamp: 1_000, receivedAt: 1_000, positionSource: "REGION_CENTER", regionId: "room-03" });
+  animation.ingest("T", { ...room05Center, timestamp: 1_000, receivedAt: 2_000, measurementTimestamp: 1_000, positionSource: "REGION_CENTER", regionId: "room-05" });
+
+  assert.equal(animation.getState("T")?.transitionKind, "non-routable-region-relocation");
+  animation.update(2_200);
+  assert.deepEqual([frames.at(-1)!.x, frames.at(-1)!.y], [room03Center.x, room03Center.y]);
+  assert.ok(frames.at(-1)!.opacity < 1);
+  animation.update(2_300);
+  assert.deepEqual([frames.at(-1)!.x, frames.at(-1)!.y, frames.at(-1)!.opacity], [room05Center.x, room05Center.y, 0]);
+  animation.update(2_600);
+  assert.deepEqual([frames.at(-1)!.x, frames.at(-1)!.y, frames.at(-1)!.opacity], [room05Center.x, room05Center.y, 1]);
+  assert.equal(animation.getState("T")?.transitionKind, null);
+  assert.deepEqual(animation.getState("T")?.samples.map(({ x, y, regionId }) => ({ x, y, regionId })), [{ ...room05Center, regionId: "room-05" }]);
+});
+
+test("REGION_CENTER outside the display area cannot start a relocation", () => {
+  const animation = controller({ interpolationDelayMs: 0 });
+  animation.setDisplayArea([boxAround(room03Center)]);
+  animation.ingest("T", { ...room03Center, timestamp: 1_000, receivedAt: 1_000, positionSource: "REGION_CENTER", regionId: "room-03" });
+  animation.ingest("T", { ...room05Center, timestamp: 2_000, receivedAt: 2_000, positionSource: "REGION_CENTER", regionId: "room-05" });
+  assert.deepEqual([animation.getState("T")?.renderedX, animation.getState("T")?.renderedY], [room03Center.x, room03Center.y]);
+  assert.equal(animation.getState("T")?.transitionKind, null);
+});
+
+test("repeated publication at the same room centre does not restart relocation", () => {
+  const animation = controller({ interpolationDelayMs: 0, regionTransitionDurationMs: 600 });
+  animation.setDisplayArea([boxAround(room03Center), boxAround(room05Center)]);
+  animation.ingest("T", { ...room03Center, timestamp: 1_000, receivedAt: 1_000, positionSource: "REGION_CENTER", regionId: "room-03" });
+  animation.ingest("T", { ...room05Center, timestamp: 1_000, receivedAt: 2_000, positionSource: "REGION_CENTER", regionId: "room-05" });
+  animation.update(2_200);
+  animation.ingest("T", { ...room05Center, timestamp: 1_000, receivedAt: 2_250, measurementTimestamp: 1_000, positionSource: "REGION_CENTER", regionId: "room-05" });
+  animation.update(2_300);
+  assert.deepEqual([animation.getState("T")?.renderedX, animation.getState("T")?.renderedY], [room05Center.x, room05Center.y]);
+  animation.update(2_600);
+  assert.equal(animation.getState("T")?.transitionKind, null);
+});
 
 test("retains a renderer attached before the tag's first position arrives", () => {
   const animation = controller({ interpolationDelayMs: 0 });

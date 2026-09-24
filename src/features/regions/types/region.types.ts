@@ -16,6 +16,9 @@ export type DoorEvidenceMode = "required" | "preferred" | "optional" | "ignored"
 export interface DecisionEvidenceSettings {
   readonly entryEvidenceDurationMs: number; readonly exitEvidenceDurationMs: number;
   readonly entryConfirmationCount: number; readonly exitConfirmationCount: number;
+  /** Direct room-to-room handoff needs independent, time-spread target-room evidence. */
+  readonly roomSwitchConfirmationCount: number; readonly roomSwitchEvidenceDurationMs: number;
+  readonly roomSwitchUncertainAfterMs: number;
   readonly evidenceWindowMs: number; readonly maxEvidenceGapMs: number;
   readonly expectedIntervalMs: number; readonly relocationEvidenceDurationMultiplier: number;
   readonly outsideReleaseDurationMultiplier: number; readonly exitMarginMeters: number;

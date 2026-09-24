@@ -1,9 +1,9 @@
 import type { TrackingPosition } from "../trackingBuffer";
 import { createHash } from "node:crypto";
 import { crossesDoor, pointInPolygon, wallDistance, type DoorCrossingResult } from "./geometry";
-import type { CompiledDoor, CompiledRegion, CompiledRegionsConfig, DecisionEventType, DecisionSeverity, DecisionTrace, EvidenceScoreComponents, ProcessedPosition, RegionEngineStatus, SilentDoorProximityCandidate, VehicleRegionState, VehicleRegionStatus } from "./types";
+import type { CompiledDoor, CompiledRegion, CompiledRegionsConfig, DecisionEventType, DecisionSeverity, DecisionTrace, EvidenceScoreComponents, ProcessedPosition, RegionEngineStatus, RoomSwitchCandidate, RoomTransitionTrace, SilentDoorProximityCandidate, VehicleRegionState, VehicleRegionStatus } from "./types";
 
-export const ROOM_ENGINE_VERSION = "room-evidence-6";
+export const ROOM_ENGINE_VERSION = "room-evidence-7";
 interface Evidence { at: number; raw: TrackingPosition; room: string | null; weight: number }
 type ReliableLocation = { kind: "room"; regionId: string } | { kind: "corridor" } | null;
 interface State extends VehicleRegionStatus {
@@ -13,6 +13,7 @@ interface State extends VehicleRegionStatus {
   cadence: number; relocation: boolean; lastSupportAt: number; reasons: string[];
   score: EvidenceScoreComponents; requiredDurationMs: number; requiredMeasurements: number; lastQuality: number | null;
   silentDoorCandidate: SilentDoorProximityCandidate | null; silentDoorInferenceActive: boolean;
+  roomSwitchCandidate: RoomSwitchCandidate | null; roomTransition: RoomTransitionTrace | null;
   lastReliableLocation: ReliableLocation; dropoutInferenceActive: boolean;
   observedReliableRaw: TrackingPosition | null;
   collectedDurationMs: number;
@@ -32,7 +33,7 @@ export class RegionPositionEngine {
   public reload(config: CompiledRegionsConfig): void { this.config = config; for (const v of this.vehicles.values()) {
     v.tracePreviousState = v.state; v.traceTrigger = "config_reload"; v.traceInput = undefined;
     v.history = []; v.candidateRegionId = null; v.crossing = null; v.exitCrossing = null; v.exitAt = 0; v.exitEvidenceLastAt = 0;
-    v.silentDoorCandidate = null; v.silentDoorInferenceActive = false; v.lastReliableLocation = null; v.dropoutInferenceActive = false; v.observedReliableRaw = null;
+    v.silentDoorCandidate = null; v.silentDoorInferenceActive = false; v.roomSwitchCandidate = null; v.roomTransition = null; v.lastReliableLocation = null; v.dropoutInferenceActive = false; v.observedReliableRaw = null;
     if (!config.regions.some(r => r.id === v.activeRegionId)) v.activeRegionId = null;
     v.state = "LOCATION_LOST"; v.relocation = true; v.reasons = ["Harita değişti; yeni ölçüm kanıtı bekleniyor"]; this.send(v, true); } }
   public getVehicleState(id: string): State | undefined { return this.vehicles.get(id); }
@@ -57,6 +58,9 @@ export class RegionPositionEngine {
           silentDoorDistanceMeters: v.silentDoorCandidate?.distanceMeters ?? null,
           silentDoorObservedAt: v.silentDoorCandidate?.observedAt ?? null,
           silentDoorCandidateSource: v.silentDoorCandidate?.source ?? null,
+          roomSwitchCandidateRegionId: v.roomSwitchCandidate?.toRegionId ?? null,
+          roomSwitchConfirmationCount: v.roomSwitchCandidate?.confirmationCount ?? 0,
+          roomSwitchCollectedDurationMs: v.roomSwitchCandidate?.collectedDurationMs ?? 0,
           score: v.score, reasons: v.reasons, configVersion: config?.version }; }) };
   }
   private region(id: string | null): CompiledRegion | undefined { return this.config?.regions.find(r => r.id === id); }
@@ -84,6 +88,44 @@ export class RegionPositionEngine {
   }
   private hasSilentDoorInference(): boolean {
     return this.config!.regions.some(region => region.settings.coverage === "silent" && region.settings.silentEntryMaxDistanceMeters > 0);
+  }
+  private clearRoomSwitch(v: State): void { v.roomSwitchCandidate = null; }
+  private beginRoomSwitch(v: State, fromRegionId: string, toRegionId: string, at: number): RoomSwitchCandidate {
+    return v.roomSwitchCandidate = { fromRegionId, toRegionId, startedAt: at, lastEvidenceAt: at, confirmationCount: 1, collectedDurationMs: 0 };
+  }
+  /** Reliable target-room evidence is deliberately independent from door geometry. */
+  private observeRoomSwitch(v: State, active: CompiledRegion, target: CompiledRegion, at: number): RoomSwitchCandidate {
+    const current = v.roomSwitchCandidate;
+    if (!current || current.fromRegionId !== active.id || current.toRegionId !== target.id || at - current.lastEvidenceAt > target.settings.maxEvidenceGapMs) {
+      return this.beginRoomSwitch(v, active.id, target.id, at);
+    }
+    return v.roomSwitchCandidate = { ...current, lastEvidenceAt: at, confirmationCount: current.confirmationCount + 1, collectedDurationMs: at - current.startedAt };
+  }
+  private confirmRoomSwitch(v: State, target: CompiledRegion, raw: TrackingPosition, candidate: RoomSwitchCandidate): ProcessedPosition {
+    const confirmedAt = Date.parse(raw.timestamp);
+    v.roomTransition = {
+      transitionId: createHash("sha256").update(JSON.stringify([v.vehicleId, candidate.fromRegionId, candidate.toRegionId, candidate.startedAt, confirmedAt])).digest("hex"),
+      fromRegionId: candidate.fromRegionId, toRegionId: candidate.toRegionId, candidateStartedAt: candidate.startedAt,
+      effectiveAt: candidate.lastEvidenceAt, confirmedAt, confirmationCount: candidate.confirmationCount, collectedDurationMs: candidate.collectedDurationMs,
+    };
+    v.activeRegionId = target.id; v.lastKnown = target.id; v.candidateRegionId = null; v.state = "IN_REGION";
+    v.lastSupportAt = confirmedAt; v.reliableRaw = raw; v.relocation = false; v.silentDoorInferenceActive = false; v.dropoutInferenceActive = false;
+    v.crossing = null; v.exitCrossing = null; v.exitAt = 0; v.exitEvidenceLastAt = 0; v.exitConfirmationCount = 0;
+    v.insideConfirmationCount = 0; v.requiredDurationMs = 0; v.requiredMeasurements = 0; v.collectedDurationMs = 0; v.score = EMPTY_SCORE;
+    v.history = [v.history.at(-1)!]; this.clearRoomSwitch(v);
+    v.entryConfidence = target.settings.confirmedInsideScore;
+    v.reasons = ["Doğrudan güvenilir hedef oda ölçüm dizisi doğrulandı; kapı ve koridor geçişi beklenmedi"];
+    const result = this.send(v);
+    v.roomTransition = null;
+    return result;
+  }
+  private inferSilentDoor(v: State, candidate: SilentDoorProximityCandidate): boolean {
+    const inferred = this.region(candidate.regionId); if (!inferred) return false;
+    v.activeRegionId = inferred.id; v.lastKnown = inferred.id; v.candidateRegionId = null; v.crossing = null;
+    this.clearRoomSwitch(v); v.silentDoorInferenceActive = true; v.dropoutInferenceActive = true; v.state = "INFERRED_IN_REGION";
+    v.entryConfidence = this.inferredScore(inferred);
+    v.reasons = [`Sessiz oda kapısına yakın koridor ölçümü sonrası sinyal kesildi; en yakın kapıya göre tahmini oda atandı (${candidate.doorId}, ${candidate.distanceMeters.toFixed(2)} m)`];
+    return true;
   }
   private inferredScore(region: CompiledRegion, evidenceScore = 0): number {
     // Reuse the configured evidence base so a new inference does not inherit an uninitialised zero score.
@@ -140,10 +182,10 @@ export class RegionPositionEngine {
         crossing: null, exitCrossing: null, exitAt: 0, exitEvidenceLastAt: 0, cadence: this.config.rules.expectedIntervalMs, relocation: false,
         lastSupportAt: at, reasons: [], score: EMPTY_SCORE, requiredDurationMs: 0, requiredMeasurements: 0, lastQuality: null,
         silentDoorCandidate: null, silentDoorInferenceActive: false, lastReliableLocation: null, dropoutInferenceActive: false, observedReliableRaw: null,
-        collectedDurationMs: 0, tracePreviousState: undefined, traceTrigger: "measurement", traceInput: raw };
+        roomSwitchCandidate: null, roomTransition: null, collectedDurationMs: 0, tracePreviousState: undefined, traceTrigger: "measurement", traceInput: raw };
       this.vehicles.set(raw.tagCode, v); }
     if (longGap) v.relocation = true;
-    if (previous && delta > this.gap(v, active)) { v.history = []; v.candidateRegionId = null; v.crossing = null; v.exitCrossing = null; v.exitAt = 0; v.exitEvidenceLastAt = 0; v.exitConfirmationCount = 0; }
+    if (previous && delta > this.gap(v, active)) { v.history = []; v.candidateRegionId = null; v.crossing = null; v.exitCrossing = null; v.exitAt = 0; v.exitEvidenceLastAt = 0; v.exitConfirmationCount = 0; this.clearRoomSwitch(v); }
     if (delta > 0 && delta <= this.gap(v, active)) v.cadence = Math.max(50, v.cadence * 0.8 + delta * 0.2);
     v.lastRawPosition = raw; v.lastRawDataTimestamp = at; v.lastSeenRawPosition = raw; v.lastSeenRawDataTimestamp = at; v.lastQuality = quality;
     v.history.push({ at, raw, room: candidate?.id ?? null, weight });
@@ -167,12 +209,29 @@ export class RegionPositionEngine {
       v.lastReliableLocation = { kind: "corridor" };
       v.silentDoorCandidate = this.nearestSilentDoorCandidate(raw, at);
     }
-    if (active && candidate?.id === active.id) { v.exitAt = 0; v.exitEvidenceLastAt = 0; v.exitCrossing = null; v.exitConfirmationCount = 0; v.candidateRegionId = null;
+    if (active && candidate?.id === active.id) { v.exitAt = 0; v.exitEvidenceLastAt = 0; v.exitCrossing = null; v.exitConfirmationCount = 0; v.candidateRegionId = null; this.clearRoomSwitch(v);
       if (reliable) { v.state = "IN_REGION"; v.lastSupportAt = at; v.reliableRaw = raw; v.entryConfidence = active.settings.confirmedInsideScore; v.relocation = false; v.silentDoorInferenceActive = false; v.dropoutInferenceActive = false; }
       else if (v.silentDoorInferenceActive) { v.state = "INFERRED_IN_REGION"; v.entryConfidence = this.inferredScore(active, v.entryConfidence); }
       else if (at - v.lastSupportAt >= this.lostAfter(v, active)) { v.state = "LOCATION_LOST"; v.relocation = true; }
       else if (at - v.lastSupportAt >= this.staleAfter(v, active)) v.state = "INFERRED_IN_REGION";
       v.reasons = [weight >= active.settings.reliableEvidenceWeight ? "Atanmış odada güvenilir iç ölçüm" : "Duvar bandı ölçümü; önceki oda korunuyor"]; return this.send(v); }
+    if (active && !v.relocation && candidate && candidate.id !== active.id && reliable) {
+      // A reliable target-room point is simultaneously negative evidence for the old room
+      // and positive evidence for the target. It is never enough by itself to change rooms.
+      const roomSwitch = this.observeRoomSwitch(v, active, candidate, at);
+      v.candidateRegionId = candidate.id; v.insideConfirmationCount = roomSwitch.confirmationCount;
+      // Keep the old-room departure evidence observable and consistent with the same
+      // target-room samples; confirmation will atomically clear both sides.
+      v.exitAt = roomSwitch.startedAt; v.exitEvidenceLastAt = at; v.exitConfirmationCount = roomSwitch.confirmationCount;
+      v.collectedDurationMs = roomSwitch.collectedDurationMs; v.requiredMeasurements = candidate.settings.roomSwitchConfirmationCount;
+      v.requiredDurationMs = candidate.settings.roomSwitchEvidenceDurationMs;
+      v.score = this.calculateScore(candidate, roomSwitch.collectedDurationMs, roomSwitch.confirmationCount, null);
+      if (roomSwitch.confirmationCount >= candidate.settings.roomSwitchConfirmationCount
+        && roomSwitch.collectedDurationMs >= candidate.settings.roomSwitchEvidenceDurationMs) return this.confirmRoomSwitch(v, candidate, raw, roomSwitch);
+      v.state = "INFERRED_IN_REGION";
+      v.reasons = ["Farklı odada güvenilir iç ölçüm dizisi birikiyor; eski oda tek sıçramaya karşı korunuyor"];
+      return this.send(v);
+    }
     if (active) {
       if (!v.exitCrossing && previous && previous.weight >= active.settings.reliableEvidenceWeight && at - previous.at <= this.gap(v, active)) v.exitCrossing = crossesDoor(previous.raw, raw, active, false, candidate?.id ?? "corridor", at);
       if (v.exitCrossing && at - v.exitCrossing.occurredAt > (active.entrances.find(d => d.id === v.exitCrossing?.doorId)?.settings.crossingValidityMs ?? active.settings.evidenceWindowMs)) v.exitCrossing = null;
@@ -205,6 +264,7 @@ export class RegionPositionEngine {
         const qualifyingCompletion = active.settings.coverage !== "silent" || silentCorridorEvidence;
         if (qualifyingCompletion && at - v.exitAt >= v.requiredDurationMs && v.exitConfirmationCount >= v.requiredMeasurements) {
           v.activeRegionId = null; v.state = "TRACKING_OUTSIDE"; v.history = [v.history.at(-1)!]; v.candidateRegionId = null;
+          this.clearRoomSwitch(v);
           v.exitAt = 0; v.exitEvidenceLastAt = 0; v.exitConfirmationCount = 0; v.exitCrossing = null;
           v.requiredDurationMs = 0; v.requiredMeasurements = 0; v.collectedDurationMs = 0; v.score = EMPTY_SCORE;
           v.reasons = [active.settings.coverage === "silent"
@@ -258,8 +318,21 @@ export class RegionPositionEngine {
     const age = now - v.lastRawDataTimestamp, r = this.region(timeoutRegionId ?? null); if (age > Math.max(3_600_000, this.lostAfter(v, r) * 10)) { this.vehicles.delete(id); continue; }
     if (now - v.lastPublishedTimestamp < this.broadcastIntervalMs) continue;
     v.tracePreviousState = v.state; v.traceTrigger = "timer"; v.traceInput = undefined;
-    if (age >= this.lostAfter(v, r)) { v.state = "LOCATION_LOST"; v.relocation = true; v.entryConfidence = Math.min(v.entryConfidence, Math.max(0, this.settings(r).invalidMeasurementMaximumScore * (1 - age / (this.lostAfter(v, r) * this.settings(r).lostAfterStaleMultiplier)))); v.reasons = ["Uzun ölçüm kesintisi; güncel konum belirsiz, son bilinen oda korunuyor"]; }
-    else if (age >= this.staleAfter(v, r)) { if (v.activeRegionId && r && r.usesDoorPolicy && v.exitCrossing && r.entrances.find(d => d.id === v.exitCrossing?.doorId)?.settings.allowEstimatedExitAfterSignalLoss) { v.activeRegionId = null; v.state = "TRACKING_OUTSIDE"; v.reasons = ["Yönlü kapı çıkışı sonrası ölçüm kesildi; tahmini çıkış uygulandı"]; }
+    const roomSwitch = v.roomSwitchCandidate;
+    if (roomSwitch && roomSwitch.confirmationCount >= 2 && now - roomSwitch.startedAt >= this.settings(this.region(roomSwitch.toRegionId)).roomSwitchUncertainAfterMs) {
+      // Do not retain the old room indefinitely after contradictory, but insufficient,
+      // in-room evidence. A last corridor/door candidate has priority over LOCATION_LOST.
+      if (v.lastReliableLocation?.kind === "corridor" && v.silentDoorCandidate) this.inferSilentDoor(v, v.silentDoorCandidate);
+      else {
+        v.activeRegionId = null; v.state = "LOCATION_LOST"; v.relocation = true; v.entryConfidence = 0;
+        v.candidateRegionId = roomSwitch.toRegionId; this.clearRoomSwitch(v);
+        v.reasons = ["Farklı odada kanıt yetersiz kaldı; eski oda süresiz korunmadı ve geçerli kapı çıkarımı yok"];
+      }
+      this.send(v, true); continue;
+    }
+    if (age >= this.lostAfter(v, r)) { this.clearRoomSwitch(v); v.state = "LOCATION_LOST"; v.relocation = true; v.entryConfidence = Math.min(v.entryConfidence, Math.max(0, this.settings(r).invalidMeasurementMaximumScore * (1 - age / (this.lostAfter(v, r) * this.settings(r).lostAfterStaleMultiplier)))); v.reasons = ["Uzun ölçüm kesintisi; güncel konum belirsiz, son bilinen oda korunuyor"]; }
+    else if (age >= this.staleAfter(v, r)) { if (v.lastReliableLocation?.kind === "corridor" && v.silentDoorCandidate) { this.inferSilentDoor(v, v.silentDoorCandidate); }
+      else if (v.activeRegionId && r && r.usesDoorPolicy && v.exitCrossing && r.entrances.find(d => d.id === v.exitCrossing?.doorId)?.settings.allowEstimatedExitAfterSignalLoss) { v.activeRegionId = null; this.clearRoomSwitch(v); v.state = "TRACKING_OUTSIDE"; v.reasons = ["Yönlü kapı çıkışı sonrası ölçüm kesildi; tahmini çıkış uygulandı"]; }
       else if (v.activeRegionId) { v.state = "INFERRED_IN_REGION"; v.dropoutInferenceActive = true; v.entryConfidence = Math.min(v.entryConfidence, this.settings(r).inferredInsideMaximumScore); v.reasons = [r?.settings.coverage === "silent" && v.lastReliableLocation?.kind === "room" && v.lastReliableLocation.regionId === r.id
         ? "Sessiz oda içinde güvenilir ölçüm sonrası sinyal kesildi; son ölçülen oda tahmini korunuyor."
         : v.silentDoorInferenceActive && v.silentDoorCandidate
@@ -284,19 +357,11 @@ export class RegionPositionEngine {
             : "Yönlü kapı geçişi ve iç ölçüm sonrası kesinti; tahmini oda"];
         }
       }
-      if (!v.activeRegionId && v.lastReliableLocation?.kind === "corridor" && v.silentDoorCandidate) {
-        const inferred = this.region(v.silentDoorCandidate.regionId);
-        if (inferred) {
-          v.activeRegionId = inferred.id; v.lastKnown = inferred.id; v.candidateRegionId = null; v.crossing = null;
-          v.silentDoorInferenceActive = true; v.dropoutInferenceActive = true; v.state = "INFERRED_IN_REGION";
-          v.entryConfidence = this.inferredScore(inferred);
-          v.reasons = [`Sessiz oda kapısına yakın koridor ölçümü sonrası sinyal kesildi; en yakın kapıya göre tahmini oda atandı (${v.silentDoorCandidate.doorId}, ${v.silentDoorCandidate.distanceMeters.toFixed(2)} m)`];
-        }
-      }
       if (!v.activeRegionId && v.lastReliableLocation?.kind === "corridor" && this.hasSilentDoorInference()) { v.candidateRegionId = null; v.state = "LOCATION_LOST"; v.reasons = ["Son güvenilir koridor ölçümü uygun sessiz oda kapısına yakın değil; güncel konum belirsiz"]; }
       else if (!v.activeRegionId && !v.candidateRegionId) { v.state = "LOCATION_LOST"; v.reasons = ["Kesinti giriş kanıtı değildir; güncel konum belirsiz"]; } }
     else continue; this.send(v, true); } }
   private reasonCode(message: string): string {
+    if (message.includes("Doğrudan güvenilir hedef oda ölçüm dizisi doğrulandı")) return "DIRECT_ROOM_SWITCH_CONFIRMED";
     if (message.includes("Hız sınırını")) return "MEASUREMENT_REJECTED_BY_SPEED";
     if (message.includes("Düşük donanım")) return "MEASUREMENT_REJECTED_BY_QUALITY";
     if (message.includes("Gecikmiş ölçüm")) return "MEASUREMENT_REJECTED_AS_STALE";
@@ -314,6 +379,7 @@ export class RegionPositionEngine {
   }
   private eventType(v: State): DecisionEventType {
     if (v.traceTrigger === "config_reload") return "CONFIG_RELOADED";
+    if (v.roomTransition) return "ROOM_TRANSITIONED";
     if (v.reasons.some(reason => /Hız sınırını|Gecikmiş ölçüm|Düşük donanım/.test(reason))) return "MEASUREMENT_REJECTED";
     if (v.state === "LOCATION_LOST") return "LOCATION_LOST";
     if (v.state === "ENTRY_CANDIDATE") return "ENTRY_CANDIDATE";
@@ -332,6 +398,7 @@ export class RegionPositionEngine {
     const input = v.traceInput ?? v.lastRawPosition;
     const crossing = v.exitCrossing ?? v.crossing;
     const silentDoor = v.silentDoorCandidate;
+    const transition = v.roomTransition;
     const doorId = silentDoor?.doorId ?? crossing?.doorId;
     const silentRegion = silentDoor ? this.region(silentDoor.regionId) : undefined;
     const eventType = this.eventType(v);
@@ -339,7 +406,7 @@ export class RegionPositionEngine {
       ...(doorId ? { doorId } : {}),
       ...(silentDoor ? { doorDistanceMeters: silentDoor.distanceMeters } : {}),
       ...(silentRegion ? { allowedDoorDistanceMeters: silentRegion.settings.silentEntryMaxDistanceMeters } : {}),
-      ...(["ENTRY_CANDIDATE", "EXIT_CANDIDATE", "ROOM_CONFIRMED"].includes(eventType) ? {
+      ...(["ENTRY_CANDIDATE", "EXIT_CANDIDATE", "ROOM_CONFIRMED", "ROOM_TRANSITIONED"].includes(eventType) ? {
         collectedMeasurements: v.state === "EXIT_CANDIDATE" ? v.exitConfirmationCount : v.insideConfirmationCount,
         requiredMeasurements: v.requiredMeasurements,
         collectedDurationMs: v.collectedDurationMs,
@@ -350,11 +417,15 @@ export class RegionPositionEngine {
         ...(v.lastReliableLocation?.kind ? { kind: v.lastReliableLocation.kind } : {}),
         ...(v.lastReliableLocation?.kind === "room" ? { regionId: v.lastReliableLocation.regionId } : {}),
       } } : {}),
-      ...((v.score.total > 0 || eventType === "ENTRY_CANDIDATE" || eventType === "EXIT_CANDIDATE" || eventType === "ROOM_CONFIRMED") ? { score: { ...v.score } } : {}),
+      ...((v.score.total > 0 || eventType === "ENTRY_CANDIDATE" || eventType === "EXIT_CANDIDATE" || eventType === "ROOM_CONFIRMED" || eventType === "ROOM_TRANSITIONED") ? { score: { ...v.score } } : {}),
     };
     return {
       eventType, severity: this.severity(eventType), ...(v.tracePreviousState ? { previousState: v.tracePreviousState } : {}),
       nextState: v.state, trigger: v.traceTrigger ?? (v.traceInput ? "measurement" : "timer"),
+      ...(transition ? { transitionId: transition.transitionId, fromRegionId: transition.fromRegionId, toRegionId: transition.toRegionId,
+        candidateStartedAt: new Date(transition.candidateStartedAt).toISOString(), effectiveAt: new Date(transition.effectiveAt).toISOString(),
+        confirmedAt: new Date(transition.confirmedAt).toISOString(), confirmationCount: transition.confirmationCount,
+        collectedDurationMs: transition.collectedDurationMs } : {}),
       input: { measuredAt: input.timestamp, ...(input.receivedAt ? { receivedAt: input.receivedAt } : {}), x: input.x, y: input.y,
         ...(input.quality !== undefined ? { quality: input.quality } : {}), signalGapMs: Math.max(0, this.now() - Date.parse(input.timestamp)) },
       ...(Object.keys(evidence).length ? { evidence } : {}),

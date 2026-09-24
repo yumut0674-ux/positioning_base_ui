@@ -41,6 +41,10 @@ type September21Fixture = { readonly tagCode:string; readonly mapId:string; read
 function september21Fixture(): September21Fixture {
   return JSON.parse(readFileSync(new URL("./fixtures/september21SporKoridorRoute.json",import.meta.url),"utf8")) as September21Fixture;
 }
+type DirectRoomSwitchFixture = { readonly mapId:string; readonly room05From06F:readonly (readonly [string,number,number])[]; readonly room05From9A8:readonly (readonly [string,number,number])[]; readonly room05From9A8PreviousFast:readonly (readonly [string,number,number])[]; readonly sparseD956:readonly (readonly [string,number,number])[] };
+function directRoomSwitchFixture(): DirectRoomSwitchFixture {
+  return JSON.parse(readFileSync(new URL("./fixtures/directRoomSwitchFieldFixtures.json",import.meta.url),"utf8")) as DirectRoomSwitchFixture;
+}
 function silentProximityConfig(base: RegionsConfig, distance = 1.5): RegionsConfig {
   return { ...base, regions: base.regions.map(region => ({ ...region, coverage: "silent" as const,
     inference: { ...region.inference, coverage: "silent" as const, silentEntryMaxDistanceMeters: distance } })) };
@@ -115,10 +119,11 @@ test("synthetic publications preserve measurement time, long gaps expose uncerta
   const lost=s.tick(40000);assert.equal(lost.regionInference.state,"LOCATION_LOST");assert.equal(lost.regionInference.regionId,null);
   assert.equal(lost.regionInference.lastKnownRegionId,"A");assert.deepEqual([lost.x,lost.y],[3,3]);
 });
-test("single and short neighbor jumps cannot replace a confirmed room",()=>{
-  const s=setup();s.enter();
-  for(let t=3000;t<=6000;t+=1000) assert.equal(s.point(t,8,3)?.regionInference.regionId,"A");
-  assert.equal(s.point(7000,3,3)?.positionSource,"REGION_CENTER");
+test("a single neighbor jump cannot replace a confirmed room, while a sustained direct sequence can",()=>{
+  const s=setup({maximumSpeedMetersPerSecond:10});s.enter();
+  assert.equal(s.point(3000,8,3)?.regionInference.regionId,"A");
+  assert.equal(s.point(4000,8,3)?.regionInference.regionId,"A");
+  assert.equal(s.point(5000,8,3)?.regionInference.regionId,"B");
 });
 test("wall measurements alone do not confirm adjacent room",()=>{
   const s=setup();for(let t=0;t<10000;t+=1000) assert.equal(s.point(t,6.1,3)?.regionInference.regionId,null);
@@ -535,7 +540,7 @@ test("21 September 2026 real route exits Rooms 3 and 5 without doors and infers 
   assert.equal(state.silentDoorCandidate?.regionId,"room-06");assert.ok(Math.abs(state.silentDoorCandidate!.distanceMeters-.088)<.005);
   now=Date.parse(cutoff)+4_000;engine.tick();const inferred=published.at(-1)!;
   assert.equal(inferred.regionInference.state,"INFERRED_IN_REGION");assert.equal(inferred.regionInference.regionId,"room-06");
-  assert.equal(inferred.engineVersion,"room-evidence-6");
+  assert.equal(inferred.engineVersion,ROOM_ENGINE_VERSION);
 });
 
 test("decision trace explains silent-door inference and far-corridor loss without changing the decision", () => {
@@ -552,6 +557,67 @@ test("decision trace explains silent-door inference and far-corridor loss withou
   const far=setup();far.engine.reload(compileRegionsConfig(silentProximityConfig(far.config)));far.point(0,6,-3);const lost=far.tick(8000);
   assert.equal(lost.decisionTrace?.eventType,"LOCATION_LOST");assert.ok(lost.decisionTrace?.reasons.some(reason=>reason.code==="NO_SUITABLE_DOOR_NEARBY"));
   assert.equal(lost.decisionTrace?.evidence?.doorDistanceMeters,undefined);
+});
+
+test("direct room switch requires three reliable target-room samples spread across configured time", () => {
+  const s=setup({maximumSpeedMetersPerSecond:10});s.enter();
+  const one=s.point(3000,9,3)!;
+  assert.equal(one.regionInference.regionId,"A");assert.equal(one.regionInference.candidateRegionId,"B");
+  assert.equal(s.engine.getVehicleState("T")!.roomSwitchCandidate?.confirmationCount,1);assert.equal(s.engine.getVehicleState("T")!.exitConfirmationCount,1);
+  const two=s.point(4000,9,3)!;
+  assert.equal(two.regionInference.regionId,"A");assert.equal(s.engine.getVehicleState("T")!.roomSwitchCandidate?.confirmationCount,2);assert.equal(s.engine.getVehicleState("T")!.exitConfirmationCount,2);
+  const switched=s.point(4600,9,3)!;
+  assert.equal(switched.regionInference.regionId,"B");assert.equal(switched.regionInference.state,"IN_REGION");
+  assert.equal(switched.decisionTrace?.eventType,"ROOM_TRANSITIONED");assert.equal(switched.decisionTrace?.fromRegionId,"A");assert.equal(switched.decisionTrace?.toRegionId,"B");
+  assert.equal(switched.decisionTrace?.confirmationCount,3);assert.equal(switched.decisionTrace?.collectedDurationMs,1600);
+  assert.ok(switched.decisionTrace?.transitionId);assert.ok(switched.decisionTrace?.reasons.some(reason=>reason.code==="DIRECT_ROOM_SWITCH_CONFIRMED"));
+  assert.equal(s.published.filter(position=>position.decisionTrace?.eventType==="ROOM_EXITED").length,0);
+});
+
+test("anonymized fast field fixtures confirm Room 3 to Room 5 without a corridor publication", () => {
+  const fixture=directRoomSwitchFixture();
+  for (const samples of [fixture.room05From06F,fixture.room05From9A8,fixture.room05From9A8PreviousFast]) {
+    const s=setupConfig(sportsCorridorConfig());const first=Date.parse(samples[0][0]);
+    for (const offset of [-6000,-4000,-2000]) s.point(first+offset-epoch,-1.013164,2.285254,"fixture-tag");
+    let result:ProcessedPosition|undefined;
+    for (const [timestamp,x,y] of samples) result=s.point(Date.parse(timestamp)-epoch,x,y,"fixture-tag");
+    assert.equal(result!.regionInference.regionId,"room-05");assert.equal(s.published.filter(position=>position.decisionTrace?.eventType==="ROOM_TRANSITIONED").length,1);
+    assert.equal(s.published.filter(position=>position.decisionTrace?.eventType==="ROOM_EXITED").length,0);
+  }
+});
+
+test("sparse field fixture cannot confirm Room 5 or retain Room 3 after a long loss", () => {
+  const samples=directRoomSwitchFixture().sparseD956;const s=setupConfig(sportsCorridorConfig());const first=Date.parse(samples[0][0]);
+  for (const offset of [-6000,-4000,-2000]) s.point(first+offset-epoch,-1.013164,2.285254,"sparse-tag");
+  for (const [timestamp,x,y] of samples) s.point(Date.parse(timestamp)-epoch,x,y,"sparse-tag");
+  const lost=s.tick(Date.parse(samples[1][0])-epoch+60_000);
+  assert.notEqual(lost.regionInference.regionId,"room-05");assert.equal(lost.regionInference.state,"LOCATION_LOST");assert.equal(lost.regionInference.lastKnownRegionId,"room-03");
+});
+
+test("an active old room still yields to the nearest silent target-door cutoff without directional movement", () => {
+  const s=setup();const silent={...silentProximityConfig(s.config,1.5),engine:{...s.config.engine,maximumSpeedMetersPerSecond:10}};
+  s.engine.reload(compileRegionsConfig(silent));s.enter();
+  s.point(3000,9,-1);const inferred=s.tick(12000);
+  assert.equal(inferred.regionInference.state,"INFERRED_IN_REGION");assert.equal(inferred.regionInference.regionId,"B");
+  assert.equal(inferred.decisionTrace?.eventType,"ROOM_INFERRED");assert.ok(inferred.decisionTrace?.reasons.some(reason=>reason.code==="SIGNAL_LOST_NEAR_SILENT_ROOM_DOOR"));
+});
+
+test("direct room switch is cancelled by old-room support, restarted for a different target, and ignores rejected packets", () => {
+  const cancelled=setup({maximumSpeedMetersPerSecond:10});cancelled.enter();cancelled.point(3000,9,3);
+  cancelled.point(4000,3,3);assert.equal(cancelled.engine.getVehicleState("T")!.roomSwitchCandidate,null);assert.equal(cancelled.engine.getVehicleState("T")!.activeRegionId,"A");
+
+  const base=scenarioConfig() as RegionsConfig;const roomB=base.regions[1];const withC={...base,engine:{...base.engine,maximumSpeedMetersPerSecond:20},regions:[...base.regions,{...roomB,id:"C",name:"C",entrances:[],polygon:roomB.polygon.map(point=>({ ...point, world:{...point.world,x:point.world.x+6},pixel:{...point.pixel,x:point.pixel.x+60} })),roomCenter:{...roomB.roomCenter!,world:{...roomB.roomCenter!.world,x:roomB.roomCenter!.world.x+6},pixel:{...roomB.roomCenter!.pixel,x:roomB.roomCenter!.pixel.x+60}}}]};
+  const changed=setupConfig(withC);changed.point(0,3,2);changed.point(1000,3,2.5);changed.point(2000,3,3);changed.point(3000,9,3);changed.point(4000,15,3);
+  const candidate=changed.engine.getVehicleState("T")!.roomSwitchCandidate;assert.equal(candidate?.toRegionId,"C");assert.equal(candidate?.confirmationCount,1);
+
+  const rejected=setup();rejected.enter();const packet=rejected.point(2100,100,100)!;
+  assert.equal(packet.decisionTrace?.eventType,"MEASUREMENT_REJECTED");assert.equal(rejected.engine.getVehicleState("T")!.roomSwitchCandidate,null);
+});
+
+test("insufficient direct room evidence does not retain the old room past roomSwitchUncertainAfterMs", () => {
+  const s=setup({maximumSpeedMetersPerSecond:10});s.enter();s.point(3000,9,3);s.point(4000,9,3);
+  const lost=s.tick(13000);
+  assert.equal(lost.regionInference.state,"LOCATION_LOST");assert.equal(lost.regionInference.regionId,null);assert.equal(lost.regionInference.lastKnownRegionId,"A");assert.equal(lost.regionInference.candidateRegionId,"B");
 });
 
 test("decision trace snapshots entry evidence, required-door rejection, door crossing and exit", () => {

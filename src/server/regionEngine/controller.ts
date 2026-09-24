@@ -111,6 +111,9 @@ export class RegionEngineController {
       activeVehicleCount: statuses.reduce((sum, [, status]) => sum + status.activeVehicleCount, 0),
       vehiclesInRegions: statuses.reduce((sum, [, status]) => sum + status.vehiclesInRegions, 0),
       configLoaded: statuses.length > 0,
+      // The map-specific status remains authoritative for multi-map deployments; expose
+      // the same value at the root when exactly one active map is loaded.
+      ...(statuses.length === 1 && statuses[0][1].configVersion ? { configVersion: statuses[0][1].configVersion } : {}),
       maps: Object.fromEntries([
         ...statuses.map(([mapId, status, managed]) => [mapId, { engineVersion: status.engineVersion ?? ROOM_ENGINE_VERSION, activeVehicleCount: status.activeVehicleCount, vehiclesInRegions: status.vehiclesInRegions, configLoaded: status.configLoaded, configVersion: status.configVersion, warnings: managed.warnings }] as const),
         ...[...this.unavailableMaps].map((mapId) => [mapId, { engineVersion: ROOM_ENGINE_VERSION, activeVehicleCount: 0, vehiclesInRegions: 0, configLoaded: false, warnings: ["Region config kullanılamıyor"] }] as const),

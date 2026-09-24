@@ -7,7 +7,7 @@ export interface DecisionFilterForm {
   tagCode: string; from: string; to: string; mapId: string; regionId: string; eventType: string; measurementKind: string; importantOnly: boolean;
 }
 
-const EVENTS: readonly DecisionEventType[] = ["MEASUREMENT_ACCEPTED","MEASUREMENT_REJECTED","ENTRY_CANDIDATE","ROOM_CONFIRMED","ROOM_INFERRED","EXIT_CANDIDATE","ROOM_EXITED","LOCATION_LOST","CONFIG_RELOADED"];
+const EVENTS: readonly DecisionEventType[] = ["MEASUREMENT_ACCEPTED","MEASUREMENT_REJECTED","ENTRY_CANDIDATE","ROOM_CONFIRMED","ROOM_TRANSITIONED","ROOM_INFERRED","EXIT_CANDIDATE","ROOM_EXITED","LOCATION_LOST","CONFIG_RELOADED"];
 
 interface Props {
   readonly value: DecisionFilterForm; readonly live: boolean; readonly disabled?: boolean; readonly error?: string | null;

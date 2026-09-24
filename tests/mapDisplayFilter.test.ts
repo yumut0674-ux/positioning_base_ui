@@ -295,3 +295,27 @@ test("hiding and reopening the tag layer retains the validated position until ta
   assert.equal(f.animation.getState("A"), undefined);
   f.filter.dispose();
 });
+
+test("panel target and marker converge after a non-routable direct room transition", () => {
+  const from = p(-1.013164, 2.285254);
+  const to = p(2.507731, -1.552673);
+  const box = (point: { x: number; y: number }) => [p(point.x - .45, point.y - .45), p(point.x + .45, point.y - .45), p(point.x + .45, point.y + .45), p(point.x - .45, point.y + .45)];
+  const f = fixture();
+  f.filter.configure([box(from), box(to)], 2_000);
+  const measuredAt = 1_000;
+  f.filter.ingest({ ...tag(from.x, from.y, measuredAt), publishedAt: new Date(1_100).toISOString(), positionSource: "REGION_CENTER",
+    regionInference: { enabled: true, state: "INFERRED_IN_REGION", regionId: "room-03", regionName: "Oda 3" } });
+  f.advance(2_000);
+  f.filter.ingest({ ...tag(to.x, to.y, measuredAt), publishedAt: new Date(1_200).toISOString(), positionSource: "REGION_CENTER",
+    regionInference: { enabled: true, state: "ROOM_TRANSITIONED", regionId: "room-05", regionName: "Oda 5" } });
+
+  assert.deepEqual(f.displays().A.position, to); // panel/store projection already targets Oda 5
+  assert.equal(f.animation.getState("A")?.transitionKind, "non-routable-region-relocation");
+  assert.deepEqual([f.animation.getState("A")?.renderedX, f.animation.getState("A")?.renderedY], [from.x, from.y]);
+  f.animation.update(2_400);
+  assert.deepEqual([f.animation.getState("A")?.renderedX, f.animation.getState("A")?.renderedY], [to.x, to.y]);
+  f.animation.update(2_800);
+  assert.equal(f.animation.getState("A")?.transitionKind, null);
+  assert.deepEqual([f.animation.getState("A")?.renderedX, f.animation.getState("A")?.renderedY], [to.x, to.y]);
+  f.filter.dispose();
+});

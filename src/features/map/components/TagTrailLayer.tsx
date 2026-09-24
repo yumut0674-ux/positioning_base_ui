@@ -44,6 +44,7 @@ function TagTrailLayerComponent({ width, height, tags, transform, positionAnimat
             x: state.renderedX,
             y: state.renderedY,
             source,
+            relocationSequence: state.relocationSequence,
           }, now, durationMs);
         }
         return { now, trails: next };

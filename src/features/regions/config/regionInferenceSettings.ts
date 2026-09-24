@@ -12,6 +12,8 @@ export const DEFAULT_DOOR_INFERENCE_SETTINGS: DoorInferenceSettings = Object.fre
 export const DEFAULT_REGION_ENGINE_SETTINGS: GlobalRegionEngineSettings = Object.freeze({
   entryEvidenceDurationMs: 1_500, exitEvidenceDurationMs: 1_500,
   entryConfirmationCount: 2, exitConfirmationCount: 2, evidenceWindowMs: 12_000,
+  roomSwitchConfirmationCount: 3, roomSwitchEvidenceDurationMs: 1_500,
+  roomSwitchUncertainAfterMs: 10_000,
   maxEvidenceGapMs: 4_000, expectedIntervalMs: 1_000,
   relocationEvidenceDurationMultiplier: 2, outsideReleaseDurationMultiplier: 2, exitMarginMeters: 0.5,
   baseScore: 0.15, maximumScore: 0.9, durationContributionMaximum: 0.35,

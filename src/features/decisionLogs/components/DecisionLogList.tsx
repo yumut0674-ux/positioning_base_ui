@@ -1,7 +1,7 @@
 import type { DecisionLogSummary } from "../types/decisionLog.types";
 import styles from "./decisionLogs.module.css";
 
-const eventLabels: Record<string,string> = { MEASUREMENT_ACCEPTED:"Ölçüm kabul",MEASUREMENT_REJECTED:"Ölçüm reddi",ENTRY_CANDIDATE:"Giriş adayı",ROOM_CONFIRMED:"Oda doğrulandı",ROOM_INFERRED:"Oda tahmini",EXIT_CANDIDATE:"Çıkış adayı",ROOM_EXITED:"Odadan çıkıldı",LOCATION_LOST:"Konum kayıp",CONFIG_RELOADED:"Config yenilendi" };
+const eventLabels: Record<string,string> = { MEASUREMENT_ACCEPTED:"Ölçüm kabul",MEASUREMENT_REJECTED:"Ölçüm reddi",ENTRY_CANDIDATE:"Giriş adayı",ROOM_CONFIRMED:"Oda doğrulandı",ROOM_TRANSITIONED:"Oda değiştirildi",ROOM_INFERRED:"Oda tahmini",EXIT_CANDIDATE:"Çıkış adayı",ROOM_EXITED:"Odadan çıkıldı",LOCATION_LOST:"Konum kayıp",CONFIG_RELOADED:"Config yenilendi" };
 const kindLabels: Record<string,string> = { measured:"Ölçülen",estimated:"Tahmini",uncertain:"Belirsiz" };
 
 interface Props { readonly items: readonly DecisionLogSummary[]; readonly selectedId: string | null; readonly onSelect: (id: string) => void }

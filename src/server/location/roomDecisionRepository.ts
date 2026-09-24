@@ -10,7 +10,7 @@ export interface RoomDecisionRepository {
   detail(decisionId: string): Promise<ProcessedPosition | null>;
 }
 const quote = (v: string) => `'${v.replaceAll("'", "''")}'`;
-const IMPORTANT_EVENTS = new Set(["MEASUREMENT_REJECTED", "ROOM_CONFIRMED", "ROOM_INFERRED", "ROOM_EXITED", "LOCATION_LOST", "CONFIG_RELOADED"]);
+const IMPORTANT_EVENTS = new Set(["MEASUREMENT_REJECTED", "ROOM_CONFIRMED", "ROOM_TRANSITIONED", "ROOM_INFERRED", "ROOM_EXITED", "LOCATION_LOST", "CONFIG_RELOADED"]);
 type SharedDecisionProcess = NodeJS.Process & { __uwbRoomDecisionRecentCache?: Map<string, ProcessedPosition> };
 function sharedRecentDecisions(): Map<string, ProcessedPosition> {
   const host = process as SharedDecisionProcess;

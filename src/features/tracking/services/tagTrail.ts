@@ -4,6 +4,7 @@ export interface TagTrailPoint extends Point2D {
   readonly at: number;
   readonly segment: number;
   readonly source: "RAW" | "REGION_CENTER";
+  readonly relocationSequence: number;
 }
 
 const MINIMUM_TRAIL_MOVEMENT_METERS = 0.03;
@@ -17,21 +18,23 @@ export function pruneTagTrail(points: readonly TagTrailPoint[], now: number, dur
 
 export function appendTagTrailPoint(
   points: readonly TagTrailPoint[],
-  sample: Point2D & { readonly source?: "RAW" | "REGION_CENTER" },
+  sample: Point2D & { readonly source?: "RAW" | "REGION_CENTER"; readonly relocationSequence?: number },
   now: number,
   durationMs: number,
 ): TagTrailPoint[] {
   const retained = pruneTagTrail(points, now, durationMs);
   const source = sample.source ?? "RAW";
+  const relocationSequence = sample.relocationSequence ?? 0;
   const previous = retained.at(-1);
-  if (previous && previous.x === sample.x && previous.y === sample.y && previous.source === source) return retained;
+  if (previous && previous.x === sample.x && previous.y === sample.y && previous.source === source
+    && previous.relocationSequence === relocationSequence) return retained;
 
   const movement = previous ? Math.hypot(sample.x - previous.x, sample.y - previous.y) : Number.POSITIVE_INFINITY;
   if (previous && source === "RAW" && previous.source === "RAW" && movement < MINIMUM_TRAIL_MOVEMENT_METERS) return retained;
 
   const startsNewSegment = Boolean(previous) && (
-    source !== "RAW"
-    || previous!.source !== "RAW"
+    previous!.relocationSequence !== relocationSequence
+    || previous!.source !== source
     || movement > TRAIL_BREAK_DISTANCE_METERS
   );
   const point: TagTrailPoint = {
@@ -39,6 +42,7 @@ export function appendTagTrailPoint(
     y: sample.y,
     at: now,
     source,
+    relocationSequence,
     segment: previous ? previous.segment + (startsNewSegment ? 1 : 0) : 0,
   };
   return [...retained, point].slice(-MAXIMUM_TRAIL_POINTS);

@@ -13,7 +13,7 @@ export const roomDecisionQuerySchema = z.object({
   to: isoWithTimezone,
   mapId: optionalText,
   regionId: optionalText,
-  eventType: z.enum(["MEASUREMENT_ACCEPTED", "MEASUREMENT_REJECTED", "ENTRY_CANDIDATE", "ROOM_CONFIRMED", "ROOM_INFERRED", "EXIT_CANDIDATE", "ROOM_EXITED", "LOCATION_LOST", "CONFIG_RELOADED"]).optional(),
+  eventType: z.enum(["MEASUREMENT_ACCEPTED", "MEASUREMENT_REJECTED", "ENTRY_CANDIDATE", "ROOM_CONFIRMED", "ROOM_TRANSITIONED", "ROOM_INFERRED", "EXIT_CANDIDATE", "ROOM_EXITED", "LOCATION_LOST", "CONFIG_RELOADED"]).optional(),
   state: z.enum(["TRACKING_OUTSIDE", "ENTRY_CANDIDATE", "IN_REGION", "INFERRED_IN_REGION", "EXIT_CANDIDATE", "LOCATION_LOST"]).optional(),
   measurementKind: z.enum(["measured", "estimated", "uncertain"]).optional(),
   engineVersion: optionalText,

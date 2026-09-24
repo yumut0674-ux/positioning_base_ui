@@ -28,6 +28,24 @@ test("global, room and door settings resolve in priority order without mutating 
   assert.equal(JSON.stringify({ global, room, door }), snapshot);
 });
 
+test("spor-koridor editor and compiled motor resolve 10 m/s for corridor and every room", async () => {
+  const config = JSON.parse(await readFile(new URL("../config/maps/spor-koridor/regions.json", import.meta.url), "utf8")) as RegionsConfig;
+  const global = resolveGlobalSettings(config.engine);
+  const editorEffective = config.regions.map(region => ({
+    kind: region.kind,
+    speed: resolveRoomSettings(config.engine, region.inference, region).maximumSpeedMetersPerSecond,
+  }));
+  const compiled = compileRegionsConfig(config);
+
+  assert.equal(global.maximumSpeedMetersPerSecond, 10);
+  assert.ok(config.regions.every(region => region.inference?.maximumSpeedMetersPerSecond === undefined));
+  assert.ok(editorEffective.some(item => item.kind === "corridor"));
+  assert.ok(editorEffective.some(item => item.kind !== "corridor"));
+  assert.ok(editorEffective.every(item => item.speed === 10));
+  assert.equal(compiled.rules.maximumSpeedMetersPerSecond, 10);
+  assert.ok(compiled.regions.every(region => region.settings.maximumSpeedMetersPerSecond === 10));
+});
+
 test("legacy evidenceDurationMs maps to entry and exit and legacy config compiles", () => {
   const config = scenarioConfig() as RegionsConfig;
   const compiled = compileRegionsConfig(config);

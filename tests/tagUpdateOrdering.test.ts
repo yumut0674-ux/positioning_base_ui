@@ -37,6 +37,19 @@ test("same measurement accepts only a strictly newer valid engine publication", 
   assert.equal(shouldAcceptTagUpdate(inferred, { ...inferred, timestamp: measurementTime - 1, publishedAt: published(9_000) }), false);
 });
 
+test("same measurement accepts newer ROOM_TRANSITIONED publication and rejects the older decision", () => {
+  const room03 = tag({
+    x: -1.013164, y: 2.285254, publishedAt: published(3_000), positionSource: "REGION_CENTER",
+    regionInference: { enabled: true, state: "INFERRED_IN_REGION", regionId: "room-03", regionName: "Oda 3" },
+  });
+  const room05 = tag({
+    x: 2.507731, y: -1.552673, publishedAt: published(4_000), positionSource: "REGION_CENTER",
+    regionInference: { enabled: true, state: "ROOM_TRANSITIONED", regionId: "room-05", regionName: "Oda 5", reasons: ["DIRECT_ROOM_SWITCH_CONFIRMED"] },
+  });
+  assert.equal(shouldAcceptTagUpdate(room03, room05), true);
+  assert.equal(shouldAcceptTagUpdate(room05, { ...room03, publishedAt: published(3_999) }), false);
+});
+
 test("store shows inferred Room 6 and later LOCATION_LOST without changing measurement age", () => {
   const original = useIpsStore.getState();
   try {

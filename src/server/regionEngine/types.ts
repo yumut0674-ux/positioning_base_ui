@@ -14,6 +14,7 @@ export type DecisionEventType =
   | "MEASUREMENT_REJECTED"
   | "ENTRY_CANDIDATE"
   | "ROOM_CONFIRMED"
+  | "ROOM_TRANSITIONED"
   | "ROOM_INFERRED"
   | "EXIT_CANDIDATE"
   | "ROOM_EXITED"
@@ -32,6 +33,15 @@ export interface DecisionTrace {
   readonly severity: DecisionSeverity;
   readonly previousState?: VehicleRegionState;
   readonly nextState: VehicleRegionState;
+  /** Present only for an atomic direct room-to-room handoff. */
+  readonly transitionId?: string;
+  readonly fromRegionId?: string;
+  readonly toRegionId?: string;
+  readonly candidateStartedAt?: string;
+  readonly effectiveAt?: string;
+  readonly confirmedAt?: string;
+  readonly confirmationCount?: number;
+  readonly collectedDurationMs?: number;
   readonly trigger: "measurement" | "timer" | "config_reload";
   readonly input: {
     readonly measuredAt: string;
@@ -153,6 +163,26 @@ export interface SilentDoorProximityCandidate {
   readonly source: "silent-door-proximity";
 }
 
+export interface RoomSwitchCandidate {
+  readonly fromRegionId: string;
+  readonly toRegionId: string;
+  readonly startedAt: number;
+  readonly lastEvidenceAt: number;
+  readonly confirmationCount: number;
+  readonly collectedDurationMs: number;
+}
+
+export interface RoomTransitionTrace {
+  readonly transitionId: string;
+  readonly fromRegionId: string;
+  readonly toRegionId: string;
+  readonly candidateStartedAt: number;
+  readonly effectiveAt: number;
+  readonly confirmedAt: number;
+  readonly confirmationCount: number;
+  readonly collectedDurationMs: number;
+}
+
 export interface RegionEngineStatus {
   readonly enabled: boolean;
   readonly engineVersion?: string;
@@ -188,5 +218,8 @@ export interface RegionVehicleDiagnostic {
   readonly silentDoorCandidateRegionId: string | null; readonly silentDoorCandidateDoorId: string | null;
   readonly silentDoorDistanceMeters: number | null; readonly silentDoorObservedAt: number | null;
   readonly silentDoorCandidateSource: "silent-door-proximity" | null;
+  readonly roomSwitchCandidateRegionId?: string | null;
+  readonly roomSwitchConfirmationCount?: number;
+  readonly roomSwitchCollectedDurationMs?: number;
   readonly reasons: readonly string[]; readonly configVersion?: string;
 }

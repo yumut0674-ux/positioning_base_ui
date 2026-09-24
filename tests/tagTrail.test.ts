@@ -30,6 +30,13 @@ test("trail ignores jitter and breaks across jumps or region-centre positions", 
   assert.deepEqual(points.map((point) => point.segment), [0, 0, 1, 2]);
 });
 
+test("non-routable room relocation starts a new trail segment at the destination", () => {
+  let points = appendTagTrailPoint([], { x: -1.013164, y: 2.285254, source: "REGION_CENTER", relocationSequence: 0 }, 1_000, 5_000);
+  points = appendTagTrailPoint(points, { x: 2.507731, y: -1.552673, source: "REGION_CENTER", relocationSequence: 1 }, 1_500, 5_000);
+  assert.equal(points.length, 2);
+  assert.notEqual(points[0].segment, points[1].segment);
+});
+
 test("trail settings validate and persist browser preferences", () => {
   const values = new Map<string, string>();
   const storage = {

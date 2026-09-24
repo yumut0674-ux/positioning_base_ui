@@ -20,7 +20,10 @@ function HtmlTagNodeComponent({ tag, transform, positionAnimation, selected, onS
   const colorStyle = { color: tag.color, opacity: uncertain ? 0.5 : estimated ? 0.75 : 1 } satisfies CSSProperties;
 
   useLayoutEffect(() => positionAnimation.attach(tag.id, {
-    render: (x, y) => renderHtmlTagPosition(positionRef.current, transform, x, y),
+    render: (x, y, _stale, opacity) => {
+      renderHtmlTagPosition(positionRef.current, transform, x, y);
+      if (positionRef.current) positionRef.current.style.opacity = String(opacity);
+    },
   }), [positionAnimation, tag.id, transform]);
 
   return (
