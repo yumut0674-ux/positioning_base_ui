@@ -8,13 +8,15 @@ import type { RegionsConfig } from '../../src/features/regions/types/region.type
 import { compareRows, deliveryMs, iso, ms, sha256, type Manifest, type RawRow, type Truth } from './model';
 import { readDataset } from './importer';
 import { score } from './score';
+import { spatialEvidence, type SpatialVisitEvidence } from './spatialEvidence';
 
 export interface Decision { at:string; tagCode:string; state:string; roomId:string|null; eventType:string|null; reasonCodes:string[];
   synthetic:boolean; input:{measuredAt:string; receivedAt?:string; x:number; y:number; quality?:number; signalGapMs?:number}; decisionId?:string }
 export interface Run { schemaVersion:1; testId:string; engineVersion:string; git:{commit:string;dirty:boolean;status:string};
   config:{path:string;sha256:string;version:string;context:string}; dataset:{source:string;caveat:string;sha256:string;rowCount:number;candidateTags:Record<string,number>;timing:string;quality:Manifest['quality'];truthRevision:number;truthSha256:string;warmupMs:number;observationMs:number};
   simulation:{tickMs:number;sampleMs:number;boundaryToleranceMs:number;tickOrigin:string;equalTimeOrder:string};
-  unscoredTags:string[]; decisions:Decision[]; metrics:ReturnType<typeof score> }
+  unscoredTags:string[]; decisions:Decision[]; metrics:ReturnType<typeof score>;
+  rawSpatialEvidence?:SpatialVisitEvidence[] }
 const git = (args:string[]):string => { try { return execFileSync('git',args,{encoding:'utf8'}).trim(); } catch { return 'unavailable'; } };
 export function replayRows(rows: RawRow[], truth: Truth, config: ReturnType<typeof compileRegionsConfig>, settings:{tickMs:number;sampleMs:number;boundaryToleranceMs:number;warmupMs:number;observationMs:number}):{decisions:Decision[];metrics:ReturnType<typeof score>;unscoredTags:string[]} {
   const decisions:Decision[]=[];
@@ -59,5 +61,5 @@ export async function runTest(id:string, options:{configPath:string;tickMs:numbe
       context:manifest.source.includes('SENTETİK')?'anonim sentetik fixture + güncel harita':'geçmiş veri + güncel harita (geçmiş harita snapshotı sağlanmadı)'},
     dataset:{source:manifest.source,caveat:manifest.caveat,sha256:manifest.sha256,rowCount:manifest.rowCount,candidateTags:manifest.candidateTags,timing:manifest.timing,quality:manifest.quality,truthRevision:truth.revision,truthSha256,warmupMs:manifest.warmupMs,observationMs:manifest.observationMs},
     simulation:{tickMs:options.tickMs,sampleMs:options.sampleMs,boundaryToleranceMs:options.boundaryToleranceMs,tickOrigin:iso(new Date(ms(truth.test.from)-manifest.warmupMs).toISOString()),equalTimeOrder:'tick then packet by database id'},
-    ...result};
+    ...result,rawSpatialEvidence:spatialEvidence(rows,truth,config)};
 }

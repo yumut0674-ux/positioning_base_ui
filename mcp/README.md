@@ -119,16 +119,20 @@ verilebilir. `/clear` konuşma hafızasını, `/exit` ise programı kapatır.
 ## Rota Geçmişi web chat asistanı
 
 Rota Geçmişi sayfasındaki chat paneli tarayıcıdan doğrudan Gemini'ye veya konum
-araçlarına bağlanmaz. Tarayıcı `POST /api/assistant` proxy endpointine gider;
-proxy de yalnızca yerelde çalışan asistan servisine istek yapar. Proxy, her
+araçlarına bağlanmaz. Tarayıcı `POST /api/assistant` endpointine gider. “En son
+neredeydi” ve “şu an nerede” gibi tanınan tek varlık soruları burada doğrudan
+yerel entity/konum servisleriyle yanıtlanır; kişi ve konum verisi Gemini'ye
+gönderilmez. Diğer sorular yerel FastAPI asistanına iletilir. Endpoint her
 tarayıcı için HttpOnly bir ad alanı üretir; istemcinin verdiği oturum kimliği
 tek başına başka bir konuşmaya erişim için yeterli değildir.
 
 Mevcut uygulamada doğrulanmış kullanıcı/rol aktarımı bulunmadığı için web
-istekleri varsayılan olarak `unauthenticated` kabul edilir. Bu durumda kişi,
+istekleri varsayılan olarak `unauthenticated` kabul edilir. FastAPI akışında kişi,
 tag veya konum geçmişi istekleri modele ya da MCP araçlarına gönderilmez; genel
-UWB kullanım soruları cevaplanabilir. UI bağlamındaki tag, varlık, koordinat ve
-rota bilgisi de modele iletilmez. Hasta veya personel verisiyle çalışan bir
+UWB kullanım soruları cevaplanabilir. Tanınan tek varlık konum soruları aynı
+uygulamanın mevcut `/api/location/*` servisleriyle sunucu tarafında yanıtlanır.
+UI bağlamındaki tag kodu yalnızca veritabanında doğrulanacak arama anahtarıdır;
+koordinat ve rota bilgisi modele iletilmez. Hasta veya personel verisiyle çalışan bir
 kurulum, üretime alınmadan önce güvenilir sunucu tarafı kimlik doğrulama,
 rol/birim kapsamı ve retrieval filtresi eklemelidir; istemci mesajındaki
 “adminim” ifadesi yetki kanıtı değildir.

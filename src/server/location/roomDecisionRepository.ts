@@ -1,10 +1,12 @@
 import { queryPostgres } from "../postgresClient";
 import { logger } from "../logger";
 import type { ProcessedPosition } from "../regionEngine/types";
+import type { TagAssignment } from "./location.types";
 import type { DecisionLogFilters, DecisionLogListResponse, DecisionLogSummary } from "../../features/decisionLogs/types/decisionLog.types";
 
 export interface RoomDecisionRepository {
   latest(tag: string, at: string): Promise<ProcessedPosition | null>;
+  latestMeasuredRoom(assignments: readonly TagAssignment[], at: string): Promise<ProcessedPosition | null>;
   history(tags: readonly string[], from: string, to: string, limit: number): Promise<readonly ProcessedPosition[]>;
   list(filters: DecisionLogFilters): Promise<DecisionLogListResponse>;
   detail(decisionId: string): Promise<ProcessedPosition | null>;
@@ -142,6 +144,30 @@ export class PostgresRoomDecisionRepository implements RoomDecisionRepository {
     const [row] = await this.query(`SELECT payload::text FROM tag_room_decisions WHERE tag_code=${quote(tag)} AND published_at<=${quote(at)}::timestamptz ORDER BY published_at DESC,id DESC LIMIT 1;`);
     return row?.payload ? JSON.parse(row.payload) as ProcessedPosition : null;
   }
+  public async latestMeasuredRoom(assignments: readonly TagAssignment[], at: string): Promise<ProcessedPosition | null> {
+    if (!assignments.length) return null;
+    const valid = (p: ProcessedPosition) => assignments.some(a =>
+      a.tagCode.toLocaleLowerCase("tr-TR") === p.tagCode.toLocaleLowerCase("tr-TR")
+      && Date.parse(p.lastRawDataTimestamp) >= Date.parse(a.assignedAt)
+      && (!a.unassignedAt || Date.parse(p.lastRawDataTimestamp) < Date.parse(a.unassignedAt)))
+      && Date.parse(p.lastRawDataTimestamp) <= Date.parse(at)
+      && p.regionInference.state === "IN_REGION"
+      && p.regionInference.measurementKind === "measured"
+      && Boolean(p.regionInference.regionId);
+    const pending = [...this.inFlight, ...this.queue, ...this.latestByTag.values()].filter(valid)
+      .sort((a, b) => Date.parse(b.lastRawDataTimestamp) - Date.parse(a.lastRawDataTimestamp))[0] ?? null;
+    const assignmentWhere = assignments.map(a =>
+      `(tag_code=${quote(a.tagCode)} AND measured_at>=${quote(a.assignedAt)}::timestamptz${a.unassignedAt ? ` AND measured_at<${quote(a.unassignedAt)}::timestamptz` : ""})`).join(" OR ");
+    const [row] = await this.query(`SELECT payload::text FROM tag_room_decisions WHERE (${assignmentWhere})
+      AND measured_at<=${quote(at)}::timestamptz AND published_at<=${quote(at)}::timestamptz
+      AND COALESCE(state,payload#>>'{regionInference,state}')='IN_REGION'
+      AND COALESCE(measurement_kind,payload#>>'{regionInference,measurementKind}')='measured'
+      AND COALESCE(region_id,payload#>>'{regionInference,regionId}') IS NOT NULL
+      ORDER BY measured_at DESC,published_at DESC,id DESC LIMIT 1;`);
+    const stored = row?.payload ? JSON.parse(row.payload) as ProcessedPosition : null;
+    if (!stored || !valid(stored)) return pending;
+    return pending && Date.parse(pending.lastRawDataTimestamp) > Date.parse(stored.lastRawDataTimestamp) ? pending : stored;
+  }
   public async history(tags: readonly string[], from: string, to: string, limit: number): Promise<readonly ProcessedPosition[]> {
     if (!tags.length) return [];
     const rows = await this.query(`WITH decisions AS (
@@ -207,4 +233,8 @@ export class PostgresRoomDecisionRepository implements RoomDecisionRepository {
   }
 }
 declare global { var __uwbRoomDecisions: PostgresRoomDecisionRepository | undefined }
+// Vite keeps this instance across hot reloads. Refresh its methods when the class changes.
+if (globalThis.__uwbRoomDecisions && Object.getPrototypeOf(globalThis.__uwbRoomDecisions) !== PostgresRoomDecisionRepository.prototype) {
+  Object.setPrototypeOf(globalThis.__uwbRoomDecisions, PostgresRoomDecisionRepository.prototype);
+}
 export const roomDecisions = globalThis.__uwbRoomDecisions ??= new PostgresRoomDecisionRepository();

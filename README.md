@@ -608,7 +608,10 @@ mcp\.venv\Scripts\python.exe -m uvicorn chat_api:app --app-dir mcp --host 127.0.
 ```
 
 Asistan servisini prod ortamda genel ağa açmayın. `/api/assistant` proxy'si
-uygulama içinden bu servise gider; provider anahtarları tarayıcıya gönderilmez.
+genel yardım sorularını bu servise iletir; “en son/şu an nerede” sorularını
+yerel konum servisinden yanıtlar. Provider anahtarları tarayıcıya gönderilmez.
+Konum yanıtlarını sınamak için `npm run test:ai:location` ve kayıtlı bir test
+varlığıyla `npm run test:ai:location:live -- --entity-name <ad>` kullanın.
 
 ## Domain üzerinden geçici paylaşım
 

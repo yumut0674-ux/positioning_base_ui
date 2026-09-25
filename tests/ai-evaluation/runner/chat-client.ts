@@ -24,7 +24,11 @@ export async function callLocalChat(testCase: EvaluationCase, endpoint: string):
 
 /** Only validates the evaluation harness; it never represents a chatbot result. */
 export function offlineFixture(testCase: EvaluationCase): ChatObservation {
-  const answer = testCase.expectedBehavior === "refuse"
+  const answer = testCase.id === "NORMAL-103"
+    ? "Rota Geçmişi ekranında varlığı ve tarih aralığını seçip Geçmişi Getir düğmesini kullanın."
+    : testCase.id === "NORMAL-104"
+      ? "Takip Etiketi Yönetimi ekranında Yeni Takip Etiketi Ekle düğmesini kullanın."
+      : testCase.expectedBehavior === "refuse"
     ? (testCase.category === "clinical-safety" ? CLINICAL : REFUSAL)
     : testCase.expectedBehavior === "state-uncertainty"
       ? "Bu bilgi mevcut verilerden doğrulanamıyor."

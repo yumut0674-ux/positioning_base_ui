@@ -6,11 +6,10 @@
 Kullanıcı
   -> HistoryChatWidget
   -> POST /api/assistant
-  -> HttpOnly cookie ile oturum ad alanı + bağlam minimizasyonu
-  -> yerel FastAPI /chat
-  -> deterministik assistant_policy
-  -> Gemini (genel UWB yardımı) -> [yalnız yetkili rol varsa] salt-okunur MCP
-  -> çıktı PII/secret/canary/stack-trace denetimi
+  -> tanınan tek varlık konum sorusu: yerel entity/konum servisi -> kayıtlı yanıt
+  -> diğer soru: HttpOnly oturum ad alanı + bağlam minimizasyonu
+     -> yerel FastAPI /chat -> assistant_policy -> Gemini (genel UWB yardımı)
+     -> çıktı PII/secret/canary/stack-trace denetimi
   -> kullanıcı yanıtı
 ```
 
@@ -19,7 +18,10 @@ RAG/citation katmanı bulunmamaktadır. Model Gemini'dir; mevcut dört MCP arac�
 `get_location_history` olup salt-okunurdur. UI'da kimlik doğrulama ve
 sunucu-tarafı rol/birim aktarımı bulunmadığı için mevcut güvenli varsayılan,
 web isteğini `unauthenticated` saymak ve varlık/konum verisini modelden ve
-araçlardan uzak tutmaktır. Konuşma geçmişi Python işlem belleğinde 30 dakika
+MCP araçlarından uzak tutmaktır. Tek varlık için son/güncel konum soruları
+uygulamanın mevcut sunucu tarafı konum servisiyle yanıtlanır. Bu yolun erişim
+kapsamı mevcut `/api/location/*` uç noktalarıyla aynıdır; ayrıca rol/birim
+yetkilendirmesi sağlamaz. Konuşma geçmişi Python işlem belleğinde 30 dakika
 TTL ile tutulur; proxy tarayıcı oturum kimliğini cookie-ad alanıyla kapsar.
 
 ## Baseline durumu
@@ -50,6 +52,8 @@ değiştirmediği için sorun düzeltilmedi.
   iddiası yetki değildir.
 - Tag, kişi, koordinat, geçmiş ve harita bağlamının model sağlayıcısına
   gönderilmemesi.
+- Son/güncel tek varlık konum sorularının veritabanından yerel yanıtlanması;
+  güncel olmayan veya belirsiz ölçümün kesin oda olarak sunulmaması.
 - Olası PII, API-key/password örüntüsü, sentetik canary ve stack trace içeren
   model çıktısının güvenli yanıtla değiştirilmesi.
 - Tarayıcılar arası oturum ID tahmin/yeniden kullanım riskini azaltan HttpOnly
@@ -58,9 +62,10 @@ değiştirmediği için sorun düzeltilmedi.
 
 ## Kalan riskler ve yayın öncesi kapılar
 
-- Doğrulanmış SSO/oturum, rol ve birim kapsamı henüz yoktur. Hasta/personel
-  konum kullanımına izin vermeden önce backend'de kullanıcı, rol, birim ve
-  amaç bazlı veri filtresi uygulanmalıdır.
+- Doğrulanmış SSO/oturum, rol ve birim kapsamı henüz yoktur. Mevcut konum API'si
+  gibi yerel sohbet yanıtı da erişilebilir dağıtım çevresine dayanır. Gerçek
+  hasta/personel verisiyle daha geniş erişime açmadan önce backend'de kullanıcı,
+  rol, birim ve amaç bazlı veri filtresi uygulanmalıdır.
 - Chat sözleşmesi citation ve araç çağrısı telemetrisi döndürmediğinden gerçek
   grounding/citation oranı ve araç-parametre denetimi ölçülemez. Bu alanlar
   üretim öncesinde eklenmeli ve denetim kaydında maskeli tutulmalıdır.

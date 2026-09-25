@@ -56,10 +56,28 @@ _PERSONNEL_ETHICS_RE = re.compile(
     re.IGNORECASE,
 )
 _SENSITIVE_DATA_RE = re.compile(
-    r"(?:hasta(?:ların|lar|\s+adı|\s+konumu)?|personel(?:in|leri)?|veritaban(?:ı|ındaki)|"
-    r"ilk\s+\d+|tüm\s+kayıt|konum(?:unu|ları| geçmişi)?|nerede(?:dir|\s+)?|"
+    r"(?:(?:hasta|personel|kişi|kullanıcı)\S*(?:\s+\S+){0,8}\s+"
+    r"(?:ad(?:ı|ları|larını)|konum(?:u|unu|ları|larını| geçmişi| geçmişini)|nerede|hangi\s+odada|geçmişi)|"
+    r"(?:konum(?:unu|larını| geçmişini)?|geçmişini)\s+(?:getir|göster|listele|söyle|paylaş|bul|ver|analiz\s+et)\b|"
+    r"(?:seçili|bu)\s+(?:etiket|tag)(?:in)?(?:\s+\S+){0,5}\s+konumunu|"
+    r"(?:ilk\s+\d+|tüm\s+kayıt|veritaban(?:ındaki|ında)).{0,80}(?:hasta|personel|konum|kayıt)|"
     r"(?:previous|other|another)\s+user(?:'s)?\s+(?:conversation|chat)|"
     r"(?:başka|diğer)\s+kullanıcının(?:\s+önceki)?\s+(?:konuşması|konuşma\s+geçmişi))",
+    re.IGNORECASE,
+)
+_TAG_LOCATION_RE = re.compile(
+    r"\b[A-ZÇĞİÖŞÜ0-9_-]*TAG-[A-Z0-9_-]+\b.{0,80}(?:nerede|hangi\s+odada|konum)",
+    re.IGNORECASE,
+)
+_RECORD_LIST_RE = re.compile(
+    r"\b(?:hasta|personel|kullanıcı)\S*(?:\s+\S+){0,6}\s+"
+    r"(?:listele|listesini|adlarını|göster|ver)\b",
+    re.IGNORECASE,
+)
+_WHERE_RE = re.compile(r"\bnerede(?:dir)?\b|\bhangi\s+odada\b", re.IGNORECASE)
+_UI_NAVIGATION_RE = re.compile(
+    r"\b(?:ayar|menü|buton|düğme|harita|sayfa|ekran|filtre)\S*"
+    r"(?:\s+\S+){0,4}\s+nerede(?:dir)?\b",
     re.IGNORECASE,
 )
 _TC_RE = re.compile(r"(?<!\d)\d{11}(?!\d)")
@@ -101,7 +119,13 @@ def decide_request(message: str, role: str = "unauthenticated") -> PolicyDecisio
 
     # There is currently no authenticated identity bridge from the web app.  Do
     # not infer authority from a user sentence or a client-supplied role.
-    if role in {"unauthenticated", "readonly"} and any(_SENSITIVE_DATA_RE.search(item) for item in variants):
+    if role in {"unauthenticated", "readonly"} and any(_TAG_LOCATION_RE.search(item) for item in variants):
+        return PolicyDecision(False, False, UNCERTAINTY_MESSAGE, "unverified-tag-location")
+    if role in {"unauthenticated", "readonly"} and any(
+        _SENSITIVE_DATA_RE.search(item) or _RECORD_LIST_RE.search(item)
+        or (_WHERE_RE.search(item) and not _UI_NAVIGATION_RE.search(item))
+        for item in variants
+    ):
         return PolicyDecision(False, False, UNAUTHORISED_MESSAGE, "unverified-data-access")
     return PolicyDecision(True, role in {"clinical_staff", "technical_staff", "unit_manager", "system_admin"})
 

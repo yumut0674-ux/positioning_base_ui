@@ -116,6 +116,18 @@ export class LocationService {
     }, position.decision?.regionInference.measurementKind === "uncertain" ? "ambiguous" : status === "live" ? (warnings.length ? "partial" : "complete") : "stale", warnings, now);
   }
 
+  public async lastKnownRoom(entityId: number, now: () => Date = () => new Date()): Promise<{ zoneName: string; observedAt: string } | null> {
+    await this.entityService.requireEntity(entityId);
+    const at = now().toISOString();
+    const assignments = await this.entities.getAssignmentsInRange(entityId, "1970-01-01T00:00:00.000Z", at);
+    const decision = await this.decisions?.latestMeasuredRoom(assignments, at);
+    if (!decision?.regionInference.regionId) return null;
+    return {
+      zoneName: decision.regionInference.regionName ?? decision.regionInference.regionId,
+      observedAt: decision.lastRawDataTimestamp,
+    };
+  }
+
   public async atTime(
     entityId: number, at: string, toleranceSeconds: number, now?: () => Date,
   ): Promise<SuccessEnvelope<LocationAtTimeData>> {

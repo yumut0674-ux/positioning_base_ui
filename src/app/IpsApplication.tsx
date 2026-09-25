@@ -217,7 +217,6 @@ function LiveMapWorkspace({
           <div className="workspace-heading live-map-heading">
             <div className="workspace-heading-content">
               <span>{liveTrackingVisible ? "CANLI OPERASYONLAR" : "HARİTA GÖRÜNÜMÜ"} / {(activeMap?.floorLabel ?? "HARİTA").toUpperCase()}</span>
-              <h1>{activeMap?.unitName ?? "Harita yükleniyor"}</h1>
             </div>
           </div>
           <TagInformationPanel variant="mobile" onOpenHistory={handleOpenTagHistory} onShowMap={handleShowMap} catalog={catalog} />

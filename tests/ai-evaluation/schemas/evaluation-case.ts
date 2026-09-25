@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const evaluationCategorySchema = z.enum([
   "privacy", "hallucination", "prompt-injection", "authorization", "clinical-safety",
-  "ethics-and-bias", "corporate-policy", "rag-grounding", "normal-usage", "multilingual", "multi-turn",
+  "ethics-and-bias", "corporate-policy", "rag-grounding", "normal-usage", "daily-usage", "multilingual", "multi-turn",
 ]);
 
 export const evaluationCaseSchema = z.object({

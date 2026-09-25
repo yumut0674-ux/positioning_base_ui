@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
 import { logger } from "@/src/server/logger";
+import { entityService, locationService } from "@/src/server/location";
+import { answerLocationQuestion, parseLocationQuestion } from "@/src/server/assistant/locationAnswer";
 
 export const runtime = "nodejs";
 
@@ -119,7 +121,15 @@ function upstreamUnavailable(status = 503) {
   }, { status });
 }
 
-function safeUpstreamError(status: number) {
+function safeUpstreamError(status: number, payload?: unknown) {
+  const detail = payload && typeof payload === "object" && "detail" in payload
+    ? (payload as { detail: unknown }).detail
+    : null;
+  if (status === 502 && typeof detail === "string" && detail.startsWith("Gemini API kotası aşıldı.")) {
+    return NextResponse.json({
+      error: "Gekon AI kullanım kotası doldu. Sistem yöneticisinin Gemini API limitlerini kontrol etmesi gerekiyor.",
+    }, { status: 503 });
+  }
   const responseStatus = status >= 500 ? 502 : 400;
   return NextResponse.json({
     error: "Gekon AI yanıtı tamamlanamadı. Lütfen biraz sonra tekrar deneyin.",
@@ -158,6 +168,24 @@ export async function POST(request: Request) {
   const publicSessionId = parsed.data.sessionId ?? randomUUID();
   const internalSessionId = `${namespace.id}:${publicSessionId}`;
 
+  const locationQuestion = parseLocationQuestion(parsed.data.message);
+  if (locationQuestion) {
+    try {
+      const answer = await answerLocationQuestion(locationQuestion, parsed.data.context?.tagCode, {
+        search: (query, limit) => entityService.search(query, limit),
+        current: (entityId) => locationService.current(entityId),
+        lastKnownRoom: (entityId) => locationService.lastKnownRoom(entityId),
+      });
+      return withClientCookie(NextResponse.json({
+        data: { sessionId: publicSessionId, answer },
+        meta: { provider: "local", model: "verified-location" },
+      }), namespace);
+    } catch (error) {
+      logger.error("assistant.location_answer_failed", error);
+      return NextResponse.json({ error: "Konum verisine şu anda ulaşılamıyor. Lütfen biraz sonra tekrar deneyin." }, { status: 503 });
+    }
+  }
+
   try {
     const response = await fetchWithTimeout(chatbotServiceUrl("/chat"), {
       method: "POST",
@@ -175,7 +203,7 @@ export async function POST(request: Request) {
     const payload = await readJson(response);
     if (!response.ok) {
       logger.error("assistant.upstream_rejected", new Error(`HTTP ${response.status}`), { status: response.status });
-      return safeUpstreamError(response.status);
+      return safeUpstreamError(response.status, payload);
     }
 
     const safePayload = assistantResponseSchema.safeParse(payload);

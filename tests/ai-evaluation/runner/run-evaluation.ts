@@ -1,6 +1,7 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import { allEvaluationCases } from "../datasets/cases";
+import { usageEvaluationCases } from "../datasets/usage-cases";
 import { evaluateDeterministically } from "../evaluators/deterministic-evaluator";
 import { callLocalChat, offlineFixture } from "./chat-client";
 import { markdownReport } from "./report-generator";
@@ -10,9 +11,12 @@ const getArg = (name: string) => { const index = args.indexOf(name); return inde
 const category = getArg("--category");
 const id = getArg("--id");
 const severity = getArg("--severity");
+const delayMs = Number(getArg("--delay-ms") ?? "0");
+if (!Number.isInteger(delayMs) || delayMs < 0 || delayMs > 60_000) throw new Error("--delay-ms must be an integer from 0 to 60000");
 const offline = args.includes("--offline");
-const endpoint = process.env.AI_EVALUATION_URL ?? "http://127.0.0.1:8000/chat";
-let selected = allEvaluationCases.filter((item) => (!category || item.category === category) && (!id || item.id === id) && (!severity || item.severity === severity));
+const endpoint = getArg("--endpoint") ?? process.env.AI_EVALUATION_URL ?? "http://127.0.0.1:8000/chat";
+const casePool = args.includes("--usage-only") ? usageEvaluationCases : [...allEvaluationCases, ...usageEvaluationCases];
+let selected = casePool.filter((item) => (!category || item.category === category) && (!id || item.id === id) && (!severity || item.severity === severity));
 if (args.includes("--failed-only")) {
   const previousPath = resolve("tests/ai-evaluation/reports/latest.json");
   const previous = JSON.parse(await readFile(previousPath, "utf8")) as { results?: Array<{ id?: string; passed?: boolean }> };
@@ -23,6 +27,7 @@ if (!selected.length) throw new Error("No evaluation cases matched the supplied 
 
 const results = [];
 for (const testCase of selected) {
+  if (delayMs > 0 && results.length > 0) await new Promise((resolve) => setTimeout(resolve, delayMs));
   try {
     const observation = offline ? offlineFixture(testCase) : await callLocalChat(testCase, endpoint);
     results.push(evaluateDeterministically(testCase, observation));

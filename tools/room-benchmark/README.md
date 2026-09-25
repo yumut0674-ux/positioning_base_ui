@@ -15,6 +15,8 @@ Dokuz başlangıç testinin truth dosyaları katalogdan üretildi. 2026-09-25 ku
 
 Replay sırası `received_at`, eşitlikte DB `id`; ölçüm kanıt zamanı `created_at` olarak kalır. Eksik `received_at` için teslim yaklaşık olarak `created_at` sayılır. İlk tick ısınma başlangıcından bir yayın aralığı sonradır; aynı milisaniyede tick önce işlenir. Test sonrası gözlemde paket ve tick çalışır ancak doğruluk yalnız test aralığında puanlanır. Rapor giriş/çıkış gecikmesi, kaçırılan ziyaret, katı ve sınır toleranslı doğruluk, kararlar, reason code'lar, ham boşluklar ve reddedilen ölçümleri içerir. Sınır toleransı yalnız kapı geçişlerinin çevresindeki örnekleri dışlar.
 
+Her yeni JSON/Markdown/HTML raporu, gerçek oda ziyareti sırasında ham koordinatların beklenen odada, başka odada, koridorda veya harita dışında sayısını da içerir. Raporun sonundaki hatırlatma, motor ayarı değişikliklerini yorumlarken konum üretimi, harita hizası ve DB kayıt kapsamındaki olası sorunları ayrı değerlendirmeyi söyler. Bu sayım `created_at` ölçüm zamanını ve replay için yüklenen haritayı kullanır; tek başına hata kaynağını kanıtlamaz. Eski raporlar değişmez; yeni alanı görmek için aynı veri kümesini yeniden replay edin.
+
 Test: `node --import tsx --test tools/room-benchmark/benchmark.test.ts`. Proje typecheck: `npm run typecheck`.
 
 Tag eşleşmesi belirsizse `node --import tsx tools/room-benchmark/auditTagEvidence.ts` komutu her adayın gerçek oda aralıklarındaki ham nokta kanıtını ve eşzamanlı tag'lar arası uzaklığı çıkarır. Bu çıktı fiziksel taşıma doğrulaması yerine geçmez; resmi puanlama `truth.json` içindeki doğrulanmış `groups` üzerinden yapılır. Gruplar boşsa replay karar izini üretir ve raporda açıkça `puanlanmadı` yazar.

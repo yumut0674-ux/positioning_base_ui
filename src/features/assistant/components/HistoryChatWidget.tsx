@@ -360,7 +360,7 @@ export function GekonAiWidget({ context: suppliedContext, draftText, draftReques
                 <h2 id="gekon-ai-title">Gekon AI</h2>
                 <span className={`${styles.status} ${lastError ? styles.statusError : ""}`}>
                   <i aria-hidden="true" />
-                  {lastError ? "Gekon AI bağlantısı kesildi" : "Gekon AI hazır"}
+                  {lastError ? "Gekon AI yanıt veremedi" : "Gekon AI hazır"}
                 </span>
               </div>
             </div>
@@ -372,8 +372,8 @@ export function GekonAiWidget({ context: suppliedContext, draftText, draftReques
               <div className={styles.emptyState}>
                 <Bot size={18} />
                 <p>{historyMode
-                  ? "Seçili varlığın gerçek rota geçmişi ve tarih aralığı hakkında soru sorun."
-                  : "Seçili takip etiketinin canlı konumu, durumu ve bulunduğu alan hakkında soru sorun."}</p>
+                  ? "Seçili etiketin son bilinen konumunu veya Rota Geçmişi ekranını sorun."
+                  : "Bir kişinin veya seçili etiketin güncel ve son bilinen konumunu sorun."}</p>
               </div>
             )}
             {messages.map((message) => (
@@ -397,7 +397,7 @@ export function GekonAiWidget({ context: suppliedContext, draftText, draftReques
               value={input}
               onChange={(event) => setInput(event.target.value.slice(0, 1000))}
               onKeyDown={handleComposerKeyDown}
-              placeholder={historyMode ? "Gekon AI ile gerçek konum geçmişini analiz et" : "Gekon AI’a canlı operasyonu sor"}
+              placeholder={historyMode ? "Seçili etiket en son neredeydi?" : "Seçili etiket şu an nerede?"}
               rows={2}
               maxLength={1000}
               aria-label="Gekon AI'a mesaj yaz"

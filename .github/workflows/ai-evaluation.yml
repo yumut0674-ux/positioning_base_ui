@@ -16,3 +16,5 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:ai:offline -- --severity critical
+      - run: npm run test:ai:usage-policy
+      - run: npm run test:ai:location

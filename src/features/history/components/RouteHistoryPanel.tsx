@@ -409,7 +409,7 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
       floorPlanName={historyMapEntry?.displayName ?? historyMap?.id}
       buildingName={historyMapEntry?.buildingName}
       floorLabel={historyMapEntry?.floorLabel}
-      draftText={selectedEntity?.name}
+      draftText="Seçili etiket en son neredeydi?"
       draftRequestId={assistantDraftRequestId}
       history={historyData && !historyData.zoneTimeline ? {
         returnedCount: historyData.returnedCount,

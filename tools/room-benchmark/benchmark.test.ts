@@ -7,6 +7,7 @@ import { replayRows } from './replay';
 import { compare, markdown } from './report';
 import { inspectRows } from './importer';
 import { score } from './score';
+import { spatialEvidence } from './spatialEvidence';
 import type { RawRow, Truth } from './model';
 
 const config=compileRegionsConfig(JSON.parse(readFileSync(new URL('../../config/maps/spor-koridor/regions.json',import.meta.url),'utf8')) as RegionsConfig);
@@ -79,4 +80,24 @@ test('unassigned tags are explicitly unscored while decisions remain visible',()
     ...replay,schemaVersion:1});
   assert.match(output,/Motor kararları üretildi; oda doğruluğu hesaplanmadı/);
   assert.match(output,/Tag eşleşmesi doğrulanmadığı için süreler puanlanmadı/);
+  assert.match(output,/Ham konum \/ sistem hatırlatması/);
+});
+
+test('report ends with raw spatial evidence and a system-level interpretation reminder',()=>{
+  const room06=config.regions.find(region=>region.id==='room-06')!.roomCenter;
+  const room01=config.regions.find(region=>region.id==='room-01')!.roomCenter;
+  const visitTruth:Truth={...truth,visits:[{roomId:'room-06',from:at(7000),to:at(16000)}],groups:[{id:'walker',tagCodes:['A']}]};
+  const rows=[row(1,'A',8000,8000,room06.x,room06.y),row(2,'A',9000,9000,room01.x,room01.y),
+    row(3,'A',10000,10000,11,1),row(4,'A',11000,11000,100,100),{...row(5,'A',12000,12000),x:null}];
+  const evidence=spatialEvidence(rows,visitTruth,config);
+  assert.deepEqual(evidence,[{tagCode:'A',visitIndex:1,roomId:'room-06',packetCount:5,expectedRoomCount:1,
+    otherRoomCounts:{'room-01':1},corridorCount:1,outsideMappedCount:1,missingCoordinatesCount:1}]);
+  const output=markdown({schemaVersion:1,testId:visitTruth.testId,engineVersion:'test',git:{commit:'test',dirty:false,status:''},
+    config:{path:'fixture',sha256:'x',version:'x',context:'fixture'},
+    dataset:{source:'fixture',caveat:'fixture',sha256:'x',rowCount:rows.length,candidateTags:{A:rows.length},timing:'exact',
+      quality:inspectRows(rows),truthRevision:1,truthSha256:'x',warmupMs:5000,observationMs:70000},
+    simulation:{tickMs:1000,sampleMs:250,boundaryToleranceMs:2000,tickOrigin:at(0),equalTimeOrder:'tick then packet'},
+    unscoredTags:[],decisions:[],metrics:score(visitTruth,[],rows),rawSpatialEvidence:evidence});
+  assert.match(output,/\| A \| 1\. room-06 \| 5 \| 1 \| room-01: 1 \| 1 \| 1 \| 1 \|/);
+  assert.match(output.trimEnd().split('\n').at(-1)!,/^Hatırlatma: Gerçekte odadayken ham koordinatların/);
 });

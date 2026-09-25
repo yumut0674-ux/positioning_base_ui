@@ -49,7 +49,19 @@ export function markdown(run:Run):string {
   out.push('','## Rota grupları','','| Grup | Taglar | Doğrulanmış s | Tahmini s | Kaçırılan ziyaret |','|---|---|---:|---:|---:|');
   for(const group of m.groups) out.push(`| ${group.id} | ${group.tags.join(', ')} | ${round(group.strict.correctConfirmedMs/1000)} | ${round(group.strict.correctInferredMs/1000)} | ${group.missedVisits} |`);
   out.push('','## Süreler','',m.successPercent===null?'Tag eşleşmesi doğrulanmadığı için süreler puanlanmadı.':`Koridorda yanlış oda: ${round(m.summary.corridorFalseRoomMs/1000)} s; yanlış oda: ${round(m.summary.wrongRoomMs/1000)} s; belirsiz/kayıp: ${round(m.summary.lostOrUncertainMs/1000)} s.`,
-    '',`Ölçümler/veri boşlukları, bütün kararlar ve kaçırılan ziyaret çizelgeleri report.json içindedir. ${run.dataset.caveat}`);
+    '',`Ölçümler/veri boşlukları, bütün kararlar ve kaçırılan ziyaret çizelgeleri report.json içindedir. ${run.dataset.caveat}`,
+    '','## Ham konum / sistem hatırlatması','');
+  if(run.rawSpatialEvidence?.length) {
+    out.push('Gerçek oda ziyareti sırasındaki ham paketler, ölçüm zamanı ve bu raporda kullanılan harita ile sınıflandırıldı.','',
+      '| Tag | Ziyaret | Paket | Beklenen odada | Başka odada | Koridorda | Harita dışında | Koordinat eksik |',
+      '|---|---|---:|---:|---|---:|---:|---:|');
+    for(const item of run.rawSpatialEvidence) {
+      const other=Object.entries(item.otherRoomCounts).map(([room,count])=>`${room}: ${count}`).join(', ')||'—';
+      out.push(`| ${item.tagCode} | ${item.visitIndex}. ${item.roomId} | ${item.packetCount} | ${item.expectedRoomCount} | ${other} | ${item.corridorCount} | ${item.outsideMappedCount} | ${item.missingCoordinatesCount} |`);
+    }
+    out.push('');
+  } else out.push('Bu raporda ziyaret bazlı ham koordinat dağılımı bulunmuyor; yeni replay ile üretilebilir.','');
+  out.push('Hatırlatma: Gerçekte odadayken ham koordinatların başka odaya, koridora veya harita dışına düşmesi konum üretimi, harita hizası ya da kayıt kapsamı açısından ayrıca incelenmelidir. Böyle bir durumda motor sonucunu yalnız karar kuralına bağlamayın; doğrulanmış ve tahmini doğru oda sürelerini ayrı değerlendirin. Bu dağılım tek başına hangi sistem bileşeninin hatalı olduğunu kanıtlamaz.');
   return out.join('\n')+'\n';
 }
 export async function writeReport(run:Run,runId?:string):Promise<string> {
@@ -59,7 +71,7 @@ export async function writeReport(run:Run,runId?:string):Promise<string> {
   const md=markdown(run);
   await writeFile(path.join(dir,'report.json'),JSON.stringify(run,null,2)+'\n',{flag:'wx'});
   await writeFile(path.join(dir,'report.md'),md,{flag:'wx'});
-  await writeFile(path.join(dir,'report.html'),`<!doctype html><html lang="tr"><meta charset="utf-8"><title>Oda benchmarkı</title><style>body{font:16px system-ui;max-width:1100px;margin:40px auto;padding:0 20px;line-height:1.5}table{border-collapse:collapse;display:block;overflow:auto}td{padding:6px 10px;border:1px solid #bbb}tr:first-child{font-weight:700;background:#eee}</style>${htmlBody(md)}<p>Ayrıntılı kararlar: <a href="report.json">report.json</a></p></html>`);
+  await writeFile(path.join(dir,'report.html'),`<!doctype html><html lang="tr"><meta charset="utf-8"><title>Oda benchmarkı</title><style>body{font:16px system-ui;max-width:1100px;margin:40px auto;padding:0 20px;line-height:1.5}table{border-collapse:collapse;display:block;overflow:auto}td{padding:6px 10px;border:1px solid #bbb}tr:first-child{font-weight:700;background:#eee}</style><p>Ayrıntılı kararlar: <a href="report.json">report.json</a></p>${htmlBody(md)}</html>`);
   return dir;
 }
 export async function readRun(file:string):Promise<Run> {return JSON.parse(await readFile(file,'utf8')) as Run;}
@@ -73,5 +85,6 @@ export function compare(a:Run,b:Run):string {
     const old=sum(a,'correctConfirmedMs')+sum(a,'correctInferredMs'),now=sum(b,'correctConfirmedMs')+sum(b,'correctInferredMs');
     out.push(`| ${id} | ${round(old)} | ${round(now)} | ${round(now-old)} | ${round(sum(a,'wrongRoomMs'))} | ${round(sum(b,'wrongRoomMs'))} |`);
   }
+  out.push('','Hatırlatma: Motor kazanım/kaybını yorumlarken ilgili raporlardaki ham konum dağılımını, veri boşluklarını ve doğrulanmış/tahmini doğru oda sürelerini birlikte inceleyin. Oda ziyareti sırasında başka oda veya koridor koordinatı üretilmesi, karar motoru dışındaki konumlandırma zincirinde de sorun olabileceğini gösterir.');
   return out.join('\n')+'\n';
 }
