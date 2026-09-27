@@ -170,14 +170,13 @@ export class PositionAnimationController {
     const renderedSegmentIsValid = !this.displayArea
       || segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, sample, this.displayArea);
     const queuedSegmentIsValid = !this.displayArea || !latest || segmentInDisplayArea(latest, sample, this.displayArea);
-    const isRegionCentreChange = sample.positionSource === "REGION_CENTER"
-      && latest?.positionSource === "REGION_CENTER"
-      && latest.regionId !== sample.regionId;
     if (this.displayArea && (!renderedSegmentIsValid || !queuedSegmentIsValid)) {
       state.samples = [sample];
       state.lastReceivedAt = incoming.measurementTimestamp ?? receivedAt;
       state.stale = receivedAt - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
-      if (this.config.enabled && isRegionCentreChange) {
+      // A confirmed room centre can be separated from the last raw point by a
+      // tiny map gap. Fade and relocate instead of leaving the marker at the door.
+      if (this.config.enabled && sample.positionSource === "REGION_CENTER") {
         this.startNonRoutableRegionRelocation(state, sample, receivedAt);
       } else if (this.config.enabled) {
         this.startTransition(state, sample, receivedAt, this.transitionDuration(state, sample, this.config.teleportAnimationDurationMs), "normal-route");

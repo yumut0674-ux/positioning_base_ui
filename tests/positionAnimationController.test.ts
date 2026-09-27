@@ -72,6 +72,29 @@ test("field room-03 to room-05 relocation fades, snaps, and finishes exactly at 
   assert.deepEqual(animation.getState("T")?.samples.map(({ x, y, regionId }) => ({ x, y, regionId })), [{ ...room05Center, regionId: "room-05" }]);
 });
 
+test("RAW to room-03 centre crosses a narrow map gap without sticking at the door", () => {
+  const corridor = [{ x: 0, y: 1 }, { x: 2, y: 1 }, { x: 2, y: 3 }, { x: 0, y: 3 }];
+  const room = [{ x: -2, y: 1 }, { x: -0.02, y: 1 }, { x: -0.02, y: 3 }, { x: -2, y: 3 }];
+  const raw = { x: 0, y: 2.317 };
+  assert.equal(segmentInDisplayArea(raw, room03Center, [corridor, room]), false);
+
+  const animation = controller({ interpolationDelayMs: 0, regionTransitionDurationMs: 600 });
+  animation.setDisplayArea([corridor, room]);
+  const frames: { x: number; y: number; opacity: number }[] = [];
+  animation.attach("T", { render: (x, y, _stale, opacity) => frames.push({ x, y, opacity }) });
+  animation.ingest("T", { ...raw, timestamp: 1_000, receivedAt: 1_000, positionSource: "RAW" });
+  animation.ingest("T", { ...room03Center, timestamp: 2_000, receivedAt: 2_000,
+    positionSource: "REGION_CENTER", regionId: "room-03" });
+
+  assert.equal(animation.getState("T")?.transitionKind, "non-routable-region-relocation");
+  animation.update(2_200);
+  assert.deepEqual([frames.at(-1)!.x, frames.at(-1)!.y], [raw.x, raw.y]);
+  animation.update(2_300);
+  assert.deepEqual([frames.at(-1)!.x, frames.at(-1)!.y, frames.at(-1)!.opacity], [room03Center.x, room03Center.y, 0]);
+  animation.update(2_600);
+  assert.deepEqual([frames.at(-1)!.x, frames.at(-1)!.y, frames.at(-1)!.opacity], [room03Center.x, room03Center.y, 1]);
+});
+
 test("REGION_CENTER outside the display area cannot start a relocation", () => {
   const animation = controller({ interpolationDelayMs: 0 });
   animation.setDisplayArea([boxAround(room03Center)]);

@@ -2,14 +2,16 @@
 
 import { motion } from "framer-motion";
 import {
-  AlertTriangle, CalendarRange, ChevronDown, CircleDot, Clock3, Crosshair, Database,
+  AlertTriangle, CalendarRange, ChevronDown, CircleDot, Clock3, Crosshair, Database, FileText,
   History, Layers3, Loader2, MessageCircle, MapPin, MapPinned, Maximize2, Route, Search,
 } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Circle, Group, Image as KonvaImage, Layer, Line, Rect, Stage, Text } from "react-konva";
 import type Konva from "konva";
 import useImage from "use-image";
 import { HistoryChatWidget } from "@/src/features/assistant/components/HistoryChatWidget";
+import { RouteReportDialog } from "@/src/features/reports/components/RouteReportDialog";
+import { fetchTags, type TagDefinition } from "@/src/features/tracking/services/tagApi";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { CoordinateTransformService } from "@/src/features/map/services/CoordinateTransformService";
 import { buildLocationTimeline, routeDistanceByMap, segmentRouteByMap, type HistoricalPosition, type LocationStay } from "@/src/features/map/services/RouteTimelineService";
@@ -73,14 +75,23 @@ interface RouteHistoryPanelProps {
 }
 
 export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistoryPanelProps) {
+  const tagSearchId = useId();
+  const tagSearchInputRef = useRef<HTMLInputElement>(null);
+  const suppressTagOpenOnFocusRef = useRef(false);
   const hostRef = useRef<HTMLDivElement>(null);
+  const sidebarRef = useRef<HTMLElement>(null);
+  const summaryRef = useRef<HTMLElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const size = useElementSize(hostRef);
   const [historyMap, setHistoryMap] = useState<MapDetails | null>(null);
   const [mapCatalog, setMapCatalog] = useState<MapCatalog | null>(null);
   const [floorImage] = useImage(historyMap?.image.url ?? "", "anonymous");
   const [initialRange] = useState(initialDateRange);
-  const [entityQuery, setEntityQuery] = useState(() => requestedTagCode?.trim().toUpperCase() || "TAG-001");
+  const [entityQuery, setEntityQuery] = useState(() => requestedTagCode?.trim().toUpperCase() || "");
+  const [registeredTags, setRegisteredTags] = useState<TagDefinition[]>([]);
+  const [tagListState, setTagListState] = useState<"loading" | "ready" | "error">("loading");
+  const [tagDropdownOpen, setTagDropdownOpen] = useState(false);
+  const [tagFilterActive, setTagFilterActive] = useState(false);
   const [entities, setEntities] = useState<readonly EntityMatch[]>([]);
   const [selectedEntityId, setSelectedEntityId] = useState<number | null>(null);
   const [entitySearchRequestKey, setEntitySearchRequestKey] = useState(requestKey);
@@ -96,6 +107,7 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
   const [selectedStayId, setSelectedStayId] = useState<string | null>(null);
   const [viewport, setViewport] = useState({ x: 0, y: 0, scale: .9 });
   const [assistantDraftRequestId, setAssistantDraftRequestId] = useState(0);
+  const [reportOpen, setReportOpen] = useState(false);
   const mapWidth = historyMap?.image.width ?? Math.max(1, size.width);
   const mapHeight = historyMap?.image.height ?? Math.max(1, size.height);
   const historyMapId = historyMap?.id ?? null;
@@ -110,6 +122,47 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
   useEffect(() => {
     void fetchMapCatalog().then(setMapCatalog).catch(() => setMapCatalog(null));
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    const apply = (tags: TagDefinition[]) => { if (active) { setRegisteredTags(tags); setTagListState("ready"); } };
+    void fetchTags().then(apply).catch(() => { if (active) setTagListState("error"); });
+    const onTagsChanged = (event: Event) => apply((event as CustomEvent<TagDefinition[]>).detail ?? []);
+    window.addEventListener("tag-definitions-updated", onTagsChanged);
+    return () => { active = false; window.removeEventListener("tag-definitions-updated", onTagsChanged); };
+  }, []);
+
+  const visibleTags = useMemo(() => {
+    const query = tagFilterActive ? entityQuery.trim().toLocaleLowerCase("tr-TR") : "";
+    return query ? registeredTags.filter(tag => `${tag.id} ${tag.displayName}`.toLocaleLowerCase("tr-TR").includes(query)) : registeredTags;
+  }, [entityQuery, registeredTags, tagFilterActive]);
+
+  const chooseTag = (tag: TagDefinition) => {
+    setEntityQuery(tag.id);
+    setTagDropdownOpen(false);
+    setTagFilterActive(false);
+    setEntitySearchRequestKey(current => current + 1);
+    setSelectedEntityId(null);
+    setPositions([]);
+    setHistoryData(null);
+    setHistoryWarnings([]);
+    setHistoryState("idle");
+    setHistoryMessage(null);
+    setSelectedStayId(null);
+  };
+
+  useEffect(() => {
+    if (historyState !== "success") return;
+    const frame = window.requestAnimationFrame(() => {
+      const sidebar = sidebarRef.current;
+      const summary = summaryRef.current;
+      if (!sidebar || !summary) return;
+      const summaryTop = summary.getBoundingClientRect().top - sidebar.getBoundingClientRect().top + sidebar.scrollTop;
+      const target = Math.max(sidebar.scrollTop, summaryTop - Math.min(140, sidebar.clientHeight * .25));
+      sidebar.scrollTo({ top: target, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [historyState]);
 
   useEffect(() => {
     const requestedTag = requestedTagCode?.trim().toUpperCase();
@@ -354,9 +407,9 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
   }));
 
   return <div className={styles.panelRoot}>
-      <div className="workspace-heading">
+      <div className={`workspace-heading ${styles.historyHeading}`}>
         <div><span>HAREKET ANALİZİ / {(historyMap?.id ?? "KAT BELİRLENEMEDİ").toUpperCase()}</span><h1>Rota Geçmişi</h1></div>
-        <div className="workspace-meta"><i /><span>{historyData?.zoneTimeline ? "ODA KARAR GEÇMİŞİ" : "GERÇEK KONUM VERİSİ"}</span><strong>{selectedEntity?.tagCode ?? selectedEntity?.entityCode ?? "—"}</strong></div>
+        <button type="button" className={styles.reportButton} onClick={() => setReportOpen(true)}><FileText size={18} aria-hidden="true" />Konum Raporu Oluştur</button>
       </div>
       <section className={styles.mapFrame}>
         <div ref={hostRef} className={styles.mapCanvas}>
@@ -377,11 +430,33 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
         <div className={styles.mapMeta}><CircleDot size={13} /> {historyMap ? "PLAN KALİBRE EDİLDİ" : "KAT BELİRLENEMEDİ"} <span>{historyMap ? `${historyMap.calibration.pixelsPerMeter} PX/M` : "PLAN YOK"} · {routeSegments.length} SEGMENT</span></div>
         <div className={styles.zoomReadout}>{Math.round(viewport.scale * 100)}%</div>
         <div className={styles.mapTools}><button type="button" onClick={fitMap} title="Haritayı sığdır"><Maximize2 size={16} /></button><button type="button" title="Katmanlar"><Layers3 size={16} /></button><button type="button" title="Odak noktası"><Crosshair size={16} /></button></div>
-        <motion.aside className={styles.sidebar} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>
+        <motion.aside ref={sidebarRef} className={styles.sidebar} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>
           <div className={styles.panelHeader}><span className={styles.iconFrame}><History size={18} /></span><div><small>HAREKET ANALİZİ</small><h2>Rota Geçmişi</h2></div></div>
           <p className={styles.intro}>Kayıtlı varlığı ve tarih aralığını seçerek veritabanındaki gerçek hareket akışını inceleyin.</p>
           <div className={styles.fields}>
-            <label><span><Search size={13} /> CİHAZ / TAKİP ETİKETİ ARA</span><input value={entityQuery} onChange={(event) => setEntityQuery(event.target.value)} placeholder="Takip etiketi kodu veya varlık adı" /></label>
+            <div className={styles.tagSearch} onBlur={event => { if (!event.currentTarget.contains(event.relatedTarget)) setTagDropdownOpen(false); }}>
+              <label htmlFor={tagSearchId}><span><Search size={13} /> CİHAZ / TAKİP ETİKETİ ARA</span></label>
+              <div className={styles.tagSearchInput}><input ref={tagSearchInputRef} id={tagSearchId} type="search" value={entityQuery}
+                onChange={event => { setEntityQuery(event.target.value); setTagFilterActive(true); setTagDropdownOpen(true); }}
+                onFocus={() => { if (suppressTagOpenOnFocusRef.current) { suppressTagOpenOnFocusRef.current = false; return; } setTagFilterActive(false); setTagDropdownOpen(true); }}
+                onClick={() => { setTagFilterActive(false); setTagDropdownOpen(true); }}
+                onKeyDown={event => {
+                  if (event.key === "Escape") setTagDropdownOpen(false);
+                  if (event.key === "Enter" && tagDropdownOpen && visibleTags[0]) { event.preventDefault(); chooseTag(visibleTags[0]); }
+                  if (event.key === "ArrowDown") { event.preventDefault(); setTagDropdownOpen(true); window.requestAnimationFrame(() => document.getElementById(`${tagSearchId}-option-0`)?.focus()); }
+                }}
+                placeholder="Tag adı, kodu veya varlık adı" role="combobox" aria-autocomplete="list" aria-expanded={tagDropdownOpen} aria-controls={`${tagSearchId}-options`} /><ChevronDown size={14} aria-hidden="true" /></div>
+              {tagDropdownOpen && <div id={`${tagSearchId}-options`} className={styles.registeredTags} role="listbox" aria-label="Sistemde kayıtlı taglar">
+                <div className={styles.registeredTagsTitle}>KAYITLI TAGLAR{tagListState === "ready" ? ` · ${visibleTags.length}` : ""}</div>
+                {tagListState === "loading" && <p role="status">Taglar yükleniyor…</p>}
+                {tagListState === "error" && <p role="alert">Tag listesi yüklenemedi. Arama alanını kullanabilirsiniz.</p>}
+                {tagListState === "ready" && visibleTags.length === 0 && <p>{registeredTags.length ? "Eşleşen tag bulunamadı." : "Kayıtlı tag bulunamadı."}</p>}
+                {tagListState === "ready" && visibleTags.length > 0 && <div className={styles.registeredTagList}>{visibleTags.map((tag, index) => <button id={`${tagSearchId}-option-${index}`} key={tag.id} type="button" role="option" aria-selected={entityQuery.trim().toUpperCase() === tag.id.toUpperCase()} onClick={() => chooseTag(tag)} onKeyDown={event => {
+                  if (event.key === "Escape") { suppressTagOpenOnFocusRef.current = true; tagSearchInputRef.current?.focus(); setTagDropdownOpen(false); }
+                  if (event.key === "ArrowDown" || event.key === "ArrowUp") { event.preventDefault(); const next = (index + (event.key === "ArrowDown" ? 1 : visibleTags.length - 1)) % visibleTags.length; document.getElementById(`${tagSearchId}-option-${next}`)?.focus(); }
+                }}><span>{tag.displayName}</span><code>{tag.id}</code></button>)}</div>}
+              </div>}
+            </div>
             <label><span><MapPinned size={13} /> İZLENEN VARLIK</span><div className={styles.selectWrap}><select value={selectedEntityId ?? ""} onChange={(event) => { setSelectedEntityId(event.target.value ? Number(event.target.value) : null); setPositions([]); setHistoryData(null); setHistoryState("idle"); setHistoryMessage(null); }} disabled={entitySearchLoading || entities.length === 0}><option value="">{entitySearchLoading ? "Varlıklar aranıyor…" : entities.length ? "Varlık seçin" : "Eşleşen kayıt yok"}</option>{entities.map((entity) => <option key={entity.entityId} value={entity.entityId}>{entity.name} · {entity.tagCode ?? "takip etiketi atanmamış"}</option>)}</select><ChevronDown size={14} /></div></label>
             <div className={styles.dateGrid}><label><span><CalendarRange size={13} /> BAŞLANGIÇ</span><input type="datetime-local" value={startDate} onChange={(event) => setStartDate(event.target.value)} /></label><label><span><Clock3 size={13} /> BİTİŞ</span><input type="datetime-local" value={endDate} min={startDate} onChange={(event) => setEndDate(event.target.value)} /></label></div>
           </div>
@@ -394,12 +469,13 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
           {historyWarnings.length > 0 && <div className={styles.warningList}>{historyWarnings.map((warning) => <p key={warning}>{warning}</p>)}</div>}
           {historyData?.sampled && <div className={styles.sampledNotice}>Çok yoğun veri: {historyData.sourcePointCount} kayıttan {historyData.returnedCount} rota noktası örneklendi.</div>}
 
-          {historyState === "success" && <motion.section className={styles.summary} key={positions[0]?.timestamp} initial={{ opacity: .4, y: 5 }} animate={{ opacity: 1, y: 0 }}><div className={styles.summaryTitle}><Route size={14} /><span>ROTA ÖZETİ</span><i>GERÇEK VERİ</i></div><div className={styles.stats}><div><small>BULUNAN NOKTA</small><strong>{positions.length}</strong><em>{historyData?.sourcePointCount ?? positions.length} kaynak kayıt</em></div><div><small>TOPLAM MESAFE</small><strong>{historyData?.zoneTimeline ? "—" : distance.toFixed(1)}{!historyData?.zoneTimeline && <b>m</b>}</strong><em>{historyData?.zoneTimeline ? "Geçiş rotası bilinmiyor" : "ham koordinat toplamı"}</em></div><div><small>ZİYARET EDİLEN BÖLGE</small><strong>{visitedLocationCount}</strong><em>benzersiz alan</em></div><div><small>TOPLAM TAKİP</small><strong>{formatDuration(totalDuration)}</strong><em>veri aralığı</em></div></div></motion.section>}
+          {historyState === "success" && <motion.section ref={summaryRef} className={styles.summary} key={positions[0]?.timestamp} initial={{ opacity: .4, y: 5 }} animate={{ opacity: 1, y: 0 }}><div className={styles.summaryTitle}><Route size={14} /><span>ROTA ÖZETİ</span><i>GERÇEK VERİ</i></div><div className={styles.stats}><div><small>BULUNAN NOKTA</small><strong>{positions.length}</strong><em>{historyData?.sourcePointCount ?? positions.length} kaynak kayıt</em></div><div><small>TOPLAM MESAFE</small><strong>{historyData?.zoneTimeline ? "—" : distance.toFixed(1)}{!historyData?.zoneTimeline && <b>m</b>}</strong><em>{historyData?.zoneTimeline ? "Geçiş rotası bilinmiyor" : "ham koordinat toplamı"}</em></div><div><small>ZİYARET EDİLEN BÖLGE</small><strong>{visitedLocationCount}</strong><em>benzersiz alan</em></div><div><small>TOPLAM TAKİP</small><strong>{formatDuration(totalDuration)}</strong><em>veri aralığı</em></div></div></motion.section>}
 
           {historyState === "success" && <section className={styles.timeline} aria-label="Konum zaman çizelgesi"><div className={styles.timelineHeader}><div className={styles.timelineTitle}><MapPin size={14} /><span>KONUM ZAMAN ÇİZELGESİ</span></div><span className={styles.timelineCount}>{visitedLocationCount} BÖLGE</span></div>{selectedStay && <button type="button" className={styles.showAll} onClick={() => { setSelectedStayId(null); fitMap(); }}>Tüm rotayı göster</button>}<div className={styles.timelineList}>{timeline.map((stay) => <button key={stay.id} type="button" className={`${styles.timelineRow} ${selectedStayId === stay.id ? styles.selectedTimelineRow : ""} ${stay.isDataGap ? styles.gapTimelineRow : ""}`} onClick={() => chooseStay(stay)}><span className={styles.timelineMarker} aria-hidden="true" /><span className={styles.timelineContent}><span className={styles.timelineTime}>{formatTime(stay.startedAt)} — {formatTime(stay.endedAt)} <b>· {formatDuration(stay.durationMs)}</b></span><strong>{stay.locationLabel}</strong><small>{stay.mapId ? mapCatalog?.maps.find((map) => map.id === stay.mapId)?.displayName ?? stay.mapId : "Kat belirlenemedi"}{stay.isMapTransition ? " · Kat geçişi" : ""}</small>{!stay.isDataGap && longestStay?.id === stay.id && <em>EN UZUN KALIŞ</em>}</span></button>)}</div>{longestStay && <p className={styles.longestSummary}>En uzun kalış: <strong>{longestStay.locationLabel}</strong> · {formatDuration(longestStay.durationMs)}</p>}</section>}
           <div className={styles.legend}><span><i className={styles.startDot} /> Başlangıç</span><span><i className={styles.routeDot} /> Rota</span><span><i className={styles.endDot} /> Bitiş</span></div>
         </motion.aside>
       </section>
+    {reportOpen && <RouteReportDialog onClose={() => setReportOpen(false)} initialTagCode={selectedEntity?.tagCode ?? undefined} initialFrom={startDate} initialTo={endDate} />}
     <HistoryChatWidget
       tagCode={selectedEntity?.tagCode ?? undefined}
       entityName={selectedEntity?.name}

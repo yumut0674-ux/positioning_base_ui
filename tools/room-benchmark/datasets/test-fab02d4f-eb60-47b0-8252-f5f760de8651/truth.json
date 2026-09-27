@@ -1,0 +1,21 @@
+{
+  "testId": "test-fab02d4f-eb60-47b0-8252-f5f760de8651",
+  "timezone": "Europe/Istanbul",
+  "revision": 2,
+  "revisionReason": "İlk saha kronometresi kaydından sonra kullanıcı tek 'lok' tag'ının taşındığını doğruladı; tags tablosunda lok = D95660981D60BDA1 ve bu aralıkta tek aday bu kod",
+  "test": {
+    "from": "2026-09-26T10:32:03.369Z",
+    "to": "2026-09-26T10:35:28.755Z"
+  },
+  "visits": [
+    { "roomId": "room-03", "from": "2026-09-26T10:32:18.197Z", "to": "2026-09-26T10:32:49.770Z" },
+    { "roomId": "room-05", "from": "2026-09-26T10:32:51.507Z", "to": "2026-09-26T10:33:27.890Z" },
+    { "roomId": "room-06", "from": "2026-09-26T10:33:32.118Z", "to": "2026-09-26T10:34:04.335Z" },
+    { "roomId": "room-07", "from": "2026-09-26T10:34:06.185Z", "to": "2026-09-26T10:34:39.085Z" },
+    { "roomId": "room-05", "from": "2026-09-26T10:34:44.131Z", "to": "2026-09-26T10:35:16.137Z" }
+  ],
+  "groups": [
+    { "id": "lok-rota", "tagCodes": ["D95660981D60BDA1"], "note": "Kullanıcı: yalnız lok taşındı; DB tags kaydı kodu doğruladı" }
+  ],
+  "note": "Oda aralıkları arasındaki süre koridordur."
+}
