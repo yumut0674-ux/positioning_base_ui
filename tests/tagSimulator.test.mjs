@@ -44,6 +44,17 @@ test("default simulator cadence is fixed at one update per second", () => {
   assert.equal(getRandomDelay(1_000, 1_000), 1_000);
 });
 
+test("simulator sends source heartbeat separately from tag positions when configured", async () => {
+  const bodies = [];
+  const simulator = createTagSimulator({ trackingHealthToken: "test-token", now: () => new Date("2026-01-01T00:00:00Z"),
+    fetchImplementation: async (_url, init) => { bodies.push({ body: JSON.parse(init.body), headers: init.headers }); return { ok: true }; },
+    logger: { log() {}, error() {} } });
+  await simulator.sendNextTagUpdates();
+  assert.equal(bodies.filter(item => item.body.type === "position").length, 4);
+  assert.equal(bodies.filter(item => item.body.type === "source_health").length, 1);
+  assert.equal(bodies.find(item => item.body.type === "source_health").headers["x-tracking-health-token"], "test-token");
+});
+
 test("simulation endpoint selection distinguishes local and public destinations", () => {
   assert.equal(resolveSimulationEndpoint("1"), "http://127.0.0.1:3000/api/tracking/ingest");
   assert.equal(resolveSimulationEndpoint("public"), "https://neu-demo.gekon.com.tr/api/tracking/ingest");

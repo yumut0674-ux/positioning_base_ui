@@ -1,6 +1,12 @@
 import type { RegionsConfig } from "../types/region.types";
 
 export interface RegionEngineStatusResponse {
+  readonly areaTracking?: { readonly active: boolean; readonly pendingWrites: number; readonly queuedEvents: number; readonly queuedStates: number;
+    readonly batchSize: number; readonly maxPendingEvents: number; readonly maxPendingStates: number; readonly coalescedStateWrites: number;
+    readonly droppedRecords: number; readonly rejectedWrites: number; readonly error: string | null;
+    readonly sourceHealth: Readonly<Record<string, "healthy" | "outage" | "unknown">>;
+    readonly pendingExits: readonly { readonly tagCode: string; readonly mapId: string; readonly areaId: string; readonly gateId: string;
+      readonly lastMeasuredAt: string; readonly dueAt: string; readonly sourceHealth: "healthy" | "outage" | "unknown"; readonly reason: string }[] };
   readonly warnings?: readonly string[];
   readonly enabled: boolean;
   readonly rawPort: number;

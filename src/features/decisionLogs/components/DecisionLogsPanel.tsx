@@ -5,6 +5,7 @@ import { Download, RefreshCw } from "lucide-react";
 import { DecisionLogFilters, type DecisionFilterForm } from "./DecisionLogFilters";
 import { DecisionLogList } from "./DecisionLogList";
 import { DecisionLogDetail } from "./DecisionLogDetail";
+import { AreaEventLogs } from "./AreaEventLogs";
 import { downloadDecisionLogs, fetchDecisionLogDetail, fetchDecisionLogs } from "../services/decisionLogsApi";
 import { RouteReportDialog } from "@/src/features/reports/components/RouteReportDialog";
 import type { DecisionLogDetail as Detail, DecisionLogFilters as Filters, DecisionLogSummary } from "../types/decisionLog.types";
@@ -33,6 +34,7 @@ export function DecisionLogsPanel() {
   const [detailLoading,setDetailLoading]=useState(false); const [detailError,setDetailError]=useState<string|null>(null); const [live,setLive]=useState(true); const [nextCursor,setNextCursor]=useState<string|null>(null); const [total,setTotal]=useState(0);
   const inFlight=useRef(false);
   const [reportOpen,setReportOpen]=useState(false);
+  const [view,setView]=useState<"rooms"|"areas">("rooms");
   const load=useCallback(async (mode:"replace"|"poll"|"more", cursor?:string) => {
     if(inFlight.current)return; inFlight.current=true; if(mode==="replace")setLoading(true);else setRefreshing(true); setError(null);
     try { const queryForm=mode==="poll"?{...active,to:localInput(new Date())}:active; const result=await fetchDecisionLogs(toFilters(queryForm,cursor)); setItems(current=>mode==="replace"?[...result.items]:merge(current,result.items)); if(mode!=="poll")setNextCursor(result.nextCursor); setTotal(result.metadata.filteredCount); setSelectedId(current=>current??result.items[0]?.decisionId??null); }
@@ -46,8 +48,10 @@ export function DecisionLogsPanel() {
   const clear=()=>{const value=initialForm();setDraft(value);setValidation(null);setSelectedId(null);setDetail(null);setActive(value);};
   const cards=useMemo(()=>({assigned:items.filter(i=>i.eventType==="ROOM_CONFIRMED").length,inferred:items.filter(i=>i.eventType==="ROOM_INFERRED").length,uncertain:items.filter(i=>i.eventType==="LOCATION_LOST"||i.measurementKind==="uncertain").length,rejected:items.filter(i=>i.eventType==="MEASUREMENT_REJECTED").length}),[items]);
   return <div className={styles.panel}>
-    <header className={styles.heading}><div><small>ANALİZLER / ODA MOTORU</small><h1>Oda Motoru Karar Kayıtları</h1><p>Ham ölçümden yayımlanan oda kararına kadar kanıtları ve durum geçişlerini inceleyin.</p></div><div className={styles.headingActions}><button type="button" onClick={()=>setReportOpen(true)}><Download size={15}/> Rapor Oluştur</button><button type="button" onClick={()=>downloadDecisionLogs(items,"json")} disabled={!items.length}><Download size={15}/> JSON</button><button type="button" onClick={()=>downloadDecisionLogs(items,"csv")} disabled={!items.length}><Download size={15}/> CSV</button><button type="button" onClick={()=>void load("poll")} disabled={refreshing}><RefreshCw size={15} className={refreshing?styles.spin:""}/> Yenile</button></div></header>
+    <header className={styles.heading}><div><small>ANALİZLER / KONUM KARARLARI</small><h1>{view==="rooms"?"Oda Motoru Karar Kayıtları":"Büyük Alan Giriş/Çıkış Olayları"}</h1><p>{view==="rooms"?"Ham ölçümden yayımlanan oda kararına kadar kanıtları ve durum geçişlerini inceleyin.":"Gözlemlenen ve tahmini alan geçişlerini ayrı zamanlarıyla inceleyin."}</p></div>{view==="rooms"&&<div className={styles.headingActions}><button type="button" onClick={()=>setReportOpen(true)}><Download size={15}/> Rapor Oluştur</button><button type="button" onClick={()=>downloadDecisionLogs(items,"json")} disabled={!items.length}><Download size={15}/> JSON</button><button type="button" onClick={()=>downloadDecisionLogs(items,"csv")} disabled={!items.length}><Download size={15}/> CSV</button><button type="button" onClick={()=>void load("poll")} disabled={refreshing}><RefreshCw size={15} className={refreshing?styles.spin:""}/> Yenile</button></div>}</header>
     {reportOpen&&<RouteReportDialog onClose={()=>setReportOpen(false)}/>}
+    <div className={styles.logViews} role="tablist" aria-label="Karar kaydı görünümü"><button type="button" role="tab" aria-selected={view==="rooms"} onClick={()=>setView("rooms")}>Oda kararları</button><button type="button" role="tab" aria-selected={view==="areas"} onClick={()=>setView("areas")}>Büyük alan olayları</button></div>
+    {view==="rooms" ? <>
     <div className={styles.cards}><article><span>Toplam karar</span><strong>{total}</strong><small>{items.length} kayıt görüntüleniyor</small></article><article><span>Odaya atama</span><strong>{cards.assigned}</strong><small>Doğrulanmış</small></article><article><span>Tahmini karar</span><strong>{cards.inferred}</strong><small>Ölçüm kesintisi / çıkarım</small></article><article><span>Belirsiz / konum kayıp</span><strong>{cards.uncertain}</strong><small>İncelenen sayfada</small></article><article><span>Reddedilen ölçüm</span><strong>{cards.rejected}</strong><small>Kalite, hız veya zaman</small></article></div>
     <DecisionLogFilters value={draft} live={live} disabled={loading} error={validation} onChange={setDraft} onApply={apply} onClear={clear} onLiveChange={setLive}/>
     {error&&<div className={styles.errorBanner} role="alert"><span>{error}</span><button type="button" onClick={()=>void load("replace")}>Tekrar dene</button></div>}
@@ -56,5 +60,6 @@ export function DecisionLogsPanel() {
       <DecisionLogDetail item={detail} loading={detailLoading} error={detailError} onBack={()=>setSelectedId(null)}/>
     </div>
     {live&&<div className={styles.liveStatus}><i/> Canlı yenileme açık · 4 saniye</div>}
+    </> : <AreaEventLogs />}
   </div>;
 }

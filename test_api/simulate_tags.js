@@ -364,6 +364,7 @@ export function createTagSimulator({
   mapId = "spor-koridor",
   zoneId = "zone-a",
   zoneName = "Spor Koridoru",
+  trackingHealthToken = process.env.TRACKING_HEALTH_TOKEN,
   now = () => new Date(),
   logger = console,
 } = {}) {
@@ -377,6 +378,7 @@ export function createTagSimulator({
     ? ["normal", "entry-gap", "inside-long-gap", "neighbor-jumps"]
     : tags.map(() => scenario);
   let tickNumber = 0;
+  let lastHeartbeatAt = -Infinity;
 
   function measuredPosition(index, position, state) {
     roomTicks[index] = state.isWaitingInRoom ? roomTicks[index] + 1 : 0;
@@ -422,15 +424,26 @@ export function createTagSimulator({
     });
     tickNumber += 1;
 
+    const sendHeartbeat = Boolean(trackingHealthToken) && currentTime.getTime() - lastHeartbeatAt >= 5_000;
+    if (sendHeartbeat) lastHeartbeatAt = currentTime.getTime();
+    const heartbeatZones = scenario === "multi-floor" || scenario === "same-coordinate-different-floor" || scenario === "delayed-old-floor-event"
+      ? [zoneId, "zone-b"] : [zoneId];
     const requestController = new AbortController();
     activeRequests.add(requestController);
     try {
-      const responses = await Promise.all(positions.map((position) => fetchImplementation(endpoint, {
+      const positionRequests = positions.map((position) => fetchImplementation(endpoint, {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify(position),
         signal: requestController.signal,
-      })));
+      }));
+      const healthRequests = sendHeartbeat ? heartbeatZones.filter(Boolean).map(sourceZone => fetchImplementation(endpoint, {
+        method: "POST",
+        headers: { "content-type": "application/json", "x-tracking-health-token": trackingHealthToken },
+        body: JSON.stringify({ type: "source_health", zone_id: sourceZone, status: "healthy", timestamp: currentTime.toISOString() }),
+        signal: requestController.signal,
+      })) : [];
+      const responses = await Promise.all([...positionRequests, ...healthRequests]);
       const failedResponse = responses.find((response) => !response.ok);
       if (failedResponse) throw new Error(await failedResponse.text());
     } catch (error) {

@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { trackingBuffer, type TrackingPosition } from "@/src/server/trackingBuffer";
 import { zoneMapResolver } from "@/src/server/maps/zoneMapResolver";
+import { regionEngineController } from "@/src/server/regionEngine/controller";
+import { AreaTransitionPersistenceError } from "@/src/server/regionEngine/areaTransitionRepository";
+import { timingSafeEqual } from "node:crypto";
 
 export const runtime = "nodejs";
 
@@ -83,6 +86,25 @@ export function parsePositionPayload(value: unknown): TrackingPosition {
   };
 }
 
+export function parseSourceHealthPayload(value: unknown, now = Date.now()): { zoneId: string; healthy: boolean } {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("Kaynak sağlık bildirimi nesne olmalıdır");
+  const body = value as Record<string, unknown>;
+  if (Object.keys(body).some(field => !["type", "zone_id", "status", "timestamp"].includes(field)) ||
+      body.type !== "source_health" || typeof body.zone_id !== "string" || !body.zone_id.trim() || body.zone_id.length > 100 ||
+      !["healthy", "outage"].includes(String(body.status)) || typeof body.timestamp !== "string" || !isIsoDateTime(body.timestamp))
+    throw new Error("Geçersiz kaynak sağlık bildirimi");
+  const at = Date.parse(body.timestamp);
+  if (now - at > 15_000 || at > now + 2_000) throw new Error("Kaynak sağlık bildirimi güncel değil");
+  return { zoneId: body.zone_id.trim(), healthy: body.status === "healthy" };
+}
+
+function validHealthToken(supplied: string | null): boolean {
+  const configured = process.env.TRACKING_HEALTH_TOKEN;
+  if (!configured || !supplied) return false;
+  const expected = Buffer.from(configured), actual = Buffer.from(supplied);
+  return expected.length === actual.length && timingSafeEqual(expected, actual);
+}
+
 function normalizeNullableString(value: unknown, field: string, maxLength: number): string | null {
   // Expand/migrate phase: omitted legacy keys are accepted exactly like explicit null.
   if (value === undefined || value === null) return null;
@@ -103,13 +125,24 @@ export async function POST(request: Request) {
     if (contentType !== "application/json") {
       throw new Error("Content-Type application/json olmalıdır");
     }
-    const parsed = parsePositionPayload(await request.json());
+    const payload = await request.json() as unknown;
+    if (payload && typeof payload === "object" && (payload as { type?: unknown }).type === "source_health") {
+      if (!validHealthToken(request.headers.get("x-tracking-health-token")))
+        return NextResponse.json({ error: "Kaynak sağlık tokenı yapılandırılmamış veya geçersiz" }, { status: 401 });
+      const signal = parseSourceHealthPayload(payload);
+      const resolution = await zoneMapResolver.resolve(signal.zoneId);
+      if (!resolution.mapId) return NextResponse.json({ error: "Kaynak bölgesi bir haritaya bağlı değil" }, { status: 400 });
+      regionEngineController.noteSourceHealth(resolution.mapId, signal.zoneId, signal.healthy);
+      return NextResponse.json({ accepted: 1, mapId: resolution.mapId, sourceHealth: signal.healthy ? "healthy" : "outage" }, { status: 202 });
+    }
+    const parsed = parsePositionPayload(payload);
     const resolution = await zoneMapResolver.resolve(parsed.sourceZoneId ?? null);
     const position = { ...parsed, mapId: resolution.mapId };
     const buffered = await trackingBuffer.ingest(position);
     return NextResponse.json({ accepted: 1, buffered: buffered ? 1 : 0, mapId: resolution.mapId, resolved: resolution.resolved }, { status: 202 });
   } catch (error) {
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Geçersiz konum verisi" }, { status: 400 });
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Geçersiz konum verisi" },
+      { status: error instanceof AreaTransitionPersistenceError ? 503 : 400 });
   }
 }
 

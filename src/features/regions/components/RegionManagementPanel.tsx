@@ -6,7 +6,7 @@ import { Circle, Group, Image as KonvaImage, Layer, Line, Rect, Stage, Text } fr
 import useImage from "use-image";
 import {
   Check, CircleHelp, Crosshair, Download, DoorOpen, Hexagon, MousePointer2, Plus, Save,
-  Power, Trash2, Upload, X,
+  Power, Trash2, Upload, X, Eye, EyeOff,
 } from "lucide-react";
 import { MAP_VIEWPORT_LIMITS } from "@/src/features/map/config/mapConfig";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
@@ -29,6 +29,8 @@ import { RegionInferenceEditor } from "./RegionInferenceEditor";
 import { ParameterHelpPanel } from "./ParameterHelpPanel";
 import { RawTagLayer } from "./RawTagLayer";
 import { createRawTagMarkers } from "../services/rawTagPresentation";
+import { EMPTY_AREA_VISIBILITY, areaVisibilityKey, isAreaVisible, isGateVisible, readAreaVisibility, toggleAreaVisibility, visibleSelection, type AreaEditorVisibility } from "../services/areaEditorVisibility";
+import type { AreaGateDefinition, LargeAreaDefinition } from "../types/region.types";
 type SelectedPoint = { readonly type: "polygon" | "center" | "entrance"; readonly index: number } | null;
 type Viewport = { readonly x: number; readonly y: number; readonly scale: number };
 
@@ -41,12 +43,36 @@ function configWithSystemMap(config: RegionsConfig): RegionsConfig { return conf
 
 function validateConfig(config: RegionsConfig): string[] {
   const errors: string[] = [];
+  const validPolygon = (polygon: readonly CoordinatePair[]) => polygon.length >= 3 && polygon.every(point =>
+    Number.isFinite(point.pixel.x) && Number.isFinite(point.pixel.y) && Number.isFinite(point.world.x) && Number.isFinite(point.world.y)) &&
+    Math.abs(polygon.reduce((sum, point, index) => {
+      const next = polygon[(index + 1) % polygon.length];
+      return sum + point.world.x * next.world.y - next.world.x * point.world.y;
+    }, 0)) >= 0.0002;
   if (config.map.calibration.points.length < 3) errors.push("Sistem haritası için en az üç kalibrasyon noktası gerekli.");
   for (const region of config.regions) {
     if (!region.name.trim()) errors.push(`${region.id}: Oda adı boş olamaz.`);
     if (region.polygon.length < 3) errors.push(`${region.name || region.id}: Çokgen en az 3 noktadan oluşmalı.`);
     if (!region.roomCenter && region.kind !== "corridor" && !/^corridor/.test(region.id)) errors.push(`${region.name || region.id}: Oda merkezi eklenmeli.`);
   }
+  const areaIds = new Set<string>(); const gateIds = new Set<string>();
+  for (const area of config.largeAreas ?? []) {
+    if (!area.id.trim() || areaIds.has(area.id) || !area.name.trim()) errors.push("Büyük alan kimliği veya adı boş/tekrarlı.");
+    areaIds.add(area.id);
+    if (!validPolygon(area.polygon)) errors.push(`${area.name}: Geçerli, en az üç köşeli alan çokgeni gerekli.`);
+    for (const gate of area.gates) {
+      if (!gate.id.trim() || gateIds.has(gate.id) || !gate.name.trim() || gate.areaId !== area.id) errors.push(`${area.name}: Geçiş bölgesi kimliği/bağlantısı geçersiz.`);
+      gateIds.add(gate.id);
+      if (!validPolygon(gate.polygon)) errors.push(`${gate.name}: Geçerli, en az üç köşeli geçiş çokgeni gerekli.`);
+      if (!Number.isInteger(gate.waitMs) || gate.waitMs < 1000) errors.push(`${gate.name}: Bekleme süresi en az bir saniye olmalı.`);
+      if (!["entry", "exit", "bidirectional"].includes(gate.role)) errors.push(`${gate.name}: Geçiş rolü geçersiz.`);
+    }
+  }
+  const tracking = config.areaTracking;
+  if (tracking?.minimumQuality !== undefined && (!Number.isFinite(tracking.minimumQuality) || tracking.minimumQuality < 0 || tracking.minimumQuality > 1)) errors.push("Alan minimum kalite eşiği 0–1 arasında olmalı.");
+  if (tracking?.confirmationCount !== undefined && (!Number.isInteger(tracking.confirmationCount) || tracking.confirmationCount < 1 || tracking.confirmationCount > 10)) errors.push("Alan doğrulama ölçümü 1–10 arasında olmalı.");
+  if (tracking?.confirmationWindowMs !== undefined && (!Number.isFinite(tracking.confirmationWindowMs) || tracking.confirmationWindowMs < 100 || tracking.confirmationWindowMs > 60_000)) errors.push("Alan kanıt penceresi 100–60000 ms arasında olmalı.");
+  if (tracking?.maximumSpeedMetersPerSecond !== undefined && (!Number.isFinite(tracking.maximumSpeedMetersPerSecond) || tracking.maximumSpeedMetersPerSecond < 0.1 || tracking.maximumSpeedMetersPerSecond > 100)) errors.push("Alan maksimum hızı 0,1–100 m/s arasında olmalı.");
   return errors;
 }
 
@@ -70,6 +96,10 @@ export function RegionManagementPanel() {
   const [config, setConfig] = useState<RegionsConfig>(DEFAULT_REGIONS_CONFIG);
   const [floorImage] = useImage(config.map.image, "anonymous");
   const [selectedRegionId, setSelectedRegionId] = useState<string | null>(null);
+  const [selectedAreaId, setSelectedAreaId] = useState<string | null>(null);
+  const [selectedGateId, setSelectedGateId] = useState<string | null>(null);
+  const [areaDrawMode, setAreaDrawMode] = useState<"area" | "gate" | null>(null);
+  const [areaVisibility, setAreaVisibility] = useState<AreaEditorVisibility>(EMPTY_AREA_VISIBILITY);
   const [selectedPoint, setSelectedPoint] = useState<SelectedPoint>(null);
   const [tool, setTool] = useState<RegionEditorTool>("select");
   const [viewport, setViewport] = useState<Viewport>(INITIAL_VIEWPORT);
@@ -93,6 +123,17 @@ export function RegionManagementPanel() {
     [activeMapId, inverseTransform, observedTags, rawTagClock],
   );
   const selectedRegion = config.regions.find((region) => region.id === selectedRegionId) ?? null;
+  const selectedArea = (config.largeAreas ?? []).find(area => area.id === selectedAreaId) ?? null;
+  const selectedGate = selectedArea?.gates.find(gate => gate.id === selectedGateId) ?? null;
+  const changeVisibility = (kind: "area" | "gate" | "all", id?: string) => {
+    const next = toggleAreaVisibility(areaVisibility, kind, id);
+    window.localStorage.setItem(areaVisibilityKey(activeMapId), JSON.stringify(next));
+    setAreaVisibility(next);
+    const selected = visibleSelection(next, selectedAreaId, selectedGateId);
+    if (!selected.areaId && selectedAreaId) {
+      setSelectedAreaId(null); setSelectedGateId(null); setAreaDrawMode(null);
+    }
+  };
   const selectedCoordinate = !selectedRegion || !selectedPoint ? null
     : selectedPoint.type === "center" ? selectedRegion.roomCenter
       : selectedPoint.type === "polygon" ? selectedRegion.polygon[selectedPoint.index] ?? null
@@ -112,6 +153,10 @@ export function RegionManagementPanel() {
 
   useEffect(() => {
     hasInitialFitRef.current = false;
+    const visibilityTimer = window.setTimeout(() => {
+      setAreaVisibility(readAreaVisibility(activeMapId, window.localStorage));
+      setSelectedAreaId(null); setSelectedGateId(null); setAreaDrawMode(null);
+    }, 0);
     const storageKey = `ips-regions-config:${activeMapId}`;
     const stored = window.localStorage.getItem(storageKey);
     const load = async () => {
@@ -139,6 +184,7 @@ export function RegionManagementPanel() {
       }
     };
     void load();
+    return () => window.clearTimeout(visibilityTimer);
   }, [activeMapId, regionsEndpoint]);
 
   useEffect(() => {
@@ -234,6 +280,13 @@ export function RegionManagementPanel() {
   };
 
   const addPointAtPointer = () => {
+    if (areaDrawMode && selectedAreaId) {
+      const point = pointerToPixel(); if (!point) return;
+      setConfig(current => ({ ...current, largeAreas: (current.largeAreas ?? []).map(area => area.id !== selectedAreaId ? area :
+        areaDrawMode === "area" ? { ...area, polygon: [...area.polygon, point] } :
+          { ...area, gates: area.gates.map(gate => gate.id === selectedGateId ? { ...gate, polygon: [...gate.polygon, point] } : gate) }) }));
+      return;
+    }
     if (tool === "select" || !selectedRegion) return;
     const point = pointerToPixel();
     if (!point) return;
@@ -255,7 +308,7 @@ export function RegionManagementPanel() {
   };
 
   const handlePointerDown = (event: Konva.KonvaEventObject<PointerEvent>) => {
-    if (event.target !== event.target.getStage()) {
+    if (event.target !== event.target.getStage() && (!areaDrawMode || event.target.hasName("area-handle"))) {
       pointerGestureRef.current = null;
       return;
     }
@@ -273,7 +326,7 @@ export function RegionManagementPanel() {
   const handlePointerUp = (event: Konva.KonvaEventObject<PointerEvent>) => {
     const gesture = pointerGestureRef.current;
     pointerGestureRef.current = null;
-    if (!gesture || gesture.moved || event.target !== event.target.getStage()) return;
+    if (!gesture || gesture.moved || (event.target !== event.target.getStage() && !areaDrawMode)) return;
     addPointAtPointer();
   };
 
@@ -330,6 +383,42 @@ export function RegionManagementPanel() {
     setSelectedRegionId(remaining[0]?.id ?? null);
     setSelectedPoint(null);
     setStatus("Oda/bölge silindi");
+  };
+
+  const updateArea = (id: string, updater: (area: LargeAreaDefinition) => LargeAreaDefinition) => {
+    setConfig(current => ({ ...current, largeAreas: (current.largeAreas ?? []).map(area => area.id === id ? updater(area) : area) }));
+  };
+  const updateGate = (areaId: string, gateId: string, updater: (gate: AreaGateDefinition) => AreaGateDefinition) => {
+    updateArea(areaId, area => ({ ...area, gates: area.gates.map(gate => gate.id === gateId ? updater(gate) : gate) }));
+  };
+  const addArea = () => {
+    const id = `area-${crypto.randomUUID().slice(0, 8)}`;
+    if (areaVisibility.hideAll) {
+      const next = toggleAreaVisibility(areaVisibility, "all");
+      window.localStorage.setItem(areaVisibilityKey(activeMapId), JSON.stringify(next)); setAreaVisibility(next);
+    }
+    setConfig(current => ({ ...current, largeAreas: [...(current.largeAreas ?? []), { id, name: `Büyük alan ${(current.largeAreas?.length ?? 0) + 1}`, color: "#6c4bc2", polygon: [], gates: [] }] }));
+    setSelectedRegionId(null); setSelectedAreaId(id); setSelectedGateId(null); setTool("select"); setAreaDrawMode("area");
+  };
+  const addGate = (areaId: string) => {
+    const id = `gate-${crypto.randomUUID().slice(0, 8)}`;
+    updateArea(areaId, area => ({ ...area, gates: [...area.gates, { id, areaId, name: `Geçiş bölgesi ${area.gates.length + 1}`, role: "bidirectional", waitMs: 30_000, polygon: [] }] }));
+    setSelectedRegionId(null); setSelectedAreaId(areaId); setSelectedGateId(id); setTool("select"); setAreaDrawMode("gate");
+  };
+  const moveGate = (gate: AreaGateDefinition, targetAreaId: string) => {
+    if (!isAreaVisible(areaVisibility, targetAreaId)) {
+      const next = toggleAreaVisibility(areaVisibility, "area", targetAreaId);
+      window.localStorage.setItem(areaVisibilityKey(activeMapId), JSON.stringify(next)); setAreaVisibility(next);
+    }
+    setConfig(current => ({ ...current, largeAreas: (current.largeAreas ?? []).map(area =>
+      area.id === gate.areaId ? { ...area, gates: area.gates.filter(item => item.id !== gate.id) } :
+      area.id === targetAreaId ? { ...area, gates: [...area.gates, { ...gate, areaId: targetAreaId }] } : area) }));
+    setSelectedAreaId(targetAreaId); setSelectedGateId(gate.id);
+  };
+  const updateAreaPoint = (areaId: string, gateId: string | null, index: number, pixel: { x: number; y: number }) => {
+    const pair = withWorldCoordinates(pixel, transform);
+    if (gateId) updateGate(areaId, gateId, gate => ({ ...gate, polygon: gate.polygon.map((point, i) => i === index ? pair : point) }));
+    else updateArea(areaId, area => ({ ...area, polygon: area.polygon.map((point, i) => i === index ? pair : point) }));
   };
 
   const saveConfig = async () => {
@@ -473,7 +562,25 @@ export function RegionManagementPanel() {
           <div className={styles.panelTitle}><div><span>ODA/BÖLGE LİSTESİ</span><strong>{config.regions.length} oda/bölge</strong></div><button onClick={addRegion} title="Yeni oda/bölge"><Plus size={15} /></button></div>
           <div className={styles.zoneList}>
             {config.regions.length === 0 && <div className={styles.empty}><Hexagon size={24} /><strong>Henüz oda/bölge yok</strong><span>Yeni oda/bölge ekleyerek başlayın.</span></div>}
-            {config.regions.map((region) => <button key={region.id} className={region.id === selectedRegionId ? styles.selectedZone : ""} onClick={() => { setSelectedRegionId(region.id); setSelectedPoint(null); setTool("select"); }}><i style={{ background: region.color }} /><div><strong>{region.name}</strong><span>{region.polygon.length} köşe · {region.entrances.length} giriş</span></div></button>)}
+            {config.regions.map((region) => <button key={region.id} className={region.id === selectedRegionId ? styles.selectedZone : ""} onClick={() => { setSelectedRegionId(region.id); setSelectedAreaId(null); setSelectedGateId(null); setAreaDrawMode(null); setSelectedPoint(null); setTool("select"); }}><i style={{ background: region.color }} /><div><strong>{region.name}</strong><span>{region.polygon.length} köşe · {region.entrances.length} giriş</span></div></button>)}
+          </div>
+          <div className={styles.panelTitle}><div><span>BÜYÜK ALANLAR / GEÇİŞ BÖLGELERİ</span><strong>{config.largeAreas?.length ?? 0} alan</strong></div><button type="button" onClick={addArea} title="Büyük alan ekle"><Plus size={15}/></button></div>
+          <div className={styles.zoneList}>
+            {(config.largeAreas ?? []).map(area => <div key={area.id}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <button type="button" className={area.id === selectedAreaId && !selectedGateId ? styles.selectedZone : ""} onClick={() => { if (!isAreaVisible(areaVisibility, area.id)) return; setSelectedRegionId(null); setSelectedAreaId(area.id); setSelectedGateId(null); setAreaDrawMode(null); setTool("select"); }}>
+                  <i style={{ background: area.color }}/><div><strong>{area.name}</strong><span>{area.polygon.length} köşe · {area.gates.length} geçiş</span></div>
+                </button>
+                <button type="button" aria-label={`${area.name} ${isAreaVisible(areaVisibility, area.id) ? "gizle" : "göster"}`} onClick={() => changeVisibility("area", area.id)} title="Yalnızca editörde gizle/göster">{isAreaVisible(areaVisibility, area.id) ? <Eye size={16}/> : <EyeOff size={16}/>}</button>
+                <button type="button" aria-label={`${area.name} geçiş bölgesi ekle`} disabled={!isAreaVisible(areaVisibility, area.id)} onClick={() => addGate(area.id)}><Plus size={15}/></button>
+              </div>
+              {area.gates.map(gate => <div key={gate.id} style={{ display: "flex", alignItems: "center", paddingLeft: 16 }}>
+                <button type="button" className={gate.id === selectedGateId ? styles.selectedZone : ""} onClick={() => { if (!isGateVisible(areaVisibility, area.id, gate.id)) return; setSelectedRegionId(null); setSelectedAreaId(area.id); setSelectedGateId(gate.id); setAreaDrawMode(null); setTool("select"); }}>
+                  <div><strong>{gate.name}</strong><span>{gate.role === "entry" ? "Giriş" : gate.role === "exit" ? "Çıkış" : "İki yönlü"} · {gate.polygon.length} köşe</span></div>
+                </button>
+                <button type="button" aria-label={`${gate.name} ${isGateVisible(areaVisibility, area.id, gate.id) ? "gizle" : "göster"}`} onClick={() => changeVisibility("gate", gate.id)} title="Yalnızca editörde gizle/göster">{isGateVisible(areaVisibility, area.id, gate.id) ? <Eye size={16}/> : <EyeOff size={16}/>}</button>
+              </div>)}
+            </div>)}
           </div>
           <div className={styles.mapInfo}><span>HARİTA KAYNAĞI</span><strong>{config.map.mapId}</strong><small>{config.map.widthPx} × {config.map.heightPx} px</small><p>Harita aktif katalog kaydından alınır ve bu ekrandan değiştirilemez.</p></div>
         </aside>
@@ -508,13 +615,24 @@ export function RegionManagementPanel() {
                   {region.polygon.length > 0 && <Text x={region.polygon[0].pixel.x + 10} y={region.polygon[0].pixel.y + 9} text={region.name} fill={region.color} fontSize={12} fontStyle="bold" />}
                 </Group>;
               })}
+              {(config.largeAreas ?? []).filter(area => isAreaVisible(areaVisibility, area.id)).map(area => <Group key={area.id}>
+                {area.polygon.length >= 2 && <Line points={area.polygon.flatMap(point => [point.pixel.x, point.pixel.y])} closed={area.polygon.length >= 3} fill={`${area.color}20`} stroke={area.color} strokeWidth={area.id === selectedAreaId ? 3 : 2} onClick={() => { if (areaDrawMode) return; setSelectedRegionId(null); setSelectedAreaId(area.id); setSelectedGateId(null); }} />}
+                {area.id === selectedAreaId && !selectedGateId && area.polygon.map((point, index) => <Circle name="area-handle" key={index} x={point.pixel.x} y={point.pixel.y} radius={6} fill="#fff" stroke={area.color} strokeWidth={2} draggable onDragEnd={event => updateAreaPoint(area.id, null, index, { x: event.target.x(), y: event.target.y() })} />)}
+                {area.gates.filter(gate => isGateVisible(areaVisibility, area.id, gate.id)).map(gate => <Group key={gate.id}>
+                  {gate.polygon.length >= 2 && <Line points={gate.polygon.flatMap(point => [point.pixel.x, point.pixel.y])} closed={gate.polygon.length >= 3} fill="#e2a51d33" stroke="#ad7213" strokeWidth={gate.id === selectedGateId ? 3 : 2} onClick={() => { if (areaDrawMode) return; setSelectedRegionId(null); setSelectedAreaId(area.id); setSelectedGateId(gate.id); }} />}
+                  {gate.id === selectedGateId && gate.polygon.map((point, index) => <Circle name="area-handle" key={index} x={point.pixel.x} y={point.pixel.y} radius={6} fill="#fff" stroke="#ad7213" strokeWidth={2} draggable onDragEnd={event => updateAreaPoint(area.id, gate.id, index, { x: event.target.x(), y: event.target.y() })} />)}
+                </Group>)}
+              </Group>)}
             </Group></Layer>
             {showRawTagPositions && <RawTagLayer markers={rawTagMarkers} viewport={viewport} />}
           </Stage>}
           <div className={styles.tools}>
+            <button type="button" onClick={() => changeVisibility("all")} aria-label={`Büyük alanları ve geçiş bölgelerini ${areaVisibility.hideAll ? "göster" : "gizle"}`}><Eye size={16}/><span>Büyük alanları ve geçiş bölgelerini {areaVisibility.hideAll ? "göster" : "gizle"}</span></button>
+            {selectedArea && !areaVisibility.hideAll && <button type="button" className={areaDrawMode ? styles.activeTool : ""} onClick={() => { setAreaDrawMode(selectedGate ? "gate" : "area"); setTool("select"); }}><Hexagon size={16}/><span>{selectedGate ? "Geçiş çokgeni çiz" : "Büyük alan çokgeni çiz"}</span></button>}
+            {areaDrawMode && <button type="button" onClick={() => setAreaDrawMode(null)}><Check size={16}/><span>Çizimi bitir</span></button>}
             {(["select", "polygon", "center", "entrance"] as const).map((value) => {
               const Icon = value === "select" ? MousePointer2 : value === "polygon" ? Hexagon : value === "center" ? Crosshair : DoorOpen;
-              return <button key={value} className={tool === value ? styles.activeTool : ""} disabled={!selectedRegion && value !== "select"} onClick={() => { setTool(value); setSelectedPoint(null); }} title={TOOL_LABELS[value]}><Icon size={16} /><span>{TOOL_LABELS[value]}</span></button>;
+              return <button key={value} className={tool === value && !areaDrawMode ? styles.activeTool : ""} disabled={!selectedRegion && value !== "select"} onClick={() => { setTool(value); setAreaDrawMode(null); setSelectedPoint(null); }} title={TOOL_LABELS[value]}><Icon size={16} /><span>{TOOL_LABELS[value]}</span></button>;
             })}
             {tool === "polygon" && <button className={styles.finishTool} disabled={(selectedRegion?.polygon.length ?? 0) < 3} onClick={() => { setTool("select"); setStatus("Çokgen tamamlandı"); }}><Check size={16} /><span>Tamamla</span></button>}
           </div>
@@ -529,7 +647,7 @@ export function RegionManagementPanel() {
 
         <aside className={styles.properties}>
           <div className={styles.panelTitle}>
-            <div><span>ÖZELLİKLER</span><strong>{selectedRegion ? "Seçili oda/bölge" : "Oda/bölge seçilmedi"}</strong></div>
+            <div><span>ÖZELLİKLER</span><strong>{selectedRegion ? "Seçili oda/bölge" : selectedGate ? "Geçiş bölgesi" : selectedArea ? "Büyük alan" : "Öğe seçilmedi"}</strong></div>
             <button
               type="button"
               className={`${styles.propertyHelpButton} ${propertyHelpOpen ? styles.propertyHelpButtonActive : ""}`}
@@ -547,7 +665,38 @@ export function RegionManagementPanel() {
             open={propertyHelpOpen}
             onClose={() => setPropertyHelpOpen(current => nextParameterHelpVisibility(current, "close"))}
           />
-          {!selectedRegion ? <div className={styles.empty}><MousePointer2 size={24} /><strong>Bir oda/bölge seçin</strong><span>Özellikleri burada düzenleyebilirsiniz.</span></div> : <>
+          {selectedArea && <section className={`${styles.coordinateSection} ${styles.areaEditorSection}`}>
+            <h2>{selectedGate ? "Geçiş bölgesi" : "Büyük alan"}</h2>
+            {selectedGate ? <>
+              <label><span>Bölge adı</span><input value={selectedGate.name} onChange={event => updateGate(selectedArea.id, selectedGate.id, gate => ({ ...gate, name: event.target.value }))} /></label>
+              <label><span>Bağlı büyük alan</span><select value={selectedArea.id} onChange={event => moveGate(selectedGate, event.target.value)}>{(config.largeAreas ?? []).map(area => <option key={area.id} value={area.id}>{area.name}</option>)}</select></label>
+              <label><span>Rol</span><select value={selectedGate.role} onChange={event => updateGate(selectedArea.id, selectedGate.id, gate => ({ ...gate, role: event.target.value as AreaGateDefinition["role"] }))}><option value="entry">Giriş</option><option value="exit">Çıkış</option><option value="bidirectional">İki yönlü</option></select></label>
+              <label><span>Bekleme süresi (saniye)</span><input type="number" min="1" max="3600" value={selectedGate.waitMs / 1000} onChange={event => updateGate(selectedArea.id, selectedGate.id, gate => ({ ...gate, waitMs: event.target.valueAsNumber * 1000 }))} /></label>
+              <div className={styles.areaEditorActions}>
+                <button type="button" className={styles.areaEditorDanger} onClick={() => { updateArea(selectedArea.id, area => ({ ...area, gates: area.gates.filter(gate => gate.id !== selectedGate.id) })); setSelectedGateId(null); setAreaDrawMode(null); }}><Trash2 size={14}/> Geçiş bölgesini sil</button>
+              </div>
+            </> : <>
+              <label><span>Alan adı</span><input value={selectedArea.name} onChange={event => updateArea(selectedArea.id, area => ({ ...area, name: event.target.value }))} /></label>
+              <label><span>Renk</span><input type="color" value={selectedArea.color} onChange={event => updateArea(selectedArea.id, area => ({ ...area, color: event.target.value }))} /></label>
+              <div className={styles.areaEditorActions}>
+                <button type="button" onClick={() => addGate(selectedArea.id)}><Plus size={14}/> Geçiş bölgesi ekle</button>
+                <button type="button" className={styles.areaEditorDanger} onClick={() => { setConfig(current => ({ ...current, largeAreas: (current.largeAreas ?? []).filter(area => area.id !== selectedArea.id) })); setSelectedAreaId(null); setAreaDrawMode(null); }}><Trash2 size={14}/> Büyük alanı sil</button>
+              </div>
+            </>}
+            <p>Çokgen köşeleri: {selectedGate?.polygon.length ?? selectedArea.polygon.length}. Haritada çizim aracını seçip boş haritaya tıklayın; köşeleri sürükleyerek düzeltin.</p>
+            {(selectedGate?.polygon ?? selectedArea.polygon).map((point, index) => <div key={index} className={styles.areaEditorPoint}>
+              <span>{index + 1}. {point.world.x.toFixed(2)}, {point.world.y.toFixed(2)} m</span>
+              <button type="button" aria-label={`Köşe ${index + 1} sil`} onClick={() => selectedGate
+                ? updateGate(selectedArea.id, selectedGate.id, gate => ({ ...gate, polygon: gate.polygon.filter((_, i) => i !== index) }))
+                : updateArea(selectedArea.id, area => ({ ...area, polygon: area.polygon.filter((_, i) => i !== index) }))}>×</button>
+            </div>)}
+            <h3>Alan kanıt eşikleri (bu harita)</h3>
+            <label><span>Minimum kalite</span><input type="number" min="0" max="1" step="0.05" value={config.areaTracking?.minimumQuality ?? 0.25} onChange={event => setConfig(current => ({ ...current, areaTracking: { ...current.areaTracking, minimumQuality: event.target.valueAsNumber } }))} /></label>
+            <label><span>Doğrulama ölçümü</span><input type="number" min="1" max="10" value={config.areaTracking?.confirmationCount ?? 2} onChange={event => setConfig(current => ({ ...current, areaTracking: { ...current.areaTracking, confirmationCount: event.target.valueAsNumber } }))} /></label>
+            <label><span>Kanıt penceresi (ms)</span><input type="number" min="100" max="60000" value={config.areaTracking?.confirmationWindowMs ?? 10000} onChange={event => setConfig(current => ({ ...current, areaTracking: { ...current.areaTracking, confirmationWindowMs: event.target.valueAsNumber } }))} /></label>
+            <label><span>Maksimum hız (m/s)</span><input type="number" min="0.1" max="100" step="0.1" value={config.areaTracking?.maximumSpeedMetersPerSecond ?? 4} onChange={event => setConfig(current => ({ ...current, areaTracking: { ...current.areaTracking, maximumSpeedMetersPerSecond: event.target.valueAsNumber } }))} /></label>
+          </section>}
+          {!selectedRegion ? (!selectedArea && <div className={styles.empty}><MousePointer2 size={24} /><strong>Bir oda/bölge seçin</strong><span>Özellikleri burada düzenleyebilirsiniz.</span></div>) : <>
             <section className={styles.pointListSection}>
               <div className={styles.pointListTitle}><span>NOKTA KOORDİNATLARI</span><strong>{coordinateItems.length} nokta</strong></div>
               {coordinateItems.length === 0 ? <div className={styles.pointPrompt}><Crosshair size={18} /><span>Polygon, merkez veya giriş eklediğinizde koordinatlar burada görünecek.</span></div> : <div className={styles.pointList}>
@@ -581,9 +730,9 @@ export function RegionManagementPanel() {
             <div className={styles.metrics}><div><span>ÇOKGEN</span><strong>{selectedRegion.polygon.length}</strong><small>köşe</small></div><div><span>GİRİŞLER</span><strong>{selectedRegion.entrances.length}</strong><small>nokta</small></div></div>
             <section className={styles.coordinateSection}><h2>Gerçek dünya koordinatları</h2>{selectedRegion.roomCenter ? <p>Merkez: <code>{selectedRegion.roomCenter.world.x.toFixed(2)}, {selectedRegion.roomCenter.world.y.toFixed(2)} m</code></p> : <p>Oda merkezi tanımlanmadı.</p>}<small>Haritadaki bir noktayı seçerek koordinatlarını ince ayarlayabilirsiniz.</small></section>
             {selectedPoint && <button className={styles.deletePoint} onClick={deleteSelectedPoint}><X size={14} /> Seçili noktayı sil</button>}
-            {errors.length > 0 && <div className={styles.errors}>{errors.map((error) => <p key={error}>{error}</p>)}</div>}
             <button className={styles.deleteZone} onClick={deleteRegion}><Trash2 size={14} /> Oda/bölgeyi sil</button>
           </>}
+          {errors.length > 0 && <div className={styles.errors}>{errors.map((error) => <p key={error}>{error}</p>)}</div>}
         </aside>
       </div>
     </section>

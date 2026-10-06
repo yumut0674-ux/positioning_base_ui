@@ -94,7 +94,32 @@ export interface RegionDefinition {
   readonly inference?: RoomInferenceSettings;
 }
 
+export type AreaGateRole = "entry" | "exit" | "bidirectional";
+export interface AreaGateDefinition {
+  readonly id: string;
+  readonly name: string;
+  readonly areaId: string;
+  readonly role: AreaGateRole;
+  readonly waitMs: number;
+  readonly polygon: readonly CoordinatePair[];
+}
+export interface LargeAreaDefinition {
+  readonly id: string;
+  readonly name: string;
+  readonly color: string;
+  readonly polygon: readonly CoordinatePair[];
+  readonly gates: readonly AreaGateDefinition[];
+}
+export interface AreaTrackingSettings {
+  readonly minimumQuality?: number;
+  readonly confirmationCount?: number;
+  readonly confirmationWindowMs?: number;
+  readonly maximumSpeedMetersPerSecond?: number;
+}
+
 export interface RegionsConfig {
+  readonly largeAreas?: readonly LargeAreaDefinition[];
+  readonly areaTracking?: AreaTrackingSettings;
   readonly mapDisplay?: { readonly outsideHoldMs: number };
   readonly engine?: Partial<GlobalRegionEngineSettings>;
   readonly map: {

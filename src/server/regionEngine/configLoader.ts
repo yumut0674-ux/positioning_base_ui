@@ -2,7 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { pointInPolygon, wallDistance } from "./geometry";
-import type { CoordinatePair, DoorInferenceSettings, RegionEntrance, RegionsConfig, ResolvedRoomSettings } from "@/src/features/regions/types/region.types";
+import type { AreaGateDefinition, CoordinatePair, DoorInferenceSettings, RegionEntrance, RegionsConfig, ResolvedRoomSettings } from "@/src/features/regions/types/region.types";
 import { resolveDoorSettings, resolveGlobalSettings, resolveRoomSettings } from "../../features/regions/config/regionInferenceSettings";
 import embeddedRegionsConfig from "../../../config/regions.json";
 import type { CompiledCorridor, CompiledRegion, CompiledRegionsConfig } from "./types";
@@ -50,6 +50,38 @@ function validateResolved(settings: ResolvedRoomSettings, label: string, history
 
 export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConfig {
   if (!config || !Array.isArray(config.regions)) throw new Error("Region config içinde regions listesi bulunamadı");
+  const polygon = (pairs: readonly CoordinatePair[], label: string) => {
+    if (!Array.isArray(pairs) || pairs.length < 3) throw new Error(`${label}: çokgen en az üç nokta içermeli`);
+    for (const pair of pairs) for (const point of [pair?.pixel, pair?.world])
+      if (!Number.isFinite(point?.x) || !Number.isFinite(point?.y)) throw new Error(`${label}: koordinat geçersiz`);
+    const points = pairs.map(pair => pair.world);
+    const area = Math.abs(points.reduce((sum, p, i) => { const next = points[(i + 1) % points.length]; return sum + p.x * next.y - next.x * p.y; }, 0)) / 2;
+    if (area < 0.0001) throw new Error(`${label}: çokgen alanı geçersiz`);
+    return points;
+  };
+  const areaIds = new Set<string>(); const gateIds = new Set<string>();
+  if (config.largeAreas !== undefined && !Array.isArray(config.largeAreas)) throw new Error("Büyük alanlar listesi geçersiz");
+  const largeAreas = (config.largeAreas ?? []).map(area => {
+    if (!area.id?.trim() || !area.name?.trim() || areaIds.has(area.id)) throw new Error("Büyük alan kimliği veya adı geçersiz/tekrarlı");
+    areaIds.add(area.id);
+    if (!/^#[0-9a-f]{6}$/i.test(area.color)) throw new Error(`${area.name}: renk geçersiz`);
+    if (!Array.isArray(area.gates)) throw new Error(`${area.name}: geçiş bölgeleri listesi geçersiz`);
+    return { id: area.id, name: area.name, polygon: polygon(area.polygon, area.name), gates: area.gates.map((gate: AreaGateDefinition) => {
+      if (!gate.id?.trim() || !gate.name?.trim() || gateIds.has(gate.id) || gate.areaId !== area.id) throw new Error(`${area.name}: geçiş bölgesi kimliği, adı veya alan bağlantısı geçersiz`);
+      gateIds.add(gate.id);
+      if (!["entry", "exit", "bidirectional"].includes(gate.role)) throw new Error(`${gate.name}: geçiş rolü geçersiz`);
+      if (!Number.isInteger(gate.waitMs) || gate.waitMs < 1000 || gate.waitMs > 3_600_000) throw new Error(`${gate.name}: bekleme süresi geçersiz`);
+      return { id: gate.id, name: gate.name, role: gate.role, waitMs: gate.waitMs, polygon: polygon(gate.polygon, gate.name) };
+    }) };
+  });
+  const tracking = config.areaTracking ?? {};
+  const areaTracking = {
+    minimumQuality: finite(tracking.minimumQuality ?? 0.25, "Alan/minimumQuality", 0, 1),
+    confirmationCount: finite(tracking.confirmationCount ?? 2, "Alan/confirmationCount", 1, 10),
+    confirmationWindowMs: finite(tracking.confirmationWindowMs ?? 10_000, "Alan/confirmationWindowMs", 100, 60_000),
+    maximumSpeedMetersPerSecond: finite(tracking.maximumSpeedMetersPerSecond ?? 4, "Alan/maximumSpeedMetersPerSecond", 0.1, 100),
+  };
+  if (!Number.isInteger(areaTracking.confirmationCount)) throw new Error("Alan/confirmationCount: tam sayı gerekli");
   validateSettings((config.engine ?? {}) as Record<string, unknown>, "Global ayarlar", true);
   validateDoorSettings(config.engine?.doorDefaults, "Global kapı varsayılanları");
   const global = resolveGlobalSettings(config.engine);
@@ -109,7 +141,7 @@ export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConf
     }
     regions.push(compiled);
   }
-  return { version: createHash("sha256").update(JSON.stringify(config)).digest("hex").slice(0, 16), warnings, regions, corridors,
+  return { version: createHash("sha256").update(JSON.stringify(config)).digest("hex").slice(0, 16), warnings, regions, corridors, largeAreas, areaTracking,
     rules: { ...globalRoom, maxTags: global.maxTags, historySize } };
 }
 

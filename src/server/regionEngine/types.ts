@@ -1,4 +1,5 @@
 import type { TrackingPosition } from "../trackingBuffer";
+import type { AreaSourceHealth, PendingAreaExitDiagnostic } from "./AreaTransitionEngine";
 import type { ResolvedDoorSettings, ResolvedRoomSettings } from "../../features/regions/types/region.types";
 
 export type VehicleRegionState =
@@ -109,11 +110,18 @@ export interface CompiledCorridor {
 }
 
 export interface CompiledRegionsConfig {
+  readonly largeAreas: readonly CompiledLargeArea[];
+  readonly areaTracking: { readonly minimumQuality: number; readonly confirmationCount: number; readonly confirmationWindowMs: number; readonly maximumSpeedMetersPerSecond: number };
   readonly version?: string;
   readonly warnings?: readonly string[];
   readonly regions: readonly CompiledRegion[];
   readonly corridors: readonly CompiledCorridor[];
   readonly rules: RegionEngineRules;
+}
+
+export interface CompiledLargeArea {
+  readonly id: string; readonly name: string; readonly polygon: readonly { readonly x: number; readonly y: number }[];
+  readonly gates: readonly { readonly id: string; readonly name: string; readonly role: "entry" | "exit" | "bidirectional"; readonly waitMs: number; readonly polygon: readonly { readonly x: number; readonly y: number }[] }[];
 }
 
 export interface ProcessedPosition extends TrackingPosition {
@@ -184,6 +192,10 @@ export interface RoomTransitionTrace {
 }
 
 export interface RegionEngineStatus {
+  readonly areaTracking?: { readonly active: boolean; readonly pendingWrites: number; readonly queuedEvents: number; readonly queuedStates: number;
+    readonly batchSize: number; readonly maxPendingEvents: number; readonly maxPendingStates: number; readonly coalescedStateWrites: number;
+    readonly droppedRecords: number; readonly rejectedWrites: number; readonly error: string | null;
+    readonly sourceHealth: Readonly<Record<string, AreaSourceHealth>>; readonly pendingExits: readonly PendingAreaExitDiagnostic[] };
   readonly enabled: boolean;
   readonly engineVersion?: string;
   readonly controllerRevision?: string;

@@ -3,7 +3,7 @@ import path from "node:path";
 import { NextResponse } from "next/server";
 import { DEFAULT_REGIONS_CONFIG } from "@/src/features/regions/config/defaultRegionsConfig";
 import { DEFAULT_DOOR_INFERENCE_SETTINGS, DEFAULT_REGION_ENGINE_SETTINGS } from "@/src/features/regions/config/regionInferenceSettings";
-import type { DoorInferenceOverrides, RegionDefinition, RegionsConfig, RoomInferenceSettings } from "@/src/features/regions/types/region.types";
+import type { DoorInferenceOverrides, RegionDefinition, RegionsConfig, RoomInferenceSettings, LargeAreaDefinition } from "@/src/features/regions/types/region.types";
 import { compileRegionsConfig } from "@/src/server/regionEngine/configLoader";
 import { regionEngineController } from "@/src/server/regionEngine/controller";
 import { resolvePositionAnimationConfig } from "@/src/features/tracking/config/positionAnimationConfig";
@@ -45,7 +45,7 @@ function cleanRegion(value: unknown): RegionDefinition {
 }
 
 export function cleanRegionsConfig(value: unknown, expectedMapId?: string): RegionsConfig {
-  const body = object(value, "Geçersiz config") as { regions?: unknown; engine?: unknown; positionAnimation?: unknown; mapDisplay?: unknown; map?: unknown };
+  const body = object(value, "Geçersiz config") as { regions?: unknown; engine?: unknown; positionAnimation?: unknown; mapDisplay?: unknown; map?: unknown; largeAreas?: unknown; areaTracking?: unknown };
   if (!Array.isArray(body.regions)) throw new Error("regions alanı bir liste olmalıdır");
   const rawEngine = body.engine === undefined ? {} : known(body.engine, new Set([...ENGINE_KEYS, "mode"]), "Global ayarlar");
   const engineRules = { ...rawEngine };
@@ -55,8 +55,25 @@ export function cleanRegionsConfig(value: unknown, expectedMapId?: string): Regi
   const map = (body.map ?? DEFAULT_REGIONS_CONFIG.map) as RegionsConfig["map"];
   if (!map || typeof map !== "object" || !mapIdSchema.safeParse(map.mapId).success) throw new Error("Region config map.mapId geçersiz");
   if (expectedMapId && map.mapId !== expectedMapId) throw new Error("Region config map.mapId URL mapId ile eşleşmiyor");
+  if (body.largeAreas !== undefined && !Array.isArray(body.largeAreas)) throw new Error("Büyük alanlar listesi geçersiz");
+  const largeAreas = (body.largeAreas ?? []).map((value: unknown): LargeAreaDefinition => {
+    const area = known(value, new Set(["id", "name", "color", "polygon", "gates"]), "Büyük alan");
+    if (!Array.isArray(area.polygon) || !Array.isArray(area.gates)) throw new Error("Büyük alan çokgeni veya geçiş listesi geçersiz");
+    const pair = (value: unknown) => { const item = known(value, new Set(["pixel", "world"]), "Alan koordinatı");
+      if (!isPoint(item.pixel) || !isPoint(item.world)) throw new Error("Alan koordinatı geçersiz"); return { pixel: item.pixel, world: item.world }; };
+    return { id: String(area.id ?? ""), name: String(area.name ?? ""), color: String(area.color ?? ""),
+      polygon: area.polygon.map(pair), gates: area.gates.map((value: unknown) => {
+        const gate = known(value, new Set(["id", "name", "areaId", "role", "waitMs", "polygon"]), "Geçiş bölgesi");
+        if (!Array.isArray(gate.polygon)) throw new Error("Geçiş bölgesi çokgeni geçersiz");
+        return { id: String(gate.id ?? ""), name: String(gate.name ?? ""), areaId: String(gate.areaId ?? ""),
+          role: gate.role as "entry" | "exit" | "bidirectional", waitMs: gate.waitMs as number, polygon: gate.polygon.map(pair) };
+      }) };
+  });
+  const areaTracking = body.areaTracking === undefined ? undefined : known(body.areaTracking,
+    new Set(["minimumQuality", "confirmationCount", "confirmationWindowMs", "maximumSpeedMetersPerSecond"]), "Alan eşikleri");
   const config: RegionsConfig = { ...DEFAULT_REGIONS_CONFIG, map, engine, positionAnimation: resolvePositionAnimationConfig(body.positionAnimation),
-    mapDisplay: resolveMapDisplayConfig(body.mapDisplay), regions: body.regions.map(cleanRegion) };
+    mapDisplay: resolveMapDisplayConfig(body.mapDisplay), regions: body.regions.map(cleanRegion), largeAreas,
+    ...(areaTracking ? { areaTracking: areaTracking as RegionsConfig["areaTracking"] } : {}) };
   compileRegionsConfig(config); return config;
 }
 

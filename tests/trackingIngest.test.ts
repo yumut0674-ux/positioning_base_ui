@@ -21,6 +21,25 @@ function jsonRequest(payload: unknown): Request {
   });
 }
 
+test("kaynak heartbeat'i ayrı token ve bilinen zone gerektirir", async () => {
+  const oldToken = process.env.TRACKING_HEALTH_TOKEN;
+  process.env.TRACKING_HEALTH_TOKEN = "test-health-secret";
+  const body = { type: "source_health", zone_id: "zone-a", status: "healthy", timestamp: new Date().toISOString() };
+  try {
+    assert.equal((await POST(jsonRequest(body))).status, 401);
+    const authorized = (payload: unknown) => new Request("http://localhost/api/tracking/ingest", {
+      method: "POST", headers: { "content-type": "application/json", "x-tracking-health-token": "test-health-secret" }, body: JSON.stringify(payload),
+    });
+    const response = await POST(authorized(body));
+    assert.equal(response.status, 202);
+    assert.equal((await response.json() as { sourceHealth: string }).sourceHealth, "healthy");
+    assert.equal((await POST(authorized({ ...body, zone_id: "not-configured" }))).status, 400);
+  } finally {
+    if (oldToken === undefined) delete process.env.TRACKING_HEALTH_TOKEN;
+    else process.env.TRACKING_HEALTH_TOKEN = oldToken;
+  }
+});
+
 test("örnek position payload'ı 202 ile kabul edilir ve gönderilen zaman korunur", async () => {
   const originalIngest = trackingBuffer.ingest.bind(trackingBuffer);
   let captured: TrackingPosition | undefined;

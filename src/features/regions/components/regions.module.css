@@ -90,6 +90,16 @@
 .zoneList > button strong, .zoneList > button span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .zoneList > button strong { color: #283b51; font-size: 10px; }
 .zoneList > button span { margin-top: 5px; color: #75899d; font: 7px ui-monospace, monospace; }
+.zoneList > div { border-bottom: 1px solid #e4edf1; }
+.zoneList > div > div { min-width: 0; }
+.zoneList > div > div > button:first-child { min-width: 0; flex: 1; display: flex; align-items: center; gap: 8px; padding: 7px; border: 1px solid transparent; border-radius: 5px; background: transparent; text-align: left; cursor: pointer; }
+.zoneList > div > div > button:first-child:hover, .zoneList > div > div > .selectedZone { border-color: #b8ddd8; background: #eaf8f6; }
+.zoneList > div > div > button:first-child i { flex: 0 0 7px; height: 25px; border-radius: 3px; }
+.zoneList > div > div > button:first-child div { min-width: 0; }
+.zoneList > div > div > button:first-child strong, .zoneList > div > div > button:first-child span { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.zoneList > div > div > button:first-child strong { color: #283b51; font-size: 10px; }
+.zoneList > div > div > button:first-child span { margin-top: 4px; color: #75899d; font-size: 8px; }
+.zoneList > div > div > button:not(:first-child) { flex: 0 0 25px; height: 25px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 1px solid #c5d6e2; border-radius: 5px; background: #fff; color: #52667d; cursor: pointer; }
 .empty { min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; color: #91a5b5; text-align: center; }
 .empty svg { margin-bottom: 10px; color: #8abdb7; }
 .empty strong { color: #526980; font-size: 10px; }
@@ -106,13 +116,13 @@
 .mapInfo p { margin: 9px 0 0; color: #758a9e; font-size: 8px; line-height: 1.5; }
 .map { position: relative; min-width: 0; min-height: 0; overflow: hidden; background: #e8f0f5; }
 .map::after { content: ""; position: absolute; inset: 0; pointer-events: none; box-shadow: inset 0 0 45px rgba(48,72,91,.13); }
-.tools { position: absolute; z-index: 3; top: 12px; left: 12px; display: flex; gap: 4px; padding: 4px; border: 1px solid #bdcedb; border-radius: 6px; background: rgba(255,255,255,.94); box-shadow: 0 10px 24px rgba(53,75,100,.14); }
+.tools { position: absolute; z-index: 3; top: 12px; left: 12px; max-width: calc(100% - 24px); display: flex; flex-wrap: wrap; gap: 4px; padding: 4px; border: 1px solid #bdcedb; border-radius: 6px; background: rgba(255,255,255,.94); box-shadow: 0 10px 24px rgba(53,75,100,.14); }
 .tools button { min-height: 31px; padding: 0 8px; font-size: 8px; }
 .tools button:disabled { opacity: .45; cursor: not-allowed; }
 .tools .activeTool { color: #087f73; border-color: #a9d9d2; background: #dcf6f2; }
 .tools .finishTool { color: #fff; border-color: #087f73; background: #087f73; }
 .tools .finishTool:disabled { color: #8092a3; border-color: #d1dde5; background: #eff4f7; }
-.mapControls { position: absolute; z-index: 3; right: 12px; top: 12px; display: flex; align-items: center; overflow: hidden; border: 1px solid #bdcedb; border-radius: 5px; background: rgba(255,255,255,.94); box-shadow: 0 9px 20px rgba(53,75,100,.1); }
+.mapControls { position: absolute; z-index: 3; right: 12px; bottom: 48px; display: flex; align-items: center; overflow: hidden; border: 1px solid #bdcedb; border-radius: 5px; background: rgba(255,255,255,.94); box-shadow: 0 9px 20px rgba(53,75,100,.1); }
 .mapControls button { min-height: 29px; padding: 0 9px; border: 0; border-right: 1px solid #bdcedb; border-radius: 0; font: 8px ui-monospace, monospace; }
 .mapControls span { min-width: 45px; color: #5f7389; text-align: center; font: 8px ui-monospace, monospace; }
 .mapStatus { position: absolute; z-index: 3; left: 12px; bottom: 12px; max-width: calc(100% - 105px); padding: 7px 9px; border: 1px solid #c5d6e2; border-radius: 4px; background: rgba(255,255,255,.92); color: #5e748a; font: 8px ui-monospace, monospace; box-shadow: 0 8px 20px rgba(53,75,100,.1); }
@@ -168,6 +178,19 @@
 .coordinateSection p { margin: 0 0 7px; color: #687e94; font-size: 8px; }
 .coordinateSection code { color: #087f73; font-size: 8px; }
 .coordinateSection small { color: #8294a7; font-size: 7px; line-height: 1.45; }
+.areaEditorSection { display: grid; gap: 10px; }
+.areaEditorSection h2 { margin: 0; color: #28465c; font-size: 12px; line-height: 1.35; }
+.areaEditorSection h3 { margin: 4px 0 0; padding-top: 11px; border-top: 1px solid #d8e5ed; color: #36536a; font-size: 11px; line-height: 1.35; font-weight: 650; }
+.areaEditorSection label > span { margin-bottom: 5px; font-size: 10px; line-height: 1.35; }
+.areaEditorSection input, .areaEditorSection select { box-sizing: border-box; width: 100%; min-width: 0; height: 34px; padding: 0 9px; border: 1px solid #c9d9e5; border-radius: 5px; outline: none; background: #fff; color: #26394f; font-size: 11px; }
+.areaEditorSection input[type="color"] { padding: 3px; }
+.areaEditorSection select:focus { border-color: rgba(0,168,150,.55); box-shadow: 0 0 0 3px rgba(0,168,150,.08); }
+.areaEditorSection p { margin: 0; font-size: 9px; line-height: 1.5; }
+.areaEditorActions { display: flex; flex-wrap: wrap; gap: 7px; }
+.areaEditorActions button { display: inline-flex; min-height: 32px; align-items: center; justify-content: center; gap: 5px; padding: 0 9px; border: 1px solid #b9d9d5; border-radius: 5px; background: #e8f8f5; color: #087f73; font-size: 10px; font-weight: 600; line-height: 1.2; cursor: pointer; }
+.areaEditorActions .areaEditorDanger { border-color: #e2c9c7; background: #fff6f5; color: #a4443f; }
+.areaEditorPoint { display: flex; align-items: center; justify-content: space-between; gap: 7px; color: #536d82; font-size: 10px; }
+.areaEditorPoint button { flex: none; width: 24px; height: 24px; border: 1px solid #d0dee8; border-radius: 4px; background: #fff; color: #8b5653; font-size: 15px; line-height: 1; cursor: pointer; }
 .pointListSection { margin-top: 12px; padding: 10px; border: 1px solid #c9dbe3; border-radius: 5px; background: #f7fbff; }
 .pointListTitle { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
 .pointListTitle span { color: #60798e; font: 7px ui-monospace, monospace; letter-spacing: .1em; }
