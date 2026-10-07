@@ -1,12 +1,8 @@
-"use client";
+import { headers } from "next/headers";
+import { HomeClient } from "./HomeClient";
+import { resolveUiMode } from "@/src/app/uiMode";
 
-import dynamic from "next/dynamic";
-
-const IpsApplication = dynamic(
-  () => import("@/src/app/IpsApplication").then((module) => module.IpsApplication),
-  { ssr: false },
-);
-
-export default function Home() {
-  return <IpsApplication />;
+export default async function Home() {
+  const mode = resolveUiMode((await headers()).get("host"));
+  return <HomeClient mode={mode} />;
 }

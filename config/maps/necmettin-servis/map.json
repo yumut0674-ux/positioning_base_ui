@@ -1,0 +1,28 @@
+{
+  "id": "necmettin-servis",
+  "image": {
+    "url": "/maps/necmettin-servis/floor-plan.png",
+    "width": 3840,
+    "height": 2160
+  },
+  "world": {
+    "widthMeters": 54.5856772468127,
+    "heightMeters": 30.704443451332146
+  },
+  "calibration": {
+    "worldOrigin": {
+      "x": 0,
+      "y": 0
+    },
+    "canvasOrigin": {
+      "x": -26.29057954870241,
+      "y": 1947.6674030972363
+    },
+    "pixelsPerMeter": 70.34812415420238,
+    "invertYAxis": true,
+    "rotationDegrees": 0
+  },
+  "updatedAt": "2026-10-07T19:27:39.602Z",
+  "status": "active",
+  "liveTrackingEnabled": true
+}

@@ -2,23 +2,27 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { BarChart3, Boxes, Building2, Crosshair, Headset, Hexagon, Map, RadioTower, Route, Settings, X } from "lucide-react";
+import type { UiMode } from "../uiMode";
 
 const SIDEBAR_COLLAPSED_STORAGE_KEY = "ips-sidebar-collapsed";
 
 export type WorkspaceView = "map" | "tags" | "anchors" | "regions" | "history" | "support" | "analyses";
 
-const NAVIGATION: ReadonlyArray<{ readonly label: string; readonly view: WorkspaceView; readonly icon: typeof Map }> = [
-  { label: "Canlı Harita", view: "map", icon: Map },
+type NavigationItem = { readonly label: string; readonly view: WorkspaceView; readonly icon: typeof Map };
+
+const MAP_NAVIGATION: NavigationItem = { label: "Canlı Harita", view: "map", icon: Map };
+const HISTORY_NAVIGATION: NavigationItem = { label: "Rota Geçmişi", view: "history", icon: Route };
+const SUPPORT_NAVIGATION: NavigationItem = { label: "Destek ve İletişim", view: "support", icon: Headset };
+const ADMIN_NAVIGATION: ReadonlyArray<NavigationItem> = [
   { label: "İzlenen Varlıklar", view: "tags", icon: Boxes },
   { label: "Referans İstasyonları", view: "anchors", icon: RadioTower },
   { label: "Oda/Bölge", view: "regions", icon: Hexagon },
-  { label: "Rota Geçmişi", view: "history", icon: Route },
-  { label: "Destek ve İletişim", view: "support", icon: Headset },
 ];
 
-const REVIEW_NAVIGATION: ReadonlyArray<{ readonly label: string; readonly view: WorkspaceView; readonly icon: typeof Map }> = [{ label: "Analizler", view: "analyses", icon: BarChart3 }];
+const REVIEW_NAVIGATION: ReadonlyArray<NavigationItem> = [{ label: "Analizler", view: "analyses", icon: BarChart3 }];
 
 interface AppSidebarProps {
+  readonly mode: UiMode;
   readonly activeView: WorkspaceView;
   readonly collapsed: boolean;
   readonly mobileOpen: boolean;
@@ -49,7 +53,8 @@ export function useSidebarCollapse() {
   return { collapsed, toggleCollapsed };
 }
 
-export function AppSidebar({ activeView, collapsed, mobileOpen, onMobileClose, onViewChange }: AppSidebarProps) {
+export function AppSidebar({ mode, activeView, collapsed, mobileOpen, onMobileClose, onViewChange }: AppSidebarProps) {
+  const item = ({ label, view, icon: Icon }: NavigationItem) => <button key={view} className={activeView === view ? "active" : ""} onClick={() => onViewChange(view)} aria-label={label} title={label}><Icon size={17} /><span>{label}</span></button>;
   return (
     <aside className={`app-sidebar${collapsed ? " is-collapsed" : ""}${mobileOpen ? " is-mobile-open" : ""}`}>
       <div className="mobile-sidebar-heading">
@@ -58,15 +63,14 @@ export function AppSidebar({ activeView, collapsed, mobileOpen, onMobileClose, o
       </div>
       <nav aria-label="Primary navigation">
         <small>İZLE</small>
-        {NAVIGATION.slice(0, 1).map(({ label, view, icon: Icon }) => <button key={view} className={activeView === view ? "active" : ""} onClick={() => onViewChange(view)} aria-label={label} title={label}><Icon size={17} /><span>{label}</span></button>)}
-        <small>YÖNET</small>
-        {NAVIGATION.slice(1).map(({ label, view, icon: Icon }) => <button key={view} className={activeView === view ? "active" : ""} onClick={() => onViewChange(view)} aria-label={label} title={label}><Icon size={17} /><span>{label}</span></button>)}
-        <small>İNCELE</small>
-        {REVIEW_NAVIGATION.map(({ label, view, icon: Icon }) => <button key={view} className={activeView === view ? "active" : ""} onClick={() => onViewChange(view)} aria-label={label} title={label}><Icon size={17} /><span>{label}</span></button>)}
+        {item(MAP_NAVIGATION)}
+        {item(HISTORY_NAVIGATION)}
+        {mode === "admin" && <><small>YÖNET</small>{ADMIN_NAVIGATION.map(item)}<small>İNCELE</small>{REVIEW_NAVIGATION.map(item)}</>}
+        <small>İLETİŞİM</small>
+        {item(SUPPORT_NAVIGATION)}
       </nav>
       <div className="sidebar-footer">
-        <button><Building2 size={17} /><span>Saha ayarları</span></button>
-        <button><Settings size={17} /><span>Sistem</span></button>
+        {mode === "admin" && <><button><Building2 size={17} /><span>Saha ayarları</span></button><button><Settings size={17} /><span>Sistem</span></button></>}
         <div className="sidebar-system"><Crosshair size={15} /><div><strong>UWB MOTORU</strong><span><i /> ÇALIŞIYOR</span></div></div>
       </div>
     </aside>

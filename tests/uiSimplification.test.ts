@@ -19,6 +19,7 @@ test("header omits the notifications control", () => {
 
 test("sidebar uses explicit views without the alarms entry or badge", () => {
   const html = renderToStaticMarkup(createElement(AppSidebar, {
+    mode: "admin",
     activeView: "map",
     collapsed: true,
     mobileOpen: false,
@@ -34,7 +35,7 @@ test("sidebar uses explicit views without the alarms entry or badge", () => {
 });
 
 test("existing analyses navigation opens through the active workspace style",()=>{
-  let selected="";const html=renderToStaticMarkup(createElement(AppSidebar,{activeView:"analyses",collapsed:false,mobileOpen:false,onMobileClose:()=>{},onViewChange:view=>{selected=view;}}));
+  let selected="";const html=renderToStaticMarkup(createElement(AppSidebar,{mode:"admin",activeView:"analyses",collapsed:false,mobileOpen:false,onMobileClose:()=>{},onViewChange:view=>{selected=view;}}));
   assert.match(html,/class="active"[^>]*aria-label="Analizler"/);assert.equal(selected,"");
 });
 

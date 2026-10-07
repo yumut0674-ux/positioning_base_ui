@@ -3,6 +3,8 @@ import path from "node:path";
 import embeddedCatalog from "../../../config/maps/catalog.json";
 import embeddedOrthopedicsMap from "../../../config/maps/kat1-ortopedi/map.json";
 import embeddedSportsCorridorMap from "../../../config/maps/spor-koridor/map.json";
+import embeddedServiceMap from "../../../config/maps/necmettin-servis/map.json";
+import embeddedIntensiveCareMap from "../../../config/maps/necmettin-yogun-bakim/map.json";
 import { mapCatalogSchema, mapDetailsSchema } from "./map.validation";
 import type { MapCatalog, MapCatalogEntry, MapDetails } from "./map.types";
 
@@ -33,7 +35,11 @@ export class FileMapRepository implements MapRepository {
       ? embeddedSportsCorridorMap
       : entry.id === embeddedOrthopedicsMap.id
         ? embeddedOrthopedicsMap
-        : undefined;
+        : entry.id === embeddedServiceMap.id
+          ? embeddedServiceMap
+          : entry.id === embeddedIntensiveCareMap.id
+            ? embeddedIntensiveCareMap
+            : undefined;
     const value = await this.readJson(configFile, fallback);
     return mapDetailsSchema.parse(value) as MapDetails;
   }

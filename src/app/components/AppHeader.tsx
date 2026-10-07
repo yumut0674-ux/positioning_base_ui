@@ -5,8 +5,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { LogoMark } from "@/src/shared/components/LogoMark";
 import { groupMapCatalog, isSelectableMap } from "@/src/features/map/services/mapSelection";
 import type { MapCatalog, MapCatalogEntry } from "@/src/server/maps/map.types";
+import type { UiMode } from "../uiMode";
 
 interface AppHeaderProps {
+  readonly mode?: UiMode;
   readonly sidebarCollapsed: boolean;
   readonly mobileMenuOpen: boolean;
   readonly onSidebarToggle: () => void;
@@ -23,7 +25,7 @@ function statusLabel(entry: MapCatalogEntry): string {
   return "HAZIR";
 }
 
-export function AppHeader({ sidebarCollapsed, mobileMenuOpen, onSidebarToggle, catalog, activeMapId = null, onMapSelect = () => undefined }: AppHeaderProps) {
+export function AppHeader({ mode = "admin", sidebarCollapsed, mobileMenuOpen, onSidebarToggle, catalog, activeMapId = null, onMapSelect = () => undefined }: AppHeaderProps) {
   const toggleLabel = mobileMenuOpen ? "Menüyü kapat" : sidebarCollapsed ? "Menüyü genişlet" : "Menüyü daralt";
   const [selectorOpen, setSelectorOpen] = useState(false);
   const selectorRef = useRef<HTMLDivElement>(null);
@@ -84,7 +86,7 @@ export function AppHeader({ sidebarCollapsed, mobileMenuOpen, onSidebarToggle, c
       </div>
       <div className="header-actions">
         <button aria-label="Ara"><Search size={17} /></button>
-        <div className="operator"><CircleUserRound size={24} /><div><strong>Umut Başev</strong><small>KONTROL OPERATÖRÜ</small></div></div>
+        {mode === "admin" && <div className="operator"><CircleUserRound size={24} /><div><strong>Umut Başev</strong><small>KONTROL OPERATÖRÜ</small></div></div>}
       </div>
     </header>
   );

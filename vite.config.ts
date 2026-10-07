@@ -24,7 +24,7 @@ export default defineConfig(({ mode }) => {
       __REGION_POSITION_ALLOWED_ORIGIN__: JSON.stringify(process.env.REGION_POSITION_ALLOWED_ORIGIN ?? ""),
     },
     server: {
-      allowedHosts: ["neu-demo.gekon.com.tr"],
+      allowedHosts: ["neu-demo.gekon.com.tr", "neu-admin.gekon.com.tr"],
       ...(isCodexSeatbeltSandbox
         ? { watch: { useFsEvents: false, usePolling: true } }
         : {}),

@@ -1,0 +1,121 @@
+{
+  "mapDisplay": {
+    "outsideHoldMs": 2000
+  },
+  "engine": {
+    "entryEvidenceDurationMs": 1500,
+    "exitEvidenceDurationMs": 1500,
+    "entryConfirmationCount": 2,
+    "exitConfirmationCount": 2,
+    "evidenceWindowMs": 12000,
+    "roomSwitchConfirmationCount": 3,
+    "roomSwitchEvidenceDurationMs": 1500,
+    "roomSwitchUncertainAfterMs": 10000,
+    "maxEvidenceGapMs": 4000,
+    "expectedIntervalMs": 1000,
+    "relocationEvidenceDurationMultiplier": 2,
+    "outsideReleaseDurationMultiplier": 2,
+    "exitMarginMeters": 0.5,
+    "baseScore": 0.15,
+    "maximumScore": 0.9,
+    "durationContributionMaximum": 0.35,
+    "durationContributionFullAtMs": 2100,
+    "measurementContributionPerSample": 0.04,
+    "measurementContributionMaximum": 0.15,
+    "doorEntryBonus": 0.25,
+    "doorExitBonus": 0,
+    "confirmedInsideScore": 0.85,
+    "inferredInsideMaximumScore": 0.65,
+    "invalidMeasurementMaximumScore": 0.5,
+    "minimumHardwareQuality": 0.25,
+    "reliableEvidenceWeight": 0.5,
+    "wallEvidenceWeight": 0.1,
+    "maximumSpeedMetersPerSecond": 4,
+    "movementToleranceMeters": 0.25,
+    "lostAfterMs": 30000,
+    "relocationAfterMs": 15000,
+    "regularCoverageStaleMultiplier": 3,
+    "intermittentCoverageStaleMultiplier": 5,
+    "silentCoverageStaleMultiplier": 8,
+    "lostAfterStaleMultiplier": 4,
+    "maxTags": 5000,
+    "historySize": 64,
+    "doorDefaults": {
+      "enabled": true,
+      "direction": "bidirectional",
+      "evidenceMode": "preferred",
+      "entryEvidenceWeight": 1,
+      "exitEvidenceWeight": 1,
+      "entryConfidenceBonus": 0.25,
+      "exitConfidenceBonus": 0,
+      "crossingValidityMs": 12000,
+      "minimumDirectionalMovementMeters": 0,
+      "missingDoorEvidenceDurationMultiplier": 1,
+      "missingDoorEvidenceCountMultiplier": 1,
+      "allowEstimatedEntryAfterSignalLoss": true,
+      "allowEstimatedExitAfterSignalLoss": true
+    }
+  },
+  "map": {
+    "source": "system",
+    "mapId": "necmettin-yogun-bakim",
+    "image": "/maps/necmettin-yogun-bakim/floor-plan.png",
+    "widthPx": 3840,
+    "heightPx": 2160,
+    "calibration": {
+      "type": "affine",
+      "points": [
+        {
+          "id": "origin",
+          "pixel": {
+            "x": 719.75,
+            "y": 3039.8
+          },
+          "world": {
+            "x": 0,
+            "y": 0
+          }
+        },
+        {
+          "id": "x-axis",
+          "pixel": {
+            "x": 881.3531027795734,
+            "y": 3039.8
+          },
+          "world": {
+            "x": 1,
+            "y": 0
+          }
+        },
+        {
+          "id": "y-axis",
+          "pixel": {
+            "x": 719.75,
+            "y": 2878.1968972204268
+          },
+          "world": {
+            "x": 0,
+            "y": 1
+          }
+        }
+      ]
+    }
+  },
+  "positionAnimation": {
+    "enabled": true,
+    "mode": "buffered_interpolation",
+    "interpolationDelayMs": 4500,
+    "maximumBufferSize": 16,
+    "maximumSegmentDurationMs": 2500,
+    "maximumExtrapolationMs": 0,
+    "stalePositionTimeoutMs": 4000,
+    "teleportDistanceMeters": 6,
+    "teleportAnimationDurationMs": 1500,
+    "regionTransitionDurationMs": 2000,
+    "maximumVisualSpeedMetersPerSecond": 1.2,
+    "maximumTransitionDurationMs": 8000,
+    "easing": "ease_in_out"
+  },
+  "regions": [],
+  "largeAreas": []
+}
