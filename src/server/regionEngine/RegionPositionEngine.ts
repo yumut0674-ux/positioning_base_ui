@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { crossesDoor, pointInPolygon, wallDistance, type DoorCrossingResult } from "./geometry";
 import type { CompiledDoor, CompiledRegion, CompiledRegionsConfig, DecisionEventType, DecisionSeverity, DecisionTrace, EvidenceScoreComponents, ProcessedPosition, RegionEngineStatus, RoomSwitchCandidate, RoomTransitionTrace, SilentDoorProximityCandidate, VehicleRegionState, VehicleRegionStatus } from "./types";
 
-export const ROOM_ENGINE_VERSION = "room-evidence-8";
+export const ROOM_ENGINE_VERSION = "room-evidence-9";
 interface Evidence { at: number; raw: TrackingPosition; room: string | null; weight: number }
 type ReliableLocation = { kind: "room"; regionId: string } | { kind: "corridor" } | null;
 interface State extends VehicleRegionStatus {
@@ -85,6 +85,11 @@ export class RegionPositionEngine {
   }
   private isCorridorPosition(raw: TrackingPosition): boolean {
     return this.config!.corridors.length === 0 || this.config!.corridors.some(corridor => pointInPolygon(raw, corridor));
+  }
+  private connectedArea(raw: TrackingPosition, roomId: string | null = null): string | { readonly id: string; readonly kind: "corridor" } {
+    if (roomId) return roomId;
+    const corridor = this.config!.corridors.find(area => pointInPolygon(raw, area));
+    return corridor ? { id: corridor.id, kind: "corridor" } : "corridor";
   }
   private hasSilentDoorInference(): boolean {
     return this.config!.regions.some(region => region.settings.coverage === "silent" && region.settings.silentEntryMaxDistanceMeters > 0);
@@ -243,35 +248,33 @@ export class RegionPositionEngine {
       return this.send(v);
     }
     if (active) {
-      if (!v.exitCrossing && previous && previous.weight >= active.settings.reliableEvidenceWeight && at - previous.at <= this.gap(v, active)) v.exitCrossing = crossesDoor(previous.raw, raw, active, false, candidate?.id ?? "corridor", at);
+      if (!v.exitCrossing && previous && previous.weight >= active.settings.reliableEvidenceWeight && at - previous.at <= this.gap(v, active)) v.exitCrossing = crossesDoor(previous.raw, raw, active, false, this.connectedArea(raw, candidate?.id), at);
       if (v.exitCrossing && at - v.exitCrossing.occurredAt > (active.entrances.find(d => d.id === v.exitCrossing?.doorId)?.settings.crossingValidityMs ?? active.settings.evidenceWindowMs)) v.exitCrossing = null;
       const configuredPolicy = this.doorPolicy(active, "exit", v.exitCrossing);
       // Silent rooms can prove an exit with continuous trustworthy corridor measurements.
       // A real door crossing remains useful score evidence, but is never a prerequisite here.
-      const silentCorridorEvidence = active.settings.coverage === "silent"
-        && reliable
+      const corridorEvidence = reliable
         && !candidate
         && this.isCorridorPosition(raw)
         && wallDistance(raw, active) >= active.settings.exitMarginMeters;
       const policy = active.settings.coverage === "silent"
         ? { ...configuredPolicy, allowed: true, durationMultiplier: 1, countMultiplier: 1 }
         : configuredPolicy;
-      if (silentCorridorEvidence && v.exitEvidenceLastAt && at - v.exitEvidenceLastAt > active.settings.maxEvidenceGapMs) {
+      if ((v.exitAt && at - v.exitAt > active.settings.evidenceWindowMs)
+        || (corridorEvidence && v.exitEvidenceLastAt && at - v.exitEvidenceLastAt > active.settings.maxEvidenceGapMs)) {
         v.exitAt = 0; v.exitEvidenceLastAt = 0; v.exitConfirmationCount = 0;
       }
       if (!v.exitAt && (active.settings.coverage === "silent"
-        ? silentCorridorEvidence
-        : v.exitCrossing || (active.usesDoorPolicy && policy.allowed))) v.exitAt = at;
+        ? corridorEvidence
+        : v.exitCrossing || (active.usesDoorPolicy && policy.allowed && corridorEvidence))) v.exitAt = at;
       if (v.exitAt && at - v.exitAt <= active.settings.evidenceWindowMs && policy.allowed) {
         v.state = "EXIT_CANDIDATE";
-        if (active.settings.coverage === "silent") {
-          if (silentCorridorEvidence) { v.exitConfirmationCount++; v.exitEvidenceLastAt = at; }
-        } else if (wallDistance(raw, active) >= active.settings.exitMarginMeters) v.exitConfirmationCount++;
+        if (corridorEvidence) { v.exitConfirmationCount++; v.exitEvidenceLastAt = at; }
         v.requiredDurationMs = active.settings.exitEvidenceDurationMs * policy.durationMultiplier;
         v.requiredMeasurements = Math.max(2, Math.ceil(active.settings.exitConfirmationCount * policy.countMultiplier));
         v.collectedDurationMs = at - v.exitAt;
         v.score = this.calculateScore(active, v.collectedDurationMs, v.exitConfirmationCount, v.exitCrossing, "exit");
-        const qualifyingCompletion = active.settings.coverage !== "silent" || silentCorridorEvidence;
+        const qualifyingCompletion = corridorEvidence;
         if (qualifyingCompletion && at - v.exitAt >= v.requiredDurationMs && v.exitConfirmationCount >= v.requiredMeasurements) {
           v.activeRegionId = null; v.relocation = false; v.state = "TRACKING_OUTSIDE"; v.history = [v.history.at(-1)!]; v.candidateRegionId = null;
           this.clearRoomSwitch(v);
@@ -302,7 +305,7 @@ export class RegionPositionEngine {
     if (v.candidateRegionId !== candidate.id) { v.candidateRegionId = candidate.id; v.candidateSince = at; v.crossing = null; }
     // Reliable raw evidence inside a silent room stands on its own; weak wall samples may still use legacy door evidence.
     if (!v.crossing && previous && previous.weight >= candidate.settings.reliableEvidenceWeight && at - previous.at <= this.gap(v, candidate)
-      && !(candidate.settings.coverage === "silent" && reliable)) v.crossing = crossesDoor(previous.raw, raw, candidate, true, active?.id ?? "corridor", at);
+      && !(candidate.settings.coverage === "silent" && reliable)) v.crossing = crossesDoor(previous.raw, raw, candidate, true, this.connectedArea(previous.raw, active?.id), at);
     if (v.crossing && at - v.crossing.occurredAt > (candidate.entrances.find(d => d.id === v.crossing?.doorId)?.settings.crossingValidityMs ?? candidate.settings.evidenceWindowMs)) v.crossing = null;
     const evidence = v.history.filter(e => e.room === candidate.id && e.at >= v.candidateSince && e.weight >= candidate.settings.reliableEvidenceWeight);
     const span = evidence.length ? evidence.at(-1)!.at - evidence[0].at : 0; v.insideConfirmationCount = evidence.length; v.collectedDurationMs = span;

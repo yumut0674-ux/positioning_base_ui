@@ -66,7 +66,7 @@
       "displayName": "Yoğun Bakım",
       "status": "active",
       "liveTrackingEnabled": true,
-      "trackingZoneIds": ["necmettin-yogun-bakim", "yogun-bakim"],
+      "trackingZoneIds": ["Neüyoğun", "neuyogun", "necmettin-yogun-bakim", "yogun-bakim"],
       "sortOrder": 16,
       "configPath": "necmettin-yogun-bakim/map.json",
       "regionsConfigPath": "necmettin-yogun-bakim/regions.json"

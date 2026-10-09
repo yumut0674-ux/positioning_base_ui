@@ -1,13 +1,13 @@
 {
   "id": "necmettin-servis",
   "image": {
-    "url": "/maps/necmettin-servis/floor-plan.png",
+    "url": "/maps/necmettin-servis/floor-plan-1e98c4840f0c.png",
     "width": 3840,
     "height": 2160
   },
   "world": {
-    "widthMeters": 54.5856772468127,
-    "heightMeters": 30.704443451332146
+    "widthMeters": 54.4196231891102,
+    "heightMeters": 30.611038043874483
   },
   "calibration": {
     "worldOrigin": {
@@ -15,14 +15,14 @@
       "y": 0
     },
     "canvasOrigin": {
-      "x": -26.29057954870241,
-      "y": 1947.6674030972363
+      "x": -26.584397118828022,
+      "y": 1955.9599941366955
     },
-    "pixelsPerMeter": 70.34812415420238,
+    "pixelsPerMeter": 70.56278186006284,
     "invertYAxis": true,
     "rotationDegrees": 0
   },
-  "updatedAt": "2026-10-07T19:27:39.602Z",
+  "updatedAt": "2026-10-09T11:28:47.028Z",
   "status": "active",
   "liveTrackingEnabled": true
 }

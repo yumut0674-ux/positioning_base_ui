@@ -540,7 +540,10 @@ test("after a doorless silent exit, dropout near another silent door infers that
 });
 
 test("21 September 2026 real route exits Rooms 3 and 5 without doors and infers Room 6 at the recorded cutoff", () => {
-  const fixture=september21Fixture();const config=sportsCorridorConfig();let now=Date.parse(fixture.positions[0][0]);
+  const fixture=september21Fixture();const base=sportsCorridorConfig();
+  // This regression exercises speed rejection as well as exits. Keep its limit
+  // fixed instead of letting later manual live-map tuning remove every rejection.
+  const config={...base,engine:{...base.engine,maximumSpeedMetersPerSecond:4.5}};let now=Date.parse(fixture.positions[0][0]);
   const published:ProcessedPosition[]=[];const engine=new RegionPositionEngine(position=>published.push(position),250,()=>now,false);
   engine.enable(compileRegionsConfig(config));
   const cutoff="2026-09-21T09:49:31.785Z";let speedRejectedExitCount=-1;

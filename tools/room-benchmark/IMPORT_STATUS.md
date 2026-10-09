@@ -1,5 +1,9 @@
 # Saha verisi aktarım durumu — 2026-09-24
 
+## 2026-10-09 hastane testi
+
+`test-f6d295ed-38a9-4e8f-a8d2-f5f6ba4b1d06`: kullanıcı `hasan` tagını doğruladı; SELECT ile kod `06F0623201E95CE8` olarak eşleştirildi. Truth revizyon 2. 456 ham satır salt okunur aktarıldı; received_at/ölçüm/koordinat eksikliği, zaman anomalisi ve >5 s teslim boşluğu yok; 456 kalite değeri eksik. Ham SHA `56fa57dca0d6925c90869fa40d6ab3d1f743a66fbd0351f7d3002979c6fd0591`. Aktif motor `room-evidence-9`, yoğun bakım configVersion `db4d1a246b950588`: 4/5 ziyaret yakalandı, zaman ağırlıklı doğru oda %28,136. Raporlar `reports/necmettin-yogun-bakim-f6d295ed-20261009/` içinde. 8 Ekim testinin belirsiz tag eşleşmesi değiştirilmedi.
+
 Dokuz testin tamamı `tag_location_history` tablosundan yalnız `SELECT` ile alındı. Her testte 30 saniye ısınma ve 60 saniye gözlem penceresi vardır. Toplam **3.970** satır; `raw.jsonl` SHA-256 değerleri test manifestlerinde kayıtlıdır. Bunlar veritabanında kalıcı olan tag kayıtlarıdır; canlı motorun gördüğü tüm olayları kapsadığı iddia edilmez.
 
 | Test kısa ID | Satır | Aday tag | >5 sn teslim boşluğu | Puanlama |
@@ -38,3 +42,7 @@ Puanlı replay `reports/ab1564af-three-tags-20260926/` altında. Güncel motor `
 ## 2026-09-26 15:51:28.100 testi — veri kümesi eklendi
 
 `test-734a7d51-5553-43d5-be81-dbca4c37ab71` için dört oda ziyareti `truth.json` revizyon 1'e UTC/ISO olarak kaydedildi. Kullanıcının üç tag'ın birlikte taşındığı doğrulamasıyla önceki üçlü testteki `D95660981D60BDA1`, `9A8FA14BB93426F1` ve `06F0623201E95CE8` aynı rota grubuna bağlandı. Bu aralıktaki veritabanı adayları da yalnız bu üç koddu: sırasıyla 304, 290 ve 292 paket. `tag_location_history` tablosundan yalnız `SELECT` ile, 30 saniye ısınma ve 60 saniye gözlem dahil toplam **886** ham satır aktarıldı. `received_at`, ölçüm zamanı ve koordinatlar tam; zamanlama tam. `quality` alanı tüm 886 satırda boş. Beş saniyeyi aşan **8** teslim boşluğu manifestte bulunur; en uzunları Oda 6 ziyareti yakınında 31–33 saniyedir. Ham dosya SHA-256: `ee71e7e89dc67babbdbaa65c45f1397b9789d881eb98979eb52dab4606949433`. Bu ekleme sırasında puanlı replay yapılmadı.
+
+## Necmettin Hastanesi — Yoğun Bakım, 2026-10-08
+
+`test-2a7fecc4-d625-4091-8b6c-a5a056302913` için Oda 2 → Oda 5 → Oda 2 aralıkları `truth.json` revizyon 1'e UTC/ISO olarak kaydedildi. Kullanıcı tek tag taşıdığını, ancak hangisi olduğundan emin olmadığını belirtti. Veritabanındaki tek aday `06F0623201E95CE8` (`tags` adı `hasan`), 30 saniye ısınma ve 60 saniye gözlem dahil 441 satır. Bu kod fiziksel tag olarak doğrulanmadığı için `groups` boş ve rapor **puanlanmadı**. Salt okunur `SELECT` aktarımında `received_at`, ölçüm zamanı ve koordinat eksikliği yok; büyük teslim boşluğu yok; 441 `quality` değeri boş. Ham veri SHA-256 `a1983ab5e8040c6667724b1e6aeae57076c7fd8d8f1c21975895b38fad82fa92`. Güncel yoğun bakım haritası ve aktif motorla karar izi `reports/necmettin-yogun-bakim-2a7fecc4-unscored-20261008/` altında; ayrıntılı neden analizi `reports/necmettin-yogun-bakim-2a7fecc4-analysis.md` dosyasında. Test sırasındaki veritabanı kararları da salt okunur karşılaştırıldı: motor `room-evidence-8`, configVersion `36181d9e68761282`.

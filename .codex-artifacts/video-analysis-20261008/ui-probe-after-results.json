@@ -1,0 +1,5502 @@
+[
+  {
+    "at": "2026-10-08T15:01:41.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.163888888888889,
+      "y": 5.59320987654321
+    },
+    "raw": {
+      "x": 2.163888888888889,
+      "y": 5.59320987654321
+    },
+    "rendered": {
+      "x": 2.163888888888889,
+      "y": 5.59320987654321
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.163888888888889,
+      "y": 5.59320987654321
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:42.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.1155092592592593,
+      "y": 5.559104938271605
+    },
+    "raw": {
+      "x": 2.1155092592592593,
+      "y": 5.559104938271605
+    },
+    "rendered": {
+      "x": 2.163888888888889,
+      "y": 5.59320987654321
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.8539921762197176,
+      "y": 5.553789478841918
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:43.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.4293981481481481,
+      "y": 5.47573731138546
+    },
+    "raw": {
+      "x": 1.4293981481481481,
+      "y": 5.47573731138546
+    },
+    "rendered": {
+      "x": 2.163888888888889,
+      "y": 5.59320987654321
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.723770734976572,
+      "y": 5.5298511634951515
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:44.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.8076388888888886,
+      "y": 5.778892318244171
+    },
+    "raw": {
+      "x": 1.8076388888888886,
+      "y": 5.778892318244171
+    },
+    "rendered": {
+      "x": 2.163888888888889,
+      "y": 5.59320987654321
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.7965110532431299,
+      "y": 5.640398873912402
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:45.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.2635802469135804,
+      "y": 5.657630315500687
+    },
+    "raw": {
+      "x": 2.2635802469135804,
+      "y": 5.657630315500687
+    },
+    "rendered": {
+      "x": 2.163888888888889,
+      "y": 5.59320987654321
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.9999675933416372,
+      "y": 5.660822954675239
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:46.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.184413580246914,
+      "y": 5.7144718792866955
+    },
+    "raw": {
+      "x": 2.184413580246914,
+      "y": 5.7144718792866955
+    },
+    "rendered": {
+      "x": 1.798936706146615,
+      "y": 5.557167091111545
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.051848977752858,
+      "y": 5.675913445543142
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:47.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.3634259259259258,
+      "y": 5.657630315500685
+    },
+    "raw": {
+      "x": 1.3634259259259258,
+      "y": 5.657630315500685
+    },
+    "rendered": {
+      "x": 1.7366094686202624,
+      "y": 5.53221127909272
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.9322005901025223,
+      "y": 5.699381561525047
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:48.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.669675925925926,
+      "y": 5.790260631001373
+    },
+    "raw": {
+      "x": 2.669675925925926,
+      "y": 5.790260631001373
+    },
+    "rendered": {
+      "x": 1.7955610201169787,
+      "y": 5.628575068811532
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.1827341049883815,
+      "y": 5.730254801075545
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:49.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.6843364197530866,
+      "y": 5.740997942386833
+    },
+    "raw": {
+      "x": 2.6843364197530866,
+      "y": 5.740997942386833
+    },
+    "rendered": {
+      "x": 1.9985580979220485,
+      "y": 5.660840025215033
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.3402981950182826,
+      "y": 5.733629453135453
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:50.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.0451388888888893,
+      "y": 5.767524005486969
+    },
+    "raw": {
+      "x": 2.0451388888888893,
+      "y": 5.767524005486969
+    },
+    "rendered": {
+      "x": 2.0468639336991106,
+      "y": 5.674463469552276
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.2109512137274776,
+      "y": 5.7474797899485655
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:51.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.163888888888889,
+      "y": 5.877417695473252
+    },
+    "raw": {
+      "x": 2.163888888888889,
+      "y": 5.877417695473252
+    },
+    "rendered": {
+      "x": 2.233386940717615,
+      "y": 5.7226057055199275
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.3220768154570828,
+      "y": 5.7960879380875
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:52.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.388194444444445,
+      "y": 5.83573388203018
+    },
+    "raw": {
+      "x": 2.388194444444445,
+      "y": 5.83573388203018
+    },
+    "rendered": {
+      "x": 2.1808714022754754,
+      "y": 5.730025260261043
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.3220768154570828,
+      "y": 5.7960879380875
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:53.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.7151234567901246,
+      "y": 5.8736282578875185
+    },
+    "raw": {
+      "x": 2.7151234567901246,
+      "y": 5.8736282578875185
+    },
+    "rendered": {
+      "x": 2.3347759922045537,
+      "y": 5.734220764723534
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.5609421175100637,
+      "y": 5.850782377529337
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:54.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.4996141975308657,
+      "y": 5.843312757201647
+    },
+    "raw": {
+      "x": 2.4996141975308657,
+      "y": 5.843312757201647
+    },
+    "rendered": {
+      "x": 2.2139721038715834,
+      "y": 5.748801176499915
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.672002948166758,
+      "y": 5.864476074327754
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:55.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.420447530864199,
+      "y": 5.8698388203017835
+    },
+    "raw": {
+      "x": 2.420447530864199,
+      "y": 5.8698388203017835
+    },
+    "rendered": {
+      "x": 2.3220768154570828,
+      "y": 5.7960879380875
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.5813099978794742,
+      "y": 5.857145950606118
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:56.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.3104938271604953,
+      "y": 5.877417695473252
+    },
+    "raw": {
+      "x": 2.3104938271604953,
+      "y": 5.877417695473252
+    },
+    "rendered": {
+      "x": 2.3220768154570828,
+      "y": 5.7960879380875
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.443567044272715,
+      "y": 5.851712405701479
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:57.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.1477623456790136,
+      "y": 5.847102194787381
+    },
+    "raw": {
+      "x": 2.1477623456790136,
+      "y": 5.847102194787381
+    },
+    "rendered": {
+      "x": 2.5420541132920285,
+      "y": 5.8479836401037515
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.3571074346909895,
+      "y": 5.850364905010593
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:58.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.3148919753086434,
+      "y": 5.862259945130316
+    },
+    "raw": {
+      "x": 2.3148919753086434,
+      "y": 5.862259945130316
+    },
+    "rendered": {
+      "x": 2.672002948166758,
+      "y": 5.864476074327754
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.1720355802504447,
+      "y": 5.829778022974364
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:01:59.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.26797839506173,
+      "y": 5.858470507544582
+    },
+    "raw": {
+      "x": 2.26797839506173,
+      "y": 5.858470507544582
+    },
+    "rendered": {
+      "x": 2.5813099978794742,
+      "y": 5.857145950606118
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.1720355802504447,
+      "y": 5.829778022974364
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:00.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.14922839506173,
+      "y": 5.862259945130316
+    },
+    "raw": {
+      "x": 2.14922839506173,
+      "y": 5.862259945130316
+    },
+    "rendered": {
+      "x": 2.443567044272715,
+      "y": 5.851712405701479
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.226455617571124,
+      "y": 5.8475123318092725
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:01.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.202006172839508,
+      "y": 5.831944444444446
+    },
+    "raw": {
+      "x": 2.202006172839508,
+      "y": 5.831944444444446
+    },
+    "rendered": {
+      "x": 2.3903482166272645,
+      "y": 5.85088297323738
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.226455617571124,
+      "y": 5.8475123318092725
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:02.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.122839506172842,
+      "y": 5.828155006858712
+    },
+    "raw": {
+      "x": 2.122839506172842,
+      "y": 5.828155006858712
+    },
+    "rendered": {
+      "x": 2.1720355802504447,
+      "y": 5.829778022974364
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.226455617571124,
+      "y": 5.8475123318092725
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:03.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.2415895061728413,
+      "y": 5.877417695473251
+    },
+    "raw": {
+      "x": 2.2415895061728413,
+      "y": 5.877417695473251
+    },
+    "rendered": {
+      "x": 2.1720355802504447,
+      "y": 5.829778022974364
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.226455617571124,
+      "y": 5.8475123318092725
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:04.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.3163580246913593,
+      "y": 5.89636488340192
+    },
+    "raw": {
+      "x": 2.3163580246913593,
+      "y": 5.89636488340192
+    },
+    "rendered": {
+      "x": 2.226455617571124,
+      "y": 5.8475123318092725
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.1685312056430064,
+      "y": 5.8388209516654
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:05.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.3251543209876555,
+      "y": 5.884996570644718
+    },
+    "raw": {
+      "x": 2.3251543209876555,
+      "y": 5.884996570644718
+    },
+    "rendered": {
+      "x": 2.226455617571124,
+      "y": 5.8475123318092725
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.1685312056430064,
+      "y": 5.8388209516654
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:06.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.7341820987654333,
+      "y": 5.956995884773662
+    },
+    "raw": {
+      "x": 2.7341820987654333,
+      "y": 5.956995884773662
+    },
+    "rendered": {
+      "x": 2.226455617571124,
+      "y": 5.8475123318092725
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.389580552471732,
+      "y": 5.896271854615267
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:07.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.04508101851851853,
+      "y": 5.589420438957476
+    },
+    "raw": {
+      "x": 0.04508101851851853,
+      "y": 5.589420438957476
+    },
+    "rendered": {
+      "x": 2.226455617571124,
+      "y": 5.8475123318092725
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.389580552471732,
+      "y": 5.896271854615267
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:08.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.04508101851851853,
+      "y": 5.589420438957476
+    },
+    "raw": {
+      "x": 0.04508101851851853,
+      "y": 5.589420438957476
+    },
+    "rendered": {
+      "x": 2.1685312056430064,
+      "y": 5.8388209516654
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.389580552471732,
+      "y": 5.896271854615267
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:09.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.2490740740740742,
+      "y": 6.328360768175584
+    },
+    "raw": {
+      "x": 1.2490740740740742,
+      "y": 6.328360768175584
+    },
+    "rendered": {
+      "x": 2.1685312056430064,
+      "y": 5.8388209516654
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.8279511053837436,
+      "y": 6.072587986931937
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:10.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.4601851851851855,
+      "y": 6.301834705075446
+    },
+    "raw": {
+      "x": 1.4601851851851855,
+      "y": 6.301834705075446
+    },
+    "rendered": {
+      "x": 2.2961694926981826,
+      "y": 5.879811406100674
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.5628308754969986,
+      "y": 6.201903657110407
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:11.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.6581018518518522,
+      "y": 6.309413580246914
+    },
+    "raw": {
+      "x": 1.6581018518518522,
+      "y": 6.309413580246914
+    },
+    "rendered": {
+      "x": 2.364006469048086,
+      "y": 5.899446272358026
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.5628308754969986,
+      "y": 6.201903657110407
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:12.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.4865740740740745,
+      "y": 6.332150205761317
+    },
+    "raw": {
+      "x": 1.4865740740740745,
+      "y": 6.332150205761317
+    },
+    "rendered": {
+      "x": 2.256145899629528,
+      "y": 5.9128346116245565
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.5628308754969986,
+      "y": 6.201903657110407
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:13.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.587731481481482,
+      "y": 6.210888203017833
+    },
+    "raw": {
+      "x": 1.587731481481482,
+      "y": 6.210888203017833
+    },
+    "rendered": {
+      "x": 2.0800941012650744,
+      "y": 5.96118036175502
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.5628308754969986,
+      "y": 6.201903657110407
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:14.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.644907407407408,
+      "y": 6.2828875171467775
+    },
+    "raw": {
+      "x": 1.644907407407408,
+      "y": 6.2828875171467775
+    },
+    "rendered": {
+      "x": 1.5882978046475829,
+      "y": 6.177110244832323
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.5628308754969986,
+      "y": 6.201903657110407
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:15.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.724074074074074,
+      "y": 6.366255144032922
+    },
+    "raw": {
+      "x": 1.724074074074074,
+      "y": 6.366255144032922
+    },
+    "rendered": {
+      "x": 1.5628308754969986,
+      "y": 6.201903657110407
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.6088381650252281,
+      "y": 6.248797830073769
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:16.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.389814814814815,
+      "y": 6.320781893004115
+    },
+    "raw": {
+      "x": 1.389814814814815,
+      "y": 6.320781893004115
+    },
+    "rendered": {
+      "x": 1.5628308754969986,
+      "y": 6.201903657110407
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.5463373817432828,
+      "y": 6.269339294317839
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:17.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.6009259259259259,
+      "y": 6.536779835390947
+    },
+    "raw": {
+      "x": 1.6009259259259259,
+      "y": 6.536779835390947
+    },
+    "rendered": {
+      "x": 1.5628308754969986,
+      "y": 6.201903657110407
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.517826433157246,
+      "y": 6.3648881175249725
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:18.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.244675925925926,
+      "y": 6.699725651577504
+    },
+    "raw": {
+      "x": 1.244675925925926,
+      "y": 6.699725651577504
+    },
+    "rendered": {
+      "x": 1.5628308754969986,
+      "y": 6.201903657110407
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.4703884217438812,
+      "y": 6.497346591051685
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:19.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.7343364197530864,
+      "y": 7.014248971193416
+    },
+    "raw": {
+      "x": 1.7343364197530864,
+      "y": 7.014248971193416
+    },
+    "rendered": {
+      "x": 1.5628308754969986,
+      "y": 6.201903657110407
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.599425196597353,
+      "y": 6.745322378724536
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:20.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.422067901234568,
+      "y": 7.628137860082306
+    },
+    "raw": {
+      "x": 1.422067901234568,
+      "y": 7.628137860082306
+    },
+    "rendered": {
+      "x": 1.5904480168579067,
+      "y": 6.254841923462457
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.5645842118009454,
+      "y": 7.147237209972183
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:21.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.4308641975308642,
+      "y": 8.571707818930044
+    },
+    "raw": {
+      "x": 1.4308641975308642,
+      "y": 8.571707818930044
+    },
+    "rendered": {
+      "x": 1.4963917873762973,
+      "y": 6.3205504451472105
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.4820773428480616,
+      "y": 7.896942528842557
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:22.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.3795524691358023,
+      "y": 9.647908093278463
+    },
+    "raw": {
+      "x": 1.3795524691358023,
+      "y": 9.647908093278463
+    },
+    "rendered": {
+      "x": 1.5458037752279372,
+      "y": 6.4297274353996405
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.4555455802530286,
+      "y": 8.878193718139698
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:23.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.6097222222222223,
+      "y": 10.280744170096023
+    },
+    "raw": {
+      "x": 1.6097222222222223,
+      "y": 10.280744170096023
+    },
+    "rendered": {
+      "x": 1.5560986186434063,
+      "y": 6.658956925206691
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.5188444196374837,
+      "y": 9.454025534509894
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:24.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.9862911522633744,
+      "y": 12.164951989026063
+    },
+    "raw": {
+      "x": 1.9862911522633744,
+      "y": 12.164951989026063
+    },
+    "rendered": {
+      "x": 1.608770093587456,
+      "y": 6.998138351095077
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.8009920166572988,
+      "y": 11.182290062818215
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:25.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.4541152263374484,
+      "y": 12.343055555555555
+    },
+    "raw": {
+      "x": 1.4541152263374484,
+      "y": 12.343055555555555
+    },
+    "rendered": {
+      "x": 1.5042315334992324,
+      "y": 7.605047180708746
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.6659181580523248,
+      "y": 11.634292267678804
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:26.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.4293981481481481,
+      "y": 14.145970507544583
+    },
+    "raw": {
+      "x": 1.4293981481481481,
+      "y": 14.145970507544583
+    },
+    "rendered": {
+      "x": 1.4969599541269287,
+      "y": 8.458718341497486
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.669558124441343,
+      "y": 13.366898925622671
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:27.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 3.405992798353909,
+      "y": 15.676320301783266
+    },
+    "raw": {
+      "x": 3.405992798353909,
+      "y": 15.676320301783266
+    },
+    "rendered": {
+      "x": 1.5773787780857738,
+      "y": 9.527076913337563
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.669558124441343,
+      "y": 13.366898925622671
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:28.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.1963477366255146,
+      "y": 16.61159122085048
+    },
+    "raw": {
+      "x": 2.1963477366255146,
+      "y": 16.61159122085048
+    },
+    "rendered": {
+      "x": 1.6910433550256894,
+      "y": 10.551251163123174
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.7443261432044175,
+      "y": 15.411097911142441
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:29.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.0817901234567904,
+      "y": 17.70804183813443
+    },
+    "raw": {
+      "x": 2.0817901234567904,
+      "y": 17.70804183813443
+    },
+    "rendered": {
+      "x": 1.6987926750435292,
+      "y": 11.728040017265515
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.9400539997591513,
+      "y": 16.804268707678688
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:30.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.18032407407407405,
+      "y": 19.693707133058986
+    },
+    "raw": {
+      "x": 0.18032407407407405,
+      "y": 19.693707133058986
+    },
+    "rendered": {
+      "x": 1.8562338848553461,
+      "y": 12.684074998699812
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.1858533321856453,
+      "y": 18.397689491205497
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:31.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 21.186745541838135
+    },
+    "raw": {
+      "x": 0,
+      "y": 21.186745541838135
+    },
+    "rendered": {
+      "x": 1.6495178133717505,
+      "y": 13.460124596072141
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.6877949326676742,
+      "y": 19.569093032471205
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:32.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.1990740740740735,
+      "y": 20.557698902606308
+    },
+    "raw": {
+      "x": 2.1990740740740735,
+      "y": 20.557698902606308
+    },
+    "rendered": {
+      "x": 1.4940857255670188,
+      "y": 14.207862222682804
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.6877949326676742,
+      "y": 19.569093032471205
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:33.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.030632716049383,
+      "y": 21.893475651577504
+    },
+    "raw": {
+      "x": 1.030632716049383,
+      "y": 21.893475651577504
+    },
+    "rendered": {
+      "x": 1.6981701378094667,
+      "y": 15.377868537830059
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.5222274078656184,
+      "y": 21.12059338263218
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:34.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.5553240740740746,
+      "y": 20.34549039780521
+    },
+    "raw": {
+      "x": 2.5553240740740746,
+      "y": 20.34549039780521
+    },
+    "rendered": {
+      "x": 1.8385279781347952,
+      "y": 16.57703823845878
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.9332867726391871,
+      "y": 20.812187256662956
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:35.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.6843364197530866,
+      "y": 19.337500000000002
+    },
+    "raw": {
+      "x": 2.6843364197530866,
+      "y": 19.337500000000002
+    },
+    "rendered": {
+      "x": 1.4648993914514779,
+      "y": 17.70231353427047
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.3160012178510714,
+      "y": 20.022086212809246
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:36.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.8956018518518518,
+      "y": 18.412877229080934
+    },
+    "raw": {
+      "x": 1.8956018518518518,
+      "y": 18.412877229080934
+    },
+    "rendered": {
+      "x": 1.013244553111788,
+      "y": 18.82379554085959
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.9802134003485532,
+      "y": 19.146983955264975
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:37.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.753395061728395,
+      "y": 17.76488340192044
+    },
+    "raw": {
+      "x": 1.753395061728395,
+      "y": 17.76488340192044
+    },
+    "rendered": {
+      "x": 1.273721283109826,
+      "y": 19.928799524708786
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.7135082601185672,
+      "y": 18.388485038953718
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:38.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.3634259259259258,
+      "y": 17.70804183813443
+    },
+    "raw": {
+      "x": 1.3634259259259258,
+      "y": 17.70804183813443
+    },
+    "rendered": {
+      "x": 1.6251392991348368,
+      "y": 21.023117651152514
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.59375604607514,
+      "y": 18.155726707926174
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:39.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.3634259259259258,
+      "y": 17.70804183813443
+    },
+    "raw": {
+      "x": 1.3634259259259258,
+      "y": 17.70804183813443
+    },
+    "rendered": {
+      "x": 2.14308514222132,
+      "y": 20.343467282926728
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.59375604607514,
+      "y": 18.155726707926174
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:40.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.3634259259259258,
+      "y": 17.70804183813443
+    },
+    "raw": {
+      "x": 1.3634259259259258,
+      "y": 17.70804183813443
+    },
+    "rendered": {
+      "x": 2.0247094869729136,
+      "y": 19.53304090682974
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.59375604607514,
+      "y": 18.155726707926174
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:41.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.3810185185185186,
+      "y": 16.813734567901236
+    },
+    "raw": {
+      "x": 1.3810185185185186,
+      "y": 16.813734567901236
+    },
+    "rendered": {
+      "x": 1.8619773981187353,
+      "y": 18.579258840404233
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.041084065720544,
+      "y": 18.25927902080754
+    },
+    "transitionKind": "normal-route",
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:42.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.3810185185185186,
+      "y": 16.813734567901236
+    },
+    "raw": {
+      "x": 1.3810185185185186,
+      "y": 16.813734567901236
+    },
+    "rendered": {
+      "x": 1.7631238681005548,
+      "y": 17.999872655429492
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.041084065720544,
+      "y": 18.25927902080754
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:43.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.6405092592592592,
+      "y": 16.92362825788752
+    },
+    "raw": {
+      "x": 1.6405092592592592,
+      "y": 16.92362825788752
+    },
+    "rendered": {
+      "x": 1.7631238681005548,
+      "y": 17.999872655429492
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.2905534445921174,
+      "y": 17.70340654529825
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:44.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.07037037037037037,
+      "y": 18.121090534979427
+    },
+    "raw": {
+      "x": 0.07037037037037037,
+      "y": 18.121090534979427
+    },
+    "rendered": {
+      "x": 1.7631238681005548,
+      "y": 17.999872655429492
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.5592423213930582,
+      "y": 17.858159739109
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:45.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.10797182213077276,
+      "y": 18.15519547325103
+    },
+    "raw": {
+      "x": 0.10797182213077276,
+      "y": 18.15519547325103
+    },
+    "rendered": {
+      "x": 1.2037175543798408,
+      "y": 18.20084988429346
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.41564405634488927,
+      "y": 17.952679137451753
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:46.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.8572788065843624,
+      "y": 17.68093278463649
+    },
+    "raw": {
+      "x": 1.8572788065843624,
+      "y": 17.68093278463649
+    },
+    "rendered": {
+      "x": 1.1121986279001368,
+      "y": 18.100820183485144
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.9790371909490474,
+      "y": 17.770383119589308
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:47.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.5357767489711935,
+      "y": 17.644924554183817
+    },
+    "raw": {
+      "x": 1.5357767489711935,
+      "y": 17.644924554183817
+    },
+    "rendered": {
+      "x": 1.237501728578922,
+      "y": 17.821617400849593
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.1579943888868967,
+      "y": 17.730055980986062
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:48.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.1581790123456792,
+      "y": 16.665946502057615
+    },
+    "raw": {
+      "x": 1.1581790123456792,
+      "y": 16.665946502057615
+    },
+    "rendered": {
+      "x": 0.7827535223569216,
+      "y": 17.737948346672912
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.9521292649443126,
+      "y": 17.126666059742274
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:49.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.818504050925926,
+      "y": 17.58084705075446
+    },
+    "raw": {
+      "x": 1.818504050925926,
+      "y": 17.58084705075446
+    },
+    "rendered": {
+      "x": 0.48378509120790647,
+      "y": 17.907827275101294
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.0814792228134227,
+      "y": 17.386551134437774
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:50.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.143415637860084
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.143415637860084
+    },
+    "rendered": {
+      "x": 0.416891316000865,
+      "y": 17.827638589964717
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.8657006896548508,
+      "y": 17.256938294616482
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:51.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.143415637860084
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.143415637860084
+    },
+    "rendered": {
+      "x": 1.157848763262358,
+      "y": 17.723056607873087
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.8657006896548508,
+      "y": 17.256938294616482
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:52.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.0115740740740742,
+      "y": 17.53372770919067
+    },
+    "raw": {
+      "x": 1.0115740740740742,
+      "y": 17.53372770919067
+    },
+    "rendered": {
+      "x": 0.8596499343067372,
+      "y": 17.3334463972271
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.7508403830107556,
+      "y": 17.595390189654434
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:53.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.822453703703704,
+      "y": 17.620884773662553
+    },
+    "raw": {
+      "x": 0.822453703703704,
+      "y": 17.620884773662553
+    },
+    "rendered": {
+      "x": 0.6046141443876868,
+      "y": 17.260839036502837
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.7508403830107556,
+      "y": 17.595390189654434
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:54.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.9324074074074076,
+      "y": 17.529938271604937
+    },
+    "raw": {
+      "x": 0.9324074074074076,
+      "y": 17.529938271604937
+    },
+    "rendered": {
+      "x": 1.3898573584248752,
+      "y": 17.325672971978335
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.8070812387754415,
+      "y": 17.605799934819583
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:55.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.012094907407407408,
+      "y": 18.08319615912209
+    },
+    "raw": {
+      "x": 0.012094907407407408,
+      "y": 18.08319615912209
+    },
+    "rendered": {
+      "x": 0.7482976363741838,
+      "y": 17.445377911947254
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.5214740294991488,
+      "y": 17.777309554497506
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:56.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.769675925925926,
+      "y": 17.503412208504802
+    },
+    "raw": {
+      "x": 0.769675925925926,
+      "y": 17.503412208504802
+    },
+    "rendered": {
+      "x": 0.7430679948647791,
+      "y": 17.597228328524228
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.5959623792910914,
+      "y": 17.69510969378287
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:57.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.769675925925926,
+      "y": 17.503412208504802
+    },
+    "raw": {
+      "x": 0.769675925925926,
+      "y": 17.503412208504802
+    },
+    "rendered": {
+      "x": 0.7508403830107556,
+      "y": 17.595390189654434
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.5959623792910914,
+      "y": 17.69510969378287
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:58.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.211625514403295
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.211625514403295
+    },
+    "rendered": {
+      "x": 0.8070812387754415,
+      "y": 17.605799934819583
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.19249121373276448,
+      "y": 17.38605236226704
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:02:59.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": -0.7201646090534979,
+      "y": 17.21162551440329
+    },
+    "raw": {
+      "x": -0.7201646090534979,
+      "y": 17.21162551440329
+    },
+    "rendered": {
+      "x": 0.5434471352539699,
+      "y": 17.75306165214017
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.16528309835758973,
+      "y": 17.2992215550282
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:00.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": -1.4403292181069958,
+      "y": 17.988460219478743
+    },
+    "raw": {
+      "x": -1.4403292181069958,
+      "y": 17.988460219478743
+    },
+    "rendered": {
+      "x": 0.5917017988724006,
+      "y": 17.699811356767192
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.7980339960066918,
+      "y": 17.55077815816263
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:01.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": -0.18389917695473249,
+      "y": 17.2343621399177
+    },
+    "raw": {
+      "x": -0.18389917695473249,
+      "y": 17.2343621399177
+    },
+    "rendered": {
+      "x": 0.47019041973458253,
+      "y": 17.600863310863055
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.5128810312366915,
+      "y": 17.36460150662467
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:02.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": -0.3562242798353909,
+      "y": 17.200257201646096
+    },
+    "raw": {
+      "x": -0.3562242798353909,
+      "y": 17.200257201646096
+    },
+    "rendered": {
+      "x": 0.2732850385716716,
+      "y": 17.459264078896716
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.45342433973376994,
+      "y": 17.323890320250126
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:03.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-02",
+    "decisionPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "raw": {
+      "x": -0.43981481481481477,
+      "y": 17.18131001371742
+    },
+    "rendered": {
+      "x": 0.09443335789535734,
+      "y": 17.36728694257838
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": "region-center-route",
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:04.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-02",
+    "decisionPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "raw": {
+      "x": -0.569701646090535,
+      "y": 17.204046639231827
+    },
+    "rendered": {
+      "x": -1.0225333991686871,
+      "y": 17.45752117869937
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": "region-center-route",
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:05.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-02",
+    "decisionPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "raw": {
+      "x": -0.6918724279835391,
+      "y": 18.41287722908093
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:06.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-02",
+    "decisionPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "raw": {
+      "x": -1.1844135802469133,
+      "y": 18.295404663923183
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:07.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-02",
+    "decisionPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "raw": {
+      "x": -1.1844135802469133,
+      "y": 18.295404663923183
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:08.429Z",
+    "decisionState": "EXIT_CANDIDATE",
+    "roomId": "room-02",
+    "decisionPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "raw": {
+      "x": 1.036496913580247,
+      "y": 15.555641289437588
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:09.421Z",
+    "decisionState": "EXIT_CANDIDATE",
+    "roomId": "room-02",
+    "decisionPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "raw": {
+      "x": 1.3106481481481482,
+      "y": 13.463871742112481
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:10.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.5804012345679013,
+      "y": 11.951886145404666
+    },
+    "raw": {
+      "x": 1.5804012345679013,
+      "y": 11.951886145404666
+    },
+    "rendered": {
+      "x": 1.2959876543209876,
+      "y": 12.645353223593965
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.3928032210379044,
+      "y": 12.409294143306255
+    },
+    "transitionKind": "non-routable-region-relocation",
+    "opacity": 0.8325,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:11.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.4616512345679014,
+      "y": 10.993158436213994
+    },
+    "raw": {
+      "x": 1.4616512345679014,
+      "y": 10.993158436213994
+    },
+    "rendered": {
+      "x": 1.3928032210379044,
+      "y": 12.409294143306255
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.463571617719366,
+      "y": 11.657394927746378
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:12.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.3091820987654321,
+      "y": 9.515277777777778
+    },
+    "raw": {
+      "x": 1.3091820987654321,
+      "y": 9.515277777777778
+    },
+    "rendered": {
+      "x": 1.3928032210379044,
+      "y": 12.409294143306255
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.339705773354898,
+      "y": 10.421162271316367
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:13.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.2094907407407407,
+      "y": 8.317815500685873
+    },
+    "raw": {
+      "x": 1.2094907407407407,
+      "y": 8.317815500685873
+    },
+    "rendered": {
+      "x": 1.3928032210379044,
+      "y": 12.409294143306255
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.2147876083274223,
+      "y": 9.187341475927335
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:14.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.34012345679012346,
+      "y": 7.366666666666667
+    },
+    "raw": {
+      "x": 0.34012345679012346,
+      "y": 7.366666666666667
+    },
+    "rendered": {
+      "x": 1.3928032210379044,
+      "y": 12.409294143306255
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.8074546284986106,
+      "y": 8.10033987574058
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:15.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 7.317403978052127
+    },
+    "raw": {
+      "x": 0,
+      "y": 7.317403978052127
+    },
+    "rendered": {
+      "x": 1.464240603123733,
+      "y": 11.888788604338494
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.33517587400123794,
+      "y": 7.671272924349732
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:16.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 6.438254458161866
+    },
+    "raw": {
+      "x": 0,
+      "y": 6.438254458161866
+    },
+    "rendered": {
+      "x": 1.3532797887352506,
+      "y": 10.823715291432892
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.14217178914660572,
+      "y": 7.195906341321582
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:17.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 7.965397805212621
+    },
+    "raw": {
+      "x": 0,
+      "y": 7.965397805212621
+    },
+    "rendered": {
+      "x": 1.2192396875595002,
+      "y": 9.644290374647293
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.06600576254289293,
+      "y": 7.4278651931399065
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:18.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 7.703926611796983
+    },
+    "raw": {
+      "x": 0,
+      "y": 7.703926611796983
+    },
+    "rendered": {
+      "x": 1.0406920353649918,
+      "y": 8.466899638132556
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.12407118566311326,
+      "y": 7.80505788066843
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:19.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 6.987722908093278
+    },
+    "raw": {
+      "x": 0,
+      "y": 6.987722908093278
+    },
+    "rendered": {
+      "x": 0.44930301582283527,
+      "y": 7.791765043720522
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.07022808994825025,
+      "y": 7.40126994867004
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:20.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 7.476560356652949
+    },
+    "raw": {
+      "x": 0,
+      "y": 7.476560356652949
+    },
+    "rendered": {
+      "x": 0.20503946189891165,
+      "y": 7.53093631412115
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.04963846289934619,
+      "y": 7.314466177813259
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:21.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 7.302246227709191
+    },
+    "raw": {
+      "x": 0,
+      "y": 7.302246227709191
+    },
+    "rendered": {
+      "x": 0.09603434418974865,
+      "y": 7.183320757811492
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.035407982728358635,
+      "y": 7.382663058388199
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:22.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 7.302246227709191
+    },
+    "raw": {
+      "x": 0,
+      "y": 7.302246227709191
+    },
+    "rendered": {
+      "x": 0.12407118566311326,
+      "y": 7.80505788066843
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.035407982728358635,
+      "y": 7.382663058388199
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:23.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": -1.170267489711934,
+      "y": 7.38940329218107
+    },
+    "raw": {
+      "x": -1.170267489711934,
+      "y": 7.38940329218107
+    },
+    "rendered": {
+      "x": 0.09978965782131297,
+      "y": 7.5753470012813615
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.6697498042186956,
+      "y": 7.389332405090115
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:24.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": -0.9143518518518519,
+      "y": 7.213408779149521
+    },
+    "raw": {
+      "x": -0.9143518518518519,
+      "y": 7.213408779149521
+    },
+    "rendered": {
+      "x": 0.04963846289934619,
+      "y": 7.314466177813259
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.8708921327867176,
+      "y": 7.3769870897464696
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:25.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -1.5715020576131689,
+      "y": 7.480349794238682
+    },
+    "rendered": {
+      "x": -0.2851008634445876,
+      "y": 7.417364599527519
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": "region-center-route",
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:26.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -1.4351851851851851,
+      "y": 7.404561042524006
+    },
+    "rendered": {
+      "x": -1.4412487883952994,
+      "y": 7.772762927070942
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": "region-center-route",
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:27.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -1.417181069958848,
+      "y": 7.556052812071332
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:28.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -0.2044753086419753,
+      "y": 8.454235253772293
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:29.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -0.7561728395061728,
+      "y": 7.491718106995886
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:30.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -0.2494855967078189,
+      "y": 7.408350480109739
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:31.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -0.5259773662551439,
+      "y": 7.362877229080933
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:32.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -0.47839506172839513,
+      "y": 7.453823731138546
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:33.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -0.668724279835391,
+      "y": 7.908556241426612
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:34.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -1.4400720164609053,
+      "y": 7.313614540466392
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:35.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -1.018261316872428,
+      "y": 7.529612482853226
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:36.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -0.9027777777777778,
+      "y": 7.448251028806584
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:37.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -0.8320473251028807,
+      "y": 7.4197187928669415
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:38.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -0.9375,
+      "y": 7.362877229080933
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:39.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -0.3690843621399177,
+      "y": 6.892986968449931
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:40.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -0.8153292181069959,
+      "y": 7.434876543209875
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:41.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -0.31378600823045266,
+      "y": 7.586454046639233
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:42.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": -0.31378600823045266,
+      "y": 7.586454046639233
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:43.421Z",
+    "decisionState": "EXIT_CANDIDATE",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": 0.9074845679012348,
+      "y": 10.352743484224966
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:44.429Z",
+    "decisionState": "EXIT_CANDIDATE",
+    "roomId": "room-05",
+    "decisionPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "raw": {
+      "x": 1.188966049382716,
+      "y": 11.553995198902607
+    },
+    "rendered": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000085,
+      "y": 7.9117110000000155
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:45.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.1757716049382716,
+      "y": 13.043244170096024
+    },
+    "raw": {
+      "x": 1.1757716049382716,
+      "y": 13.043244170096024
+    },
+    "rendered": {
+      "x": 1.2652006172839507,
+      "y": 12.380092592592595
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.2355209159231841,
+      "y": 12.600179343647651
+    },
+    "transitionKind": "non-routable-region-relocation",
+    "opacity": 0.7875000000000001,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:46.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.1361882716049383,
+      "y": 14.233127572016462
+    },
+    "raw": {
+      "x": 1.1361882716049383,
+      "y": 14.233127572016462
+    },
+    "rendered": {
+      "x": 1.2355209159231841,
+      "y": 12.600179343647651
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.1612849460986472,
+      "y": 13.491709298428024
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:47.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.4689814814814814,
+      "y": 15.582167352537725
+    },
+    "raw": {
+      "x": 1.4689814814814814,
+      "y": 15.582167352537725
+    },
+    "rendered": {
+      "x": 1.2355209159231841,
+      "y": 12.600179343647651
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.4180536715060466,
+      "y": 14.760530363828893
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:48.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.0526234567901236,
+      "y": 16.946364883401923
+    },
+    "raw": {
+      "x": 1.0526234567901236,
+      "y": 16.946364883401923
+    },
+    "rendered": {
+      "x": 1.2355209159231841,
+      "y": 12.600179343647651
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.1976592166384437,
+      "y": 15.972152214781655
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:49.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.908882030178326
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.908882030178326
+    },
+    "rendered": {
+      "x": 1.2355209159231841,
+      "y": 12.600179343647651
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.6304969425945038,
+      "y": 17.10044342654084
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:50.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.7383573388203
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.7383573388203
+    },
+    "rendered": {
+      "x": 1.168484213522066,
+      "y": 13.279025007307665
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.40601690561681814,
+      "y": 17.32756417676654
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:51.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.58789437585734
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.58789437585734
+    },
+    "rendered": {
+      "x": 1.3930286037921675,
+      "y": 14.39725555979127
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.279314040493444,
+      "y": 17.408803607062755
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:52.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.5276234567901235,
+      "y": 17.726989026063098
+    },
+    "raw": {
+      "x": 1.5276234567901235,
+      "y": 17.726989026063098
+    },
+    "rendered": {
+      "x": 1.2542973292452644,
+      "y": 15.591711709967237
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.7436679831495897,
+      "y": 17.365403048766883
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:53.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.3672839506172839,
+      "y": 17.141632373113858
+    },
+    "raw": {
+      "x": 0.3672839506172839,
+      "y": 17.141632373113858
+    },
+    "rendered": {
+      "x": 0.9757221605796504,
+      "y": 16.65778720679791
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.7275116221572742,
+      "y": 17.39014041734088
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:54.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.1816358024691356,
+      "y": 18.1627743484225
+    },
+    "raw": {
+      "x": 1.1816358024691356,
+      "y": 18.1627743484225
+    },
+    "rendered": {
+      "x": 0.38888616109758645,
+      "y": 17.3385480793321
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.8891624114659518,
+      "y": 17.66516846081621
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:55.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.82551440329218
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.82551440329218
+    },
+    "rendered": {
+      "x": 0.3087272056113701,
+      "y": 17.38994445360113
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.3860438581231358,
+      "y": 17.684865594117436
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:56.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.21920438957476
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.21920438957476
+    },
+    "rendered": {
+      "x": 0.39297455730109543,
+      "y": 17.20365173841768
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.273515742450477,
+      "y": 17.492789537370356
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:57.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.213563100137172
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.213563100137172
+    },
+    "rendered": {
+      "x": 0.8499332012050634,
+      "y": 17.474594637779557
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.13593916523074223,
+      "y": 17.362370179115622
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:58.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": -1.337448559670782,
+      "y": 17.194393004115224
+    },
+    "raw": {
+      "x": -1.337448559670782,
+      "y": 17.194393004115224
+    },
+    "rendered": {
+      "x": 0.8352788150297259,
+      "y": 17.573492446324433
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.6814109031025684,
+      "y": 17.271481045813477
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:03:59.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": -1.337448559670782,
+      "y": 17.194393004115224
+    },
+    "raw": {
+      "x": -1.337448559670782,
+      "y": 17.194393004115224
+    },
+    "rendered": {
+      "x": 0.5106709519251489,
+      "y": 17.639459736815674
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.6814109031025684,
+      "y": 17.271481045813477
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:00.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-02",
+    "decisionPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "raw": {
+      "x": -1.3708847736625516,
+      "y": 17.173731138545953
+    },
+    "rendered": {
+      "x": 0.08444558149503573,
+      "y": 17.63788420138734
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": "region-center-route",
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:01.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-02",
+    "decisionPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "raw": {
+      "x": -0.5787037037037038,
+      "y": 17.249022633744854
+    },
+    "rendered": {
+      "x": -1.1041166737585466,
+      "y": 17.571763664588833
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": "region-center-route",
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:02.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-02",
+    "decisionPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "raw": {
+      "x": -0.5954218106995884,
+      "y": 17.24523319615912
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:03.421Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-02",
+    "decisionPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "raw": {
+      "x": -0.5954218106995884,
+      "y": 17.24523319615912
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:04.429Z",
+    "decisionState": "IN_REGION",
+    "roomId": "room-02",
+    "decisionPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "raw": {
+      "x": -0.5954218106995884,
+      "y": 17.24523319615912
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:05.421Z",
+    "decisionState": "EXIT_CANDIDATE",
+    "roomId": "room-02",
+    "decisionPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "raw": {
+      "x": 0.31290802977188437,
+      "y": 17.776251714677638
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:06.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.44470673576391573,
+      "y": 17.78762002743484
+    },
+    "raw": {
+      "x": 0.44470673576391573,
+      "y": 17.78762002743484
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:07.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.4002314814814815,
+      "y": 17.670147462277093
+    },
+    "raw": {
+      "x": 0.4002314814814815,
+      "y": 17.670147462277093
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.3368465489998013,
+      "y": 17.700439989677005
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:08.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.49405864197530863,
+      "y": 17.670147462277093
+    },
+    "raw": {
+      "x": 0.49405864197530863,
+      "y": 17.670147462277093
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.090100967028134,
+      "y": 17.685476666587988
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:09.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.43981481481481477,
+      "y": 17.66635802469136
+    },
+    "raw": {
+      "x": 0.43981481481481477,
+      "y": 17.66635802469136
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.2612207292883382,
+      "y": 17.666314057687252
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:10.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.4324845679012345,
+      "y": 17.643621399176958
+    },
+    "raw": {
+      "x": 0.4324845679012345,
+      "y": 17.643621399176958
+    },
+    "rendered": {
+      "x": -1.8932614000000751,
+      "y": 17.527863000000046
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.2612207292883382,
+      "y": 17.666314057687252
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:11.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.018364197530868
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.018364197530868
+    },
+    "rendered": {
+      "x": -0.8346478080454152,
+      "y": 17.67345107678941
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.12129871778783466,
+      "y": 17.350087610472713
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:12.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.018364197530868
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.018364197530868
+    },
+    "rendered": {
+      "x": 0.0370818692745766,
+      "y": 17.687488611482834
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.12129871778783466,
+      "y": 17.350087610472713
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:13.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.302572016460907
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.302572016460907
+    },
+    "rendered": {
+      "x": 0.2541499165240689,
+      "y": 17.666312316966373
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.12129871778783466,
+      "y": 17.350087610472713
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:14.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.60951646090535
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.60951646090535
+    },
+    "rendered": {
+      "x": 0.2612207292883382,
+      "y": 17.666314057687252
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.08596642451320206,
+      "y": 17.425654907428147
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:15.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 17.56025377229081
+    },
+    "raw": {
+      "x": 0,
+      "y": 17.56025377229081
+    },
+    "rendered": {
+      "x": 0.12129871778783466,
+      "y": 17.350087610472713
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.08596642451320206,
+      "y": 17.425654907428147
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:16.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.6509259259259259,
+      "y": 18.12866941015089
+    },
+    "raw": {
+      "x": 0.6509259259259259,
+      "y": 18.12866941015089
+    },
+    "rendered": {
+      "x": 0.12129871778783466,
+      "y": 17.350087610472713
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.2874107970913888,
+      "y": 17.67632476086051
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:17.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.8547067901234568,
+      "y": 17.594358710562414
+    },
+    "raw": {
+      "x": 0.8547067901234568,
+      "y": 17.594358710562414
+    },
+    "rendered": {
+      "x": 0.12129871778783466,
+      "y": 17.350087610472713
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.535817299198303,
+      "y": 17.66747900960077
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:18.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.3077160493827162,
+      "y": 16.790997942386834
+    },
+    "raw": {
+      "x": 1.3077160493827162,
+      "y": 16.790997942386834
+    },
+    "rendered": {
+      "x": 0.0870861098634545,
+      "y": 17.42326016914435
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.9236253015009577,
+      "y": 17.28163984474126
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:19.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.0760802469135804,
+      "y": 15.756481481481483
+    },
+    "raw": {
+      "x": 1.0760802469135804,
+      "y": 15.756481481481483
+    },
+    "rendered": {
+      "x": 0.08596642451320206,
+      "y": 17.425654907428147
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.0829981578309222,
+      "y": 16.476243615419165
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:20.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.9543981481481482,
+      "y": 14.517335390946501
+    },
+    "raw": {
+      "x": 0.9543981481481482,
+      "y": 14.517335390946501
+    },
+    "rendered": {
+      "x": 0.3370150050646082,
+      "y": 17.687839405487974
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.0285749645799998,
+      "y": 15.379183162299228
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:21.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.452854938271605,
+      "y": 13.338820301783265
+    },
+    "raw": {
+      "x": 1.452854938271605,
+      "y": 13.338820301783265
+    },
+    "rendered": {
+      "x": 0.5339290489936874,
+      "y": 17.66791197908879
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.3340424323201807,
+      "y": 14.225383094244334
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:22.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.4719135802469137,
+      "y": 12.395250342935531
+    },
+    "raw": {
+      "x": 1.4719135802469137,
+      "y": 12.395250342935531
+    },
+    "rendered": {
+      "x": 0.9080968077801679,
+      "y": 17.301476119741075
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.4210921315405693,
+      "y": 13.18894220179215
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:23.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.9249228395061728,
+      "y": 10.780949931412895
+    },
+    "raw": {
+      "x": 1.9249228395061728,
+      "y": 10.780949931412895
+    },
+    "rendered": {
+      "x": 1.0836796359981828,
+      "y": 16.5471468383372
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.634724374531729,
+      "y": 11.803313140221974
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:24.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.482175925925926,
+      "y": 9.416752400548697
+    },
+    "raw": {
+      "x": 1.482175925925926,
+      "y": 9.416752400548697
+    },
+    "rendered": {
+      "x": 1.0362102145254966,
+      "y": 15.467895828409576
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.4681085718990647,
+      "y": 10.468745731901446
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:25.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.9998456790123456,
+      "y": 8.78391632373114
+    },
+    "raw": {
+      "x": 0.9998456790123456,
+      "y": 8.78391632373114
+    },
+    "rendered": {
+      "x": 1.3123085755881743,
+      "y": 14.387558183145789
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.2043882513000868,
+      "y": 9.592636562838733
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:26.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 7.450034293552813
+    },
+    "raw": {
+      "x": 0,
+      "y": 7.450034293552813
+    },
+    "rendered": {
+      "x": 1.4131751680008737,
+      "y": 13.312583492394255
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.6481083853635404,
+      "y": 8.342932705383934
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:27.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.0746141975308645,
+      "y": 6.282887517146776
+    },
+    "raw": {
+      "x": 1.0746141975308645,
+      "y": 6.282887517146776
+    },
+    "rendered": {
+      "x": 1.5275811978908393,
+      "y": 12.180778535835943
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.8706059396435084,
+      "y": 7.198503839132941
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:28.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 5.100582990397806
+    },
+    "raw": {
+      "x": 0,
+      "y": 5.100582990397806
+    },
+    "rendered": {
+      "x": 1.4685755524318695,
+      "y": 10.992279858432175
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.5049514449932349,
+      "y": 6.3173770826641835
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:29.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 3.9713305898491083
+    },
+    "raw": {
+      "x": 0,
+      "y": 3.9713305898491083
+    },
+    "rendered": {
+      "x": 1.2908757558056663,
+      "y": 9.934590780688193
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.2928718380960762,
+      "y": 5.332037555681852
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:30.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 3.9713305898491083
+    },
+    "raw": {
+      "x": 0,
+      "y": 3.9713305898491083
+    },
+    "rendered": {
+      "x": 0.9769126945536573,
+      "y": 8.819666702521276
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.2928718380960762,
+      "y": 5.332037555681852
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:31.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.07037037037037037,
+      "y": 2.7246056241426615
+    },
+    "raw": {
+      "x": 0.07037037037037037,
+      "y": 2.7246056241426615
+    },
+    "rendered": {
+      "x": 0.766439999141851,
+      "y": 7.697979949679483
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.19942122165127973,
+      "y": 4.236916144435392
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:32.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": -1.196141975308642,
+      "y": 1.4665123456790126
+    },
+    "raw": {
+      "x": -1.196141975308642,
+      "y": 1.4665123456790126
+    },
+    "rendered": {
+      "x": -0.8864197530864197,
+      "y": 1.7204046639231827
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.9803847971829667,
+      "y": 1.6433775694240647
+    },
+    "transitionKind": "non-routable-region-relocation",
+    "opacity": 0.8474999999999999,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:33.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": -0.426536668314123,
+      "y": 0.07010459533607682
+    },
+    "raw": {
+      "x": -0.426536668314123,
+      "y": 0.07010459533607682
+    },
+    "rendered": {
+      "x": -0.9803847971829667,
+      "y": 1.6433775694240647
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.697887626264787,
+      "y": 0.7802079331309377
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:34.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.33719135802469147,
+      "y": -2.779236104433063
+    },
+    "raw": {
+      "x": 0.33719135802469147,
+      "y": -2.779236104433063
+    },
+    "rendered": {
+      "x": -0.6996984015248727,
+      "y": 0.7857407539290246
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.697887626264787,
+      "y": 0.7802079331309377
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:35.421Z",
+    "decisionState": "LOCATION_LOST",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.33719135802469147,
+      "y": -2.779236104433063
+    },
+    "raw": {
+      "x": 0.33719135802469147,
+      "y": -2.779236104433063
+    },
+    "rendered": {
+      "x": -0.697887626264787,
+      "y": 0.7802079331309377
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.697887626264787,
+      "y": 0.7802079331309377
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:36.429Z",
+    "decisionState": "LOCATION_LOST",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.33719135802469147,
+      "y": -2.779236104433063
+    },
+    "raw": {
+      "x": 0.33719135802469147,
+      "y": -2.779236104433063
+    },
+    "rendered": {
+      "x": -0.697887626264787,
+      "y": 0.7802079331309377
+    },
+    "visible": false,
+    "displayPosition": {
+      "x": -0.697887626264787,
+      "y": 0.7802079331309377
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:37.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": -10.903663670975671,
+      "y": 0.7540980795610426
+    },
+    "raw": {
+      "x": -10.903663670975671,
+      "y": 0.7540980795610426
+    },
+    "rendered": {
+      "x": -0.697887626264787,
+      "y": 0.7802079331309377
+    },
+    "visible": false,
+    "displayPosition": {
+      "x": -0.697887626264787,
+      "y": 0.7802079331309377
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:38.429Z",
+    "decisionState": "LOCATION_LOST",
+    "roomId": null,
+    "decisionPosition": {
+      "x": -10.903663670975671,
+      "y": 0.7540980795610426
+    },
+    "raw": {
+      "x": -10.903663670975671,
+      "y": 0.7540980795610426
+    },
+    "rendered": {
+      "x": -0.697887626264787,
+      "y": 0.7802079331309377
+    },
+    "visible": false,
+    "displayPosition": {
+      "x": -0.697887626264787,
+      "y": 0.7802079331309377
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:39.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": -0.25406378600823026,
+      "y": 4.888374485596708
+    },
+    "raw": {
+      "x": -0.25406378600823026,
+      "y": 4.888374485596708
+    },
+    "rendered": {
+      "x": -0.25406378600823026,
+      "y": 4.888374485596708
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": -0.25406378600823026,
+      "y": 4.888374485596708
+    },
+    "transitionKind": "non-routable-region-relocation",
+    "opacity": 0.78,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:40.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.6844907407407408,
+      "y": 8.48076131687243
+    },
+    "raw": {
+      "x": 1.6844907407407408,
+      "y": 8.48076131687243
+    },
+    "rendered": {
+      "x": -0.25406378600823026,
+      "y": 4.888374485596708
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.5601291152263375,
+      "y": 6.397176954732512
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:41.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.6405092592592592,
+      "y": 9.6744341563786
+    },
+    "raw": {
+      "x": 1.6405092592592592,
+      "y": 9.6744341563786
+    },
+    "rendered": {
+      "x": -0.25406378600823026,
+      "y": 4.888374485596708
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.2352852121399176,
+      "y": 8.565503084773663
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:42.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.696219135802469,
+      "y": 10.909790809327847
+    },
+    "raw": {
+      "x": 1.696219135802469,
+      "y": 10.909790809327847
+    },
+    "rendered": {
+      "x": -0.25406378600823026,
+      "y": 4.888374485596708
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.5236616120305349,
+      "y": 10.022399970228149
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:43.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.0275462962962965,
+      "y": 12.304303840877918
+    },
+    "raw": {
+      "x": 2.0275462962962965,
+      "y": 12.304303840877918
+    },
+    "rendered": {
+      "x": -0.25406378600823026,
+      "y": 4.888374485596708
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.8098269885092944,
+      "y": 11.407436399367466
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:44.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.706327160493827,
+      "y": 13.065980795610425
+    },
+    "raw": {
+      "x": 2.706327160493827,
+      "y": 13.065980795610425
+    },
+    "rendered": {
+      "x": -0.2267097873336946,
+      "y": 4.939064906353629
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.2739571261200338,
+      "y": 12.414433397489878
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:45.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 3.691512345679012,
+      "y": 12.58093278463649
+    },
+    "raw": {
+      "x": 3.691512345679012,
+      "y": 12.58093278463649
+    },
+    "rendered": {
+      "x": 0.2691907150845266,
+      "y": 6.019431393715871
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 3.0186725274778237,
+      "y": 12.701053983285982
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:46.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 4.288194444444445,
+      "y": 12.74766803840878
+    },
+    "raw": {
+      "x": 4.288194444444445,
+      "y": 12.74766803840878
+    },
+    "rendered": {
+      "x": 0.677827704754121,
+      "y": 7.157680264162735
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 3.520953908958118,
+      "y": 12.71949665189262
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:47.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 4.999228395061728,
+      "y": 12.937139917695475
+    },
+    "raw": {
+      "x": 4.999228395061728,
+      "y": 12.937139917695475
+    },
+    "rendered": {
+      "x": 1.0071237843967713,
+      "y": 8.30147027080699
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 4.140921425654121,
+      "y": 12.810773174821087
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:48.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 5.723456790123458,
+      "y": 12.107253086419755
+    },
+    "raw": {
+      "x": 5.723456790123458,
+      "y": 12.107253086419755
+    },
+    "rendered": {
+      "x": 1.3142463220787703,
+      "y": 9.471422301732598
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 4.8055862787312424,
+      "y": 12.515294737692527
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:49.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 6.317206790123458,
+      "y": 12.789351851851853
+    },
+    "raw": {
+      "x": 6.317206790123458,
+      "y": 12.789351851851853
+    },
+    "rendered": {
+      "x": 1.7025588224108235,
+      "y": 10.595661257828148
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 5.440466893515973,
+      "y": 12.630398725639443
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:50.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 6.570833333333335,
+      "y": 13.035665294924556
+    },
+    "raw": {
+      "x": 6.570833333333335,
+      "y": 13.035665294924556
+    },
+    "rendered": {
+      "x": 2.3907158066800616,
+      "y": 11.580353145084464
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 5.879352931315712,
+      "y": 12.787751096145927
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:51.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 7.004783950617283,
+      "y": 12.300514403292183
+    },
+    "raw": {
+      "x": 7.004783950617283,
+      "y": 12.300514403292183
+    },
+    "rendered": {
+      "x": 3.3054865339702313,
+      "y": 12.339708449023961
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 6.59527081924362,
+      "y": 12.53870304797908
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:52.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 7.827237654320988,
+      "y": 10.701371742112482
+    },
+    "raw": {
+      "x": 7.827237654320988,
+      "y": 10.701371742112482
+    },
+    "rendered": {
+      "x": 4.43140858084247,
+      "y": 12.591122136195892
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 7.112696889976115,
+      "y": 11.76702389951511
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:53.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 7.7246141975308635,
+      "y": 10.834002057613167
+    },
+    "raw": {
+      "x": 7.7246141975308635,
+      "y": 10.834002057613167
+    },
+    "rendered": {
+      "x": 5.575002804285647,
+      "y": 12.678633444118951
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 7.34476637730251,
+      "y": 11.413175597070845
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:54.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 5.98587962962963,
+      "y": 10.420953360768175
+    },
+    "raw": {
+      "x": 5.98587962962963,
+      "y": 10.420953360768175
+    },
+    "rendered": {
+      "x": 5.876363244409719,
+      "y": 12.786679213513048
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 6.762212118157891,
+      "y": 10.76119339656176
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:55.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 5.98587962962963,
+      "y": 10.420953360768175
+    },
+    "raw": {
+      "x": 5.98587962962963,
+      "y": 10.420953360768175
+    },
+    "rendered": {
+      "x": 6.580074457143231,
+      "y": 12.547541838766378
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 6.762212118157891,
+      "y": 10.76119339656176
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:56.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 5.625231481481482,
+      "y": 11.330418381344309
+    },
+    "raw": {
+      "x": 5.625231481481482,
+      "y": 11.330418381344309
+    },
+    "rendered": {
+      "x": 7.1658858675865895,
+      "y": 11.685923925308927
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 6.312233391036692,
+      "y": 10.98647351641215
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:57.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 4.730941358024692,
+      "y": 12.00493827160494
+    },
+    "raw": {
+      "x": 4.730941358024692,
+      "y": 12.00493827160494
+    },
+    "rendered": {
+      "x": 7.317941964962933,
+      "y": 11.454076160431311
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 5.448156617473155,
+      "y": 11.653177477145253
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:58.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 3.556635802469136,
+      "y": 13.164506172839506
+    },
+    "raw": {
+      "x": 3.556635802469136,
+      "y": 13.164506172839506
+    },
+    "rendered": {
+      "x": 6.874042325798763,
+      "y": 10.810204760137006
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 4.358294423155006,
+      "y": 12.537937504134709
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:04:59.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 2.657947530864197,
+      "y": 13.149348422496569
+    },
+    "raw": {
+      "x": 2.657947530864197,
+      "y": 13.149348422496569
+    },
+    "rendered": {
+      "x": 6.561424797689468,
+      "y": 10.861716796654365
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 3.4307384475644227,
+      "y": 12.930317032541106
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:00.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.8017746913580246,
+      "y": 13.801131687242798
+    },
+    "raw": {
+      "x": 1.8017746913580246,
+      "y": 13.801131687242798
+    },
+    "rendered": {
+      "x": 6.335539062162491,
+      "y": 10.974805621758545
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 2.54507464403206,
+      "y": 13.365537727821197
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:01.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.4323302469135804,
+      "y": 14.926594650205763
+    },
+    "raw": {
+      "x": 1.4323302469135804,
+      "y": 14.926594650205763
+    },
+    "rendered": {
+      "x": 5.576033742994967,
+      "y": 11.590459682627934
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.8942342325966948,
+      "y": 14.249974166389588
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:02.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.6434413580246914,
+      "y": 16.52194787379973
+    },
+    "raw": {
+      "x": 1.6434413580246914,
+      "y": 16.52194787379973
+    },
+    "rendered": {
+      "x": 4.622613133946262,
+      "y": 12.331025509711617
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.7308465404372122,
+      "y": 15.54470352257098
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:03.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.6449074074074075,
+      "y": 17.249519890260633
+    },
+    "raw": {
+      "x": 1.6449074074074075,
+      "y": 17.249519890260633
+    },
+    "rendered": {
+      "x": 3.582840433972288,
+      "y": 12.886961938697885
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.6778503137340235,
+      "y": 16.542394734389276
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:04.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.813503086419753,
+      "y": 18.572033607681757
+    },
+    "raw": {
+      "x": 1.813503086419753,
+      "y": 18.572033607681757
+    },
+    "rendered": {
+      "x": 2.8140813656904746,
+      "y": 13.207893276506729
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.775568083753841,
+      "y": 17.758863898251416
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:05.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.776851851851852,
+      "y": 19.940020576131687
+    },
+    "raw": {
+      "x": 1.776851851851852,
+      "y": 19.940020576131687
+    },
+    "rendered": {
+      "x": 2.0147848011300047,
+      "y": 14.07513925934539
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.6607099922636812,
+      "y": 19.057659243355317
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:06.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 22.1
+    },
+    "raw": {
+      "x": 0,
+      "y": 22.1
+    },
+    "rendered": {
+      "x": 1.7793145338332061,
+      "y": 15.246498965454695
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.506910869587009,
+      "y": 19.71632404838888
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:07.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 22.1
+    },
+    "raw": {
+      "x": 0,
+      "y": 22.1
+    },
+    "rendered": {
+      "x": 1.7069025678387837,
+      "y": 16.434694516355616
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.506910869587009,
+      "y": 19.71632404838888
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:08.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.5761574074074073,
+      "y": 20.356858710562413
+    },
+    "raw": {
+      "x": 0.5761574074074073,
+      "y": 20.356858710562413
+    },
+    "rendered": {
+      "x": 1.627344862243081,
+      "y": 17.404692197600223
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.5761574074074073,
+      "y": 20.356858710562413
+    },
+    "transitionKind": "normal-route",
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:09.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.42368827160493827,
+      "y": 19.25792181069959
+    },
+    "raw": {
+      "x": 0.42368827160493827,
+      "y": 19.25792181069959
+    },
+    "rendered": {
+      "x": 1.2592089206912966,
+      "y": 18.438569260979808
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.4951368255187654,
+      "y": 19.888551873517407
+    },
+    "transitionKind": "normal-route",
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:10.429Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.0790123456790126,
+      "y": 18.249931412894377
+    },
+    "raw": {
+      "x": 1.0790123456790126,
+      "y": 18.249931412894377
+    },
+    "rendered": {
+      "x": 0.8534575798074048,
+      "y": 19.578085829253688
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.9282460587662335,
+      "y": 18.89894081413976
+    },
+    "transitionKind": "normal-route",
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:11.421Z",
+    "decisionState": "ENTRY_CANDIDATE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.4442129629629629,
+      "y": 17.037311385459535
+    },
+    "raw": {
+      "x": 0.4442129629629629,
+      "y": 17.037311385459535
+    },
+    "rendered": {
+      "x": 0.5761574074074073,
+      "y": 20.356858710562413
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.7580475304583586,
+      "y": 17.827075510541263
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:12.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.8092592592592593,
+      "y": 15.74511316872428
+    },
+    "raw": {
+      "x": 0.8092592592592593,
+      "y": 15.74511316872428
+    },
+    "rendered": {
+      "x": 0.5761574074074073,
+      "y": 20.356858710562413
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.7573356767316921,
+      "y": 16.602854215769288
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:13.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.035030864197531,
+      "y": 15.169118655692731
+    },
+    "raw": {
+      "x": 1.035030864197531,
+      "y": 15.169118655692731
+    },
+    "rendered": {
+      "x": 0.5164137941028845,
+      "y": 20.07634988061156
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.8728007721313463,
+      "y": 16.00670987948157
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:14.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.2080246913580246,
+      "y": 13.130401234567902
+    },
+    "raw": {
+      "x": 1.2080246913580246,
+      "y": 13.130401234567902
+    },
+    "rendered": {
+      "x": 0.8777222838224331,
+      "y": 19.116432440393726
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.0570424945597998,
+      "y": 14.263227614980234
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:15.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.8517746913580249,
+      "y": 11.90641289437586
+    },
+    "raw": {
+      "x": 0.8517746913580249,
+      "y": 11.90641289437586
+    },
+    "rendered": {
+      "x": 0.8969033808584875,
+      "y": 18.176506008653163
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.9151127062810279,
+      "y": 12.879251230584702
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:16.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.9118827160493828,
+      "y": 10.750634430727024
+    },
+    "raw": {
+      "x": 0.9118827160493828,
+      "y": 10.750634430727024
+    },
+    "rendered": {
+      "x": 0.7339048681499473,
+      "y": 16.9932401257553
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.9212582455068887,
+      "y": 11.601820213589805
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:17.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.1405864197530864,
+      "y": 9.621382030178326
+    },
+    "raw": {
+      "x": 1.1405864197530864,
+      "y": 9.621382030178326
+    },
+    "rendered": {
+      "x": 0.8836910838179843,
+      "y": 15.872501821492413
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.9896330398578974,
+      "y": 10.466602297050049
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:18.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0.9602623456790124,
+      "y": 9.018861454046641
+    },
+    "raw": {
+      "x": 0.9602623456790124,
+      "y": 9.018861454046641
+    },
+    "rendered": {
+      "x": 0.9772636328527122,
+      "y": 14.861836609307307
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.9774592114601605,
+      "y": 9.866529704969844
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:19.421Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 1.4337962962962965,
+      "y": 7.450034293552813
+    },
+    "raw": {
+      "x": 1.4337962962962965,
+      "y": 7.450034293552813
+    },
+    "rendered": {
+      "x": 0.9742743607682921,
+      "y": 13.676591327467426
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 1.1985018157722351,
+      "y": 8.378331724439098
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  },
+  {
+    "at": "2026-10-08T15:05:20.429Z",
+    "decisionState": "TRACKING_OUTSIDE",
+    "roomId": null,
+    "decisionPosition": {
+      "x": 0,
+      "y": 6.138888888888889
+    },
+    "raw": {
+      "x": 0,
+      "y": 6.138888888888889
+    },
+    "rendered": {
+      "x": 0.9300118721758102,
+      "y": 12.4682619616307
+    },
+    "visible": true,
+    "displayPosition": {
+      "x": 0.8154742876408211,
+      "y": 7.094929041014055
+    },
+    "transitionKind": null,
+    "opacity": 1,
+    "pathValid": true
+  }
+]

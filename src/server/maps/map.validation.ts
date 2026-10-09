@@ -18,7 +18,7 @@ export const mapCatalogEntrySchema = z.object({
   displayName: z.string().trim().min(1).max(200),
   status: mapStatusSchema,
   liveTrackingEnabled: z.boolean(),
-  trackingZoneIds: z.array(z.string().trim().min(1).max(100).regex(/^[A-Za-z0-9][A-Za-z0-9._:-]*$/)).max(100).default([]),
+  trackingZoneIds: z.array(z.string().trim().min(1).max(100).regex(/^[\p{L}\p{N}][\p{L}\p{M}\p{N}._:-]*$/u)).max(100).default([]),
   sortOrder: z.number().int().min(0).max(1_000_000),
   configPath: z.string().regex(/^[a-z0-9-]+\/map\.json$/).nullable(),
   regionsConfigPath: z.string().regex(/^[a-z0-9-]+\/regions\.json$/).nullable().default(null),

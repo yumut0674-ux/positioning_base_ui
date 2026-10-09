@@ -5,7 +5,7 @@ import { pointInPolygon, wallDistance } from "./geometry";
 import type { AreaGateDefinition, CoordinatePair, DoorInferenceSettings, RegionEntrance, RegionsConfig, ResolvedRoomSettings } from "@/src/features/regions/types/region.types";
 import { resolveDoorSettings, resolveGlobalSettings, resolveRoomSettings } from "../../features/regions/config/regionInferenceSettings";
 import embeddedRegionsConfig from "../../../config/regions.json";
-import type { CompiledCorridor, CompiledRegion, CompiledRegionsConfig } from "./types";
+import type { CompiledCorridor, CompiledDoor, CompiledRegion, CompiledRegionsConfig } from "./types";
 
 const COUNTS = new Set(["entryConfirmationCount", "exitConfirmationCount", "roomSwitchConfirmationCount", "maxTags", "historySize"]);
 const MULTIPLIERS = new Set(["relocationEvidenceDurationMultiplier", "outsideReleaseDurationMultiplier", "regularCoverageStaleMultiplier", "intermittentCoverageStaleMultiplier", "silentCoverageStaleMultiplier", "lostAfterStaleMultiplier"]);
@@ -131,7 +131,8 @@ export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConf
     if (!entrances.length) warnings.push(`${regionLabel}: kapı yok; yalnızca sürekli iç ölçüm ve kesinti sonrası yeniden konumlanma kullanılabilir`);
     const compiled: CompiledRegion = { id: source.id, name: source.name, coverage: settings.coverage, expectedIntervalMs: settings.expectedIntervalMs,
       wallBandMeters: settings.wallBandMeters, sharedWallBandMeters: settings.sharedWallBandMeters, settings, polygon,
-      usesDoorPolicy: source.inference?.doorDefaults !== undefined || source.entrances.some((door: RegionEntrance) => door.inference !== undefined),
+      usesDoorPolicy: source.inference?.doorDefaults !== undefined || source.entrances.some((door: RegionEntrance) => door.inference !== undefined)
+        || entrances.some((door: CompiledDoor) => door.settings.enabled && door.settings.evidenceMode !== "ignored" && door.settings.direction !== "entry-only"),
       roomCenter: source.roomCenter.world, entrances, bounds };
     if (!pointInPolygon(compiled.roomCenter, compiled)) { warnings.push(`${regionLabel}: merkez poligon dışında; oda çıkarımından çıkarıldı, merkez düzeltilmeli`); continue; }
     if (wallDistance(compiled.roomCenter, compiled) <= settings.wallBandMeters) warnings.push(`${regionLabel}: dar oda; güvenilir iç alan yetersiz, kapı kanıtı gerekebilir`);

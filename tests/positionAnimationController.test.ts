@@ -104,6 +104,70 @@ test("REGION_CENTER outside the display area cannot start a relocation", () => {
   assert.equal(animation.getState("T")?.transitionKind, null);
 });
 
+test("room centre to RAW corridor fades across a map gap and reaches the latest measurement without restarting", () => {
+  const corridor = [{ x: 0, y: 1 }, { x: 2, y: 1 }, { x: 2, y: 3 }, { x: 0, y: 3 }];
+  const room = [{ x: -2, y: 1 }, { x: -0.02, y: 1 }, { x: -0.02, y: 3 }, { x: -2, y: 3 }];
+  const animation = controller({ interpolationDelayMs: 0, regionTransitionDurationMs: 600 });
+  animation.setDisplayArea([corridor, room]);
+  const frames: { x: number; y: number; opacity: number }[] = [];
+  animation.attach("T", { render: (x, y, _stale, opacity) => frames.push({ x, y, opacity }) });
+  animation.ingest("T", { ...room03Center, timestamp: 1000, receivedAt: 1000, positionSource: "REGION_CENTER", regionId: "room-03" });
+  animation.ingest("T", { x: 0.5, y: 2, timestamp: 2000, receivedAt: 2000, positionSource: "RAW" });
+  animation.update(2200);
+  assert.ok(frames.at(-1)!.opacity < 1);
+  animation.ingest("T", { x: 0.6, y: 2, timestamp: 2250, receivedAt: 2250, positionSource: "RAW" });
+  animation.update(2300);
+  assert.deepEqual([frames.at(-1)!.x, frames.at(-1)!.y, frames.at(-1)!.opacity], [0.6, 2, 0]);
+  animation.ingest("T", { x: 0.7, y: 2, timestamp: 2400, receivedAt: 2400, positionSource: "RAW" });
+  animation.update(2600);
+  animation.update(2700);
+  assert.equal(animation.getState("T")?.transitionKind, null);
+  assert.deepEqual([frames.at(-1)!.x, frames.at(-1)!.y, frames.at(-1)!.opacity], [0.7, 2, 1]);
+  assert.ok(frames.every(point => inDisplayArea(point, [corridor, room])));
+});
+
+test("a disconnected target arriving after the hidden midpoint is reached even without another packet", () => {
+  const start = { x: 0, y: 0 }, first = { x: 3, y: 0 }, latest = { x: 6, y: 0 };
+  const polygons = [start, first, latest].map(point => boxAround(point));
+  const animation = controller({ interpolationDelayMs: 0, regionTransitionDurationMs: 600 });
+  animation.setDisplayArea(polygons);
+  const frames: { x: number; y: number; opacity: number }[] = [];
+  animation.attach("T", { render: (x, y, _stale, opacity) => frames.push({ x, y, opacity }) });
+  animation.ingest("T", { ...start, timestamp: 1000, receivedAt: 1000 });
+  animation.ingest("T", { ...first, timestamp: 2000, receivedAt: 2000 });
+  animation.update(2300);
+  animation.ingest("T", { ...latest, timestamp: 2400, receivedAt: 2400 });
+  animation.update(2600); animation.update(2900); animation.update(3200);
+  assert.deepEqual([frames.at(-1)!.x, frames.at(-1)!.y, frames.at(-1)!.opacity], [6, 0, 1]);
+  assert.equal(animation.getState("T")?.transitionKind, null);
+  assert.ok(frames.every(point => inDisplayArea(point, polygons)));
+});
+
+test("RAW relocation across a concave corridor does not freeze and never draws an outside point", () => {
+  const elbow = [{ x: 0, y: 0 }, { x: 6, y: 0 }, { x: 6, y: 2 }, { x: 2, y: 2 }, { x: 2, y: 6 }, { x: 0, y: 6 }];
+  const animation = controller({ interpolationDelayMs: 0, regionTransitionDurationMs: 600 });
+  animation.setDisplayArea([elbow]);
+  const frames: { x: number; y: number; opacity: number }[] = [];
+  animation.attach("T", { render: (x, y, _stale, opacity) => frames.push({ x, y, opacity }) });
+  animation.ingest("T", { x: 1, y: 5, timestamp: 1000, receivedAt: 1000 });
+  animation.ingest("T", { x: 5, y: 1, timestamp: 2000, receivedAt: 2000 });
+  animation.update(2300); animation.update(2600);
+  assert.deepEqual([frames.at(-1)!.x, frames.at(-1)!.y, frames.at(-1)!.opacity], [5, 1, 1]);
+  assert.ok(frames.every(point => inDisplayArea(point, [elbow])));
+});
+
+test("disabled animation relocates immediately across a map gap and still rejects an outside target", () => {
+  const animation = controller({ enabled: false });
+  animation.setDisplayArea([boxAround(room03Center), boxAround(room05Center)]);
+  const output = recorder();
+  animation.attach("T", output.renderer);
+  animation.ingest("T", { ...room03Center, timestamp: 1000, receivedAt: 1000, positionSource: "REGION_CENTER", regionId: "room-03" });
+  animation.ingest("T", { ...room05Center, timestamp: 2000, receivedAt: 2000, positionSource: "RAW" });
+  assert.deepEqual([output.latest().x, output.latest().y], [room05Center.x, room05Center.y]);
+  animation.ingest("T", { x: 100, y: 100, timestamp: 3000, receivedAt: 3000 });
+  assert.deepEqual([output.latest().x, output.latest().y], [room05Center.x, room05Center.y]);
+});
+
 test("repeated publication at the same room centre does not restart relocation", () => {
   const animation = controller({ interpolationDelayMs: 0, regionTransitionDurationMs: 600 });
   animation.setDisplayArea([boxAround(room03Center), boxAround(room05Center)]);

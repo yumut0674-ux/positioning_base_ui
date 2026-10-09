@@ -1,0 +1,351 @@
+{
+  "sourceSession": "C:\\Users\\1548u\\Desktop\\UWB\\ui\\loc_engine\\v9\\View\\arayuz\\logs\\yogun_20261008_180124",
+  "sourcePositions": 455,
+  "dbRows": 441,
+  "matchedRows": 441,
+  "sameDisplayCoordinates": 441,
+  "visits": [
+    {
+      "roomId": "room-02",
+      "from": "2026-10-08T15:02:35.373Z",
+      "to": "2026-10-08T15:03:00.840Z",
+      "matchedRows": 38,
+      "upstreamRawLocations": {
+        "corridor-main": 24,
+        "room-02": 13,
+        "room-01": 1
+      },
+      "forwardedLocations": {
+        "corridor-main": 34,
+        "room-02": 4
+      },
+      "displayChangedRawByOver1m": 6,
+      "outsideArea": 4,
+      "solverCandidates": {
+        "polygon": 33,
+        "expanded": 1,
+        "outside-projected": 4
+      },
+      "examples": [
+        {
+          "at": "2026-10-08T15:02:37.868Z",
+          "forwarded": [
+            1.3634259259259258,
+            17.70804183813443
+          ],
+          "solverRaw": [
+            -2.7128257887517147,
+            18.948302469135804
+          ],
+          "rawLocation": "room-02",
+          "forwardedLocation": "corridor-main",
+          "outsideArea": false,
+          "candidate": "expanded"
+        },
+        {
+          "at": "2026-10-08T15:02:41.366Z",
+          "forwarded": [
+            1.3810185185185186,
+            16.813734567901236
+          ],
+          "solverRaw": [
+            -2.1190843621399176,
+            17.752023319615915
+          ],
+          "rawLocation": "room-02",
+          "forwardedLocation": "corridor-main",
+          "outsideArea": false,
+          "candidate": "polygon"
+        },
+        {
+          "at": "2026-10-08T15:02:48.918Z",
+          "forwarded": [
+            0.0013744212962962965,
+            17.488254458161865
+          ],
+          "solverRaw": [
+            -0.6280864197530861,
+            17.653600823045267
+          ],
+          "rawLocation": "room-02",
+          "forwardedLocation": "corridor-main",
+          "outsideArea": false,
+          "candidate": "polygon"
+        },
+        {
+          "at": "2026-10-08T15:02:51.966Z",
+          "forwarded": [
+            1.0115740740740742,
+            17.53372770919067
+          ],
+          "solverRaw": [
+            -1.1810442386831275,
+            18.192678326474624
+          ],
+          "rawLocation": "room-02",
+          "forwardedLocation": "corridor-main",
+          "outsideArea": false,
+          "candidate": "polygon"
+        }
+      ]
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-10-08T15:03:10.759Z",
+      "to": "2026-10-08T15:03:36.873Z",
+      "matchedRows": 50,
+      "upstreamRawLocations": {
+        "corridor-main": 11,
+        "room-05": 39
+      },
+      "forwardedLocations": {
+        "corridor-main": 21,
+        "room-05": 29
+      },
+      "displayChangedRawByOver1m": 1,
+      "outsideArea": 29,
+      "solverCandidates": {
+        "polygon": 20,
+        "expanded": 1,
+        "outside-projected": 29
+      },
+      "examples": [
+        {
+          "at": "2026-10-08T15:03:14.742Z",
+          "forwarded": [
+            0,
+            7.434876543209877
+          ],
+          "solverRaw": [
+            -0.14598765432098784,
+            7.416820987654322
+          ],
+          "rawLocation": "room-05",
+          "forwardedLocation": "corridor-main",
+          "outsideArea": false,
+          "candidate": "polygon"
+        },
+        {
+          "at": "2026-10-08T15:03:15.274Z",
+          "forwarded": [
+            0,
+            7.317403978052127
+          ],
+          "solverRaw": [
+            -0.30606995884773663,
+            7.280555555555556
+          ],
+          "rawLocation": "room-05",
+          "forwardedLocation": "corridor-main",
+          "outsideArea": false,
+          "candidate": "polygon"
+        },
+        {
+          "at": "2026-10-08T15:03:15.721Z",
+          "forwarded": [
+            0,
+            7.745610425240057
+          ],
+          "solverRaw": [
+            -1.0210905349794241,
+            7.632475994513032
+          ],
+          "rawLocation": "room-05",
+          "forwardedLocation": "corridor-main",
+          "outsideArea": false,
+          "candidate": "polygon"
+        },
+        {
+          "at": "2026-10-08T15:03:16.358Z",
+          "forwarded": [
+            0,
+            6.438254458161866
+          ],
+          "solverRaw": [
+            -0.28034979423868317,
+            6.403017832647464
+          ],
+          "rawLocation": "room-05",
+          "forwardedLocation": "corridor-main",
+          "outsideArea": false,
+          "candidate": "polygon"
+        }
+      ]
+    },
+    {
+      "roomId": "room-02",
+      "from": "2026-10-08T15:03:46.353Z",
+      "to": "2026-10-08T15:04:12.352Z",
+      "matchedRows": 43,
+      "upstreamRawLocations": {
+        "corridor-main": 28,
+        "room-02": 15
+      },
+      "forwardedLocations": {
+        "corridor-main": 33,
+        "room-02": 10
+      },
+      "displayChangedRawByOver1m": 5,
+      "outsideArea": 10,
+      "solverCandidates": {
+        "polygon": 31,
+        "expanded": 2,
+        "outside-projected": 10
+      },
+      "examples": [
+        {
+          "at": "2026-10-08T15:03:49.222Z",
+          "forwarded": [
+            0,
+            17.908882030178326
+          ],
+          "solverRaw": [
+            -1.5749228395061727,
+            18.32738340192044
+          ],
+          "rawLocation": "room-02",
+          "forwardedLocation": "corridor-main",
+          "outsideArea": false,
+          "candidate": "expanded"
+        },
+        {
+          "at": "2026-10-08T15:03:49.717Z",
+          "forwarded": [
+            0,
+            17.7383573388203
+          ],
+          "solverRaw": [
+            -0.27348251028806597,
+            17.80269204389575
+          ],
+          "rawLocation": "room-02",
+          "forwardedLocation": "corridor-main",
+          "outsideArea": false,
+          "candidate": "polygon"
+        },
+        {
+          "at": "2026-10-08T15:03:54.774Z",
+          "forwarded": [
+            0,
+            17.529938271604937
+          ],
+          "solverRaw": [
+            -0.7113683127572018,
+            17.66251714677641
+          ],
+          "rawLocation": "room-02",
+          "forwardedLocation": "corridor-main",
+          "outsideArea": false,
+          "candidate": "polygon"
+        },
+        {
+          "at": "2026-10-08T15:03:56.320Z",
+          "forwarded": [
+            0,
+            17.21920438957476
+          ],
+          "solverRaw": [
+            -1.2917181069958847,
+            17.43336762688615
+          ],
+          "rawLocation": "room-02",
+          "forwardedLocation": "corridor-main",
+          "outsideArea": false,
+          "candidate": "polygon"
+        }
+      ]
+    }
+  ],
+  "forwardedOutsideExamples": [
+    {
+      "at": "2026-10-08T15:04:33.677Z",
+      "forwarded": [
+        0.33719135802469147,
+        -2.779236104433063
+      ],
+      "solverRaw": [
+        -1.6010802469135803,
+        -2.2717163923182437
+      ],
+      "quality": "fair",
+      "pdop": 10.856033777708232,
+      "outsideArea": true,
+      "candidate": "outside-projected"
+    },
+    {
+      "at": "2026-10-08T15:04:34.275Z",
+      "forwarded": [
+        0.33719135802469147,
+        -2.779236104433063
+      ],
+      "solverRaw": [
+        1.5113168724279835,
+        1.1728395061728394
+      ],
+      "quality": "fair",
+      "pdop": 5.2731403417082126,
+      "outsideArea": true,
+      "candidate": "outside-projected"
+    },
+    {
+      "at": "2026-10-08T15:04:34.693Z",
+      "forwarded": [
+        -10.903663670975671,
+        0.7540980795610426
+      ],
+      "solverRaw": [
+        -8.0,
+        -7.408770576131688
+      ],
+      "quality": "poor",
+      "pdop": 32.21376159241751,
+      "outsideArea": true,
+      "candidate": "outside-projected"
+    },
+    {
+      "at": "2026-10-08T15:04:36.664Z",
+      "forwarded": [
+        -10.903663670975671,
+        0.7540980795610426
+      ],
+      "solverRaw": [
+        1.4251457475994525,
+        4.138168724279836
+      ],
+      "quality": "good",
+      "pdop": 1.3768976129334007,
+      "outsideArea": true,
+      "candidate": "outside-projected"
+    },
+    {
+      "at": "2026-10-08T15:04:37.230Z",
+      "forwarded": [
+        -10.903663670975671,
+        0.7540980795610426
+      ],
+      "solverRaw": [
+        0.7984310699588477,
+        4.361093964334705
+      ],
+      "quality": "good",
+      "pdop": 1.4971626438290537,
+      "outsideArea": true,
+      "candidate": "outside-projected"
+    },
+    {
+      "at": "2026-10-08T15:05:06.015Z",
+      "forwarded": [
+        0,
+        22.1
+      ],
+      "solverRaw": [
+        -5.86576646090535,
+        30.1
+      ],
+      "quality": "poor",
+      "pdop": 38.482172110046164,
+      "outsideArea": false,
+      "candidate": "expanded"
+    }
+  ]
+}

@@ -226,16 +226,26 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
 
   const gridLines = useMemo(() => {
     const lines: React.ReactNode[] = [];
-    for (let meter = 0; meter <= Math.floor(map.world.widthMeters); meter += 1) {
-      const x = transform.worldToCanvas({ x: meter, y: 0 }).x;
-      lines.push(<Line key={`x-${meter}`} points={[x, 0, x, map.image.height]} stroke="#8ab4c8" strokeWidth={meter % 5 === 0 ? 0.8 : 0.35} opacity={0.34} />);
+    const corners = [
+      { x: 0, y: 0 }, { x: map.image.width, y: 0 },
+      { x: 0, y: map.image.height }, { x: map.image.width, y: map.image.height },
+    ].map((point) => transform.canvasToWorld(point));
+    const minX = Math.min(...corners.map((point) => point.x));
+    const maxX = Math.max(...corners.map((point) => point.x));
+    const minY = Math.min(...corners.map((point) => point.y));
+    const maxY = Math.max(...corners.map((point) => point.y));
+    for (let meter = Math.ceil(minX); meter <= Math.floor(maxX); meter += 1) {
+      const start = transform.worldToCanvas({ x: meter, y: minY });
+      const end = transform.worldToCanvas({ x: meter, y: maxY });
+      lines.push(<Line key={`x-${meter}`} points={[start.x, start.y, end.x, end.y]} stroke="#8ab4c8" strokeWidth={meter % 5 === 0 ? 0.8 : 0.35} opacity={0.34} />);
     }
-    for (let meter = 0; meter <= Math.floor(map.world.heightMeters); meter += 1) {
-      const y = transform.worldToCanvas({ x: 0, y: meter }).y;
-      lines.push(<Line key={`y-${meter}`} points={[0, y, map.image.width, y]} stroke="#8ab4c8" strokeWidth={meter % 5 === 0 ? 0.8 : 0.35} opacity={0.34} />);
+    for (let meter = Math.ceil(minY); meter <= Math.floor(maxY); meter += 1) {
+      const start = transform.worldToCanvas({ x: minX, y: meter });
+      const end = transform.worldToCanvas({ x: maxX, y: meter });
+      lines.push(<Line key={`y-${meter}`} points={[start.x, start.y, end.x, end.y]} stroke="#8ab4c8" strokeWidth={meter % 5 === 0 ? 0.8 : 0.35} opacity={0.34} />);
     }
     return lines;
-  }, [map.image.height, map.image.width, map.world.heightMeters, map.world.widthMeters, transform]);
+  }, [map.image.height, map.image.width, transform]);
 
   const mapGroupProps = { x: viewport.x, y: viewport.y, scaleX: viewport.scale, scaleY: viewport.scale };
   const measurementStart = measurement.start ? transform.worldToCanvas(measurement.start) : null;

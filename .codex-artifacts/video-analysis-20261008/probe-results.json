@@ -1,0 +1,5549 @@
+[
+  {
+    "name": "current",
+    "warnings": [],
+    "configVersion": "36181d9e68761282",
+    "roomPolicies": [
+      {
+        "id": "room-01",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-02",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-03",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-04",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-05",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-06",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-07",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      }
+    ],
+    "transitions": [
+      {
+        "at": "2026-10-08T15:01:41.421Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:06.691Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:08.805Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:20.240Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:20.806Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:23.828Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:24.207Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:26.347Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:26.793Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:27.929Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:27.944Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:28.355Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:30.748Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:31.301Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:31.790Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:32.575Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:33.767Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:34.273Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:36.800Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:37.356Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:37.873Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:40.442Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:41.373Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:43.350Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:43.851Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:44.400Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:46.913Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:48.312Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:48.928Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:49.385Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:50.382Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:51.434Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:52.498Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:53.032Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:54.470Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:56.031Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:57.429Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:57.928Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:59.351Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Aday oda için süre ve bağımsız iç ölçümler bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:03.209Z",
+        "state": "IN_REGION",
+        "roomId": "room-02",
+        "reasons": [
+          "Kapı geçmişi olmadan sürekli güvenilir iç ölçümler"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:08.095Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:24.893Z",
+        "state": "IN_REGION",
+        "roomId": "room-05",
+        "reasons": [
+          "Doğrudan güvenilir hedef oda ölçüm dizisi doğrulandı; kapı ve koridor geçişi beklenmedi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:42.736Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:59.967Z",
+        "state": "IN_REGION",
+        "roomId": "room-02",
+        "reasons": [
+          "Doğrudan güvenilir hedef oda ölçüm dizisi doğrulandı; kapı ve koridor geçişi beklenmedi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:04.456Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:33.172Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Duvara yakın ölçüm; güvenilir iç kanıt yetersiz"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:33.684Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:34.286Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:34.710Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:37.233Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:37.713Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:41.304Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:47.509Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:48.493Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:00.027Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:00.472Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:00.980Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:01.470Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:05.537Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:06.037Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:08.690Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:09.193Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:10.217Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:10.742Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:11.206Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:11.687Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:21.611Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:22.127Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:27.650Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:30.041Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:33.511Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:35.316Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:37.904Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:40.310Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:40.856Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:41.344Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:50.264Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:50.487Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:58.605Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:59.116Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:06:00.119Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      }
+    ],
+    "exits": [
+      {
+        "roomId": "room-02",
+        "physicalExit": "2026-10-08T15:03:00.840Z",
+        "assignedAt": "2026-10-08T15:03:03.209Z",
+        "firstReleaseDecision": "2026-10-08T15:03:24.893Z",
+        "elapsedSecondsFromPhysicalExit": 24.053,
+        "nextState": "IN_REGION",
+        "nextRoomId": "room-05"
+      },
+      {
+        "roomId": "room-05",
+        "physicalExit": "2026-10-08T15:03:36.873Z",
+        "assignedAt": "2026-10-08T15:03:24.893Z",
+        "firstReleaseDecision": "2026-10-08T15:03:59.967Z",
+        "elapsedSecondsFromPhysicalExit": 23.094,
+        "nextState": "IN_REGION",
+        "nextRoomId": "room-02"
+      },
+      {
+        "roomId": "room-02",
+        "physicalExit": "2026-10-08T15:04:12.352Z",
+        "assignedAt": "2026-10-08T15:03:59.967Z",
+        "firstReleaseDecision": "2026-10-08T15:04:33.172Z",
+        "elapsedSecondsFromPhysicalExit": 20.82,
+        "nextState": "ENTRY_CANDIDATE",
+        "nextRoomId": null
+      }
+    ],
+    "corridorEvidenceDuringHold": [
+      {
+        "at": "2026-10-08T15:03:08.587Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.9382716049382717,
+        "rawY": 14.562808641975309,
+        "roomDistance": 1.743984113623174,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:08.815Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.0394290123456793,
+        "rawY": 13.979235253772291,
+        "roomDistance": 2.2907840900521252,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:09.275Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.3106481481481482,
+        "rawY": 13.463871742112481,
+        "roomDistance": 2.872968995598011,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:09.696Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.2959876543209876,
+        "rawY": 12.645353223593965,
+        "roomDistance": 3.6047623754860374,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:10.232Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.5804012345679013,
+        "rawY": 11.951886145404666,
+        "roomDistance": 4.354282656485152,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:10.709Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.5891975308641977,
+        "rawY": 11.436522633744858,
+        "roomDistance": 4.83752605463768,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:11.235Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.4616512345679014,
+        "rawY": 10.993158436213994,
+        "roomDistance": 5.216513923719843,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:11.688Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.216820987654321,
+        "rawY": 10.25042866941015,
+        "roomDistance": 5.870855120605621,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:12.257Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.3091820987654321,
+        "rawY": 9.515277777777778,
+        "roomDistance": 6.608589700766102,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:12.697Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.0496913580246914,
+        "rawY": 8.973388203017834,
+        "roomDistance": 7.0931005016966715,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:13.216Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.2094907407407407,
+        "rawY": 8.317815500685873,
+        "roomDistance": 7.765972533732164,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:13.741Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.0452932098765433,
+        "rawY": 7.821399176954733,
+        "roomDistance": 8.231715932481254,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:14.243Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.34012345679012346,
+        "rawY": 7.366666666666667,
+        "roomDistance": 8.618986160719365,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:14.753Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.434876543209877,
+        "roomDistance": 8.54071563568648,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:15.281Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.317403978052127,
+        "roomDistance": 8.65818248637135,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:15.725Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.745610425240057,
+        "roomDistance": 8.229997655809058,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:16.367Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 6.438254458161866,
+        "roomDistance": 9.537293708750159,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:16.849Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 6.99909122085048,
+        "roomDistance": 8.976480510903832,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:17.368Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.965397805212621,
+        "roomDistance": 8.01022226863361,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:17.867Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.22283950617283949,
+        "rawY": 8.446656378600824,
+        "roomDistance": 7.534798324564012,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:18.383Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.703926611796983,
+        "roomDistance": 8.271679266651923,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:18.861Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.06377314814814815,
+        "rawY": 7.18477366255144,
+        "roomDistance": 8.79165313228432,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:19.359Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 6.987722908093278,
+        "roomDistance": 8.987848316794029,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:19.883Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.105195473251028,
+        "roomDistance": 8.870381051911195,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:20.389Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.476560356652949,
+        "roomDistance": 8.499033887930509,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:20.877Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.552349108367626,
+        "roomDistance": 8.42324894438844,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:21.419Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.302246227709191,
+        "roomDistance": 8.673339510638046,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:43.261Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0.9074845679012348,
+        "rawY": 10.352743484224966,
+        "roomDistance": 1.3318460857091212,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:43.665Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.0423611111111113,
+        "rawY": 10.906001371742112,
+        "roomDistance": 1.8299561512993252,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:44.205Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.188966049382716,
+        "rawY": 11.553995198902607,
+        "roomDistance": 2.447227488649938,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:44.706Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.2652006172839507,
+        "rawY": 12.380092592592595,
+        "roomDistance": 3.2130666266638603,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:45.174Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.1757716049382716,
+        "rawY": 13.043244170096024,
+        "roomDistance": 3.794363092974167,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:45.675Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.0819444444444446,
+        "rawY": 13.702606310013717,
+        "roomDistance": 4.395873386732971,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:46.167Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.1361882716049383,
+        "rawY": 14.233127572016462,
+        "roomDistance": 4.922559429388052,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:46.652Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.6888888888888889,
+        "rawY": 15.161539780521263,
+        "roomDistance": 5.966858892468098,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:47.137Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.4689814814814814,
+        "rawY": 15.582167352537725,
+        "roomDistance": 6.311999266862522,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:47.653Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.128858024691358,
+        "rawY": 16.029320987654327,
+        "roomDistance": 6.676163467776886,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:48.185Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.0526234567901236,
+        "rawY": 16.946364883401923,
+        "roomDistance": 7.567927563227407,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:48.778Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0.9250771604938273,
+        "rawY": 17.31015089163237,
+        "roomDistance": 7.9104771677920045,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:49.227Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.908882030178326,
+        "roomDistance": 8.444904987748505,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:49.725Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.7383573388203,
+        "roomDistance": 8.274389074841801,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:51.293Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.58789437585734,
+        "roomDistance": 8.123934163606119,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:51.731Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": -4.336808689942018e-19,
+        "rawY": 16.556515775034292,
+        "roomDistance": 7.092619951384873,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:52.274Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.5276234567901235,
+        "rawY": 17.726989026063098,
+        "roomDistance": 8.41844977294642,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:52.791Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.2314814814814814,
+        "rawY": 17.810356652949245,
+        "roomDistance": 8.449117572573167,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:53.228Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0.3672839506172839,
+        "rawY": 17.141632373113858,
+        "roomDistance": 7.690529720561223,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:54.288Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.1816358024691356,
+        "rawY": 18.1627743484225,
+        "roomDistance": 8.790083637941612,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:54.784Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.529938271604937,
+        "roomDistance": 8.065981240895706,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:55.224Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.82551440329218,
+        "roomDistance": 8.361541607816143,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:55.745Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0.445679012345679,
+        "rawY": 17.465517832647464,
+        "roomDistance": 8.01868231505129,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:56.328Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.21920438957476,
+        "roomDistance": 7.755265227748742,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:56.749Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.26088820301783,
+        "roomDistance": 7.796946561433784,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:57.415Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.213563100137172,
+        "roomDistance": 7.749624275959195,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:04.456Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.30493827160493825,
+        "rawY": 17.753515089163237,
+        "roomDistance": 0.3897566716050531,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:04.978Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.31290802977188437,
+        "rawY": 17.776251714677638,
+        "roomDistance": 0.3977264297719994,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:05.687Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.5356017974923107,
+        "rawY": 17.772462277091904,
+        "roomDistance": 0.6204201974924257,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:06.043Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.44470673576391573,
+        "rawY": 17.78762002743484,
+        "roomDistance": 0.5295251357640308,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:06.452Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.6954011802083603,
+        "rawY": 17.984670781893,
+        "roomDistance": 0.7802195802084767,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:06.908Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.4002314814814815,
+        "rawY": 17.670147462277093,
+        "roomDistance": 0.4850498814815958,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:07.533Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.3591820987654321,
+        "rawY": 17.67772633744856,
+        "roomDistance": 0.4440004987655465,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:08.091Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.49405864197530863,
+        "rawY": 17.670147462277093,
+        "roomDistance": 0.5788770419754229,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:08.499Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.42368827160493827,
+        "rawY": 17.620884773662553,
+        "roomDistance": 0.5085066716050523,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:08.979Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.43981481481481477,
+        "rawY": 17.66635802469136,
+        "roomDistance": 0.5246332148149291,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:09.480Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.40169753086419746,
+        "rawY": 17.643621399176958,
+        "roomDistance": 0.48651593086431155,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:09.994Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.4324845679012345,
+        "rawY": 17.643621399176958,
+        "roomDistance": 0.5173029679013487,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:10.454Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 17.15857338820302,
+        "roomDistance": 0.08481840000011077,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:10.944Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 17.018364197530868,
+        "roomDistance": 0.08481840000010982,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:12.454Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 17.302572016460907,
+        "roomDistance": 0.08481840000011177,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:13.661Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.15686728395061728,
+        "rawY": 17.507201646090536,
+        "roomDistance": 0.24168568395073045,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:13.947Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 17.60951646090535,
+        "roomDistance": 0.08481840000011387,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:14.457Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 17.518569958847735,
+        "roomDistance": 0.08481840000011324,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:15.006Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 17.56025377229081,
+        "roomDistance": 0.08481840000011354,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:15.443Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.6509259259259259,
+        "rawY": 18.12866941015089,
+        "roomDistance": 0.7357443259260433,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:16.477Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.6362654320987654,
+        "rawY": 17.75730452674897,
+        "roomDistance": 0.7210838320988803,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:16.931Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.8547067901234568,
+        "rawY": 17.594358710562414,
+        "roomDistance": 0.9395251901235706,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:17.445Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.0496913580246916,
+        "rawY": 17.348045267489713,
+        "roomDistance": 1.1345097580248036,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:17.976Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.3077160493827162,
+        "rawY": 16.790997942386834,
+        "roomDistance": 1.3925344493828244,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:18.463Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.363425925925926,
+        "rawY": 16.328686556927302,
+        "roomDistance": 1.4482443259260311,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:19.021Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.0760802469135804,
+        "rawY": 15.756481481481483,
+        "roomDistance": 1.1813173891532718,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:19.491Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.0804783950617285,
+        "rawY": 15.256275720164611,
+        "roomDistance": 1.3692067206784548,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:20.006Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.9543981481481482,
+        "rawY": 14.517335390946501,
+        "roomDistance": 1.7903227912780688,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:20.527Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.5686728395061726,
+        "rawY": 14.119444444444445,
+        "roomDistance": 2.485508867036741,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:21.015Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.452854938271605,
+        "rawY": 13.338820301783265,
+        "roomDistance": 3.052013155151822,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:21.531Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.4675154320987653,
+        "rawY": 12.956087105624142,
+        "roomDistance": 3.3947912877758397,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:22.068Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.4719135802469137,
+        "rawY": 12.395250342935531,
+        "roomDistance": 3.903747733806713,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:22.611Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.4293981481481481,
+        "rawY": 11.652520576131687,
+        "roomDistance": 4.580191965590016,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:23.087Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.9249228395061728,
+        "rawY": 10.780949931412895,
+        "roomDistance": 5.5694696658772544,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:23.616Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.2080246913580246,
+        "rawY": 10.420953360768175,
+        "roomDistance": 5.702699084015124,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:24.125Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.482175925925926,
+        "rawY": 9.416752400548697,
+        "roomDistance": 6.743020520739487,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:24.716Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.1317901234567904,
+        "rawY": 9.602434842249657,
+        "roomDistance": 6.487827250755618,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:25.257Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.9998456790123456,
+        "rawY": 8.78391632373114,
+        "roomDistance": 7.272595134012301,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:25.630Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.9954475308641976,
+        "rawY": 8.143501371742113,
+        "roomDistance": 7.905822136094632,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:26.129Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.450034293552813,
+        "roomDistance": 8.525558634165424,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:26.644Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.8385802469135805,
+        "rawY": 7.116563786008231,
+        "roomDistance": 8.906603552023066,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:27.100Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.0746141975308645,
+        "rawY": 6.282887517146776,
+        "roomDistance": 9.76138530436166,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:28.197Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 5.100582990397806,
+        "roomDistance": 10.874918783124933,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:28.794Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 3.9713305898491083,
+        "roomDistance": 12.004140067216445,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:31.148Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.07037037037037037,
+        "rawY": 2.7246056241426615,
+        "roomDistance": 13.251474119294038,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "door_connection_only",
+    "warnings": [],
+    "configVersion": "427d9cce3758ba0f",
+    "roomPolicies": [
+      {
+        "id": "room-01",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-02",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-03",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-04",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-05",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-06",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-07",
+        "usesDoorPolicy": false,
+        "coverage": "regular"
+      }
+    ],
+    "transitions": [
+      {
+        "at": "2026-10-08T15:01:41.421Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:06.691Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:08.805Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:20.240Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:20.806Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:23.828Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:24.207Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:26.347Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:26.793Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:27.929Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:27.944Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:28.355Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:30.748Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:31.301Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:31.790Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:32.575Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:33.767Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:34.273Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:36.800Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:37.356Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:37.873Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:40.442Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:41.373Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:43.350Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:43.851Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:44.400Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:46.913Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:48.312Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:48.928Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:49.385Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:50.382Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:51.434Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:52.498Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:53.032Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:54.470Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:56.031Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:57.429Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:57.928Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:59.351Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Aday oda için süre ve bağımsız iç ölçümler bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:03.209Z",
+        "state": "IN_REGION",
+        "roomId": "room-02",
+        "reasons": [
+          "Kapı geçmişi olmadan sürekli güvenilir iç ölçümler"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:08.095Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:24.893Z",
+        "state": "IN_REGION",
+        "roomId": "room-05",
+        "reasons": [
+          "Doğrudan güvenilir hedef oda ölçüm dizisi doğrulandı; kapı ve koridor geçişi beklenmedi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:42.736Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:59.967Z",
+        "state": "IN_REGION",
+        "roomId": "room-02",
+        "reasons": [
+          "Doğrudan güvenilir hedef oda ölçüm dizisi doğrulandı; kapı ve koridor geçişi beklenmedi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:04.456Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "reasons": [
+          "Kapı çıkışı sonrası süreklilik bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:06.043Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Çıkış kanıtı ve devam eden dış ölçümlerle çıkış doğrulandı",
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:06.908Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:07.533Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:10.454Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:10.944Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:13.947Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:14.457Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:20.006Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:20.527Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:23.616Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:24.125Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:26.129Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:26.644Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:28.197Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:28.794Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:31.690Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Aday oda için süre ve bağımsız iç ölçümler bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:33.684Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:34.286Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:34.710Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:37.233Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:37.713Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:41.304Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:47.509Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:48.493Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:00.027Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:00.472Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:00.980Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:01.470Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:05.537Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:06.037Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:08.690Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:09.193Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:10.217Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:10.742Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:11.206Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:11.687Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:21.611Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:22.127Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:27.650Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:30.041Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:33.511Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:35.316Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:37.904Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:40.310Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:40.856Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:41.344Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:50.264Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:50.487Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:58.605Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:59.116Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:06:00.119Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      }
+    ],
+    "exits": [
+      {
+        "roomId": "room-02",
+        "physicalExit": "2026-10-08T15:03:00.840Z",
+        "assignedAt": "2026-10-08T15:03:03.209Z",
+        "firstReleaseDecision": "2026-10-08T15:03:24.893Z",
+        "elapsedSecondsFromPhysicalExit": 24.053,
+        "nextState": "IN_REGION",
+        "nextRoomId": "room-05"
+      },
+      {
+        "roomId": "room-05",
+        "physicalExit": "2026-10-08T15:03:36.873Z",
+        "assignedAt": "2026-10-08T15:03:24.893Z",
+        "firstReleaseDecision": "2026-10-08T15:03:59.967Z",
+        "elapsedSecondsFromPhysicalExit": 23.094,
+        "nextState": "IN_REGION",
+        "nextRoomId": "room-02"
+      },
+      {
+        "roomId": "room-02",
+        "physicalExit": "2026-10-08T15:04:12.352Z",
+        "assignedAt": "2026-10-08T15:03:59.967Z",
+        "firstReleaseDecision": "2026-10-08T15:04:06.043Z",
+        "elapsedSecondsFromPhysicalExit": -6.309,
+        "nextState": "TRACKING_OUTSIDE",
+        "nextRoomId": null
+      }
+    ],
+    "corridorEvidenceDuringHold": [
+      {
+        "at": "2026-10-08T15:03:08.587Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.9382716049382717,
+        "rawY": 14.562808641975309,
+        "roomDistance": 1.743984113623174,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:08.815Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.0394290123456793,
+        "rawY": 13.979235253772291,
+        "roomDistance": 2.2907840900521252,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:09.275Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.3106481481481482,
+        "rawY": 13.463871742112481,
+        "roomDistance": 2.872968995598011,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:09.696Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.2959876543209876,
+        "rawY": 12.645353223593965,
+        "roomDistance": 3.6047623754860374,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:10.232Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.5804012345679013,
+        "rawY": 11.951886145404666,
+        "roomDistance": 4.354282656485152,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:10.709Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.5891975308641977,
+        "rawY": 11.436522633744858,
+        "roomDistance": 4.83752605463768,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:11.235Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.4616512345679014,
+        "rawY": 10.993158436213994,
+        "roomDistance": 5.216513923719843,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:11.688Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.216820987654321,
+        "rawY": 10.25042866941015,
+        "roomDistance": 5.870855120605621,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:12.257Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.3091820987654321,
+        "rawY": 9.515277777777778,
+        "roomDistance": 6.608589700766102,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:12.697Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.0496913580246914,
+        "rawY": 8.973388203017834,
+        "roomDistance": 7.0931005016966715,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:13.216Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.2094907407407407,
+        "rawY": 8.317815500685873,
+        "roomDistance": 7.765972533732164,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:13.741Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 1.0452932098765433,
+        "rawY": 7.821399176954733,
+        "roomDistance": 8.231715932481254,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:14.243Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.34012345679012346,
+        "rawY": 7.366666666666667,
+        "roomDistance": 8.618986160719365,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:14.753Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.434876543209877,
+        "roomDistance": 8.54071563568648,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:15.281Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.317403978052127,
+        "roomDistance": 8.65818248637135,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:15.725Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.745610425240057,
+        "roomDistance": 8.229997655809058,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:16.367Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 6.438254458161866,
+        "roomDistance": 9.537293708750159,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:16.849Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 6.99909122085048,
+        "roomDistance": 8.976480510903832,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:17.368Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.965397805212621,
+        "roomDistance": 8.01022226863361,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:17.867Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.22283950617283949,
+        "rawY": 8.446656378600824,
+        "roomDistance": 7.534798324564012,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:18.383Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.703926611796983,
+        "roomDistance": 8.271679266651923,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:18.861Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0.06377314814814815,
+        "rawY": 7.18477366255144,
+        "roomDistance": 8.79165313228432,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:19.359Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 6.987722908093278,
+        "roomDistance": 8.987848316794029,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:19.883Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.105195473251028,
+        "roomDistance": 8.870381051911195,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:20.389Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.476560356652949,
+        "roomDistance": 8.499033887930509,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:20.877Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.552349108367626,
+        "roomDistance": 8.42324894438844,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:21.419Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "rawX": 0,
+        "rawY": 7.302246227709191,
+        "roomDistance": 8.673339510638046,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:43.261Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0.9074845679012348,
+        "rawY": 10.352743484224966,
+        "roomDistance": 1.3318460857091212,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:43.665Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.0423611111111113,
+        "rawY": 10.906001371742112,
+        "roomDistance": 1.8299561512993252,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:44.205Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.188966049382716,
+        "rawY": 11.553995198902607,
+        "roomDistance": 2.447227488649938,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:44.706Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.2652006172839507,
+        "rawY": 12.380092592592595,
+        "roomDistance": 3.2130666266638603,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:45.174Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.1757716049382716,
+        "rawY": 13.043244170096024,
+        "roomDistance": 3.794363092974167,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:45.675Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.0819444444444446,
+        "rawY": 13.702606310013717,
+        "roomDistance": 4.395873386732971,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:46.167Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.1361882716049383,
+        "rawY": 14.233127572016462,
+        "roomDistance": 4.922559429388052,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:46.652Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.6888888888888889,
+        "rawY": 15.161539780521263,
+        "roomDistance": 5.966858892468098,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:47.137Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.4689814814814814,
+        "rawY": 15.582167352537725,
+        "roomDistance": 6.311999266862522,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:47.653Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.128858024691358,
+        "rawY": 16.029320987654327,
+        "roomDistance": 6.676163467776886,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:48.185Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.0526234567901236,
+        "rawY": 16.946364883401923,
+        "roomDistance": 7.567927563227407,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:48.778Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0.9250771604938273,
+        "rawY": 17.31015089163237,
+        "roomDistance": 7.9104771677920045,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:49.227Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.908882030178326,
+        "roomDistance": 8.444904987748505,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:49.725Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.7383573388203,
+        "roomDistance": 8.274389074841801,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:51.293Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.58789437585734,
+        "roomDistance": 8.123934163606119,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:51.731Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": -4.336808689942018e-19,
+        "rawY": 16.556515775034292,
+        "roomDistance": 7.092619951384873,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:52.274Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.5276234567901235,
+        "rawY": 17.726989026063098,
+        "roomDistance": 8.41844977294642,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:52.791Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.2314814814814814,
+        "rawY": 17.810356652949245,
+        "roomDistance": 8.449117572573167,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:53.228Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0.3672839506172839,
+        "rawY": 17.141632373113858,
+        "roomDistance": 7.690529720561223,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:54.288Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 1.1816358024691356,
+        "rawY": 18.1627743484225,
+        "roomDistance": 8.790083637941612,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:54.784Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.529938271604937,
+        "roomDistance": 8.065981240895706,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:55.224Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.82551440329218,
+        "roomDistance": 8.361541607816143,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:55.745Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0.445679012345679,
+        "rawY": 17.465517832647464,
+        "roomDistance": 8.01868231505129,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:56.328Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.21920438957476,
+        "roomDistance": 7.755265227748742,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:56.749Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.26088820301783,
+        "roomDistance": 7.796946561433784,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:57.415Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "rawX": 0,
+        "rawY": 17.213563100137172,
+        "roomDistance": 7.749624275959195,
+        "reasons": [
+          "Kapı çıkışı gözlenmedi; kısa komşu oda sıçraması reddedildi"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:04.456Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 0.30493827160493825,
+        "rawY": 17.753515089163237,
+        "roomDistance": 0.3897566716050531,
+        "reasons": [
+          "Kapı çıkışı sonrası süreklilik bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:04.978Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 0.31290802977188437,
+        "rawY": 17.776251714677638,
+        "roomDistance": 0.3977264297719994,
+        "reasons": [
+          "Kapı çıkışı sonrası süreklilik bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:05.687Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 0.5356017974923107,
+        "rawY": 17.772462277091904,
+        "roomDistance": 0.6204201974924257,
+        "reasons": [
+          "Kapı çıkışı sonrası süreklilik bekleniyor"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "explicit_preferred_policy_only",
+    "warnings": [],
+    "configVersion": "53cbde37720402a7",
+    "roomPolicies": [
+      {
+        "id": "room-01",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-02",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-03",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-04",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-05",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-06",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-07",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      }
+    ],
+    "transitions": [
+      {
+        "at": "2026-10-08T15:01:41.421Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:06.691Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:08.805Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:20.240Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:20.806Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:23.828Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:24.207Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:26.347Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:26.793Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:27.929Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:27.944Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:28.355Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:30.748Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:31.301Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:31.790Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:32.575Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:33.767Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:34.273Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:36.800Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:37.356Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:37.873Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:40.442Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:41.373Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:43.350Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:43.851Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:44.400Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:46.913Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:48.312Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:48.928Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:49.385Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:50.382Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:51.434Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:52.498Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:53.032Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:54.470Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:56.031Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:57.429Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:57.928Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:59.351Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Aday oda için süre ve bağımsız iç ölçümler bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:03.209Z",
+        "state": "IN_REGION",
+        "roomId": "room-02",
+        "reasons": [
+          "Kapı geçmişi olmadan sürekli güvenilir iç ölçümler"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:08.095Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:08.587Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:10.232Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Çıkış kanıtı ve devam eden dış ölçümlerle çıkış doğrulandı",
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:11.235Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:11.688Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:13.741Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:15.281Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:18.383Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:18.861Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:22.921Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Duvara yakın ölçüm; güvenilir iç kanıt yetersiz"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:22.956Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:23.008Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Aday oda için süre ve bağımsız iç ölçümler bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:24.893Z",
+        "state": "IN_REGION",
+        "roomId": "room-05",
+        "reasons": [
+          "Kapı geçmişi olmadan sürekli güvenilir iç ölçümler"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:42.736Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:43.261Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-05",
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:45.174Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Çıkış kanıtı ve devam eden dış ölçümlerle çıkış doğrulandı",
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:48.778Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:49.725Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:52.791Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:54.288Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:54.784Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:55.224Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:56.328Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:56.749Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:57.794Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Aday oda için süre ve bağımsız iç ölçümler bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:59.967Z",
+        "state": "IN_REGION",
+        "roomId": "room-02",
+        "reasons": [
+          "Kapı geçmişi olmadan sürekli güvenilir iç ölçümler"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:04.456Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:06.043Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Çıkış kanıtı ve devam eden dış ölçümlerle çıkış doğrulandı",
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:06.908Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:07.533Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:10.454Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:10.944Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:13.947Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:14.457Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:20.006Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:20.527Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:23.616Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:24.125Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:26.129Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:26.644Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:28.197Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:28.794Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:31.690Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Aday oda için süre ve bağımsız iç ölçümler bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:33.684Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:34.286Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:34.710Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:37.233Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:37.713Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:41.304Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:47.509Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:48.493Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:00.027Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:00.472Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:00.980Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:01.470Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:05.537Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:06.037Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:08.690Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:09.193Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:10.217Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:10.742Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:11.206Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:11.687Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:21.611Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:22.127Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:27.650Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:30.041Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:33.511Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:35.316Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:37.904Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:40.310Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:40.856Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:41.344Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:50.264Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:50.487Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:58.605Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:59.116Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:06:00.119Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      }
+    ],
+    "exits": [
+      {
+        "roomId": "room-02",
+        "physicalExit": "2026-10-08T15:03:00.840Z",
+        "assignedAt": "2026-10-08T15:03:03.209Z",
+        "firstReleaseDecision": "2026-10-08T15:03:10.232Z",
+        "elapsedSecondsFromPhysicalExit": 9.392,
+        "nextState": "TRACKING_OUTSIDE",
+        "nextRoomId": null
+      },
+      {
+        "roomId": "room-05",
+        "physicalExit": "2026-10-08T15:03:36.873Z",
+        "assignedAt": "2026-10-08T15:03:24.893Z",
+        "firstReleaseDecision": "2026-10-08T15:03:45.174Z",
+        "elapsedSecondsFromPhysicalExit": 8.301,
+        "nextState": "TRACKING_OUTSIDE",
+        "nextRoomId": null
+      },
+      {
+        "roomId": "room-02",
+        "physicalExit": "2026-10-08T15:04:12.352Z",
+        "assignedAt": "2026-10-08T15:03:59.967Z",
+        "firstReleaseDecision": "2026-10-08T15:04:06.043Z",
+        "elapsedSecondsFromPhysicalExit": -6.309,
+        "nextState": "TRACKING_OUTSIDE",
+        "nextRoomId": null
+      }
+    ],
+    "corridorEvidenceDuringHold": [
+      {
+        "at": "2026-10-08T15:03:08.587Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 0.9382716049382717,
+        "rawY": 14.562808641975309,
+        "roomDistance": 1.743984113623174,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:08.815Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 1.0394290123456793,
+        "rawY": 13.979235253772291,
+        "roomDistance": 2.2907840900521252,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:09.275Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 1.3106481481481482,
+        "rawY": 13.463871742112481,
+        "roomDistance": 2.872968995598011,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:09.696Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 1.2959876543209876,
+        "rawY": 12.645353223593965,
+        "roomDistance": 3.6047623754860374,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:43.261Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-05",
+        "rawX": 0.9074845679012348,
+        "rawY": 10.352743484224966,
+        "roomDistance": 1.3318460857091212,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:43.665Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-05",
+        "rawX": 1.0423611111111113,
+        "rawY": 10.906001371742112,
+        "roomDistance": 1.8299561512993252,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:44.205Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-05",
+        "rawX": 1.188966049382716,
+        "rawY": 11.553995198902607,
+        "roomDistance": 2.447227488649938,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:44.706Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-05",
+        "rawX": 1.2652006172839507,
+        "rawY": 12.380092592592595,
+        "roomDistance": 3.2130666266638603,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:04.456Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 0.30493827160493825,
+        "rawY": 17.753515089163237,
+        "roomDistance": 0.3897566716050531,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:04.978Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 0.31290802977188437,
+        "rawY": 17.776251714677638,
+        "roomDistance": 0.3977264297719994,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:05.687Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 0.5356017974923107,
+        "rawY": 17.772462277091904,
+        "roomDistance": 0.6204201974924257,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "both",
+    "warnings": [],
+    "configVersion": "792fa4a6846a1699",
+    "roomPolicies": [
+      {
+        "id": "room-01",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-02",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-03",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-04",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-05",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-06",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      },
+      {
+        "id": "room-07",
+        "usesDoorPolicy": true,
+        "coverage": "regular"
+      }
+    ],
+    "transitions": [
+      {
+        "at": "2026-10-08T15:01:41.421Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:06.691Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:08.805Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:20.240Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:20.806Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:23.828Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:24.207Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:26.347Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:26.793Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:27.929Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:27.944Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:28.355Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:30.748Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:31.301Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:31.790Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:32.575Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:33.767Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:34.273Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:36.800Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:37.356Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:37.873Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:40.442Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:41.373Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:43.350Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:43.851Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:44.400Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:46.913Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:48.312Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:48.928Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:49.385Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:50.382Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:51.434Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:52.498Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:53.032Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:54.470Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:56.031Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:57.429Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:57.928Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:02:59.351Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Aday oda için süre ve bağımsız iç ölçümler bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:03.209Z",
+        "state": "IN_REGION",
+        "roomId": "room-02",
+        "reasons": [
+          "Kapı geçmişi olmadan sürekli güvenilir iç ölçümler"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:08.095Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-02",
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:08.587Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:10.232Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Çıkış kanıtı ve devam eden dış ölçümlerle çıkış doğrulandı",
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:11.235Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:11.688Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:13.741Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:15.281Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:18.383Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:18.861Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:22.921Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Duvara yakın ölçüm; güvenilir iç kanıt yetersiz"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:22.956Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:23.008Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Aday oda için süre ve bağımsız iç ölçümler bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:24.893Z",
+        "state": "IN_REGION",
+        "roomId": "room-05",
+        "reasons": [
+          "Kapı geçmişi olmadan sürekli güvenilir iç ölçümler"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:42.736Z",
+        "state": "INFERRED_IN_REGION",
+        "roomId": "room-05",
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:43.261Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-05",
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:45.174Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Çıkış kanıtı ve devam eden dış ölçümlerle çıkış doğrulandı",
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:48.778Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:49.725Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:52.791Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:54.288Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:54.784Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:55.224Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:56.328Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:56.749Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:57.794Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Aday oda için süre ve bağımsız iç ölçümler bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:59.967Z",
+        "state": "IN_REGION",
+        "roomId": "room-02",
+        "reasons": [
+          "Kapı geçmişi olmadan sürekli güvenilir iç ölçümler"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:04.456Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "reasons": [
+          "Kapı çıkışı sonrası süreklilik bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:06.043Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Çıkış kanıtı ve devam eden dış ölçümlerle çıkış doğrulandı",
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:06.908Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:07.533Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:10.454Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:10.944Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:13.947Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:14.457Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:20.006Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:20.527Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:23.616Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:24.125Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:26.129Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:26.644Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:28.197Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:28.794Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:31.690Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Aday oda için süre ve bağımsız iç ölçümler bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:33.684Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:34.286Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:34.710Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:37.233Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:37.713Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:41.304Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:47.509Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:48.493Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:00.027Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:00.472Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:00.980Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:01.470Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:05.537Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:06.037Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:08.690Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:09.193Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:10.217Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:10.742Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:11.206Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:11.687Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:21.611Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:22.127Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:27.650Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:30.041Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:33.511Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:35.316Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:37.904Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:40.310Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:40.856Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:41.344Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:50.264Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:50.487Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:58.605Z",
+        "state": "ENTRY_CANDIDATE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:05:59.116Z",
+        "state": "TRACKING_OUTSIDE",
+        "roomId": null,
+        "reasons": [
+          "Ölçülen koridor konumu; oda giriş kanıtı yok"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:06:00.119Z",
+        "state": "LOCATION_LOST",
+        "roomId": null,
+        "reasons": [
+          "Hız sınırını aşan ölçüm kanıt sayılmadı"
+        ]
+      }
+    ],
+    "exits": [
+      {
+        "roomId": "room-02",
+        "physicalExit": "2026-10-08T15:03:00.840Z",
+        "assignedAt": "2026-10-08T15:03:03.209Z",
+        "firstReleaseDecision": "2026-10-08T15:03:10.232Z",
+        "elapsedSecondsFromPhysicalExit": 9.392,
+        "nextState": "TRACKING_OUTSIDE",
+        "nextRoomId": null
+      },
+      {
+        "roomId": "room-05",
+        "physicalExit": "2026-10-08T15:03:36.873Z",
+        "assignedAt": "2026-10-08T15:03:24.893Z",
+        "firstReleaseDecision": "2026-10-08T15:03:45.174Z",
+        "elapsedSecondsFromPhysicalExit": 8.301,
+        "nextState": "TRACKING_OUTSIDE",
+        "nextRoomId": null
+      },
+      {
+        "roomId": "room-02",
+        "physicalExit": "2026-10-08T15:04:12.352Z",
+        "assignedAt": "2026-10-08T15:03:59.967Z",
+        "firstReleaseDecision": "2026-10-08T15:04:06.043Z",
+        "elapsedSecondsFromPhysicalExit": -6.309,
+        "nextState": "TRACKING_OUTSIDE",
+        "nextRoomId": null
+      }
+    ],
+    "corridorEvidenceDuringHold": [
+      {
+        "at": "2026-10-08T15:03:08.587Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 0.9382716049382717,
+        "rawY": 14.562808641975309,
+        "roomDistance": 1.743984113623174,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:08.815Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 1.0394290123456793,
+        "rawY": 13.979235253772291,
+        "roomDistance": 2.2907840900521252,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:09.275Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 1.3106481481481482,
+        "rawY": 13.463871742112481,
+        "roomDistance": 2.872968995598011,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:09.696Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 1.2959876543209876,
+        "rawY": 12.645353223593965,
+        "roomDistance": 3.6047623754860374,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:43.261Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-05",
+        "rawX": 0.9074845679012348,
+        "rawY": 10.352743484224966,
+        "roomDistance": 1.3318460857091212,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:43.665Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-05",
+        "rawX": 1.0423611111111113,
+        "rawY": 10.906001371742112,
+        "roomDistance": 1.8299561512993252,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:44.205Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-05",
+        "rawX": 1.188966049382716,
+        "rawY": 11.553995198902607,
+        "roomDistance": 2.447227488649938,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:03:44.706Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-05",
+        "rawX": 1.2652006172839507,
+        "rawY": 12.380092592592595,
+        "roomDistance": 3.2130666266638603,
+        "reasons": [
+          "Tercih edilen kapı görülmedi; artırılmış çıkış kanıtı bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:04.456Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 0.30493827160493825,
+        "rawY": 17.753515089163237,
+        "roomDistance": 0.3897566716050531,
+        "reasons": [
+          "Kapı çıkışı sonrası süreklilik bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:04.978Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 0.31290802977188437,
+        "rawY": 17.776251714677638,
+        "roomDistance": 0.3977264297719994,
+        "reasons": [
+          "Kapı çıkışı sonrası süreklilik bekleniyor"
+        ]
+      },
+      {
+        "at": "2026-10-08T15:04:05.687Z",
+        "state": "EXIT_CANDIDATE",
+        "roomId": "room-02",
+        "rawX": 0.5356017974923107,
+        "rawY": 17.772462277091904,
+        "roomDistance": 0.6204201974924257,
+        "reasons": [
+          "Kapı çıkışı sonrası süreklilik bekleniyor"
+        ]
+      }
+    ]
+  }
+]

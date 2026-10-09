@@ -33,14 +33,19 @@ export function wallDistance(point: Point, region: CompiledRegion): number {
 }
 
 /** Directed crossing of a defined door opening; never infer a normal from a centre. */
-export function crossesDoor(from: Point, to: Point, region: CompiledRegion, inward: boolean, connectedArea?: string | null, occurredAt = Date.now()): DoorCrossingResult | null {
+export function crossesDoor(from: Point, to: Point, region: CompiledRegion, inward: boolean,
+  connectedArea?: string | { readonly id: string; readonly kind: "corridor" } | null, occurredAt = Date.now()): DoorCrossingResult | null {
   for (const door of region.entrances) {
     const direction = inward ? "entry" : "exit";
     if (!door.settings.enabled || door.settings.evidenceMode === "ignored") continue;
     if (inward && door.settings.direction === "exit-only") continue;
     if (!inward && door.settings.direction === "entry-only") continue;
     if (!door.inwardNormal || !door.widthMeters || !door.connectsTo) continue;
-    if (connectedArea && door.connectsTo !== connectedArea) continue;
+    if (connectedArea) {
+      const connectedId = typeof connectedArea === "string" ? connectedArea : connectedArea.id;
+      const legacyCorridorAlias = typeof connectedArea !== "string" && door.connectsTo === "corridor";
+      if (door.connectsTo !== connectedId && !legacyCorridorAlias) continue;
+    }
     const n = door.inwardNormal;
     const side = (p: Point) => (p.x - door.x) * n.x + (p.y - door.y) * n.y;
     const a = side(from), b = side(to), depth = door.crossingDepthMeters ?? 0.15;

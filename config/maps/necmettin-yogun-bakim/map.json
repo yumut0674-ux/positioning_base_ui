@@ -6,8 +6,8 @@
     "height": 2160
   },
   "world": {
-    "widthMeters": 23.76192,
-    "heightMeters": 13.36608
+    "widthMeters": 13.36608,
+    "heightMeters": 23.76192
   },
   "calibration": {
     "worldOrigin": {
@@ -15,14 +15,14 @@
       "y": 0
     },
     "canvasOrigin": {
-      "x": 719.75,
-      "y": 3039.8
+      "x": 144.44295410471886,
+      "y": 691.7069166127994
     },
     "pixelsPerMeter": 161.60310277957336,
     "invertYAxis": true,
-    "rotationDegrees": 0
+    "rotationDegrees": 90
   },
-  "updatedAt": "2026-10-07T20:46:15.647Z",
+  "updatedAt": "2026-10-08T13:17:36.000Z",
   "status": "active",
   "liveTrackingEnabled": true
 }

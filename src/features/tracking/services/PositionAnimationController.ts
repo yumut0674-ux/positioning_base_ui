@@ -167,6 +167,16 @@ export class PositionAnimationController {
       state.samples = [sample];
       return;
     }
+    if (state.relocation) {
+      if (latest && sample.timestamp < latest.timestamp) return;
+      state.lastReceivedAt = incoming.measurementTimestamp ?? receivedAt;
+      state.stale = receivedAt - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
+      state.samples = [sample];
+      // Fresh packets must not restart the fade indefinitely. Before the hidden
+      // midpoint use the newest target; afterwards keep it queued for normal motion.
+      if (!state.relocation.snapped) state.relocation = { ...state.relocation, destination: sample };
+      return;
+    }
     const renderedSegmentIsValid = !this.displayArea
       || segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, sample, this.displayArea);
     const queuedSegmentIsValid = !this.displayArea || !latest || segmentInDisplayArea(latest, sample, this.displayArea);
@@ -174,12 +184,10 @@ export class PositionAnimationController {
       state.samples = [sample];
       state.lastReceivedAt = incoming.measurementTimestamp ?? receivedAt;
       state.stale = receivedAt - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
-      // A confirmed room centre can be separated from the last raw point by a
-      // tiny map gap. Fade and relocate instead of leaving the marker at the door.
-      if (this.config.enabled && sample.positionSource === "REGION_CENTER") {
+      // Both room centres and raw corridor points can be separated by a map gap
+      // or concave corner. Relocate while hidden instead of freezing at the edge.
+      if (this.config.enabled) {
         this.startNonRoutableRegionRelocation(state, sample, receivedAt);
-      } else if (this.config.enabled) {
-        this.startTransition(state, sample, receivedAt, this.transitionDuration(state, sample, this.config.teleportAnimationDurationMs), "normal-route");
       }
       else this.apply(state, sample.x, sample.y, receivedAt);
       return;
@@ -367,7 +375,7 @@ export class PositionAnimationController {
       }
     }
     if (this.displayArea && (!inDisplayArea({ x, y }, this.displayArea)
-      || !segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, { x, y }, this.displayArea))) {
+      || (this.config.enabled && !segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, { x, y }, this.displayArea)))) {
       // A non-routable relocation must never become a visible teleport. Keep the
       // last safe point until an interior sample supplies a traversable path.
       return;
@@ -438,8 +446,12 @@ export class PositionAnimationController {
     this.applyOpacity(state, (progress - 0.5) * 2, now, wasStale);
     if (progress >= 1) {
       state.visualOpacity = 1;
-      state.samples = [relocation.destination];
       state.relocation = undefined;
+      const queued = state.samples.at(-1);
+      if (queued && this.displayArea
+        && !segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, queued, this.displayArea)) {
+        this.startNonRoutableRegionRelocation(state, queued, now);
+      }
     }
   }
 

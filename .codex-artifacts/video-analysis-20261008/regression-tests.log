@@ -1,0 +1,759 @@
+✔ normal entry and observed exit use raw gate and inside/outside evidence (11.753ms)
+✔ exit gate dropout becomes estimated after 30 seconds, with separate measurement and decision times (7.0535ms)
+✔ return within wait cancels exit; room or inside dropout never creates an exit (3.8783ms)
+✔ late, duplicate, implausible and low quality packets cannot confirm a transition (0.9899ms)
+✔ multiple gates and floor handoff share a transition id (1.9385ms)
+✔ restart preserves pending exit, idempotent event identity and global outage guard (1.2303ms)
+✔ another map staying live does not turn a failed map's pending gates into mass exits (0.8901ms)
+✔ single tag needs independent healthy heartbeat; unknown and outage keep a visible pending reason (1.8442ms)
+✔ a stale healthy signal never authorizes mass estimated exits (2.4332ms)
+✔ outside confirmation after a long gap is estimated, while timely gate evidence is observed (1.0662ms)
+✔ source health payload validates freshness independently of positions (1.7208ms)
+✔ legacy config works and invalid area association is rejected (13.1452ms)
+✔ area state and events use persisted JSON and idempotent event insertion (139.687ms)
+{"level":"error","event":"area_transition.state_spool_failed","timestamp":"2026-10-08T19:53:42.631Z","pendingWrites":1,"queuedEvents":0,"queuedStates":1,"batchSize":2,"maxPendingEvents":2,"maxPendingStates":1,"coalescedStateWrites":100,"droppedRecords":0,"rejectedWrites":1,"error":{"name":"Error","message":"Alan durum diski kuyruğu dolu; yeni durum kalıcı yazılamadı","stack":"Error: Alan durum diski kuyruğu dolu; yeni durum kalıcı yazılamadı\n    at AreaTransitionRepository.saveState (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:60:83)\n    at <anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:176:31)\n    at getActual (node:assert:611:5)\n    at strict.throws (node:assert:759:24)\n    at TestContext.<anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:176:12)\n    at async Test.run (node:internal/test_runner/test:1389:7)\n    at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)"}}
+{"level":"error","event":"area_transition.event_spool_failed","timestamp":"2026-10-08T19:53:42.637Z","pendingWrites":3,"queuedEvents":2,"queuedStates":1,"batchSize":2,"maxPendingEvents":2,"maxPendingStates":1,"coalescedStateWrites":100,"droppedRecords":0,"rejectedWrites":2,"error":{"name":"AreaTransitionPersistenceError","message":"Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı","stack":"AreaTransitionPersistenceError: Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı\n    at AreaTransitionRepository.ensureEventCapacity (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:79:19)\n    at AreaTransitionRepository.saveEvent (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:69:12)\n    at <anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:181:31)\n    at getActual (node:assert:611:5)\n    at strict.throws (node:assert:759:24)\n    at TestContext.<anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:181:12)\n    at async Test.run (node:internal/test_runner/test:1389:7)\n    at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)"}}
+{"level":"error","event":"area_transition.persistence_failed","timestamp":"2026-10-08T19:53:42.646Z","pendingWrites":3,"queuedEvents":2,"queuedStates":1,"batchSize":2,"maxPendingEvents":2,"maxPendingStates":1,"coalescedStateWrites":100,"droppedRecords":0,"rejectedWrites":2,"error":{"name":"Error","message":"database offline","stack":"Error: database offline\n    at AreaTransitionRepository.query (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:172:60)\n    at <anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:106:24)\n    at AreaTransitionRepository.flush (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:122:5)\n    at TestContext.<anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:183:17)\n    at async Test.run (node:internal/test_runner/test:1389:7)\n    at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)"}}
+✔ DB outage preserves bounded batches and durable event files for restart and retry (1517.3769ms)
+{"level":"error","event":"area_transition.event_spool_failed","timestamp":"2026-10-08T19:53:42.720Z","pendingWrites":2,"queuedEvents":1,"queuedStates":1,"batchSize":50,"maxPendingEvents":1,"maxPendingStates":20000,"coalescedStateWrites":3,"droppedRecords":0,"rejectedWrites":1,"error":{"name":"AreaTransitionPersistenceError","message":"Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı","stack":"AreaTransitionPersistenceError: Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı\n    at AreaTransitionRepository.ensureEventCapacity (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:79:19)\n    at AreaTransitionEngine.reserveEvents (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:202:65)\n    at AreaTransitionEngine.tick (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\AreaTransitionEngine.ts:175:12)\n    at <anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:207:32)\n    at getActual (node:assert:611:5)\n    at strict.throws (node:assert:759:24)\n    at TestContext.<anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:207:12)\n    at async Test.run (node:internal/test_runner/test:1389:7)\n    at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)"}}
+✔ a full durable event queue rolls back the engine transition until it can be persisted (87.157ms)
+{"level":"error","event":"area_transition.event_spool_failed","timestamp":"2026-10-08T19:53:42.829Z","pendingWrites":1,"queuedEvents":0,"queuedStates":1,"batchSize":50,"maxPendingEvents":1,"maxPendingStates":20000,"coalescedStateWrites":2,"droppedRecords":0,"rejectedWrites":1,"error":{"name":"AreaTransitionPersistenceError","message":"Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı","stack":"AreaTransitionPersistenceError: Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı\n    at AreaTransitionRepository.ensureEventCapacity (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:79:19)\n    at AreaTransitionEngine.reserveEvents (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:223:65)\n    at AreaTransitionEngine.reserveForMeasurement (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\AreaTransitionEngine.ts:111:10)\n    at AreaTransitionEngine.advance (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\AreaTransitionEngine.ts:145:16)\n    at AreaTransitionEngine.ingest (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\AreaTransitionEngine.ts:99:54)\n    at send (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:224:71)\n    at <anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:228:25)\n    at getActual (node:assert:611:5)\n    at strict.throws (node:assert:759:24)\n    at TestContext.<anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:228:12)"}}
+✔ floor handoff reserves both linked event slots before changing either area (109.2307ms)
+﹣ PostgreSQL commits an event and its final state, restores them, and deduplicates replay (0.8459ms) # SKIP
+✔ area configuration survives the validated API save and file reload (31.047ms)
+✔ editor visibility is per map, independent per item and keeps hidden items recoverable (1.0253ms)
+✔ processed browser stream URL is same-origin and contains no private service port (1.6748ms)
+✔ processed proxy streams SSE and cancels upstream when the browser stream closes (158.3455ms)
+{"level":"error","event":"tracking.processed_proxy_unavailable","timestamp":"2026-10-08T19:53:41.226Z","error":{"name":"TypeError","message":"fetch failed","stack":"TypeError: fetch failed"}}
+✔ processed proxy returns a generic 503 when its loopback upstream is unavailable (12.1522ms)
+✔ an unconfigured optional assistant does not make an otherwise healthy response fail (4.3055ms)
+✔ health response strips sensitive internal failure details (1.2123ms)
+✔ live-map tag label uses the display name instead of the hardware id (1.7853ms)
+✔ HTML tag overlay uses the same translation and scale as the Konva viewport (0.3455ms)
+✔ world coordinates are written as a compositor-friendly tag transform (0.3992ms)
+✔ detached HTML renderers are not updated by later positions (0.9388ms)
+✔ intensive care loads seven rooms without engine warnings and survives editor validation (13.2883ms)
+✔ room centres remain in physical rooms while regions extend three metres behind the rear wall (0.884ms)
+✔ each corridor door is centred in the physical front wall and opens 1.5 metres inward (0.4444ms)
+✔ neighbouring room areas have a ten centimetre gap along the full extended wall (0.6047ms)
+✔ both corridor end gates record observed area entry and exit (6.7605ms)
+{"level":"info","event":"region_engine.region_engine_enabled","timestamp":"2026-10-08T19:53:35.561Z"}
+{"level":"info","event":"region_engine.region_config_loaded","timestamp":"2026-10-08T19:53:35.561Z","score":1}
+{"level":"info","event":"region_engine.region_entry_candidate","timestamp":"2026-10-08T19:53:35.562Z","vehicleId":"vehicle-1","regionId":"room-a","score":0.5}
+{"level":"info","event":"region_engine.vehicle_entered_region","timestamp":"2026-10-08T19:53:35.562Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.vehicle_pinned_to_region_center","timestamp":"2026-10-08T19:53:35.562Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.vehicle_exited_region","timestamp":"2026-10-08T19:53:35.563Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.region_engine_disabled","timestamp":"2026-10-08T19:53:35.563Z"}
+{"level":"info","event":"region_engine.region_engine_enabled","timestamp":"2026-10-08T19:53:35.564Z"}
+{"level":"info","event":"region_engine.region_config_loaded","timestamp":"2026-10-08T19:53:35.564Z","score":1}
+{"level":"info","event":"region_engine.region_entry_candidate","timestamp":"2026-10-08T19:53:35.564Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.vehicle_entered_region","timestamp":"2026-10-08T19:53:35.564Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.vehicle_pinned_to_region_center","timestamp":"2026-10-08T19:53:35.564Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.region_entry_candidate","timestamp":"2026-10-08T19:53:35.564Z","vehicleId":"vehicle-2","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.vehicle_entered_region","timestamp":"2026-10-08T19:53:35.564Z","vehicleId":"vehicle-2","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.vehicle_pinned_to_region_center","timestamp":"2026-10-08T19:53:35.564Z","vehicleId":"vehicle-2","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.region_engine_disabled","timestamp":"2026-10-08T19:53:35.565Z"}
+✔ disabled engine does not process or mutate raw positions (4.5239ms)
+✔ outside, entry, inferred pinning and confirmed exit preserve the expected coordinates (4.8452ms)
+✔ one scheduler handles multiple vehicles and disable clears all state (1.7924ms)
+✔ center-less regions are skipped and invalid rule config is rejected (1.0902ms)
+✔ API zone Neüyoğun resolves to intensive care while its display name stays unchanged (34.8121ms)
+✔ necmettin-servis loads in the room editor with its own image and calibration (77.478ms)
+✔ necmettin-yogun-bakim loads in the room editor with its own image and calibration (138.5796ms)
+✔ intensive care uses the selected origin with Y along the long horizontal axis (33.4444ms)
+✔ checked-in map catalog and live map config are valid (45.441ms)
+✔ multiple live maps are valid but duplicate active zone mappings are rejected (106.7057ms)
+✔ invalid catalogs are rejected before being served (74.85ms)
+✔ unknown, traversal and planned map requests have controlled errors (22.4241ms)
+✔ map endpoint maps unknown and traversal input to 404 and 400 (11.5894ms)
+✔ short outside spike holds last valid point, rejects the sample, and resumes inside (2.5789ms)
+✔ one outside measurement followed by silence hides at the deadline and re-entry keeps the last rendered point (1.1848ms)
+✔ continuous outside, duplicate, old and synthetic publications do not extend the deadline (2.3747ms)
+✔ initial outside position is hidden; tags and their deadlines are independent (0.3692ms)
+✔ boundaries, adjacent/overlapping polygons, narrow gaps and L corridors (0.3056ms)
+✔ unsafe L corridor animation holds instead of snapping; queued motion stays inside (1.5981ms)
+✔ RAW map presentation suppresses jitter and requires confirmation for a sudden jump (0.6109ms)
+✔ configuration re-evaluates immediately, preserves an outside deadline and cleans up (0.6059ms)
+✔ store binding switches RAW/engine coordinates and maps without modifying measurements or room entries (1.5338ms)
+✔ a jump into a disconnected valid region updates the target without teleporting the marker (0.3736ms)
+✔ disabled animation still times out and synthetic RAW publications retain measurement age (0.2636ms)
+✔ newer synthetic decisions for one measurement do not add physical route samples (0.276ms)
+✔ hidden tag stays in the list with visibility explanation and real activity (10.0617ms)
+✔ tag panel renders the accepted inferred Room 6 decision (2.5422ms)
+✔ display wait configuration defaults to 2000 ms and validates persisted values (0.6476ms)
+✔ hiding and reopening the tag layer retains the validated position until tag cleanup (0.4025ms)
+✔ panel target and marker converge after a non-routable direct room transition (0.485ms)
+✖ sports corridor uses the supplied scale and origin while previous plans remain archived (25.7568ms)
+✔ all polygons, centres and doors use 1 px = 0.8804 cm and the supplied canvas origin (0.8676ms)
+✖ every concrete room is silent and has an editable required door on each wall (0.7307ms)
+✔ concrete room interiors do not overlap (0.4534ms)
+✔ default selection survives empty or obsolete browser storage (13.8259ms)
+✔ catalog groups floors and keeps planned units visible but disabled (1.666ms)
+✔ live coordinates are authorized only for the catalog live map (0.5076ms)
+✔ quick tracking selection waits for the requested map before focusing (1.0402ms)
+✔ fits and centers the complete floor plan in a desktop map panel (1.4545ms)
+✔ keeps the plan contained on narrow panels and ignores unmeasured panels (0.2703ms)
+✔ locks panning at the fitted scale and constrains a zoomed plan to the map panel (0.3653ms)
+✔ centers axes that remain smaller than the panel while zoomed (0.1856ms)
+✔ fit and constraints use the active map dimensions (0.3515ms)
+✔ tracking label focus uses a fifty percent map scale (0.1661ms)
+✔ uses the supplied plan origin with x horizontal and y inverted (1.3298ms)
+✔ zone resolver maps only catalog zone ids and leaves null/unknown unresolved (5.4314ms)
+✔ route segments split on every map transition and never add cross-floor distance (3.1216ms)
+✔ store follows only the selected tag across maps and rejects delayed old-floor packets (0.9971ms)
+✔ region engine manager isolates maps, clears the old map and rejects a delayed floor switch (0.6791ms)
+✔ runtime controller installs only RegionPositionEngine and exposes the active engine version (5.4011ms)
+✔ hot reload retires a stale global controller and retains exactly one tracking listener (75.72ms)
+{"level":"error","event":"area_transition.restore_failed","timestamp":"2026-10-08T19:53:42.968Z","error":{"name":"Error","message":"FATAL: password authentication failed for user \"uwb_user\"","stack":"Error: FATAL: password authentication failed for user \"uwb_user\"\n    at authenticate (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\postgresClient.ts:238:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async AreaTransitionRepository.queryPostgres (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\postgresClient.ts:326:5)\n    at async AreaTransitionRepository.restore (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:127:5)\n    at async RegionEngineController.setEnabled (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\controller.ts:83:24)"}}
+✔ hot replacement restores an enabled controller only after retirement completes (311.851ms)
+✔ controller reload applies a UI-compiled config to the existing map engine without installing a parallel engine (1.1219ms)
+✔ map-specific region config rejects URL/config mismatches and path traversal (7.2811ms)
+✔ browser SSE gateway preserves map and source-zone fields (0.8292ms)
+✔ valid REGION_CENTER changes use the existing spatial transition (5.0478ms)
+✔ field room-03 to room-05 relocation fades, snaps, and finishes exactly at the target (1.4182ms)
+✔ RAW to room-03 centre crosses a narrow map gap without sticking at the door (0.7053ms)
+✔ REGION_CENTER outside the display area cannot start a relocation (0.3765ms)
+✔ room centre to RAW corridor fades across a map gap and reaches the latest measurement without restarting (1.1051ms)
+✔ a disconnected target arriving after the hidden midpoint is reached even without another packet (0.8387ms)
+✔ RAW relocation across a concave corridor does not freeze and never draws an outside point (0.6428ms)
+✔ disabled animation relocates immediately across a map gap and still rejects an outside target (0.5184ms)
+✔ repeated publication at the same room centre does not restart relocation (0.5224ms)
+✔ retains a renderer attached before the tag's first position arrives (0.7158ms)
+✔ interpolates from message timestamps without restarting when irregular updates arrive (0.475ms)
+✔ a 1500 ms message gap remains a regular timestamp-based segment (0.2965ms)
+✔ out-of-order rendered samples and exact duplicates cannot move a tag backwards (0.3604ms)
+✔ production speed limit prevents both large jumps and long-frame catch-up jumps (0.5743ms)
+✔ extrapolation is velocity based, capped, and then holds the last projected point (0.3563ms)
+✔ REGION_CENTER eases toward its exact centre, ignores repeats, and never extrapolates (0.3837ms)
+✔ RAW after REGION_CENTER changes without a wall-crossing route, then resumes buffered movement (0.3721ms)
+✔ disabled animation applies the newest value immediately and needs no update loop (0.316ms)
+✔ teleports and overlong segments use a short controlled transition (0.3564ms)
+✔ receivedAt is the timestamp fallback (0.2042ms)
+✔ tags have independent buffers and stale state follows the configured timeout (0.2954ms)
+✔ buffer size is bounded (0.2924ms)
+✔ synthetic centre heartbeats neither reset measurement age nor move a pinned tag (0.2268ms)
+✔ stationary UWB jitter stays inside the visual dead-band (2.9474ms)
+✔ normal movement is smoothed while larger real movement catches up faster (0.4845ms)
+✔ a single impossible jump is held and a return to the route clears it (0.2854ms)
+✔ two nearby fast measurements confirm real relocation without snapping (0.2531ms)
+✔ long measurement gaps are accepted as unknown movement, not rejected as spikes (0.2931ms)
+{"level":"error","event":"region_engine.processed_port_start_failed","timestamp":"2026-10-08T19:53:36.217Z","port":50280,"message":"REGION_POSITION_PORT 50280 kullanımda; boş bir 300x portu seçin","error":{"name":"Error","message":"listen EADDRINUSE: address already in use 127.0.0.1:50280","stack":"Error: listen EADDRINUSE: address already in use 127.0.0.1:50280\n    at Server.setupListenHandle [as _listen2] (node:net:2167:16)\n    at listenInCluster (node:net:2224:12)\n    at node:net:2448:7\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)"}}
+✔ processed server publishes backward-compatible position events over SSE (114.7454ms)
+✔ processed port reports a clear error when the configured port is occupied (7.7686ms)
+✔ region engine status GET exposes the expected backward-compatible shape (15.8534ms)
+✔ status PUT validates input and repeated disable requests are idempotent (5.7224ms)
+✔ global, room and door settings resolve in priority order without mutating inputs (2.0538ms)
+✔ spor-koridor editor and compiled motor use the configured speed for corridor and every room (17.3966ms)
+✔ legacy evidenceDurationMs maps to entry and exit and legacy config compiles (1.0983ms)
+✔ cleaner preserves room and door overrides and rejects unknown fields (4.1242ms)
+✔ silent proximity distance validates its finite 0..20 metre range and warns outside silent coverage (2.6566ms)
+✔ validation endpoint compiles without writing the config file (14.6008ms)
+✔ atomic persistence round-trips overrides and failed validation keeps the last file (17.6519ms)
+✔ room-specific entry duration and required/ignored door roles affect decisions (9.5476ms)
+✔ score components and effective config are exposed in read-only diagnostics (2.0078ms)
+✔ preferred and optional missing-door policies use their configured evidence thresholds (1.6874ms)
+✔ door directions, weights and crossing expiry are enforced (2.2405ms)
+✔ disabled engine does not mutate input (7.7785ms)
+✔ kat1-ortopedi uses 4.5 m/s globally and for every effective region setting (2.7997ms)
+✔ kat1-ortopedi accepts a reasonable 4.5 m/s step and rejects a jump beyond speed plus tolerance (4.6841ms)
+✔ time and independent measurements are both required, even with count=1 (2.0148ms)
+✔ raw room motion always yields exact configured centre (3.042ms)
+✔ parallel door blackout and approach without crossing never assign a room (1.8091ms)
+✔ directional door crossing and one strong inside measurement allow estimated entry, never measured entry (0.8988ms)
+✔ required door crossing can infer a silent concrete room when signal stops at the wall (1.2259ms)
+✔ synthetic publications preserve measurement time, long gaps expose uncertainty (1.1907ms)
+✔ a single neighbor jump cannot replace a confirmed room, while a sustained direct sequence can (1.3865ms)
+✔ wall measurements alone do not confirm adjacent room (1.1705ms)
+✔ confirmed door exit releases centre, subsequent room entry succeeds (3.0756ms)
+✔ long blackout allows relocation without invented transition time (1.1187ms)
+✔ old, duplicate, delayed and low quality packets add no confirmation evidence (0.9029ms)
+✔ long evidence gaps reset candidates instead of finishing old counters (0.5323ms)
+✔ tag histories and tag count are bounded and independent (33.5ms)
+✔ coverage profiles affect dropout timing without raising entry confidence (0.821ms)
+✔ missing doors and narrow rooms report limitations without fabricated geometry (2.4254ms)
+✔ live decisions project to history and expiry is not a measured room visit (1.9772ms)
+✔ reference scenarios reproduce exactly; adding tags cannot change tag one (25.8946ms)
+✔ all scenarios include useful correct coverage, room visits are not hidden by uncertainty (69.4867ms)
+✔ physical scenario routes cross room boundaries only at defined doors (4.8845ms)
+✔ candidate confidence cannot increase during a blackout, including the lost transition (1.0655ms)
+✔ sustained corridor measurements after a long gap release an old room (1.1557ms)
+✔ confirmed corridor exit clears relocation before the next room entry (1.6887ms)
+✔ silent door proximity infers an estimated room from one corridor measurement and later becomes lost (1.4994ms)
+✔ silent door proximity enforces distance and deterministically selects the nearest then first equal door (1.6396ms)
+✔ silent door proximity needs neither movement history nor movement toward the door (0.9995ms)
+✔ each accepted corridor measurement replaces or clears the silent door candidate (0.5299ms)
+✔ configured corridor geometry prevents nearby non-corridor positions from becoming candidates (0.5536ms)
+✔ regular and intermittent rooms and disabled proximity settings preserve existing behavior (1.332ms)
+✔ ineligible doors never become silent proximity candidates (1.3129ms)
+✔ real inside evidence supersedes a prior proximity-only inferred room (0.6808ms)
+✔ reliable silent-room evidence supersedes the corridor proximity candidate without using crossing direction (0.6674ms)
+✔ scenario A: reliable silent-room measurements confirm entry without a door crossing (1.0603ms)
+✔ scenario B: the real Room 3 config confirms a long reliable inside replay without a door crossing (2.1158ms)
+✔ scenario C: the real Room 5 config confirms fourteen reliable inside samples without a door crossing (1.648ms)
+✔ scenario B: one reliable silent-room measurement survives signal loss as a nonzero inference (0.7548ms)
+✔ scenario C: a reliable corridor point near a silent door infers entry without motion evidence (0.7093ms)
+✔ silent-room raw evidence produces a stronger bounded inference than corridor proximity alone (0.9393ms)
+✔ scenario D: corridor signal loss away from every silent door becomes location lost (0.6079ms)
+✔ scenario E: data returning inside a proximity-inferred room keeps and confirms that room (0.9738ms)
+✔ scenario F: seven reliable points confirm a required-door silent room without rejection (0.7417ms)
+✔ scenario G: one wall-band sample does not clear a proximity-inferred silent room (0.5832ms)
+✔ scenario H: proximity inference chooses the nearest door without a movement vector (0.518ms)
+✔ scenario G: a room-specific manual threshold change takes effect only after config reload (0.9247ms)
+✔ scenario I: one impossible-speed packet is rejected without clearing a confirmed silent room (0.7454ms)
+✔ a rejected low-quality packet does not postpone the accepted sample stale deadline (0.709ms)
+✔ scenario J: required-door regular and intermittent rooms retain their existing entry policy (1.4239ms)
+✔ silent room exit needs continuous reliable corridor count and duration, not a required door (1.1927ms)
+✔ one corridor jump is cancelled by reliable room data and timer publications add no exit evidence (1.2025ms)
+✔ silent exit evidence resets after maxEvidenceGapMs and rejected packets never increment it (1.0903ms)
+✔ required-door regular and intermittent rooms still cannot exit through corridor evidence alone (5.4364ms)
+✔ after a doorless silent exit, dropout near another silent door infers that room by Euclidean distance (1.346ms)
+✔ 21 September 2026 real route exits Rooms 3 and 5 without doors and infers Room 6 at the recorded cutoff (9.4521ms)
+✔ decision trace explains silent-door inference and far-corridor loss without changing the decision (1.3634ms)
+✔ direct room switch requires three reliable target-room samples spread across configured time (0.8236ms)
+✔ anonymized fast field fixtures confirm Room 3 to Room 5 without a corridor publication (3.9595ms)
+✔ sparse field fixture cannot confirm Room 5 or retain Room 3 after a long loss (1.7307ms)
+✔ an active old room still yields to the nearest silent target-door cutoff without directional movement (0.7305ms)
+✔ one reliable sample inside another silent room followed by loss infers that room (0.8877ms)
+✔ 24 September fast field samples infer Room 6 during the recorded cutoff (1.7542ms)
+✔ old room support and later corridor evidence prevent a one-sample target-room cutoff (0.967ms)
+✔ one-sample cutoff ignores rejected room points and does not bypass regular-room policy (1.2801ms)
+✔ direct room switch is cancelled by old-room support, restarted for a different target, and ignores rejected packets (1.8256ms)
+✔ insufficient direct room evidence does not retain the old room past roomSwitchUncertainAfterMs (0.5721ms)
+✔ decision trace snapshots entry evidence, required-door rejection, door crossing and exit (1.5938ms)
+✔ decision trace classifies rejected measurements, long loss and config reload (3.2211ms)
+✔ decision trace is an additive output and the established processed-position contract stays intact (4.8018ms)
+✔ raw marker positions come only from observedTags and ignore processed display state (2.5235ms)
+✔ raw world position is converted with the existing inverse affine transform (0.8725ms)
+✔ engine state cannot alter a raw marker coordinate (0.2793ms)
+✔ stale raw tags remain visible and are marked stale (0.1665ms)
+✔ non-finite raw or transformed coordinates are omitted (0.3017ms)
+✔ region panel keeps the raw view opt-in and the layer non-interactive (1.1783ms)
+✔ decision queue stores raw decisions and state changes, deduplicates synthetic centres (10.5935ms)
+✔ decision buffer caps memory, including an interrupted persistence flush (131.9166ms)
+✔ raw buffer is bounded and received/measurement times persist independently (323.1073ms)
+✔ LocationService exposes the live decision and keeps inferred/uncertain visits separate (5.5574ms)
+﹣ PostgreSQL roundtrip uses separate decision table and preserves measurement/publication timestamps (0.1569ms) # SKIP
+✔ decision log list applies combined filters, merges pending records and uses a stable cursor (3.8702ms)
+✔ decision list keyset order does not skip equal timestamps (15.4387ms)
+✔ recent decision detail is shared across route repository instances (1.2872ms)
+✔ default preferred policy releases a room after sustained reliable corridor evidence without a door crossing (12.4149ms)
+✔ named corridor connections and legacy corridor aliases both prove required door crossings (2.5189ms)
+✔ a different named corridor cannot satisfy the required door connection (0.8322ms)
+✔ required doors still block a wall exit even with sustained reliable corridor data (0.9338ms)
+✔ a corridor spike, wall-band points, rejected packets and timers do not complete a preferred exit (1.8129ms)
+✔ corridor evidence restarts after a long gap instead of releasing on one new packet (1.1865ms)
+✔ tag management panel owns the live-map trail controls (2.5016ms)
+✔ live room simulation CLI options are deterministic and validated (3.5367ms)
+✔ random simulator delays stay within inclusive limits (1.2873ms)
+✔ interval environment validation falls back for non-numeric values and rejects inverted bounds (0.564ms)
+✔ default simulator cadence is fixed at one update per second (0.3485ms)
+✔ simulator sends source heartbeat separately from tag positions when configured (3.8689ms)
+✔ simulation endpoint selection distinguishes local and public destinations (0.4219ms)
+✔ tags follow the corridor, visit a room centre, then stay there for 2–20 seconds (1.1832ms)
+✔ a new position tick aborts unfinished response waits instead of skipping the send (1.8704ms)
+✔ stalled HTTP responses never suppress later one-second position ticks (3.0367ms)
+✔ old centre-only room definitions cannot create a wall shortcut (0.5516ms)
+✔ normal payload carries the zone contract and multi-floor output is deterministic (0.9868ms)
+✔ null and unknown zone scenarios emit explicit values (0.8078ms)
+✔ delayed old-floor and same-coordinate scenarios preserve explicit floor evidence (1.2605ms)
+✔ trail retains only the configured time window (2.6514ms)
+✔ trail ignores jitter and breaks across jumps or region-centre positions (0.4252ms)
+✔ non-routable room relocation starts a new trail segment at the destination (0.3732ms)
+✔ trail settings validate and persist browser preferences (0.5601ms)
+✔ tag panel trail actions update only the visual preference (0.5393ms)
+✔ same measurement accepts only a strictly newer valid engine publication (2.6745ms)
+✔ same measurement accepts newer ROOM_TRANSITIONED publication and rejects the older decision (0.3345ms)
+✔ store shows inferred Room 6 and later LOCATION_LOST without changing measurement age (1.3296ms)
+{"level":"warn","event":"tracking.zone_unresolved","timestamp":"2026-10-08T19:53:43.320Z","zoneId":"not-configured"}
+✔ kaynak heartbeat'i ayrı token ve bilinen zone gerektirir (47.6263ms)
+✔ örnek position payload'ı 202 ile kabul edilir ve gönderilen zaman korunur (4.8138ms)
+✔ null ve bilinmeyen zone kabul edilir fakat haritaya çözülmez (4.2079ms)
+✔ zone alanlarında tip ve uzunluk doğrulaması uygulanır (2.3041ms)
+✔ negatif koordinatlar geçerlidir (1.2561ms)
+✔ ingest POST aynı route üzerindeki SSE akışına position eventi yayınlar (3.5164ms)
+▶ geçersiz sözleşme payload'ları açıklayıcı 400 döndürür
+  ✔ yanlış type (1.075ms)
+  ✔ eksik tag_id (1.1587ms)
+  ✔ string x (0.7837ms)
+  ✔ string y (0.676ms)
+  ✔ geçersiz timestamp (0.6834ms)
+  ✔ fazladan alan (0.6015ms)
+✔ geçersiz sözleşme payload'ları açıklayıcı 400 döndürür (6.8594ms)
+✔ bozuk JSON 400 döndürür (0.9169ms)
+ℹ tests 256
+ℹ suites 0
+ℹ pass 252
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 2
+ℹ todo 0
+ℹ duration_ms 30936.928
+
+✖ failing tests:
+
+test at tests\mapRegionGeometry.test.ts:1:1927
+✖ sports corridor uses the supplied scale and origin while previous plans remain archived (25.7568ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  ... Skipped lines
+  
+    {
+      engine: {
+  +     baseScore: 0.15,
+  +     confirmedInsideScore: 0.85,
+        doorDefaults: {
+          allowEstimatedEntryAfterSignalLoss: true,
+          allowEstimatedExitAfterSignalLoss: true,
+          crossingValidityMs: 12000,
+          evidenceMode: 'required'
+        },
+  +     doorEntryBonus: 0.25,
+  +     doorExitBonus: 0,
+  +     durationContributionFullAtMs: 2100,
+  +     durationContributionMaximum: 0.35,
+        entryConfirmationCount: 2,
+  +     entryEvidenceDurationMs: 1500,
+  +     evidenceWindowMs: 12000,
+        exitConfirmationCount: 2,
+  +     exitEvidenceDurationMs: 1500,
+        exitMarginMeters: 0.5,
+  +     expectedIntervalMs: 1000,
+  +     historySize: 64,
+  +     inferredInsideMaximumScore: 0.65,
+  +     intermittentCoverageStaleMultiplier: 5,
+  +     invalidMeasurementMaximumScore: 0.5,
+        lostAfterMs: 60000,
+  +     lostAfterStaleMultiplier: 4,
+  +     maxEvidenceGapMs: 4000,
+  +     maxTags: 5000,
+  +     maximumScore: 0.9,
+  +     maximumSpeedMetersPerSecond: 14,
+  +     measurementContributionMaximum: 0.15,
+  +     measurementContributionPerSample: 0.04,
+  +     minimumHardwareQuality: 0.25,
+  +     movementToleranceMeters: 0.25,
+  +     outsideReleaseDurationMultiplier: 2,
+  +     regularCoverageStaleMultiplier: 3,
+  +     reliableEvidenceWeight: 0.5,
+  +     relocationAfterMs: 15000,
+  +     relocationEvidenceDurationMultiplier: 2,
+  +     roomSwitchConfirmationCount: 3,
+  +     roomSwitchEvidenceDurationMs: 1500,
+  +     roomSwitchUncertainAfterMs: 10000,
+  -     maximumSpeedMetersPerSecond: 3,
+        silentCoverageStaleMultiplier: 3,
+  +     wallEvidenceWeight: 0.1
+      },
+      map: {
+        calibration: {
+          points: [
+            {
+  ...
+          id: 'corridor-main',
+  +       inference: {
+  +         coverage: 'silent'
+  +       },
+          kind: 'corridor',
+          name: 'Ana Koridor',
+          polygon: [
+            {
+              pixel: {
+  ...
+              pixel: {
+  +             x: 1402.8,
+  +             y: 1446.98
+  -             x: 1583.5,
+  -             y: 1447
+              },
+  +           widthMeters: 1.4,
+  -           widthMeters: 1.1,
+              world: {
+  +             x: 5.2,
+  +             y: 2.537
+  -             x: 6.790877,
+  -             y: 2.536785
+              }
+            }
+          ],
+          expectedIntervalMs: 1000,
+          id: 'room-01',
+          inference: {
+  +         coverage: 'silent',
+  -         doorDefaults: {
+  -           evidenceMode: 'required'
+  -         },
+            silentEntryMaxDistanceMeters: 1.5
+          },
+          kind: 'room',
+          name: 'Oda 1',
+          polygon: [
+  ...
+              pixel: {
+  +             x: 2402.35,
+  +             y: 1446.98
+  -             x: 2353.5,
+  -             y: 1447
+              },
+  +           widthMeters: 1.9,
+  -           widthMeters: 1.1,
+              world: {
+  +             x: 14,
+  +             y: 2.537
+  -             x: 13.569957,
+  -             y: 2.536785
+              }
+            }
+          ],
+          expectedIntervalMs: 1000,
+          id: 'room-02',
+          inference: {
+  +         coverage: 'silent',
+  -         doorDefaults: {
+  -           evidenceMode: 'required'
+  -         },
+            silentEntryMaxDistanceMeters: 1.5
+          },
+          kind: 'room',
+          name: 'Oda 2',
+          polygon: [
+  ...
+                x: 812.16,
+  +             y: 1428.46
+  -             y: 1475.57
+              },
+  +           widthMeters: 1,
+  -           widthMeters: 1.1,
+              world: {
+                x: 0,
+  +             y: 2.7
+  -             y: 2.285254
+              }
+            }
+          ],
+          expectedIntervalMs: 1000,
+          id: 'room-03',
+          inference: {
+  +         coverage: 'silent',
+  +         silentEntryMaxDistanceMeters: 2.5
+  -         doorDefaults: {
+  -           evidenceMode: 'required'
+  -         },
+  -         silentEntryMaxDistanceMeters: 1.5
+          },
+          kind: 'room',
+          name: 'Oda 3',
+          polygon: [
+            {
+              pixel: {
+  +             x: -175.58,
+  +             y: 1203.37
+  -             x: 582,
+  -             y: 1216
+              },
+              world: {
+  +             x: -8.696,
+  +             y: 4.682
+  -             x: -2.026329,
+  -             y: 4.570509
+              }
+            },
+            {
+              pixel: {
+                x: 812.16,
+  ...
+              pixel: {
+  +             x: 804.22,
+  +             y: 2126.76
+  -             x: 812.16,
+  -             y: 1735.14
+              },
+              world: {
+  +             x: -0.07,
+  +             y: -3.448
+  -             x: 0,
+  -             y: 0
+              }
+            },
+            {
+              pixel: {
+  +             x: -140.17,
+  +             y: 2099.27
+  -             x: 582,
+  -             y: 1735.14
+              },
+              world: {
+  +             x: -8.384,
+  +             y: -3.206
+  -             x: -2.026329,
+  -             y: 0
+              }
+            }
+          ],
+          roomCenter: {
+            pixel: {
+  ...
+              pixel: {
+  +             x: 3049.78,
+  +             y: 1446.98
+  -             x: 2981,
+  -             y: 1447
+              },
+  +           widthMeters: 3,
+  -           widthMeters: 1.1,
+              world: {
+  +             x: 19.7,
+  +             y: 2.537
+  -             x: 19.094467,
+  -             y: 2.536785
+              }
+            }
+          ],
+          expectedIntervalMs: 1000,
+          id: 'room-04',
+          inference: {
+  +         coverage: 'silent',
+  -         doorDefaults: {
+  -           evidenceMode: 'required'
+  -         },
+            silentEntryMaxDistanceMeters: 1.5
+          },
+          kind: 'room',
+          name: 'Oda 4',
+          polygon: [
+  ...
+              pixel: {
+  +             x: 1130.2,
+  -             x: 1097,
+                y: 1739
+              },
+  +           widthMeters: 1,
+  -           widthMeters: 1.1,
+              world: {
+  +             x: 2.8,
+  +             y: -0.034
+  -             x: 2.507731,
+  -             y: -0.033983
+              }
+            }
+          ],
+          expectedIntervalMs: 1000,
+          id: 'room-05',
+          inference: {
+  +         coverage: 'silent',
+  +         silentEntryMaxDistanceMeters: 2.5
+  -         doorDefaults: {
+  -           evidenceMode: 'required'
+  -         },
+  -         silentEntryMaxDistanceMeters: 1.5
+          },
+          kind: 'room',
+          name: 'Oda 5',
+          polygon: [
+            {
+  ...
+              pixel: {
+  +             x: 1379.82,
+  +             y: 2571.35
+  -             x: 1385,
+  -             y: 2084
+              },
+              world: {
+  +             x: 4.998,
+  +             y: -7.362
+  -             x: 5.043283,
+  -             y: -3.071363
+              }
+            },
+            {
+              pixel: {
+  +             x: 805.25,
+  +             y: 2555.39
+  -             x: 809,
+  -             y: 2084
+              },
+              world: {
+  +             x: -0.061,
+  +             y: -7.222
+  -             x: -0.027821,
+  -             y: -3.071363
+              }
+            }
+          ],
+          roomCenter: {
+            pixel: {
+  ...
+              pixel: {
+  +             x: 2084.31,
+  -             x: 1762.5,
+                y: 1739
+              },
+  +           widthMeters: 1,
+  -           widthMeters: 1.1,
+              world: {
+  +             x: 11.2,
+  +             y: -0.034
+  -             x: 8.366793,
+  -             y: -0.033983
+              }
+            }
+          ],
+          expectedIntervalMs: 1000,
+          id: 'room-06',
+          inference: {
+  +         coverage: 'silent',
+  +         silentEntryMaxDistanceMeters: 2.5
+  -         doorDefaults: {
+  -           evidenceMode: 'required'
+  -         },
+  -         silentEntryMaxDistanceMeters: 1.5
+          },
+          kind: 'room',
+          name: 'Oda 6',
+          polygon: [
+            {
+  ...
+              pixel: {
+  +             x: 2132.79,
+  +             y: 2550.68
+  -             x: 2140,
+  -             y: 2084
+              },
+              world: {
+  +             x: 11.627,
+  +             y: -7.18
+  -             x: 11.690303,
+  -             y: -3.071363
+              }
+            },
+            {
+              pixel: {
+  +             x: 1379.39,
+  +             y: 2558.19
+  -             x: 1385,
+  -             y: 2084
+              },
+              world: {
+  +             x: 4.994,
+  +             y: -7.246
+  -             x: 5.043283,
+  -             y: -3.071363
+              }
+            }
+          ],
+          roomCenter: {
+            pixel: {
+  ...
+              pixel: {
+  +             x: 2254.69,
+  -             x: 2484.5,
+                y: 1739
+              },
+  +           widthMeters: 1,
+  -           widthMeters: 1.1,
+              world: {
+  +             x: 12.7,
+  +             y: -0.034
+  -             x: 14.723281,
+  -             y: -0.033983
+              }
+            }
+          ],
+          expectedIntervalMs: 1000,
+          id: 'room-07',
+          inference: {
+  +         coverage: 'silent',
+  -         doorDefaults: {
+  -           evidenceMode: 'required'
+  -         },
+            silentEntryMaxDistanceMeters: 1.5
+          },
+          kind: 'room',
+          name: 'Oda 7',
+          polygon: [
+  ...
+              pixel: {
+  +             x: 2855.45,
+  +             y: 2579.54
+  -             x: 2829,
+  -             y: 2084
+              },
+              world: {
+  +             x: 17.989,
+  +             y: -7.434
+  -             x: 17.756259,
+  -             y: -3.071363
+              }
+            },
+            {
+              pixel: {
+  +             x: 2135.19,
+  +             y: 2584.36
+  -             x: 2140,
+  -             y: 2084
+              },
+              world: {
+  +             x: 11.648,
+  +             y: -7.477
+  -             x: 11.690303,
+  -             y: -3.071363
+              }
+            }
+          ],
+          roomCenter: {
+            pixel: {
+  
+      at TestContext.<anonymous> (C:\Users\1548u\Desktop\UWB\ui\base\tests\mapRegionGeometry.test.ts:43:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: {
+      mapDisplay: { outsideHoldMs: 2000 },
+      engine: { entryEvidenceDurationMs: 1500, exitEvidenceDurationMs: 1500, entryConfirmationCount: 2, exitConfirmationCount: 2, evidenceWindowMs: 12000, roomSwitchConfirmationCount: 3, roomSwitchEvidenceDurationMs: 1500, roomSwitchUncertainAfterMs: 10000, maxEvidenceGapMs: 4000, expectedIntervalMs: 1000, relocationEvidenceDurationMultiplier: 2, outsideReleaseDurationMultiplier: 2, exitMarginMeters: 0.5, baseScore: 0.15, maximumScore: 0.9, durationContributionMaximum: 0.35, durationContributionFullAtMs: 2100, measurementContributionPerSample: 0.04, measurementContributionMaximum: 0.15, doorEntryBonus: 0.25, doorExitBonus: 0, confirmedInsideScore: 0.85, inferredInsideMaximumScore: 0.65, invalidMeasurementMaximumScore: 0.5, minimumHardwareQuality: 0.25, reliableEvidenceWeight: 0.5, wallEvidenceWeight: 0.1, maximumSpeedMetersPerSecond: 14, movementToleranceMeters: 0.25, lostAfterMs: 60000, relocationAfterMs: 15000, regularCoverageStaleMultiplier: 3, intermittentCoverageStaleMultiplier: 5, silentCoverageStaleMultiplier: 3, lostAfterStaleMultiplier: 4, maxTags: 5000, historySize: 64, doorDefaults: [Object] },
+      map: { source: 'system', mapId: 'spor-koridor', image: '/maps/spor-koridor/floor-plan.png', widthPx: 3840, heightPx: 2160, calibration: [Object] },
+      positionAnimation: { enabled: true, mode: 'buffered_interpolation', interpolationDelayMs: 4500, maximumBufferSize: 16, maximumSegmentDurationMs: 2500, maximumExtrapolationMs: 0, stalePositionTimeoutMs: 4000, teleportDistanceMeters: 6, teleportAnimationDurationMs: 1500, regionTransitionDurationMs: 2000, maximumVisualSpeedMetersPerSecond: 1.2, maximumTransitionDurationMs: 8000, easing: 'ease_in_out' },
+      regions: [
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object]
+      ]
+    },
+    expected: {
+      mapDisplay: { outsideHoldMs: 2000 },
+      engine: { entryConfirmationCount: 2, exitConfirmationCount: 2, exitMarginMeters: 0.5, maximumSpeedMetersPerSecond: 3, silentCoverageStaleMultiplier: 3, lostAfterMs: 60000, doorDefaults: [Object] },
+      map: { source: 'system', mapId: 'spor-koridor', image: '/maps/spor-koridor/floor-plan.png', widthPx: 3840, heightPx: 2160, calibration: [Object] },
+      positionAnimation: { enabled: true, mode: 'buffered_interpolation', interpolationDelayMs: 4500, maximumBufferSize: 16, maximumSegmentDurationMs: 2500, maximumExtrapolationMs: 0, stalePositionTimeoutMs: 4000, teleportDistanceMeters: 6, teleportAnimationDurationMs: 1500, regionTransitionDurationMs: 2000, maximumVisualSpeedMetersPerSecond: 1.2, maximumTransitionDurationMs: 8000, easing: 'ease_in_out' },
+      regions: [
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object],
+        [Object], [Object]
+      ]
+    },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests\mapRegionGeometry.test.ts:1:3471
+✖ every concrete room is silent and has an editable required door on each wall (0.7307ms)
+  AssertionError [ERR_ASSERTION]: room-01: dört duvar kapısı bekleniyor
+  
+  1 !== 4
+  
+      at TestContext.<anonymous> (C:\Users\1548u\Desktop\UWB\ui\base\tests\mapRegionGeometry.test.ts:76:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 4,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
