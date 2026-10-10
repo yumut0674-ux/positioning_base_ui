@@ -28,7 +28,8 @@
     "simulate:rooms": "node test_api/simulate_tags.js",
     "evaluate:rooms": "node --import tsx test_api/evaluate_rooms.ts",
     "migrate:rooms": "node --env-file=.env.local --import tsx scripts/migrate-room-decisions.ts",
-    "test:rooms:db": "node --env-file=.env.local --import tsx --test tests/roomDecisionPersistence.test.ts"
+    "test:rooms:db": "node --env-file=.env.local --import tsx --test tests/roomDecisionPersistence.test.ts",
+    "test:room-tests": "node --import tsx --test tests/roomTests.test.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.29.0",

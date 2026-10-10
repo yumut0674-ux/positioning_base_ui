@@ -7,6 +7,7 @@ const file = "config/maps/necmettin-servis/regions.json";
 const config = JSON.parse(await readFile(file, "utf8")) as RegionsConfig;
 const reference = JSON.parse(await readFile("config/maps/necmettin-yogun-bakim/regions.json", "utf8")) as RegionsConfig;
 const map = JSON.parse(await readFile("config/maps/necmettin-servis/map.json", "utf8"));
+const source = JSON.parse(await readFile("config/maps/necmettin-servis/source.floorplan.json", "utf8"));
 if ((config.regions.length || config.largeAreas?.length) && !process.argv.includes("--replace-existing")) {
   throw new Error("Review existing geometry before regenerating with --replace-existing.");
 }
@@ -14,9 +15,22 @@ const roomTemplates = reference.regions.filter(region => region.kind === "room")
 const areaTemplate = reference.largeAreas?.[0];
 if (!roomTemplates.length || !areaTemplate?.gates.length) throw new Error("Intensive-care reference rooms and area gates are required.");
 const transform = new CoordinateTransformService(map.calibration);
-const pair = (x: number, y: number) => ({ world: { x, y }, pixel: transform.worldToCanvas({ x, y }) });
+const sourceTransform = new CoordinateTransformService({
+  worldOrigin: source.map.worldOrigin, canvasOrigin: source.map.exportCalibration.originPixel,
+  pixelsPerMeter: 100 / source.map.exportCalibration.centimetersPerPixel,
+  invertYAxis: true, rotationDegrees: 0,
+});
+const pair = (x: number, y: number) => {
+  const pixel = sourceTransform.worldToCanvas({ x, y });
+  return { pixel, world: transform.canvasToWorld(pixel) };
+};
+const normal = (direction: number) => {
+  const from = pair(0, 0).world, to = pair(0, direction).world;
+  const x = to.x - from.x, y = to.y - from.y, length = Math.hypot(x, y);
+  return { x: Math.abs(x) < 1e-12 ? 0 : x / length, y: Math.abs(y) < 1e-12 ? 0 : y / length };
+};
 
-// World metre coordinates measured from the October 9 CAD export. The five
+// CAD metre coordinates measured from the October 9 export. The five
 // bathroom pairs repeat every 8.4 m; room 10's last bay is 20 cm narrower.
 const bathroomCentres = [5.9537725292536, 14.3537725292536, 22.7537725292536, 31.1537725292536, 39.5537725292536];
 const leftWall = 1.4537725292536;
@@ -62,7 +76,7 @@ function room(number: number, bay: number, top: boolean): RegionDefinition {
     polygon: boundary.map(([x, y]) => pair(x, y)),
     roomCenter: pair((walls[bay] + walls[bay + 1]) / 2, top ? (topRear + 17.08890959210326) / 2 : (bottomRear + 7.8889095921034) / 2),
     entrances: [{ ...doorwayTemplate, id: `${id}-corridor-door`, ...pair(doorwayX, front),
-      inwardNormal: { x: 0, y: direction }, connectsTo: "corridor-main" }],
+      inwardNormal: normal(direction), connectsTo: "corridor-main" }],
   };
 }
 for (let bay = 0; bay < 10; bay++) rooms.push(room(bay + 1, bay, true));

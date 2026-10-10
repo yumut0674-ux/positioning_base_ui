@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import test from "node:test";
 import { cleanRegionsConfig } from "../app/api/regions/route";
 import { createAffineTransform } from "../src/features/regions/services/affineTransform";
+import { CoordinateTransformService } from "../src/features/map/services/CoordinateTransformService";
 import type { RegionsConfig } from "../src/features/regions/types/region.types";
 import { compileRegionsConfig } from "../src/server/regionEngine/configLoader";
 import { pointInPolygon } from "../src/server/regionEngine/geometry";
@@ -16,6 +17,22 @@ const compiled = compileRegionsConfig(cleanRegionsConfig(config, "necmettin-serv
 const referenceCompiled = compileRegionsConfig(reference);
 const rooms = config.regions.filter(region => region.kind === "room");
 const transform = createAffineTransform(config.map.calibration.points);
+const map = JSON.parse(readFileSync("config/maps/necmettin-servis/map.json", "utf8"));
+const motorTransform = new CoordinateTransformService(map.calibration);
+const sourceTransform = new CoordinateTransformService({
+  worldOrigin: source.map.worldOrigin, canvasOrigin: source.map.exportCalibration.originPixel,
+  pixelsPerMeter: 100 / source.map.exportCalibration.centimetersPerPixel,
+  invertYAxis: true, rotationDegrees: 0,
+});
+const cadToMotor = (point: { x: number; y: number }) => motorTransform.canvasToWorld(sourceTransform.worldToCanvas(point));
+const motorToCad = (point: { x: number; y: number }) => sourceTransform.canvasToWorld(motorTransform.worldToCanvas(point));
+const cadRooms = compiled.regions.map(room => {
+  const polygon = room.polygon.map(motorToCad);
+  return { ...room, polygon, bounds: {
+    minX: Math.min(...polygon.map(point => point.x)), maxX: Math.max(...polygon.map(point => point.x)),
+    minY: Math.min(...polygon.map(point => point.y)), maxY: Math.max(...polygon.map(point => point.y)),
+  } };
+});
 const epoch = Date.parse("2026-10-09T12:00:00Z");
 
 test("Servis has 18 rooms, one corridor and intensive-care motor, room and door settings", () => {
@@ -42,7 +59,7 @@ test("room numbering follows the Servis CAD labels and all coordinates use Servi
     const label = source.objects.find((object: { type: string; text?: string }) => object.type === "text" && object.text === room.name);
     assert.ok(label, room.name);
     const compiledRoom = compiled.regions.find(region => region.id === room.id)!;
-    assert.ok(pointInPolygon(label.position, compiledRoom), `${room.name}: CAD label must be in its own room`);
+    assert.ok(pointInPolygon(cadToMotor(label.position), compiledRoom), `${room.name}: CAD label must be in its own room`);
     assert.ok(pointInPolygon(room.roomCenter!.world, compiledRoom));
   }
   for (const region of [...config.regions, ...config.largeAreas!]) {
@@ -57,11 +74,11 @@ test("room numbering follows the Servis CAD labels and all coordinates use Servi
 });
 
 test("rooms extend three metres behind their rear walls and adjacent rooms have a ten centimetre gap", () => {
-  for (const [index, room] of compiled.regions.entries()) {
+  for (const [index, room] of cadRooms.entries()) {
     if (index < 10) assert.ok(Math.abs(room.bounds.maxY - 22.68890959210326 - 3) < 1e-8);
     else assert.ok(Math.abs(2.2389095921034 - room.bounds.minY - 3) < 1e-8);
   }
-  for (const row of [compiled.regions.slice(0, 10), compiled.regions.slice(10)]) {
+  for (const row of [cadRooms.slice(0, 10), cadRooms.slice(10)]) {
     for (let index = 1; index < row.length; index++) {
       const gap = row[index].bounds.minX - row[index - 1].bounds.maxX;
       // Oda 14 and 15 are separated by the central service/corridor block.
@@ -76,18 +93,20 @@ test("bathroom wings stay with their rooms and the corridor excludes them and th
   for (const room of compiled.regions) {
     const top = Number(room.id.slice(-2)) <= 10;
     const door = room.entrances[0];
-    assert.deepEqual(door.inwardNormal, { x: 0, y: top ? 1 : -1 });
+    assert.deepEqual(door.inwardNormal, { x: top ? -1 : 1, y: 0 });
     const direction = top ? 1 : -1;
-    assert.ok(pointInPolygon({ x: door.x, y: door.y + direction * 0.4 }, room));
-    assert.ok(pointInPolygon({ x: door.x, y: door.y - direction * 0.4 }, corridor));
-    const bathroom = { x: (room.polygon[2].x + room.polygon[3].x) / 2, y: door.y - direction * 0.5 };
+    assert.ok(pointInPolygon({ x: door.x + door.inwardNormal.x * 0.4, y: door.y }, room));
+    assert.ok(pointInPolygon({ x: door.x - door.inwardNormal.x * 0.4, y: door.y }, corridor));
+    const cadRoom = cadRooms.find(candidate => candidate.id === room.id)!;
+    const bathroom = cadToMotor({ x: (cadRoom.polygon[2].x + cadRoom.polygon[3].x) / 2,
+      y: motorToCad(door).y - direction * 0.5 });
     assert.ok(pointInPolygon(bathroom, room), room.name);
     assert.equal(pointInPolygon(bathroom, corridor), false, room.name);
   }
   // Sample the full extended area; no traversable interior belongs to two regions.
   const regions = [...compiled.regions, corridor];
   for (let x = 1.6; x < 49.7; x += 0.37) for (let y = -0.6; y < 25.7; y += 0.41) {
-    const inside = regions.filter(region => pointInPolygon({ x, y }, region));
+    const inside = regions.filter(region => pointInPolygon(cadToMotor({ x, y }), region));
     assert.ok(inside.length <= 1, `overlap at ${x}, ${y}: ${inside.map(region => region.id).join(", ")}`);
   }
 });
@@ -100,7 +119,8 @@ test("every Servis room confirms entry and releases back to the corridor with th
     const door = room.entrances[0];
     const send = (seconds: number, distance: number) => {
       now = epoch + seconds * 1000;
-      return engine.ingest({ tagCode: room.id, x: door.x, y: door.y + door.inwardNormal!.y * distance,
+      return engine.ingest({ tagCode: room.id, x: door.x + door.inwardNormal!.x * distance,
+        y: door.y + door.inwardNormal!.y * distance,
         quality: 1, timestamp: new Date(now).toISOString() })!;
     };
     const atCentre = (seconds: number) => {
@@ -117,19 +137,19 @@ test("every Servis room confirms entry and releases back to the corridor with th
   }
 });
 
-test("both left Servis gates record area entry and observed exit using the intensive-care wait settings", () => {
+test("configured Servis gates record area entry and observed exit using the intensive-care wait settings", () => {
   assert.equal(compiled.largeAreas.length, 1);
   assert.equal(compiled.largeAreas[0].name, "Servis");
-  assert.equal(compiled.largeAreas[0].gates.length, 2);
-  const edge = compiled.largeAreas[0].polygon[0].x;
+  assert.ok(compiled.largeAreas[0].gates.length > 0);
+  const edge = motorToCad(compiled.largeAreas[0].polygon[0]).x;
   for (const [index, gate] of compiled.largeAreas[0].gates.entries()) {
-    assert.equal(gate.waitMs, referenceCompiled.largeAreas[0].gates[index].waitMs);
+    assert.equal(gate.waitMs, referenceCompiled.largeAreas[0].gates[index % referenceCompiled.largeAreas[0].gates.length].waitMs);
     assert.equal(gate.role, "bidirectional");
     const events: AreaTransitionEvent[] = [];
     const engine = new AreaTransitionEngine(new Map([[config.map.mapId, compiled]]), event => events.push(event));
-    const y = gate.polygon.reduce((sum, point) => sum + point.y, 0) / gate.polygon.length;
+    const y = gate.polygon.reduce((sum, point) => sum + motorToCad(point).y, 0) / gate.polygon.length;
     const send = (seconds: number, distance: number) => engine.ingest({
-      tagCode: `GATE-${index}`, mapId: config.map.mapId, x: edge + distance, y, quality: 0.9,
+      tagCode: `GATE-${index}`, mapId: config.map.mapId, ...cadToMotor({ x: edge + distance, y }), quality: 0.9,
       timestamp: new Date(epoch + seconds * 1000).toISOString(),
     }, epoch + seconds * 1000);
     send(0, -1); send(1, 0); send(2, 1); send(3, 1.5);

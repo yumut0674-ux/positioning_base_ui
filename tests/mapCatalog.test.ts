@@ -35,19 +35,23 @@ test("Servis motor zone resolves to the active service floor", async () => {
   assert.deepEqual(await resolver.resolve("necmettin-servis"), expected);
 });
 
-test("Servis uses the October 9 export scale and origin in both map and room editor", async () => {
+test("Servis uses the selected CAD origin and clockwise motor axes in both map and room editor", async () => {
   const source = JSON.parse(await readFile(path.join(mapsDirectory, "necmettin-servis", "source.floorplan.json"), "utf8"));
   const calibration = source.map.exportCalibration;
   assert.equal(source.project.updatedAt, "2026-10-09T11:28:47.028Z");
   assert.equal(calibration.centimetersPerPixel, 1.4171776872164112);
   const details = await new MapService(new FileMapRepository(mapsDirectory)).getMapDetails("necmettin-servis");
   assert.equal(details.calibration.pixelsPerMeter, 100 / calibration.centimetersPerPixel);
-  assert.deepEqual(details.calibration.canvasOrigin, calibration.originPixel);
+  const selectedPixel = {
+    x: calibration.originPixel.x + 1.85 * details.calibration.pixelsPerMeter,
+    y: calibration.originPixel.y - 14.25 * details.calibration.pixelsPerMeter,
+  };
+  assert.deepEqual(details.calibration.canvasOrigin, selectedPixel);
   assert.deepEqual(details.calibration.worldOrigin, source.map.worldOrigin);
   assert.equal(details.calibration.invertYAxis, true);
-  assert.equal(details.calibration.rotationDegrees, 0);
-  assert.ok(Math.abs(details.world.widthMeters - calibration.widthPx * calibration.centimetersPerPixel / 100) < 1e-8);
-  assert.ok(Math.abs(details.world.heightMeters - calibration.heightPx * calibration.centimetersPerPixel / 100) < 1e-8);
+  assert.equal(details.calibration.rotationDegrees, 90);
+  assert.ok(Math.abs(details.world.widthMeters - calibration.heightPx * calibration.centimetersPerPixel / 100) < 1e-8);
+  assert.ok(Math.abs(details.world.heightMeters - calibration.widthPx * calibration.centimetersPerPixel / 100) < 1e-8);
   const png = await readFile(path.join(process.cwd(), "public", details.image.url));
   assert.equal(createHash("sha256").update(png).digest("hex"), "1e98c4840f0cd6c851649749d47372974a024a909b801b565312c745baad1f8d");
   assert.equal(png.subarray(0, 8).toString("hex"), "89504e470d0a1a0a");
@@ -61,10 +65,13 @@ test("Servis uses the October 9 export scale and origin in both map and room edi
   assert.equal(config.map.image, details.image.url);
   const pixelToWorld = createAffineTransform(config.map.calibration.points);
   const transform = new CoordinateTransformService(details.calibration);
-  for (const world of [{ x: 0, y: 0 }, { x: 10, y: 5 }, { x: source.bounds.maxX, y: source.bounds.maxY }]) {
+  const origin = transform.canvasToWorld(selectedPixel);
+  assert.ok(Math.abs(origin.x) < 1e-8);
+  assert.ok(Math.abs(origin.y) < 1e-8);
+  for (const world of [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 0, y: 1 }, { x: 10, y: 5 }]) {
     const pixel = transform.worldToCanvas(world);
-    assert.ok(Math.abs(pixel.x - (calibration.originPixel.x + world.x * 100 / calibration.centimetersPerPixel)) < 1e-8);
-    assert.ok(Math.abs(pixel.y - (calibration.originPixel.y - world.y * 100 / calibration.centimetersPerPixel)) < 1e-8);
+    assert.ok(Math.abs(pixel.x - (selectedPixel.x + world.y * 100 / calibration.centimetersPerPixel)) < 1e-8);
+    assert.ok(Math.abs(pixel.y - (selectedPixel.y + world.x * 100 / calibration.centimetersPerPixel)) < 1e-8);
     const editorWorld = pixelToWorld(pixel);
     assert.ok(Math.abs(editorWorld.x - world.x) < 1e-8);
     assert.ok(Math.abs(editorWorld.y - world.y) < 1e-8);

@@ -1,12 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { BarChart3, Boxes, Building2, Crosshair, Headset, Hexagon, Map, RadioTower, Route, Settings, X } from "lucide-react";
+import { BarChart3, Boxes, Building2, ClipboardList, Crosshair, Headset, Hexagon, Map, RadioTower, Route, Settings, X } from "lucide-react";
 import type { UiMode } from "../uiMode";
 
 const SIDEBAR_COLLAPSED_STORAGE_KEY = "ips-sidebar-collapsed";
 
-export type WorkspaceView = "map" | "tags" | "anchors" | "regions" | "history" | "support" | "analyses";
+export type WorkspaceView = "map" | "tags" | "anchors" | "regions" | "history" | "support" | "analyses" | "room-tests";
 
 type NavigationItem = { readonly label: string; readonly view: WorkspaceView; readonly icon: typeof Map };
 
@@ -19,7 +19,7 @@ const ADMIN_NAVIGATION: ReadonlyArray<NavigationItem> = [
   { label: "Oda/Bölge", view: "regions", icon: Hexagon },
 ];
 
-const REVIEW_NAVIGATION: ReadonlyArray<NavigationItem> = [{ label: "Analizler", view: "analyses", icon: BarChart3 }];
+const REVIEW_NAVIGATION: ReadonlyArray<NavigationItem> = [{ label: "Analizler", view: "analyses", icon: BarChart3 }, { label: "Oda Test Kaydı", view: "room-tests", icon: ClipboardList }];
 
 interface AppSidebarProps {
   readonly mode: UiMode;
@@ -28,6 +28,7 @@ interface AppSidebarProps {
   readonly mobileOpen: boolean;
   readonly onMobileClose: () => void;
   readonly onViewChange: (view: WorkspaceView) => void;
+  readonly roomTestRecording?: boolean;
 }
 
 export function useSidebarCollapse() {
@@ -53,8 +54,8 @@ export function useSidebarCollapse() {
   return { collapsed, toggleCollapsed };
 }
 
-export function AppSidebar({ mode, activeView, collapsed, mobileOpen, onMobileClose, onViewChange }: AppSidebarProps) {
-  const item = ({ label, view, icon: Icon }: NavigationItem) => <button key={view} className={activeView === view ? "active" : ""} onClick={() => onViewChange(view)} aria-label={label} title={label}><Icon size={17} /><span>{label}</span></button>;
+export function AppSidebar({ mode, activeView, collapsed, mobileOpen, onMobileClose, onViewChange, roomTestRecording = false }: AppSidebarProps) {
+  const item = ({ label, view, icon: Icon }: NavigationItem) => <button key={view} className={`${activeView === view ? "active" : ""}${view === "room-tests" && roomTestRecording ? " room-test-recording" : ""}`} onClick={() => onViewChange(view)} aria-label={`${label}${view === "room-tests" && roomTestRecording ? " · Kayıt açık" : ""}`} title={label}><Icon size={17} /><span>{label}{view === "room-tests" && roomTestRecording ? " · ●" : ""}</span></button>;
   return (
     <aside className={`app-sidebar${collapsed ? " is-collapsed" : ""}${mobileOpen ? " is-mobile-open" : ""}`}>
       <div className="mobile-sidebar-heading">

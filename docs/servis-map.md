@@ -19,16 +19,23 @@ haritaya yönlendirme yapmaz. `necmettin-servis` kimliği de desteklenir.
 }
 ```
 
-Koordinatlar metre cinsindedir; X sağa, Y yukarı artar. Motorun dünya
-orijini, kaynak haritadaki `(0, 0)` noktasıyla aynı olmalıdır.
+Koordinatlar metre cinsindedir. Kaynak/CAD haritasındaki **X=1,85; Y=14,25**
+noktası motorun **(0,0)** orijinidir. Motor eksenleri arayüz görseline göre
+90° sağa döndürülmüştür: **+X aşağıya, +Y sağa** ilerler. Görsel ve bölge
+çizimleri yerlerinde kalır; koordinatlar ve oda kapılarının içeri yönleri
+aynı motor dönüşümünü kullanır.
+
+CAD koordinatından motor koordinatına dönüşüm:
+`motor.x = 14.25 - cad.y`, `motor.y = cad.x - 1.85`.
 
 9 Ekim 2026 tarihli `servisv2.floorplan (2).json` ve
 `servisv2-3840x2160-1px-1.417cm-origin-x-26.58-y1955.96px.png` kullanılmıştır:
 
 - Görsel: 3840 × 2160 piksel.
 - Ölçek: 1 piksel = 1,4171776872164112 cm; 1 metre = 70,56278186006284 piksel.
-- Dünya orijininin görseldeki yeri: `(-26.584397118828022, 1955.9599941366955)` piksel.
-- Dönüş: 0°.
+- Kaynak/CAD orijininin görseldeki yeri: `(-26.584397118828022, 1955.9599941366955)` piksel.
+- Yeni motor orijininin görseldeki yeri: `(103.95674932228825, 950.4403526308)` piksel.
+- Motor eksen dönüşü: saat yönünde 90°.
 
 Güncel görsel adresi `/maps/necmettin-servis/floor-plan-1e98c4840f0c.png`
 olarak sürümlenmiştir; tarayıcıdaki eski `floor-plan.png` önbelleğini kullanmaz.
@@ -45,7 +52,10 @@ Yoğun Bakım ile aynı ayarlar uygulanır:
 - Odalar arka dış duvarlarının ötesine 3 metre uzatılır; komşu odalar arasında 10 cm boşluk vardır.
 - Oda merkezleri fiziksel odaların içinde kalır; her odada 1,5 m genişliğinde, içeri yönlü koridor kapısı bulunur.
 - Genel motor, oda/kapı çıkarım, gösterim ve animasyon ayarları Yoğun Bakım yapılandırmasından alınır.
-- `Servis` büyük alanının sol üst ve sol alt giriş/çıkış kapıları iki yönlüdür; bekleme süresi 30 saniyedir.
+- `Servis` büyük alanında düzenlenmiş tek giriş/çıkış kapısı iki yönlüdür; bekleme süresi 30 saniyedir.
+
+Mevcut çizimleri yerinde tutarak motor kalibrasyonunu yeniden uygulamak için
+`node --import tsx scripts/calibrate-service-map.ts` komutunu kullanın.
 
 Tanımları yeniden oluşturmak için `node --import tsx scripts/configure-service-rooms.ts`
 komutunu kullanın. Mevcut çizimler varsa araç üzerine yazmaz; bilinçli yeniden

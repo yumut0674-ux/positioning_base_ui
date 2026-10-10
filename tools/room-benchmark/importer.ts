@@ -7,7 +7,7 @@ import { compareRows, deliveryMs, iso, ms, sha256, type Manifest, type RawRow, t
 const q = (s: string): string => `'${s.replaceAll("'", "''")}'`;
 const root = path.dirname(new URL(import.meta.url).pathname.replace(/^\/(?=[A-Za-z]:)/, ''));
 export const datasetDir = (id: string): string => {
-  if (!/^test-[0-9a-f-]{36}$/.test(id)) throw new Error('Geçersiz test ID');
+  if (!/^test-[0-9a-f-]{36}(?:-part-[1-9][0-9]{0,4})?$/.test(id)) throw new Error('Geçersiz test ID');
   return path.join(root, 'datasets', id);
 };
 const mapped = (r: Record<string,string|null>): RawRow => ({

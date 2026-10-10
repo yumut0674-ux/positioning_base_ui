@@ -25,7 +25,12 @@ import { useTagTrailSettingsStorage } from "@/src/features/tracking/hooks/useTag
 import { DecisionLogsPanel } from "@/src/features/decisionLogs/components/DecisionLogsPanel";
 import type { UiMode } from "./uiMode";
 
-const ADMIN_VIEWS = new Set<WorkspaceView>(["tags", "anchors", "regions", "analyses"]);
+const ADMIN_VIEWS = new Set<WorkspaceView>(["tags", "anchors", "regions", "analyses", "room-tests"]);
+
+const RoomTestPanel = dynamic(
+  () => import("@/src/features/roomTests/components/RoomTestPanel").then((module) => module.RoomTestPanel),
+  { ssr: false, loading: () => <div className="history-panel-loading-frame" role="status">Oda test paneli yükleniyor…</div> },
+);
 
 const RouteHistoryPanel = dynamic(
   () => import("@/src/features/history/components/RouteHistoryPanel").then((module) => module.RouteHistoryPanel),
@@ -41,6 +46,7 @@ interface LiveMapWorkspaceProps {
   readonly mode: UiMode;
   readonly activeView: WorkspaceView;
   readonly historyOpened: boolean;
+  readonly roomTestsOpened: boolean;
   readonly historyRequest: HistoryRequest;
   readonly onOpenTagHistory: (tagCode: string) => void;
   readonly onViewChange: (view: WorkspaceView) => void;
@@ -64,6 +70,7 @@ function LiveMapWorkspace({
   mode,
   activeView,
   historyOpened,
+  roomTestsOpened,
   historyRequest,
   onOpenTagHistory,
   onViewChange,
@@ -98,6 +105,7 @@ function LiveMapWorkspace({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [focusFeedback, setFocusFeedback] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [roomTestRecording, setRoomTestRecording] = useState(false);
   const fullscreenSupported = typeof document === "undefined" || document.fullscreenEnabled;
   const selectedTag = selectedTagId ? tags[selectedTagId] : undefined;
   const assistantContext = useMemo<GekonAiContext>(() => ({
@@ -216,9 +224,9 @@ function LiveMapWorkspace({
     <div className={`ips-shell ${activeView !== "map" ? "anchors-mode" : ""}`}>
       <AppHeader mode={mode} sidebarCollapsed={sidebarCollapsed} mobileMenuOpen={mobileMenuOpen} onSidebarToggle={handleSidebarToggle} catalog={catalog} activeMapId={activeMapId} onMapSelect={handleMapSelect} />
       {mobileMenuOpen && <button type="button" className="mobile-sidebar-backdrop" aria-label="Menüyü kapat" onClick={() => setMobileMenuOpen(false)} />}
-      <AppSidebar mode={mode} activeView={activeView} collapsed={sidebarCollapsed} mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} onViewChange={handleSidebarViewChange} />
+      <AppSidebar mode={mode} activeView={activeView} collapsed={sidebarCollapsed} mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} onViewChange={handleSidebarViewChange} roomTestRecording={roomTestRecording} />
       <main className="workspace">
-        {mode === "admin" && activeView === "anchors" ? <AnchorManagementPanel embedded /> : mode === "admin" && activeView === "tags" ? <TagManagementPanel embedded /> : mode === "admin" && activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : mode === "admin" && activeView === "analyses" ? <DecisionLogsPanel /> : activeView === "history" ? null : <>
+        {mode === "admin" && activeView === "anchors" ? <AnchorManagementPanel embedded /> : mode === "admin" && activeView === "tags" ? <TagManagementPanel embedded /> : mode === "admin" && activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : mode === "admin" && activeView === "analyses" ? <DecisionLogsPanel /> : activeView === "history" || activeView === "room-tests" ? null : <>
           <div className="workspace-heading live-map-heading">
             <div className="workspace-heading-content">
               <span>{liveTrackingVisible ? "CANLI OPERASYONLAR" : "HARİTA GÖRÜNÜMÜ"} / {(activeMap?.floorLabel ?? "HARİTA").toUpperCase()}</span>
@@ -252,6 +260,7 @@ function LiveMapWorkspace({
             <RouteHistoryPanel requestedTagCode={historyRequest.tagCode} requestKey={historyRequest.key} />
           </div>
         )}
+        {mode === "admin" && roomTestsOpened && <div className="history-panel-slot" hidden={activeView !== "room-tests"}><RoomTestPanel onRecordingChange={setRoomTestRecording} /></div>}
       </main>
       {activeView === "map" && <TagInformationPanel variant="desktop" onOpenHistory={handleOpenTagHistory} catalog={catalog} />}
       {activeView === "map" && liveTrackingVisible && <GekonAiWidget context={assistantContext} />}
@@ -264,11 +273,13 @@ export function IpsApplication({ mode }: { readonly mode: UiMode }) {
   const [queryClient] = useState(() => new QueryClient({ defaultOptions: { queries: { staleTime: 15_000, retry: 1 } } }));
   const [activeView, setActiveView] = useState<WorkspaceView>("map");
   const [historyOpened, setHistoryOpened] = useState(false);
+  const [roomTestsOpened, setRoomTestsOpened] = useState(false);
   const [historyRequest, setHistoryRequest] = useState<HistoryRequest>({ key: 0 });
 
   const changeView = useCallback((view: WorkspaceView) => {
     if (mode === "demo" && ADMIN_VIEWS.has(view)) return;
     if (view === "history") setHistoryOpened(true);
+    if (view === "room-tests") setRoomTestsOpened(true);
     setActiveView(view);
   }, [mode]);
 
@@ -278,5 +289,5 @@ export function IpsApplication({ mode }: { readonly mode: UiMode }) {
     setActiveView("history");
   }, []);
 
-  return <QueryClientProvider client={queryClient}><HashRouter><LiveMapWorkspace mode={mode} activeView={activeView} historyOpened={historyOpened} historyRequest={historyRequest} onOpenTagHistory={openTagHistory} onViewChange={changeView} /></HashRouter></QueryClientProvider>;
+  return <QueryClientProvider client={queryClient}><HashRouter><LiveMapWorkspace mode={mode} activeView={activeView} historyOpened={historyOpened} roomTestsOpened={roomTestsOpened} historyRequest={historyRequest} onOpenTagHistory={openTagHistory} onViewChange={changeView} /></HashRouter></QueryClientProvider>;
 }
