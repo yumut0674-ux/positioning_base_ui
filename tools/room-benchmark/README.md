@@ -4,6 +4,8 @@ Bu araç ayrı bir Node sürecinde **mevcut** `RegionPositionEngine` sınıfın�
 
 ## Yeni test
 
+12 Ekim Servis `servis2` testi: `test-4192b569-b345-4a41-a028-32b342ab4710`. Kullanıcının belirttiği `cihaz` adı DB'de `EA0FC8F8CA447FF5` koduyla eşleştirildi; 344 ham paket aktarıldı. Kaynağın `Z` saatleri UTC olarak korundu, saat kaydırılmadı; katı ve ±2 saniye sınır toleranslı sonuç üretildi. Replay komutu: `node --import tsx tools/room-benchmark/cli.ts replay test-4192b569-b345-4a41-a028-32b342ab4710 --config config/maps/necmettin-servis/regions.json`. İlk rapor ve parametre incelemesi `reports/necmettin-servis-servis2-4192b569-20261012/analysis.md` içinde. Servis ayarları yoğun bakım ayarlarından ayrıdır.
+
 1. `datasets/<test-id>/truth.json` oluşturun. `test.from/to` ve `visits` açık UTC/ISO olmalı; yerel kayıt saatini `Europe/Istanbul` (+03:00) kabul edin. Oda aralıkları arasındaki zaman koridordur. `revision` ve `revisionReason` zorunludur.
 2. `node --env-file=.env.local --import tsx tools/room-benchmark/cli.ts candidates <test-id>` ile 30 saniye ısınma ve 60 saniye gözlem dahil aday tag sayısını görün. Farklı pencere için `--warmup-ms`, `--observation-ms` kullanın.
 3. Hangi tag'ın taşındığını saha kaydıyla doğrulayın. Aynı rota üzerinde birlikte taşınan tag'ları tek gruba koyun: `"groups":[{"id":"rota-1","tagCodes":["TAG-A","TAG-B"]}]`. Emin olmadıklarınızı gruba eklemeyin. Gruplandırılmayan tag puanlanmaz.

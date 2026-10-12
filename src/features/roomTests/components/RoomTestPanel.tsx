@@ -1,13 +1,15 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Activity, ArrowRight, Check, CheckCircle2, Clipboard, Clock3, DoorOpen, Download, FileJson, FolderClock, Layers3, MapPin, Pause, Play, Plus, Radio, Search, Settings2, Square, Terminal, Trash2, Undo2, Upload, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { fetchTags } from "@/src/features/tracking/services/tagApi";
+import { fetchTags, type TagDefinition } from "@/src/features/tracking/services/tagApi";
 import { useIpsStore } from "@/src/app/store/useIpsStore";
 import { effectiveEvents, exportSession, projectSession, recordedMs, type ExportFormat, type TestArea, type TestPlan } from "../services/roomTestModel";
 import { downloadTest, fetchTestPlan } from "../services/roomTestApi";
 import { useRoomTestRecorder } from "../services/useRoomTestRecorder";
+import { roomTestTagOptions } from "../services/roomTestTags";
+import { RoomTestTagInput } from "./RoomTestTagInput";
 import { TestDialog } from "./TestDialog";
 import { TestPlanEditor, AREA_LABELS } from "./TestPlanEditor";
 import { TestHistoryDialog, STATUS_LABELS } from "./TestHistoryDialog";
@@ -25,6 +27,13 @@ export function RoomTestPanel({ onRecordingChange }: { onRecordingChange: (recor
   const state = useMemo(() => session ? projectSession(session) : null, [session]);
   const plans = useQuery({ queryKey: ["room-test-plans"], queryFn: fetchTestPlan });
   const tags = useQuery({ queryKey: ["tag-definitions"], queryFn: fetchTags });
+  const queryClient = useQueryClient();
+  const tagDefinitions = useIpsStore(store => store.tagDefinitions);
+  const observedTags = useIpsStore(store => store.observedTags);
+  const trackedTags = useIpsStore(store => store.tags);
+  const tagOptions = useMemo(() => roomTestTagOptions(tags.data ?? Object.values(tagDefinitions), [
+    ...Object.values(observedTags), ...Object.values(trackedTags),
+  ]), [tags.data, tagDefinitions, observedTags, trackedTags]);
   const activeMapId = useIpsStore(store => store.activeMapId);
   const [customPlan, setCustomPlan] = useState<TestPlan | null>(null), [floorId, setFloorId] = useState(""), [search, setSearch] = useState("");
   const [name, setName] = useState("Oda testi"), [tagInput, setTagInput] = useState(""), [verified, setVerified] = useState(false);
@@ -63,6 +72,11 @@ export function RoomTestPanel({ onRecordingChange }: { onRecordingChange: (recor
     return () => { clearInterval(timer); clearTimeout(deferred); };
   }, [recorder.now]);
   useEffect(() => { onRecordingChange(Boolean(running)); }, [running, onRecordingChange]);
+  useEffect(() => {
+    const onTagsChanged = (event: Event) => queryClient.setQueryData(["tag-definitions"], (event as CustomEvent<TagDefinition[]>).detail);
+    window.addEventListener("tag-definitions-updated", onTagsChanged);
+    return () => window.removeEventListener("tag-definitions-updated", onTagsChanged);
+  }, [queryClient]);
   useEffect(() => { if (autoScroll && log.current) log.current.scrollTop = log.current.scrollHeight; }, [session?.version, autoScroll]);
   useEffect(() => {
     latestSession.current = session;
@@ -133,12 +147,12 @@ export function RoomTestPanel({ onRecordingChange }: { onRecordingChange: (recor
     {Math.abs((session?.clockSample ?? plans.data?.clockSample)?.offsetMs ?? 0) > 2000 && <div className={styles.notice}>Cihaz ve sunucu saati arasında yaklaşık {Math.abs((session?.clockSample ?? plans.data?.clockSample)!.offsetMs / 1000).toFixed(1)} saniye fark var. Olaylar cihaz saatiyle kaydedilir; saat ölçümü tam oturum çıktısına eklenir.</div>}
     <section className={styles.setup} aria-label="Test bilgileri"><div className={styles.identity}>
       <label>Test adı<input value={session?.name ?? name} disabled={locked || disabled} maxLength={150} onChange={event => setName(event.target.value)} placeholder="Örn. Servis katı · yürüyüş testi"/></label>
-      <label>Tag kimliği<input value={state ? state.tagCodes.join(", ") : tagInput} disabled={locked || disabled} list="room-test-tags" onChange={event => { setTagInput(event.target.value); setVerified(false); }} placeholder="Tag kodu seçin veya yazın"/></label>
-      <datalist id="room-test-tags">{tags.data?.map(tag => <option key={tag.id} value={tag.id}>{tag.displayName}</option>)}</datalist>
+      <RoomTestTagInput label="Tag kimliği" value={state ? state.tagCodes.join(", ") : tagInput} disabled={locked || disabled}
+        options={tagOptions} loading={tags.isPending} loadFailed={tags.isError} onChange={value => { setTagInput(value); setVerified(false); }}/>
       <div className={styles.tagVerification}>{locked ? <><span className={styles.tagBadge}><Radio size={12}/>{state?.tagVerified ? "Tag doğrulandı" : "Tag doğrulanmadı"}</span><button type="button" disabled={running || disabled} onClick={() => {
         setTagCorrection({ codes: state?.tagCodes.join(", ") ?? "", verified: Boolean(state?.tagVerified), reason: "" }); setDialog("tags");
       }}>Tag bilgisini düzenle</button></> : <label className={styles.check}><input type="checkbox" checked={verified} disabled={disabled || !tagInput.trim()} onChange={event => setVerified(event.target.checked)}/>Bu tagları birlikte taşıdığımı doğruluyorum</label>}</div>
-    </div>{!locked && <p className={styles.help}>Birlikte taşınan tag kodlarını virgülle ayırabilirsiniz. Kimliği doğrulanmayan testler benchmark değerlendirmesinde puanlanmaz.{tags.isError ? " Tag listesi yüklenemedi; gerçek kodu elle yazabilirsiniz." : ""}</p>}</section>
+    </div>{!locked && <p className={styles.help}>Tag adı veya kodu yazdıkça aktif ve sistemde kayıtlı taglar önerilir. Birlikte taşınan tag kodlarını virgülle ayırabilirsiniz. Kimliği doğrulanmayan testler benchmark değerlendirmesinde puanlanmaz.{tags.isError ? " Tag listesi yüklenemedi; gerçek kodu elle yazabilirsiniz." : ""}</p>}</section>
     <section className={styles.toolbar} aria-label="Kayıt kontrolleri"><div className={styles.actions}>
       {!session && <button type="button" className={styles.primary} disabled={disabled || !plan?.floors.some(item => item.areas.length)} onClick={start}><Play size={15}/>Kaydı başlat</button>}
       {state?.status === "paused" && <button type="button" className={styles.primary} disabled={disabled} onClick={() => void recorder.perform({ type: "resume" })}><Play size={15}/>Kaydı sürdür</button>}
@@ -198,7 +212,8 @@ export function RoomTestPanel({ onRecordingChange }: { onRecordingChange: (recor
     </TestDialog>}
     {dialog === "history" && <TestHistoryDialog local={history} currentId={recorder.currentId} onOpen={recorder.open} onClose={() => setDialog(null)}/>}
     {dialog === "tags" && <TestDialog title="Tag bilgisini düzelt" description="Düzeltme önceki kayıtları silmeden yeni bir revizyon oluşturur." onClose={() => setDialog(null)}>
-      <div className={styles.field}><label>Tag kodları<input value={tagCorrection.codes} list="room-test-tags" onChange={event => setTagCorrection({ ...tagCorrection, codes: event.target.value, verified: false })}/></label></div>
+      <div className={styles.field}><RoomTestTagInput label="Tag kodları" value={tagCorrection.codes} disabled={disabled}
+        options={tagOptions} loading={tags.isPending} loadFailed={tags.isError} onChange={value => setTagCorrection({ ...tagCorrection, codes: value, verified: false })}/></div>
       <label className={styles.check}><input type="checkbox" checked={tagCorrection.verified} onChange={event => setTagCorrection({ ...tagCorrection, verified: event.target.checked })}/>Bu tagları birlikte taşıdığımı doğruluyorum</label>
       <label className={styles.field}>Düzeltme açıklaması<input value={tagCorrection.reason} placeholder="Örn. Gerçek tag kodu saha kaydıyla doğrulandı" onChange={event => setTagCorrection({ ...tagCorrection, reason: event.target.value })}/></label>
       <button type="button" className={styles.primary} disabled={!tagCorrection.reason.trim() || disabled} onClick={() => { void recorder.perform({ type: "tags", tagCodes: parseTags(tagCorrection.codes), tagVerified: tagCorrection.verified, reason: tagCorrection.reason }).then(() => setDialog(null)); }}>Düzeltmeyi kaydet</button>

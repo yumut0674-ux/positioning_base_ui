@@ -29,13 +29,6 @@ SELECT tag_code AS id, COALESCE(display_name, tag_name, tag_code) AS "displayNam
   created_at AS "createdAt"
 FROM tags ORDER BY tag_code;`;
 
-const seedSql = `
-INSERT INTO tags (tag_code, tag_name, display_name, status) VALUES
-  ('TAG-001', 'Forklift 07', 'Forklift 07', 'active'),
-  ('TAG-014', 'Operator A14', 'Operator A14', 'active'),
-  ('TAG-028', 'Pallet 28', 'Pallet 28', 'active')
-ON CONFLICT (tag_code) DO NOTHING;`;
-
 function cleanTag(input: TagInput): TagInput {
   const id = input.id?.trim().toUpperCase();
   if (!id || id.length > 100) throw new Error("Tag ID is required and must be 100 characters or fewer");
@@ -58,8 +51,8 @@ function toTag(row: Record<string, string | null>) {
   return { id: row.id ?? "", displayName: row.displayName ?? row.id ?? "", status: row.status ?? "active", createdAt: row.createdAt ?? "" };
 }
 
-async function getTags(seed = false) {
-  const rows = await queryPostgres(`${schemaSql}${seed ? seedSql : ""}${selectTagsSql}`);
+async function getTags() {
+  const rows = await queryPostgres(`${schemaSql}${selectTagsSql}`);
   return rows.map(toTag);
 }
 
@@ -70,7 +63,7 @@ function errorResponse(error: unknown, fallback: string) {
 
 export async function GET() {
   try {
-    const tags = await getTags(true);
+    const tags = await getTags();
     trackingBuffer.invalidateRegisteredTagCache();
     return NextResponse.json({ tags });
   }

@@ -1,5 +1,11 @@
 # Saha verisi aktarım durumu — 2026-09-24
 
+## 2026-10-12 Servis — servis2
+
+`test-4192b569-b345-4a41-a028-32b342ab4710`: kullanıcı `cihaz` tagını belirtti; SELECT ad-kod eşleşmesi `EA0FC8F8CA447FF5`. 30 saniye ısınma ve 60 saniye gözlem dahil 344 ham satır aktarıldı. Truth revizyon 1; kaynak UTC saatleri korunuyor, katı ve ±2 saniye sınır toleranslı değerlendirme var. `received_at`, ölçüm zamanı ve koordinat eksikliği yok; kalite 344 satırda boş. Teslim boşlukları 30,630 ve 26,254 saniye. Ham SHA-256: `121f4a3b71b9ba7b253522953b3d95ad52ae549a5af2da4e4f6874aa39f77121`.
+
+Motor `room-evidence-9`, Servis configVersion `39c2b07f0a712840`: 0/4 ziyaret; katı ve toleranslı doğru oda %0. DB'deki canlı kararların motor/config sürümü aynı ve hiçbirinde oda ataması yok. Ham geçmişin canlı akışın tamamını kapsadığı varsayılmıyor. Diğer aday taglar puanlanmadı. Ayrıntılar, parametre deneyleri ve ziyaret çizelgeleri `reports/necmettin-servis-servis2-4192b569-20261012/` içinde. Canlı config veya motor değiştirilmedi.
+
 ## 2026-10-09 hastane testi
 
 `test-f6d295ed-38a9-4e8f-a8d2-f5f6ba4b1d06`: kullanıcı `hasan` tagını doğruladı; SELECT ile kod `06F0623201E95CE8` olarak eşleştirildi. Truth revizyon 2. 456 ham satır salt okunur aktarıldı; received_at/ölçüm/koordinat eksikliği, zaman anomalisi ve >5 s teslim boşluğu yok; 456 kalite değeri eksik. Ham SHA `56fa57dca0d6925c90869fa40d6ab3d1f743a66fbd0351f7d3002979c6fd0591`. Aktif motor `room-evidence-9`, yoğun bakım configVersion `db4d1a246b950588`: 4/5 ziyaret yakalandı, zaman ağırlıklı doğru oda %28,136. Raporlar `reports/necmettin-yogun-bakim-f6d295ed-20261009/` içinde. 8 Ekim testinin belirsiz tag eşleşmesi değiştirilmedi.

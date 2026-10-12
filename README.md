@@ -528,7 +528,7 @@ Operasyon endpoint'leri:
 | `/api/tracking/ingest` | `POST` | UWB position ingest. |
 | `/api/tracking/ingest` | `GET` | Raw SSE stream. |
 | `/api/tracking/stream` | `GET` | Raw SSE stream alias. |
-| `/api/tags` | `GET` | Tag listesini getirir, yoksa seed tag'leri ekler. |
+| `/api/tags` | `GET` | Kayıtlı tag listesini getirir; otomatik örnek tag eklemez. |
 | `/api/tags` | `POST`, `PUT` | Tag ekler veya günceller. |
 | `/api/tags?id=TAG-001` | `DELETE` | Tag siler. |
 | `/api/anchors` | `GET` | Anchor listesini getirir, yoksa default anchor'ları seed eder. |

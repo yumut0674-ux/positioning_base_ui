@@ -37,13 +37,21 @@ CAD koordinatından motor koordinatına dönüşüm:
 - Yeni motor orijininin görseldeki yeri: `(103.95674932228825, 950.4403526308)` piksel.
 - Motor eksen dönüşü: saat yönünde 90°.
 
-Güncel görsel adresi `/maps/necmettin-servis/floor-plan-1e98c4840f0c.png`
+Güncel görsel adresi `/maps/necmettin-servis/floor-plan-571d3680cd25.png`
 olarak sürümlenmiştir; tarayıcıdaki eski `floor-plan.png` önbelleğini kullanmaz.
 Ana harita ve oda/bölge editörü bu yeni adresi kullanır.
 
 Harita ve oda/bölge editörü aynı kalibrasyonu kullanır. CAD duvarlarına göre
-üst sırada Oda 1–10, alt sırada Oda 11–18 ve ortak koridor tanımlıdır. Banyo
-çıkıntıları kendi odalarına dahildir; tesisat boşlukları ve isimsiz servis
+üst sırada soldan sağa Dr Odası ve 201–209, alt sırada soldan sağa 217–214
+ve 213–210 ile ortak koridor tanımlıdır. Görsel ve bölge adları 12 Ekim 2026
+tarihli adlandırmayla güncellenmiştir. Oda ön sınırları banyo çıkıntılarının
+koridora bakan uçlarıyla aynı hizaya tamamlanmıştır; aradaki koridor
+girintilerinin oda hizasında kalan kısımları ilgili odalara dahildir.
+Oda kapıları da aynı doğrultuda koridora doğru 1 metre taşınmıştır;
+2 metre yakınlık hesabı bu yeni kapı noktalarından yapılır.
+Karşılıklı kapıların yakınlık alanları kesiştiğinde sinyal kesintisi
+tahmini mevcut motor kuralına göre en yakın uygun kapıyı seçer.
+Banyo çıkıntıları kendi odalarına dahildir; tesisat boşlukları ve isimsiz servis
 odaları koridora dahil değildir. Ortadaki servis odalarının arasından ve
 altından geçen koridor devamı da tanımlıdır.
 
@@ -63,5 +71,9 @@ Mevcut çizimleri yerinde tutarak motor kalibrasyonunu yeniden uygulamak için
 
 Tanımları yeniden oluşturmak için `node --import tsx scripts/configure-service-rooms.ts`
 komutunu kullanın. Mevcut çizimler varsa araç üzerine yazmaz; bilinçli yeniden
-oluşturma için `--replace-existing` gerekir. Üretim modunda yeni görsellerin
+oluşturma için `--replace-existing` gerekir. Oda ön sınırlarını ve kapıları
+güncellerken mevcut oda merkezlerini, ayarları ve büyük alan kapılarını
+korumak için `node --import tsx scripts/configure-service-rooms.ts --update-fronts`
+komutunu kullanın; tekrar çalıştırmak kapıları yeniden kaydırmaz.
+Üretim modunda yeni görsellerin
 sunulması için `npm run build` çalıştırılıp uygulama yeniden başlatılmalıdır.

@@ -53,7 +53,7 @@ test("Servis uses the selected CAD origin and clockwise motor axes in both map a
   assert.ok(Math.abs(details.world.widthMeters - calibration.heightPx * calibration.centimetersPerPixel / 100) < 1e-8);
   assert.ok(Math.abs(details.world.heightMeters - calibration.widthPx * calibration.centimetersPerPixel / 100) < 1e-8);
   const png = await readFile(path.join(process.cwd(), "public", details.image.url));
-  assert.equal(createHash("sha256").update(png).digest("hex"), "1e98c4840f0cd6c851649749d47372974a024a909b801b565312c745baad1f8d");
+  assert.equal(createHash("sha256").update(png).digest("hex"), "571d3680cd2572a224111ce2a74466421f629d0580275675bf2b2f152e4f44c9");
   assert.equal(png.subarray(0, 8).toString("hex"), "89504e470d0a1a0a");
   assert.equal(png.readUInt32BE(16), details.image.width);
   assert.equal(png.readUInt32BE(20), details.image.height);
@@ -151,7 +151,7 @@ test("checked-in map catalog and live map config are valid", async () => {
   assert.ok(catalog.maps.every((entry) => entry.buildingId !== "spor-tesisi"));
   assert.ok(catalog.maps.some((entry) => entry.status === "planned" && entry.configPath === null));
   const details = await service.getMapDetails(catalog.liveTrackingMapId);
-  assert.equal(details.image.url, "/maps/necmettin-servis/floor-plan-1e98c4840f0c.png");
+  assert.equal(details.image.url, "/maps/necmettin-servis/floor-plan-571d3680cd25.png");
   assert.equal(details.calibration.pixelsPerMeter, 70.56278186006284);
   assert.equal(details.calibration.rotationDegrees, 90);
 });

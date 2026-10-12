@@ -6,7 +6,7 @@ import { createAffineTransform } from "../src/features/regions/services/affineTr
 import { CoordinateTransformService } from "../src/features/map/services/CoordinateTransformService";
 import type { RegionsConfig } from "../src/features/regions/types/region.types";
 import { compileRegionsConfig } from "../src/server/regionEngine/configLoader";
-import { pointInPolygon } from "../src/server/regionEngine/geometry";
+import { crossesDoor, pointInPolygon, wallDistance } from "../src/server/regionEngine/geometry";
 import { RegionPositionEngine } from "../src/server/regionEngine/RegionPositionEngine";
 import { AreaTransitionEngine, type AreaTransitionEvent } from "../src/server/regionEngine/AreaTransitionEngine";
 
@@ -35,7 +35,7 @@ const cadRooms = compiled.regions.map(room => {
 });
 const epoch = Date.parse("2026-10-09T12:00:00Z");
 
-test("Servis has 18 rooms, one corridor and its own entry thresholds with intensive-care defaults", () => {
+test("Servis has 18 silent rooms with 2 m door proximity and its own entry thresholds", () => {
   assert.equal(compiled.regions.length, 18);
   assert.equal(compiled.corridors.length, 1);
   assert.deepEqual(compiled.warnings, []);
@@ -43,14 +43,79 @@ test("Servis has 18 rooms, one corridor and its own entry thresholds with intens
   assert.deepEqual(config.positionAnimation, reference.positionAnimation);
   assert.deepEqual(config.mapDisplay, reference.mapDisplay);
   assert.deepEqual(compiled.areaTracking, referenceCompiled.areaTracking);
-  assert.deepEqual(rooms.map(room => room.name), Array.from({ length: 18 }, (_, index) => `Oda ${index + 1}`));
+  assert.deepEqual(rooms.map(room => room.name), ["Dr Odası", "201", "202", "203", "204", "205", "206", "207", "208", "209",
+    "217", "216", "215", "214", "213", "212", "211", "210"]);
   for (const [index, room] of compiled.regions.entries()) {
     const template = referenceCompiled.regions[index % referenceCompiled.regions.length];
-    assert.deepEqual(room.settings, { ...template.settings, entryEvidenceDurationMs: 3000, entryConfirmationCount: 5 });
+    assert.deepEqual(room.settings, { ...template.settings, coverage: "silent", silentEntryMaxDistanceMeters: 2,
+      entryEvidenceDurationMs: 3000, entryConfirmationCount: 5 });
     assert.equal(room.entrances.length, 1);
     assert.equal(room.entrances[0].widthMeters, template.entrances[0].widthMeters);
     assert.equal(room.entrances[0].connectsTo, "corridor-main");
+    assert.equal(room.entrances[0].approachDepthMeters, 2);
     assert.deepEqual(room.entrances[0].settings, template.entrances[0].settings);
+  }
+});
+
+test("each Servis door retains its two-metre signal-loss threshold independently of nearby doors", () => {
+  for (const room of compiled.regions) {
+    for (const distance of [2, 2.01]) {
+      let now = epoch;
+      const published: ReturnType<RegionPositionEngine["ingest"]>[] = [];
+      const engine = new RegionPositionEngine(position => published.push(position), 250, () => now, false);
+      engine.enable({ ...compiled, regions: compiled.regions.map(candidate => candidate.id === room.id ? candidate : {
+        ...candidate, settings: { ...candidate.settings, silentEntryMaxDistanceMeters: 0 },
+      }) });
+      const door = room.entrances[0];
+      const point = { x: door.x - door.inwardNormal!.x * distance,
+        y: door.y - door.inwardNormal!.y * distance };
+      assert.ok(pointInPolygon(point, compiled.corridors[0]), room.name);
+      try {
+        const measured = engine.ingest({ tagCode: room.id, ...point, quality: 1,
+          timestamp: new Date(now).toISOString() })!;
+        assert.equal(measured.regionInference.regionId, null, room.name);
+        now = epoch + 8001;
+        engine.tick();
+        const decision = published.at(-1)!;
+        if (distance === 2) {
+          assert.equal(decision.regionInference.regionId, room.id, room.name);
+          assert.equal(decision.regionInference.state, "INFERRED_IN_REGION", room.name);
+          assert.equal(decision.regionInference.measurementKind, "estimated", room.name);
+        } else {
+          assert.equal(decision.regionInference.regionId, null, room.name);
+          assert.equal(decision.regionInference.state, "LOCATION_LOST", room.name);
+        }
+      } finally { engine.disable(); }
+    }
+  }
+});
+
+test("overlapping proximity zones in the narrower corridor infer the nearest moved door", () => {
+  const oppositePairs = [["room-01", "room-11"], ["room-02", "room-12"], ["room-03", "room-13"], ["room-04", "room-14"],
+    ["room-07", "room-15"], ["room-08", "room-16"], ["room-09", "room-17"], ["room-10", "room-18"]];
+  const opposite = new Map(oppositePairs.flatMap(([a, b]) => [[a, b], [b, a]]));
+  for (const room of compiled.regions) {
+    for (const distance of [1.5, 2, 2.01]) {
+      let now = epoch;
+      const published: ReturnType<RegionPositionEngine["ingest"]>[] = [];
+      const engine = new RegionPositionEngine(position => published.push(position), 250, () => now, false);
+      engine.enable(compiled);
+      const door = room.entrances[0];
+      const point = { x: door.x - door.inwardNormal!.x * distance, y: door.y - door.inwardNormal!.y * distance };
+      // The completed main corridor is 3.6 m wide: at 1.5 m this room is
+      // closer, whereas at 2 m the opposite door is only 1.6 m away.
+      // Rooms 204/205 face the central service block instead of another room.
+      const expectedRegionId = distance === 1.5 ? room.id : opposite.get(room.id) ?? (distance === 2 ? room.id : null);
+      try {
+        assert.ok(pointInPolygon(point, compiled.corridors[0]), room.name);
+        engine.ingest({ tagCode: room.id, ...point, quality: 1, timestamp: new Date(now).toISOString() });
+        now = epoch + 8001;
+        engine.tick();
+        const decision = published.at(-1)!;
+        assert.equal(decision.regionInference.regionId, expectedRegionId, `${room.name}: ${distance} m`);
+        assert.equal(decision.regionInference.state, expectedRegionId ? "INFERRED_IN_REGION" : "LOCATION_LOST");
+      } finally { engine.disable(); }
+    }
   }
 });
 
@@ -81,33 +146,69 @@ test("rooms extend three metres behind their rear walls and adjacent rooms have 
   for (const row of [cadRooms.slice(0, 10), cadRooms.slice(10)]) {
     for (let index = 1; index < row.length; index++) {
       const gap = row[index].bounds.minX - row[index - 1].bounds.maxX;
-      // Oda 14 and 15 are separated by the central service/corridor block.
+      // Rooms 214 and 213 are separated by the central service/corridor block.
       if (row[index].id === "room-15") assert.ok(gap > 8);
       else assert.ok(Math.abs(gap - 0.1) < 1e-8);
     }
   }
 });
 
-test("bathroom wings stay with their rooms and the corridor excludes them and the utility shafts", () => {
+test("completed room fronts include corridor recesses and keep bathrooms and utility shafts separate", () => {
   const corridor = compiled.corridors[0];
-  for (const room of compiled.regions) {
-    const top = Number(room.id.slice(-2)) <= 10;
+  const bathroomCentres = [5.9537725292536, 14.3537725292536, 22.7537725292536, 31.1537725292536, 39.5537725292536];
+  for (const [index, room] of compiled.regions.entries()) {
+    const top = index < 10;
+    const bay = top ? index : [0, 1, 2, 3, 6, 7, 8, 9][index - 10];
     const door = room.entrances[0];
     assert.deepEqual(door.inwardNormal, { x: top ? -1 : 1, y: 0 });
     const direction = top ? 1 : -1;
+    const originalFront = top ? 15.28890959210326 : 9.6889095921034;
+    const cadDoor = motorToCad(door);
+    assert.ok(Math.abs(cadDoor.y - (originalFront - direction)) < 1e-8, `${room.name}: door moves one metre towards the corridor`);
+    assert.ok(wallDistance(door, room) < 1e-8, `${room.name}: door is on the completed front`);
     assert.ok(pointInPolygon({ x: door.x + door.inwardNormal.x * 0.4, y: door.y }, room));
     assert.ok(pointInPolygon({ x: door.x - door.inwardNormal.x * 0.4, y: door.y }, corridor));
-    const cadRoom = cadRooms.find(candidate => candidate.id === room.id)!;
-    const bathroom = cadToMotor({ x: (cadRoom.polygon[2].x + cadRoom.polygon[3].x) / 2,
-      y: motorToCad(door).y - direction * 0.5 });
+    // This point was in the corridor recess beside the bathroom before the update.
+    const recess = cadToMotor({ x: cadDoor.x, y: originalFront - direction * 0.5 });
+    assert.deepEqual([...compiled.regions, corridor].filter(region => pointInPolygon(recess, region)).map(region => region.id), [room.id]);
+    const centre = bathroomCentres[Math.floor(bay / 2)];
+    const bathroom = cadToMotor({ x: centre + (bay % 2 === 0 ? -1 : 1), y: originalFront - direction * 0.5 });
     assert.ok(pointInPolygon(bathroom, room), room.name);
     assert.equal(pointInPolygon(bathroom, corridor), false, room.name);
+    const shaft = cadToMotor({ x: centre, y: originalFront });
+    assert.equal([...compiled.regions, corridor].some(region => pointInPolygon(shaft, region)), false, `${room.name}: utility shaft stays outside`);
+    const inside = { x: door.x + door.inwardNormal.x * 0.4, y: door.y };
+    const outside = { x: door.x - door.inwardNormal.x * 0.4, y: door.y };
+    assert.equal(crossesDoor(outside, inside, room, true, "corridor-main", epoch)?.doorId, door.id);
+    assert.equal(crossesDoor(inside, outside, room, false, "corridor-main", epoch)?.doorId, door.id);
   }
   // Sample the full extended area; no traversable interior belongs to two regions.
   const regions = [...compiled.regions, corridor];
   for (let x = 1.6; x < 49.7; x += 0.37) for (let y = -0.6; y < 25.7; y += 0.41) {
     const inside = regions.filter(region => pointInPolygon(cadToMotor({ x, y }), region));
     assert.ok(inside.length <= 1, `overlap at ${x}, ${y}: ${inside.map(region => region.id).join(", ")}`);
+  }
+});
+
+test("reliable measurements in the completed recess confirm its room and exit through the moved door", () => {
+  for (const room of compiled.regions) {
+    let now = epoch;
+    const engine = new RegionPositionEngine(() => undefined, 250, () => now, false);
+    engine.enable(compiled);
+    const door = room.entrances[0];
+    const send = (second: number, distance: number) => {
+      now = epoch + second * 1000;
+      return engine.ingest({ tagCode: room.id, x: door.x + door.inwardNormal!.x * distance,
+        y: door.y + door.inwardNormal!.y * distance, quality: 1, timestamp: new Date(now).toISOString() })!;
+    };
+    try {
+      send(0, -1);
+      for (let second = 1; second <= 4; second++) assert.equal(send(second, 0.6).regionInference.regionId, null, room.name);
+      assert.equal(send(5, 0.6).regionInference.regionId, room.id, room.name);
+      assert.equal(send(6, 0.4).regionInference.regionId, room.id, room.name);
+      send(7, -1); send(8, -1.5);
+      assert.equal(send(9, -2).regionInference.regionId, null, room.name);
+    } finally { engine.disable(); }
   }
 });
 

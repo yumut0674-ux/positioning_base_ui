@@ -4,7 +4,7 @@ Admin arayüzünde sol menünün **İNCELE → Oda Test Kaydı** öğesiyle aç�
 
 ## Saha kaydı
 
-1. Test adını ve gerçek tag kodunu girin. Birlikte taşınan kodları virgülle ayırın. Fiziksel taşımayı doğruladıysanız doğrulama kutusunu işaretleyin.
+1. Test adını girin. **Tag kimliği** alanında ad veya kod yazdıkça sistemde kayıtlı taglar ve canlı akıştaki aktif taglar önerilir; aktif taglar önce gösterilir. Öneriyi tıklayarak veya ok tuşları ve Enter ile gerçek kodu tamamlayın. Birlikte taşınan kodları virgülle ayırın; her kod için otomatik tamamlama çalışır. Fiziksel taşımayı doğruladıysanız doğrulama kutusunu işaretleyin. Aynı öneriler **Tag bilgisini düzenle** penceresinde de kullanılabilir.
 2. Kat/birim seçin; sistem haritalarını veya **Özel plan** ile hazırladığınız şablonu kullanın. Özel plan JSON'u referans HTML'in `building / floors / areas / connects_to` biçimini kabul eder. İçe aktarılan plan uygulamadan önce düzenlenebilir.
 3. **Kaydı başlat** ile oturumu açın. Bulunduğunuz alanın kartını seçin. Sonraki kart seçimi önceki çıkış ve yeni girişi aynı anda kaydeder.
 4. Aktif karta yeniden basmak veya **Odadan çıktım**, tanımlanmış tek koridor bağlantısı varsa o koridora geçer; yoksa konumu bilinmeyen olarak bırakır. **Son geçişi geri al**, son alan değişimini düzeltir; olay geçmişi korunur.

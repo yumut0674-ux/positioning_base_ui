@@ -22,6 +22,16 @@
 .tagVerification { display:flex;flex-direction:column;align-items:flex-start;gap:6px }
 .tagVerification button { border:0!important;padding:0!important;background:transparent!important;color:#07859b;font-size:10px }
 .tagBadge { display:inline-flex;align-items:center;gap:5px;color:#46758b;font-size:10px }
+.tagInput { position:relative;display:grid;gap:5px;min-width:0 }
+.tagOptions { position:absolute;top:100%;left:0;right:0;z-index:20;display:grid;gap:3px;max-height:250px;overflow:auto;margin-top:4px;padding:5px;border:1px solid #bfd0db;border-radius:5px;background:#fff;box-shadow:0 8px 24px #20384824 }
+.panel .tagOptions button,.dialog .tagOptions button { justify-content:space-between;gap:10px;width:100%;padding:8px;border:0;text-align:left;font-weight:400 }
+.panel .tagOptions button[aria-selected=true],.dialog .tagOptions button[aria-selected=true] { background:#edf7f9;outline:1px solid #74aeb7;outline-offset:-1px }
+.tagOptions button>span { display:grid;gap:3px;min-width:0 }
+.tagOptions strong { color:#34566b;font-size:11px;font-weight:600;overflow-wrap:anywhere }
+.tagOptions code { color:#78909e;font-size:10px;overflow-wrap:anywhere }
+.tagOptions small { flex-shrink:0;border-radius:3px;background:#f1f6f9;padding:3px 5px;color:#78909e;font-size:9px }
+.tagOptions .tagActive { background:#e3f6ef;color:#078a6b }
+.tagOptions p { margin:6px;color:#78909e;font-size:10px;line-height:1.6 }
 .panel .check,.dialog .check { display:flex;align-items:center;gap:7px;color:#536f7e;font-size:10px;font-weight:500 }
 .help { margin:9px 0 0;color:#78909e;font-size:10px;line-height:1.7 }
 .toolbar { display:flex;align-items:center;justify-content:space-between;gap:15px;padding:12px 15px }

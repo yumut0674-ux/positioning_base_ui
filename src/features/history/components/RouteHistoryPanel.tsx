@@ -78,6 +78,7 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
   const tagSearchId = useId();
   const tagSearchInputRef = useRef<HTMLInputElement>(null);
   const suppressTagOpenOnFocusRef = useRef(false);
+  const mapFrameRef = useRef<HTMLElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
   const summaryRef = useRef<HTMLElement>(null);
@@ -411,7 +412,8 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
         <div><span>HAREKET ANALİZİ / {(historyMap?.id ?? "KAT BELİRLENEMEDİ").toUpperCase()}</span><h1>Rota Geçmişi</h1></div>
         <button type="button" className={styles.reportButton} onClick={() => setReportOpen(true)}><FileText size={18} aria-hidden="true" />Konum Raporu Oluştur</button>
       </div>
-      <section className={styles.mapFrame}>
+      <div className={styles.historyLayout}>
+      <section ref={mapFrameRef} className={styles.mapFrame} aria-label="Rota haritası">
         <div ref={hostRef} className={styles.mapCanvas}>
           <Stage ref={stageRef} width={size.width} height={size.height} x={viewport.x} y={viewport.y} draggable onWheel={handleWheel} onDragEnd={(event) => setViewport((current) => ({ ...current, x: event.target.x(), y: event.target.y() }))}>
             <Layer listening={false}><Group scaleX={viewport.scale} scaleY={viewport.scale}><Rect width={mapWidth} height={mapHeight} fill="#e7f0f4" />{historyMap && floorImage && <KonvaImage image={floorImage} width={mapWidth} height={mapHeight} opacity={.68} />}<Rect width={mapWidth} height={mapHeight} fill="#d8f5f0" opacity={.1} /></Group></Layer>
@@ -430,6 +432,7 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
         <div className={styles.mapMeta}><CircleDot size={13} /> {historyMap ? "PLAN KALİBRE EDİLDİ" : "KAT BELİRLENEMEDİ"} <span>{historyMap ? `${historyMap.calibration.pixelsPerMeter} PX/M` : "PLAN YOK"} · {routeSegments.length} SEGMENT</span></div>
         <div className={styles.zoomReadout}>{Math.round(viewport.scale * 100)}%</div>
         <div className={styles.mapTools}><button type="button" onClick={fitMap} title="Haritayı sığdır"><Maximize2 size={16} /></button><button type="button" title="Katmanlar"><Layers3 size={16} /></button><button type="button" title="Odak noktası"><Crosshair size={16} /></button></div>
+      </section>
         <motion.aside ref={sidebarRef} className={styles.sidebar} initial={{ opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={{ type: "spring", stiffness: 300, damping: 28 }}>
           <div className={styles.panelHeader}><span className={styles.iconFrame}><History size={18} /></span><div><small>HAREKET ANALİZİ</small><h2>Rota Geçmişi</h2></div></div>
           <p className={styles.intro}>Kayıtlı varlığı ve tarih aralığını seçerek veritabanındaki gerçek hareket akışını inceleyin.</p>
@@ -463,6 +466,7 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
           {entitySearchError && <div className={`${styles.statusCard} ${styles.statusError}`}><AlertTriangle size={15} /><span>{entitySearchError}</span></div>}
           <button type="button" className={styles.searchButton} onClick={() => void fetchHistory()} disabled={historyState === "loading" || entitySearchLoading || !selectedEntityId}>{historyState === "loading" ? <Loader2 size={16} className={styles.spin} /> : <Database size={16} />}{historyState === "loading" ? "Gerçek geçmiş aranıyor" : "Geçmişi Getir"}</button>
           <button type="button" className={styles.askAssistantButton} onClick={() => setAssistantDraftRequestId((current) => current + 1)} disabled={!selectedEntity}><MessageCircle size={15} /> Gekon AI’a Sor</button>
+          <button type="button" className={`${styles.askAssistantButton} ${styles.mobileMapButton}`} onClick={() => mapFrameRef.current?.scrollIntoView({ behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" })}><MapPinned size={15} /> Rota haritasını göster</button>
 
           {historyState !== "success" && historyState !== "loading" && <div className={`${styles.statusCard} ${historyState === "idle" ? "" : styles.statusError}`}><AlertTriangle size={15} /><span>{stateMessage(historyState, historyMessage)}</span></div>}
           {historyState === "loading" && <div className={styles.statusCard}><Loader2 size={15} className={styles.spin} /><span>Veritabanındaki rota noktaları yükleniyor…</span></div>}
@@ -474,7 +478,7 @@ export function RouteHistoryPanel({ requestedTagCode, requestKey }: RouteHistory
           {historyState === "success" && <section className={styles.timeline} aria-label="Konum zaman çizelgesi"><div className={styles.timelineHeader}><div className={styles.timelineTitle}><MapPin size={14} /><span>KONUM ZAMAN ÇİZELGESİ</span></div><span className={styles.timelineCount}>{visitedLocationCount} BÖLGE</span></div>{selectedStay && <button type="button" className={styles.showAll} onClick={() => { setSelectedStayId(null); fitMap(); }}>Tüm rotayı göster</button>}<div className={styles.timelineList}>{timeline.map((stay) => <button key={stay.id} type="button" className={`${styles.timelineRow} ${selectedStayId === stay.id ? styles.selectedTimelineRow : ""} ${stay.isDataGap ? styles.gapTimelineRow : ""}`} onClick={() => chooseStay(stay)}><span className={styles.timelineMarker} aria-hidden="true" /><span className={styles.timelineContent}><span className={styles.timelineTime}>{formatTime(stay.startedAt)} — {formatTime(stay.endedAt)} <b>· {formatDuration(stay.durationMs)}</b></span><strong>{stay.locationLabel}</strong><small>{stay.mapId ? mapCatalog?.maps.find((map) => map.id === stay.mapId)?.displayName ?? stay.mapId : "Kat belirlenemedi"}{stay.isMapTransition ? " · Kat geçişi" : ""}</small>{!stay.isDataGap && longestStay?.id === stay.id && <em>EN UZUN KALIŞ</em>}</span></button>)}</div>{longestStay && <p className={styles.longestSummary}>En uzun kalış: <strong>{longestStay.locationLabel}</strong> · {formatDuration(longestStay.durationMs)}</p>}</section>}
           <div className={styles.legend}><span><i className={styles.startDot} /> Başlangıç</span><span><i className={styles.routeDot} /> Rota</span><span><i className={styles.endDot} /> Bitiş</span></div>
         </motion.aside>
-      </section>
+      </div>
     {reportOpen && <RouteReportDialog onClose={() => setReportOpen(false)} initialTagCode={selectedEntity?.tagCode ?? undefined} initialFrom={startDate} initialTo={endDate} />}
     <HistoryChatWidget
       tagCode={selectedEntity?.tagCode ?? undefined}

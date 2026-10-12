@@ -53,6 +53,8 @@ Sessiz kapsama hem ölçüm kesintisine daha uzun tolerans verir hem de `silentE
 
 Bu özellik için `config/regions.json` ve `config/maps/spor-koridor/regions.json` içindeki mevcut yedi sessiz odaya açıkça `silentEntryMaxDistanceMeters: 1.5` eklendi. `corridor-main` hareketli koridor olarak kalır. `config/maps/kat1-ortopedi/regions.json` içindeki düzenli kapsama odalarında yakınlık özelliği etkinleştirilmedi.
 
+Servis haritasındaki (`config/maps/necmettin-servis/regions.json`) 18 odada sessiz kapsama ve `silentEntryMaxDistanceMeters: 2` etkindir. Kapı yaklaşma derinliği de açıkça 2 metredir. Son güvenilir koridor ölçümü kapıya en fazla 2 metre uzaktaysa sinyal kesintisinden sonra tahmini oda girişi üretilebilir; sürekli iç ölçümle giriş doğrulama eşikleri 3 saniye ve 5 ölçümdür.
+
 ## Simülasyon
 
 Deterministik değerlendirme gerçek zaman beklemez. Fiziksel gerçek rota referans haritanın koridoruna/kapılarına uyar. Gürültü, sıçrama, kayıp ve gecikme yalnızca üretilen paketlere uygulanır. Gerçek oda ve koordinatlar yalnızca değerlendirme izinde bulunur; ingest'e verilmez.
