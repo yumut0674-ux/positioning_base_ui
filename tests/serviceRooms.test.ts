@@ -35,11 +35,12 @@ const cadRooms = compiled.regions.map(room => {
 });
 const epoch = Date.parse("2026-10-09T12:00:00Z");
 
-test("Servis has 18 silent rooms with 2 m door proximity and its own entry thresholds", () => {
+test("Servis has 18 silent rooms with 1 m door proximity and its own entry thresholds", () => {
   assert.equal(compiled.regions.length, 18);
   assert.equal(compiled.corridors.length, 1);
   assert.deepEqual(compiled.warnings, []);
-  assert.deepEqual(config.engine, { ...reference.engine, entryEvidenceDurationMs: 3000, entryConfirmationCount: 5 });
+  assert.deepEqual(config.engine, { ...reference.engine, entryEvidenceDurationMs: 2000, entryConfirmationCount: 5,
+    maximumSpeedMetersPerSecond: 3 });
   assert.deepEqual(config.positionAnimation, reference.positionAnimation);
   assert.deepEqual(config.mapDisplay, reference.mapDisplay);
   assert.deepEqual(compiled.areaTracking, referenceCompiled.areaTracking);
@@ -47,8 +48,8 @@ test("Servis has 18 silent rooms with 2 m door proximity and its own entry thres
     "217", "216", "215", "214", "213", "212", "211", "210"]);
   for (const [index, room] of compiled.regions.entries()) {
     const template = referenceCompiled.regions[index % referenceCompiled.regions.length];
-    assert.deepEqual(room.settings, { ...template.settings, coverage: "silent", silentEntryMaxDistanceMeters: 2,
-      entryEvidenceDurationMs: 3000, entryConfirmationCount: 5 });
+    assert.deepEqual(room.settings, { ...template.settings, coverage: "silent", silentEntryMaxDistanceMeters: 1,
+      entryEvidenceDurationMs: 2000, entryConfirmationCount: 5, maximumSpeedMetersPerSecond: 3 });
     assert.equal(room.entrances.length, 1);
     assert.equal(room.entrances[0].widthMeters, template.entrances[0].widthMeters);
     assert.equal(room.entrances[0].connectsTo, "corridor-main");
@@ -57,9 +58,9 @@ test("Servis has 18 silent rooms with 2 m door proximity and its own entry thres
   }
 });
 
-test("each Servis door retains its two-metre signal-loss threshold independently of nearby doors", () => {
+test("each Servis door retains its one-metre signal-loss threshold independently of nearby doors", () => {
   for (const room of compiled.regions) {
-    for (const distance of [2, 2.01]) {
+    for (const distance of [1, 1.01]) {
       let now = epoch;
       const published: ReturnType<RegionPositionEngine["ingest"]>[] = [];
       const engine = new RegionPositionEngine(position => published.push(position), 250, () => now, false);
@@ -77,7 +78,7 @@ test("each Servis door retains its two-metre signal-loss threshold independently
         now = epoch + 8001;
         engine.tick();
         const decision = published.at(-1)!;
-        if (distance === 2) {
+        if (distance === 1) {
           assert.equal(decision.regionInference.regionId, room.id, room.name);
           assert.equal(decision.regionInference.state, "INFERRED_IN_REGION", room.name);
           assert.equal(decision.regionInference.measurementKind, "estimated", room.name);
@@ -90,22 +91,18 @@ test("each Servis door retains its two-metre signal-loss threshold independently
   }
 });
 
-test("overlapping proximity zones in the narrower corridor infer the nearest moved door", () => {
-  const oppositePairs = [["room-01", "room-11"], ["room-02", "room-12"], ["room-03", "room-13"], ["room-04", "room-14"],
-    ["room-07", "room-15"], ["room-08", "room-16"], ["room-09", "room-17"], ["room-10", "room-18"]];
-  const opposite = new Map(oppositePairs.flatMap(([a, b]) => [[a, b], [b, a]]));
+test("one-metre proximity prevents inference in the corridor between opposing moved doors", () => {
   for (const room of compiled.regions) {
-    for (const distance of [1.5, 2, 2.01]) {
+    for (const distance of [1, 1.01, 1.5, 2, 2.01]) {
       let now = epoch;
       const published: ReturnType<RegionPositionEngine["ingest"]>[] = [];
       const engine = new RegionPositionEngine(position => published.push(position), 250, () => now, false);
       engine.enable(compiled);
       const door = room.entrances[0];
       const point = { x: door.x - door.inwardNormal!.x * distance, y: door.y - door.inwardNormal!.y * distance };
-      // The completed main corridor is 3.6 m wide: at 1.5 m this room is
-      // closer, whereas at 2 m the opposite door is only 1.6 m away.
-      // Rooms 204/205 face the central service block instead of another room.
-      const expectedRegionId = distance === 1.5 ? room.id : opposite.get(room.id) ?? (distance === 2 ? room.id : null);
+      // The completed main corridor is 3.6 m wide; points beyond this
+      // room's one-metre limit remain beyond the opposite door's limit.
+      const expectedRegionId = distance === 1 ? room.id : null;
       try {
         assert.ok(pointInPolygon(point, compiled.corridors[0]), room.name);
         engine.ingest({ tagCode: room.id, ...point, quality: 1, timestamp: new Date(now).toISOString() });
@@ -212,8 +209,8 @@ test("reliable measurements in the completed recess confirm its room and exit th
   }
 });
 
-test("every Servis room waits for five reliable measurements and three seconds before confirming entry", () => {
-  for (const room of compiled.regions) {
+test("every Servis room requires both five reliable measurements and two seconds before confirming entry", () => {
+  for (const room of compiled.regions) for (const times of [[1, 2, 3, 4, 5], [1, 1.4, 1.8, 2.2, 2.6, 3]]) {
     let now = epoch;
     const engine = new RegionPositionEngine(() => undefined, 250, () => now, false);
     engine.enable(compiled);
@@ -224,17 +221,18 @@ test("every Servis room waits for five reliable measurements and three seconds b
         y: door.y + door.inwardNormal!.y * distance,
         quality: 1, timestamp: new Date(now).toISOString() })!;
     };
-    const atCentre = (seconds: number) => {
+    const atInside = (seconds: number) => {
       now = epoch + seconds * 1000;
-      return engine.ingest({ tagCode: room.id, ...room.roomCenter, quality: 1,
+      return engine.ingest({ tagCode: room.id, x: door.x + door.inwardNormal!.x * 0.6,
+        y: door.y + door.inwardNormal!.y * 0.6, quality: 1,
         timestamp: new Date(now).toISOString() })!;
     };
     try {
       send(0, -1);
-      for (let second = 1; second <= 4; second++) {
-        assert.equal(atCentre(second).regionInference.regionId, null, room.name);
+      for (const second of times.slice(0, -1)) {
+        assert.equal(atInside(second).regionInference.regionId, null, room.name);
       }
-      assert.equal(atCentre(5).regionInference.regionId, room.id, room.name);
+      assert.equal(atInside(times.at(-1)!).regionInference.regionId, room.id, room.name);
       send(6, 0.75); send(7, -1); send(8, -1.5);
       assert.equal(send(9, -2).regionInference.regionId, null, room.name);
     } finally { engine.disable(); }

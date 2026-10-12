@@ -4,7 +4,9 @@
 
 `RegionPositionEngine` tag başına zamanla sınırlı ham geçmiş kullanır. Kapı yönü ve açıklığı, iç ölçümün duvar uzaklığı, süreklilik, zaman penceresi, hız ve isteğe bağlı donanım kalitesi birlikte değerlendirilir. Paket sayısı tek başına giriş üretmez. Yinelenen ve sırasız paketler motor kanıtına alınmaz; gecikmiş/düşük kaliteli/imkânsız ölçümler ham geçmişte kalabilir ancak oda doğrulamaz.
 
-Koridor hareketlidir. Oda ataması `IN_REGION`, `INFERRED_IN_REGION` veya `EXIT_CANDIDATE` durumunda korunuyorsa görüntüleme koordinatı tam tanımlı merkezdir. Aday odanın merkezi görüntüleme hedefi değildir. Uzun kesintide `LOCATION_LOST`, güncel `regionId: null`, ayrı `lastKnownRegionId` ve soluk “Belirsiz” işareti kullanılır. Son bilinen merkez gösterilebilir. Merkez bir UWB ölçümü değildir.
+Koridor hareketlidir. Oda ataması `IN_REGION`, `INFERRED_IN_REGION` veya `EXIT_CANDIDATE` durumunda korunuyorsa görüntüleme koordinatı tam tanımlı merkezdir. Aday odanın merkezi görüntüleme hedefi değildir. Uzun kesintide `LOCATION_LOST`, güncel `regionId: null`, ayrı `lastKnownRegionId` ve soluk “Belirsiz” işareti kullanılır. Güncel oda ataması yoksa canlı işaret oda içinde tutulmaz; son ham konum veya son geçerli nokta koridora yansıtılır. Merkez bir UWB ölçümü değildir.
+
+Canlı harita yalnızca koridorlara ve motorun güncel olarak atadığı odaya izin verir. Ham ölçüm başka bir oda içinde olsa bile atama yapılana kadar en yakın koridorun içine yansıtılır; aday oda ve son bilinen oda güncel atama sayılmaz. Atama kalkınca eski oda noktaları ve bekleyen oda animasyonu hemen temizlenir. Her animasyon karesi aynı izinli geometriyle doğrulanır; koridor kıvrımında odanın içinden kestirme çizilmez. Bu sunum kuralı motorun ham ölçümlerini ve karar kayıtlarını değiştirmez. Koridor hareketi varsayılan 5.500 ms tampon, 64 nokta, 4.000 ms azami normal paket aralığı, daha düşük EMA katsayıları ve 1 m/sn görsel hız sınırıyla yumuşatılır. Haritanın tüm tanımlı alanları dışındaki ölçümlerde mevcut 2 saniyelik tutma/gizleme davranışı korunur; koridor tanımı olmayan haritada oda ataması bulunmayan işaret gizlenir.
 
 Durumlar: `TRACKING_OUTSIDE`, `ENTRY_CANDIDATE`, `IN_REGION`, `INFERRED_IN_REGION`, `EXIT_CANDIDATE`, `LOCATION_LOST`. Her yayın kısa Türkçe nedenler içerir. `confidence` kalibre edilmemiş kanıt puanıdır; panelde olasılık yüzdesi gösterilmez.
 
@@ -53,7 +55,7 @@ Sessiz kapsama hem ölçüm kesintisine daha uzun tolerans verir hem de `silentE
 
 Bu özellik için `config/regions.json` ve `config/maps/spor-koridor/regions.json` içindeki mevcut yedi sessiz odaya açıkça `silentEntryMaxDistanceMeters: 1.5` eklendi. `corridor-main` hareketli koridor olarak kalır. `config/maps/kat1-ortopedi/regions.json` içindeki düzenli kapsama odalarında yakınlık özelliği etkinleştirilmedi.
 
-Servis haritasındaki (`config/maps/necmettin-servis/regions.json`) 18 odada sessiz kapsama ve `silentEntryMaxDistanceMeters: 2` etkindir. Kapı yaklaşma derinliği de açıkça 2 metredir. Son güvenilir koridor ölçümü kapıya en fazla 2 metre uzaktaysa sinyal kesintisinden sonra tahmini oda girişi üretilebilir; sürekli iç ölçümle giriş doğrulama eşikleri 3 saniye ve 5 ölçümdür.
+Servis haritasındaki (`config/maps/necmettin-servis/regions.json`) 18 odada sessiz kapsama ve `silentEntryMaxDistanceMeters: 1` etkindir. Kapı yaklaşma derinliği ayrı bir ayardır ve 2 metredir. Son güvenilir koridor ölçümü kapıya en fazla 1 metre uzaktaysa sinyal kesintisinden sonra tahmini oda girişi üretilebilir; sürekli iç ölçümle giriş doğrulama eşikleri 2 saniye ve 5 ölçümdür.
 
 ## Simülasyon
 

@@ -3,15 +3,15 @@ import type { PositionAnimationConfig } from "../types/tracking.types";
 export const DEFAULT_POSITION_ANIMATION_CONFIG: PositionAnimationConfig = {
   enabled: true,
   mode: "buffered_interpolation",
-  interpolationDelayMs: 4_500, // Biraz daha fazla gecikme pahasina paket dalgalanmalarini gorunur harekete donusturmez.
-  maximumBufferSize: 16,
-  maximumSegmentDurationMs: 2_500,
+  interpolationDelayMs: 5_500, // Koridor hareketinde paket dalgalanmalarini yumusatmak icin daha uzun gecikme.
+  maximumBufferSize: 64,
+  maximumSegmentDurationMs: 4_000,
   maximumExtrapolationMs: 0,
   stalePositionTimeoutMs: 4_000,
   teleportDistanceMeters: 6,
   teleportAnimationDurationMs: 1_500,
   regionTransitionDurationMs: 2_000,
-  maximumVisualSpeedMetersPerSecond: 1.2,
+  maximumVisualSpeedMetersPerSecond: 1,
   maximumTransitionDurationMs: 8_000,
   easing: "ease_in_out",
 };

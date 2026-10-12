@@ -12,10 +12,10 @@ export function bindMapDisplayTracking(filter: MapDisplayFilter, engineEnabled: 
     const source = engineEnabled ? state.tags : state.observedTags;
     if (!reconfigure && source === (engineEnabled ? old?.tags : old?.observedTags)) return;
     if (reconfigure) {
-      const config = state.regionsConfig;
-      const polygons = config && (!state.activeMapId || config.map.mapId === state.activeMapId)
-        ? config.regions.map((region) => region.polygon.map((pair) => pair.world)) : [];
-      filter.configure(polygons, resolveMapDisplayConfig(config?.mapDisplay).outsideHoldMs, state.activeMapId);
+      const config = state.regionsConfig && (!state.activeMapId || state.regionsConfig.map.mapId === state.activeMapId)
+        ? state.regionsConfig : null;
+      const polygons = config?.regions.map((region) => region.polygon.map((pair) => pair.world)) ?? [];
+      filter.configure(polygons, resolveMapDisplayConfig(config?.mapDisplay).outsideHoldMs, state.activeMapId, config?.regions ?? []);
     }
     const candidates = Object.values(source).filter((tag) => tag.mapId === state.activeMapId && (!engineEnabled || !!tag.regionInference));
     filter.retain(new Set(candidates.map((tag) => tag.id)));

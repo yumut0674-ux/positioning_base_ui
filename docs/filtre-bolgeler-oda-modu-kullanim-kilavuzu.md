@@ -191,13 +191,13 @@ Bu filtre ham ölçüm geçmişini, oda kararını veya tag'in canlı/pasif hesa
 
 ### Küçük titreşimleri azaltma
 
-Ham gösterimde üstel hareketli ortalama kullanılır. Katsayı 0,42'dir:
+Koridor gösteriminde uyarlanan üstel hareketli ortalama kullanılır. Katsayı küçük hareketlerde 0,18, büyük hareketlerde en fazla 0,30'dur. 0,18 metrelik küçük titreşimler bastırılır; fiziksel olarak gerçekçi olmayan ani sıçrama ikinci ölçümle doğrulanana kadar tutulur:
 
 ```text
-Yeni gösterim = Önceki gösterim + 0,42 × (Yeni ölçüm − Önceki gösterim)
+Yeni gösterim = Önceki gösterim + Katsayı × (Yeni ölçüm − Önceki gösterim)
 ```
 
-Örneğin önceki X değeri 10 m, yeni X ölçümü 11 m ise yumuşatılmış X 10,42 m olur. Aynı işlem Y için de yapılır. İşaretin titreşimi azalır; karşılığında ölçümü takip etmesi bir miktar gecikir.
+Aynı işlem X ve Y için yapılır. İşaretin titreşimi azalır; karşılığında ölçümü takip etmesi bir miktar gecikir. Motor güncel oda ataması vermedikçe ham koordinat oda içinde olsa bile işaret koridor içine yansıtılır. Oda adayı ve son bilinen oda, işareti odaya taşımak için yeterli değildir.
 
 Harita filtresi bu işlemi yalnızca başlangıcı, bitişi ve aradaki doğru parçası geçerli alan içinde kalıyorsa uygular. Alan dışından dönüşte eski konumla yumuşatma yapılmaz. Katsayı mevcut panelde kullanıcı ayarı olarak sunulmaz.
 
@@ -208,17 +208,18 @@ Animasyon, alınmış konumları zaman sırasıyla tamponda tutar ve ara noktala
 | Ayar | Değer | Etki |
 |---|---|---|
 | `enabled` | `true` | Konum animasyonu açık. |
-| `interpolationDelayMs` | 3.000 ms | Hareketi yaklaşık 3 saniye geriden oynatarak paket dalgalanmalarını azaltır. |
-| `maximumBufferSize` | 10 | Tutulan örnek sayısını sınırlar. |
-| `maximumSegmentDurationMs` | 2.500 ms | Uzun aralıklı paketleri normal hareket parçası olarak birleştirmeyi sınırlar. |
-| `maximumExtrapolationMs` | 250 ms | Kısa süreli ileri hareket tahminini sınırlar. |
+| `interpolationDelayMs` | 5.500 ms | Hareketi yaklaşık 5,5 saniye geriden oynatarak paket dalgalanmalarını azaltır. |
+| `maximumBufferSize` | 64 | Tutulan örnek sayısını sınırlar. |
+| `maximumSegmentDurationMs` | 4.000 ms | Bu aralığa kadar düzensiz paketler tampon üzerinden oynatılır. |
+| `maximumExtrapolationMs` | 0 ms | Son konumun ötesine hareket tahmini yapılmaz. |
 | `stalePositionTimeoutMs` | 4.000 ms | Animasyonun eski ölçüm durumunu belirler. |
 | `teleportDistanceMeters` | 6 m | Büyük sıçrama eşiği. |
-| `teleportAnimationDurationMs` | 300 ms | Uygun büyük sıçrama geçişinin animasyon süresi. |
+| `teleportAnimationDurationMs` | 1.500 ms | Uygun büyük sıçrama geçişinin asgari animasyon süresi. |
+| `maximumVisualSpeedMetersPerSecond` | 1 m/sn | İşaretin görsel hızını sınırlar. |
 
 Bu değerler JSON içindeki `positionAnimation` bölümündedir; mevcut Oda/Bölge Panelinde ayrı animasyon ayar alanları yoktur. JSON düzenlenip içe aktarılarak ve kaydedilerek değiştirilebilir.
 
-Bir koridor L biçimindeyse iki nokta da içeride olsa bile aralarındaki düz çizgi duvarı kesebilir. Sistem böyle bir çizgiyi oynatmak yerine yeni geçerli noktaya doğrudan geçer. Duvar çevresinden yürüyüş rotası hesaplamaz.
+Bir koridor L biçimindeyse iki nokta da içeride olsa bile aralarındaki düz çizgi duvarı veya atanmadığı bir odayı kesebilir. Sistem böyle bir çizgi yerine işareti soldurur, görünmezken yeni geçerli noktaya taşır ve yeniden gösterir. Motor oda atamasını kaldırınca eski oda görüntüsü hemen koridora alınır ve bekleyen oda animasyonu iptal edilir. Duvar çevresinden yürüyüş rotası hesaplamaz.
 
 Oda merkezi içeren geçişler de doğrudan uygulanır; merkezler arasında fiziksel yol çizilmez. JSON'da `regionTransitionDurationMs` bulunmasına rağmen mevcut merkez geçişi kodu bu süreyi kullanarak kaydırma yapmaz.
 

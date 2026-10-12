@@ -48,14 +48,14 @@ tarihli adlandırmayla güncellenmiştir. Oda ön sınırları banyo çıkıntı
 koridora bakan uçlarıyla aynı hizaya tamamlanmıştır; aradaki koridor
 girintilerinin oda hizasında kalan kısımları ilgili odalara dahildir.
 Oda kapıları da aynı doğrultuda koridora doğru 1 metre taşınmıştır;
-2 metre yakınlık hesabı bu yeni kapı noktalarından yapılır.
+1 metre sessiz giriş yakınlık hesabı bu yeni kapı noktalarından yapılır.
 Karşılıklı kapıların yakınlık alanları kesiştiğinde sinyal kesintisi
 tahmini mevcut motor kuralına göre en yakın uygun kapıyı seçer.
 Banyo çıkıntıları kendi odalarına dahildir; tesisat boşlukları ve isimsiz servis
 odaları koridora dahil değildir. Ortadaki servis odalarının arasından ve
 altından geçen koridor devamı da tanımlıdır.
 
-Oda giriş eşikleri Servis'e özeldir: en az **3 saniye** güvenilir iç kanıt
+Oda giriş eşikleri Servis'e özeldir: en az **2 saniye** güvenilir iç kanıt
 ve **5 güvenilir ölçüm** gerekir. Saniyede bir ölçümde ilk iç ölçümden
 yaklaşık 4 saniye sonra koşullar sağlanır. Bu ayarlar diğer haritaları etkilemez.
 
@@ -63,7 +63,7 @@ Diğer ayarlar Yoğun Bakım ile aynıdır:
 
 - Odalar arka dış duvarlarının ötesine 3 metre uzatılır; komşu odalar arasında 10 cm boşluk vardır.
 - Oda merkezleri fiziksel odaların içinde kalır; her odada 1,5 m genişliğinde, içeri yönlü koridor kapısı bulunur.
-- Oda giriş eşikleri dışında genel motor, oda/kapı çıkarım, gösterim ve animasyon ayarları Yoğun Bakım yapılandırmasından alınır.
+- Oda giriş eşikleri ve 1 metrelik sessiz giriş yakınlık sınırı dışında genel motor, oda/kapı çıkarım, gösterim ve animasyon ayarları Yoğun Bakım yapılandırmasından alınır. Kapı yaklaşma derinliği ayrı bir ayardır ve 2 metre olarak kalır.
 - `Servis` büyük alanında düzenlenmiş tek giriş/çıkış kapısı iki yönlüdür; bekleme süresi 30 saniyedir.
 
 Mevcut çizimleri yerinde tutarak motor kalibrasyonunu yeniden uygulamak için

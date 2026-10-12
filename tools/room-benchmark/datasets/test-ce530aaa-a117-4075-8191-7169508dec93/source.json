@@ -1,0 +1,20 @@
+{
+  "test_id": "test-ce530aaa-a117-4075-8191-7169508dec93",
+  "test_name": "Oda testi",
+  "tag_id": "AD5D457F2924852A",
+  "tag_codes": ["AD5D457F2924852A"],
+  "timezone": "Europe/Istanbul",
+  "started_at": "2026-10-12T15:53:29.680Z",
+  "ended_at": "2026-10-12T15:58:19.255Z",
+  "rooms": [
+    {"room":"room-16","entered_at":"2026-10-12T15:53:47.535Z","exited_at":"2026-10-12T15:54:01.252Z","duration_seconds":13.717},
+    {"room":"room-07","entered_at":"2026-10-12T15:54:11.920Z","exited_at":"2026-10-12T15:54:27.344Z","duration_seconds":15.424},
+    {"room":"room-14","entered_at":"2026-10-12T15:54:37.220Z","exited_at":"2026-10-12T15:54:56.959Z","duration_seconds":19.739},
+    {"room":"room-13","entered_at":"2026-10-12T15:55:23.012Z","exited_at":"2026-10-12T15:55:40.626Z","duration_seconds":17.614},
+    {"room":"room-12","entered_at":"2026-10-12T15:56:04.677Z","exited_at":"2026-10-12T15:56:15.790Z","duration_seconds":11.113},
+    {"room":"room-14","entered_at":"2026-10-12T15:56:43.435Z","exited_at":"2026-10-12T15:56:50.605Z","duration_seconds":7.17},
+    {"room":"room-07","entered_at":"2026-10-12T15:57:01.630Z","exited_at":"2026-10-12T15:57:13.229Z","duration_seconds":11.599},
+    {"room":"room-10","entered_at":"2026-10-12T15:57:28.408Z","exited_at":"2026-10-12T15:57:47.267Z","duration_seconds":18.859},
+    {"room":"room-16","entered_at":"2026-10-12T15:57:56.464Z","exited_at":"2026-10-12T15:58:08.556Z","duration_seconds":12.092}
+  ]
+}

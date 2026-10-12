@@ -1,5 +1,11 @@
 # Saha verisi aktarım durumu — 2026-09-24
 
+## 2026-10-12 Servis — Mustafa ve Tansiyon
+
+İki test kullanıcı tarafından açık tag kodlarıyla verildi; SELECT ile adları doğrulandı, diğer adaylar puanlanmadı. `ce530aaa` / Mustafa (`AD5D457F2924852A`) 531 satır, `ca88f73a` / Tansiyon (`EC27D9C145F838EB`) 406 satır. Truth revizyon 1; UTC saatleri korunuyor. Her testte 30 sn ısınma ve 60 sn gözlem var. received_at/ölçüm/koordinat eksikliği ve negatif zaman anomalisi yok; 937 kalite değeri eksik. Büyük teslim boşlukları sırasıyla 4 ve 2. SHA-256 değerleri manifestlerde.
+
+Motor `room-evidence-9`, güncel Servis configVersion `c61e258497587aa6` ile sabit replay: Mustafa 4/9 ziyaret, katı doğru oda %9,608 (8 sn doğrulanmış + 4,25 sn tahmini); Tansiyon 2/6, %7,190 (1,5 + 4 sn). Canlı tarihsel kararlarda test ortasında `3bf2a7e064ec0ac9` → `c61e258497587aa6` geçişi var; yeni sürümün ilk kayıtlı kararı 18:56:43.232 Europe/Istanbul. Sabit replay gerçek canlı deneyle eşdeğer sayılmadı. Ayrıntılar `reports/servis-two-20261012-analysis.md`; standart raporlar `reports/necmettin-servis-ce530aaa-current-20261012/` ve `reports/necmettin-servis-ca88f73a-current-20261012/` altında. Çalışma boyunca canlı config değiştirilmedi.
+
 ## 2026-10-12 Servis — servis2
 
 `test-4192b569-b345-4a41-a028-32b342ab4710`: kullanıcı `cihaz` tagını belirtti; SELECT ad-kod eşleşmesi `EA0FC8F8CA447FF5`. 30 saniye ısınma ve 60 saniye gözlem dahil 344 ham satır aktarıldı. Truth revizyon 1; kaynak UTC saatleri korunuyor, katı ve ±2 saniye sınır toleranslı değerlendirme var. `received_at`, ölçüm zamanı ve koordinat eksikliği yok; kalite 344 satırda boş. Teslim boşlukları 30,630 ve 26,254 saniye. Ham SHA-256: `121f4a3b71b9ba7b253522953b3d95ad52ae549a5af2da4e4f6874aa39f77121`.

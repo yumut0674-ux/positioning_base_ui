@@ -220,6 +220,30 @@ test("a 1500 ms message gap remains a regular timestamp-based segment", () => {
   assert.equal(output.latest().x, 1.5);
 });
 
+test("a three-second corridor packet gap stays buffered instead of bypassing the display delay", () => {
+  const animation = controller();
+  const output = recorder();
+  animation.ingest("T", { x: 0, y: 0, timestamp: 1_000, receivedAt: 1_000 });
+  animation.attach("T", output.renderer);
+  animation.ingest("T", { x: 3, y: 0, timestamp: 4_000, receivedAt: 4_500 });
+  assert.equal(animation.getState("T")!.transitionKind, null);
+  animation.update(6_000);
+  assert.equal(output.latest().x, 0);
+  animation.update(8_000);
+  assert.equal(output.latest().x, 1.5);
+});
+
+test("the corridor buffer retains a full display delay at ten updates per second", () => {
+  const animation = controller();
+  const output = recorder();
+  animation.attach("T", output.renderer);
+  for (let index = 0; index < 60; index++) {
+    animation.ingest("T", { x: index / 10, y: 0, timestamp: 1_000 + index * 100, receivedAt: 1_000 + index * 100 });
+  }
+  animation.update(7_000);
+  assert.equal(output.latest().x, 0.5);
+});
+
 test("out-of-order rendered samples and exact duplicates cannot move a tag backwards", () => {
   const animation = controller({ interpolationDelayMs: 0 });
   const output = recorder();
@@ -330,6 +354,7 @@ test("teleports and overlong segments use a short controlled transition", () => 
   const animation = controller({
     interpolationDelayMs: 0,
     teleportAnimationDurationMs: 300,
+    maximumSegmentDurationMs: 2_500,
   });
   const output = recorder();
   animation.ingest("TAG-1", { x: 0, y: 0, timestamp: 1_000, receivedAt: 1_000 });

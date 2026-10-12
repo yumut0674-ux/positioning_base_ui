@@ -1,0 +1,19 @@
+{
+  "testId": "test-ca88f73a-7a97-48ba-b6b5-de227bfb0124",
+  "testName": "Servis — Oda testi — EC27D9C145F838EB",
+  "site": "Necmettin Hastanesi — Servis",
+  "timezone": "Europe/Istanbul",
+  "revision": 1,
+  "revisionReason": "Kullanıcının oda testi kaydı UTC saatleri ve açık tag kodu korunarak aktarıldı. Bu rota diğer eşzamanlı testten bağımsızdır.",
+  "test": {"from":"2026-10-12T15:53:59.545Z","to":"2026-10-12T15:57:12.628Z"},
+  "visits": [
+    {"roomId":"room-10","from":"2026-10-12T15:54:05.453Z","to":"2026-10-12T15:54:18.073Z"},
+    {"roomId":"room-07","from":"2026-10-12T15:54:44.640Z","to":"2026-10-12T15:54:57.205Z"},
+    {"roomId":"room-12","from":"2026-10-12T15:55:34.631Z","to":"2026-10-12T15:55:48.973Z"},
+    {"roomId":"room-13","from":"2026-10-12T15:55:54.617Z","to":"2026-10-12T15:56:07.048Z"},
+    {"roomId":"room-14","from":"2026-10-12T15:56:17.313Z","to":"2026-10-12T15:56:28.738Z"},
+    {"roomId":"room-16","from":"2026-10-12T15:56:48.633Z","to":"2026-10-12T15:57:01.188Z"}
+  ],
+  "groups": [{"id":"servis-ca88f73a","tagCodes":["EC27D9C145F838EB"],"note":"Tag kodu kullanıcı test kaydında açıkça belirtilmiştir."}],
+  "note": "Kaynak source.json içinde korunur. Z saatleri UTC'dir; yerel gösterim Europe/Istanbul. Oda ziyaretleri arasındaki süre koridordur. Saat kaydırılmaz; katı ve ±2 saniye sınır toleranslı değerlendirme birlikte üretilir."
+}

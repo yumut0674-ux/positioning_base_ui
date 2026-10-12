@@ -3,6 +3,7 @@
   "engine": {
     "entryConfirmationCount": 2,
     "exitConfirmationCount": 2,
+    "exitEvidenceDurationMs": 1000,
     "exitMarginMeters": 0.5,
     "maximumSpeedMetersPerSecond": 3,
     "silentCoverageStaleMultiplier": 3,
@@ -32,15 +33,15 @@
   "positionAnimation": {
     "enabled": true,
     "mode": "buffered_interpolation",
-    "interpolationDelayMs": 4500,
-    "maximumBufferSize": 16,
-    "maximumSegmentDurationMs": 2500,
+    "interpolationDelayMs": 5500,
+    "maximumBufferSize": 64,
+    "maximumSegmentDurationMs": 4000,
     "maximumExtrapolationMs": 0,
     "stalePositionTimeoutMs": 4000,
     "teleportDistanceMeters": 6,
     "teleportAnimationDurationMs": 1500,
     "regionTransitionDurationMs": 2000,
-    "maximumVisualSpeedMetersPerSecond": 1.2,
+    "maximumVisualSpeedMetersPerSecond": 1,
     "maximumTransitionDurationMs": 8000,
     "easing": "ease_in_out"
   },

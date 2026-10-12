@@ -51,9 +51,11 @@ test("recent tags serialize and restore through browser storage", () => {
 });
 
 test("location entry time is retained in the same area and reset after an area change", () => {
-  const first = nextTagLocationEntry(undefined, tag({ x: 9, y: 17, timestamp: 1_000 }), regionsConfig);
-  const sameArea = nextTagLocationEntry(first, tag({ x: 10, y: 18, timestamp: 9_000 }), regionsConfig);
-  const differentArea = nextTagLocationEntry(sameArea, tag({ x: 31, y: 16, timestamp: 12_000 }), regionsConfig);
+  const firstDecision = { enabled: true, state: "IN_REGION", regionId: "first", measurementKind: "measured" as const };
+  const secondDecision = { ...firstDecision, regionId: "second" };
+  const first = nextTagLocationEntry(undefined, { ...tag({ x: 9, y: 17, timestamp: 1_000 }), regionInference: firstDecision }, regionsConfig);
+  const sameArea = nextTagLocationEntry(first, { ...tag({ x: 10, y: 18, timestamp: 9_000 }), regionInference: firstDecision }, regionsConfig);
+  const differentArea = nextTagLocationEntry(sameArea, { ...tag({ x: 31, y: 16, timestamp: 12_000 }), regionInference: secondDecision }, regionsConfig);
 
   assert.equal(sameArea.enteredAt, 1_000);
   assert.equal(differentArea.enteredAt, 12_000);

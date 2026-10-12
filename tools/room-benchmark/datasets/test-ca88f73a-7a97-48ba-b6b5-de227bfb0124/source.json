@@ -1,0 +1,17 @@
+{
+  "test_id": "test-ca88f73a-7a97-48ba-b6b5-de227bfb0124",
+  "test_name": "Oda testi",
+  "tag_id": "EC27D9C145F838EB",
+  "tag_codes": ["EC27D9C145F838EB"],
+  "timezone": "Europe/Istanbul",
+  "started_at": "2026-10-12T15:53:59.545Z",
+  "ended_at": "2026-10-12T15:57:12.628Z",
+  "rooms": [
+    {"room":"room-10","entered_at":"2026-10-12T15:54:05.453Z","exited_at":"2026-10-12T15:54:18.073Z","duration_seconds":12.62},
+    {"room":"room-07","entered_at":"2026-10-12T15:54:44.640Z","exited_at":"2026-10-12T15:54:57.205Z","duration_seconds":12.565},
+    {"room":"room-12","entered_at":"2026-10-12T15:55:34.631Z","exited_at":"2026-10-12T15:55:48.973Z","duration_seconds":14.342},
+    {"room":"room-13","entered_at":"2026-10-12T15:55:54.617Z","exited_at":"2026-10-12T15:56:07.048Z","duration_seconds":12.431},
+    {"room":"room-14","entered_at":"2026-10-12T15:56:17.313Z","exited_at":"2026-10-12T15:56:28.738Z","duration_seconds":11.425},
+    {"room":"room-16","entered_at":"2026-10-12T15:56:48.633Z","exited_at":"2026-10-12T15:57:01.188Z","duration_seconds":12.555}
+  ]
+}

@@ -24,6 +24,39 @@ export function inDisplayArea(point: Point2D, polygons: readonly DisplayPolygon[
   });
 }
 
+/** Project presentation coordinates into the nearest corridor, slightly inside
+ * its edge. Concave polygons are validated rather than using their centroid. */
+export function projectIntoDisplayArea(point: Point2D, polygons: readonly DisplayPolygon[]): Point2D | undefined {
+  if (!Number.isFinite(point.x) || !Number.isFinite(point.y)) return undefined;
+  if (inDisplayArea(point, polygons)) return { x: point.x, y: point.y };
+  let closest: Point2D | undefined;
+  let closestDistance = Infinity;
+  for (const polygon of polygons) {
+    if (polygon.length < 3) continue;
+    for (let i = 0; i < polygon.length; i++) {
+      const a = polygon[i], b = polygon[(i + 1) % polygon.length];
+      const dx = b.x - a.x, dy = b.y - a.y;
+      const length = Math.hypot(dx, dy);
+      if (length <= EPS) continue;
+      const t = Math.min(1, Math.max(0, ((point.x - a.x) * dx + (point.y - a.y) * dy) / length ** 2));
+      const inset = Math.min(0.1, length / 4);
+      const interiorT = Math.min(1 - inset / length, Math.max(inset / length, t));
+      const edgePoint = { x: a.x + dx * interiorT, y: a.y + dy * interiorT };
+      let projected: Point2D | undefined;
+      for (const side of [-1, 1]) {
+        const candidate = { x: edgePoint.x - side * dy / length * inset, y: edgePoint.y + side * dx / length * inset };
+        if (inDisplayArea(candidate, [polygon])) { projected = candidate; break; }
+      }
+      // A very narrow polygon may have no room for the inset; its edge is safe.
+      projected ??= { x: a.x + dx * t, y: a.y + dy * t };
+      if (!inDisplayArea(projected, polygons)) continue;
+      const distance = Math.hypot(point.x - projected.x, point.y - projected.y);
+      if (distance < closestDistance) { closest = projected; closestDistance = distance; }
+    }
+  }
+  return closest;
+}
+
 /** Split at every polygon edge, then test every interval. No fixed-step sampling:
  * even a narrow gap or a concave corridor corner must prevent interpolation. */
 export function segmentInDisplayArea(from: Point2D, to: Point2D, polygons: readonly DisplayPolygon[]): boolean {

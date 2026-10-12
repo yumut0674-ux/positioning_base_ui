@@ -12,6 +12,8 @@ import { useIpsStore } from "../src/app/store/useIpsStore";
 import { DEFAULT_REGIONS_CONFIG } from "../src/features/regions/config/defaultRegionsConfig";
 import { TagInformationPanelContent } from "../src/features/tracking/components/TagInformationPanel";
 import type { TrackedTag } from "../src/features/tracking/types/tracking.types";
+import type { RegionDefinition } from "../src/features/regions/types/region.types";
+import { roomDecisionLabel } from "../src/features/tracking/services/roomDecisionLabel";
 
 const p = (x: number, y: number) => ({ x, y });
 const square = [p(0, 0), p(10, 0), p(10, 10), p(0, 10)];
@@ -178,7 +180,8 @@ test("store binding switches RAW/engine coordinates and maps without modifying m
   const f = fixture((mapTagDisplays) => useIpsStore.setState({ mapTagDisplays }));
   const pair = (world: { x: number; y: number }) => ({ world, pixel: world });
   const config = { ...DEFAULT_REGIONS_CONFIG, regions: [{ id: "room", name: "Room", color: "#ffffff",
-    polygon: square.map(pair), roomCenter: pair(p(5, 5)), entrances: [] }] };
+    polygon: [p(4, 4), p(10, 4), p(10, 10), p(4, 10)].map(pair), roomCenter: pair(p(5, 5)), entrances: [] },
+    { id: "corridor-main", name: "Koridor", color: "#ffffff", polygon: [p(0, 0), p(10, 0), p(10, 3), p(0, 3)].map(pair), roomCenter: null, entrances: [] }] };
   try {
     useIpsStore.setState({ tags: {}, observedTags: {}, tagLocationEntries: {}, regionsConfig: config, regionsConfigByMapId: { [config.map.mapId]: config }, activeMapId: config.map.mapId });
     const raw = tag(20, 20, 1_000);
@@ -210,6 +213,156 @@ test("store binding switches RAW/engine coordinates and maps without modifying m
     assert.equal(useIpsStore.getState().observedTags.A.timestamp, 3_001);
     unbind();
   } finally { f.filter.dispose(); useIpsStore.setState(original, true); }
+});
+
+const corridor = [p(0, 0), p(10, 0), p(10, 2), p(0, 2)];
+const roomA = [p(2, 2), p(4, 2), p(4, 5), p(2, 5)];
+const roomB = [p(6, 2), p(8, 2), p(8, 5), p(6, 5)];
+function roomPermissionFixture() {
+  const f = fixture();
+  const pair = (world: { x: number; y: number }) => ({ world, pixel: world });
+  const regions: RegionDefinition[] = [
+    { id: "corridor-main", name: "Koridor", kind: "corridor", polygon: corridor.map(pair), roomCenter: null, color: "#fff", entrances: [] },
+    { id: "room-a", name: "Oda A", kind: "room", polygon: roomA.map(pair), roomCenter: pair(p(3, 3.5)), color: "#fff", entrances: [] },
+    { id: "room-b", name: "Oda B", kind: "room", polygon: roomB.map(pair), roomCenter: pair(p(7, 3.5)), color: "#fff", entrances: [] },
+  ];
+  f.filter.configure([corridor, roomA, roomB], 2_000, DEFAULT_REGIONS_CONFIG.map.mapId, regions);
+  return f;
+}
+
+test("raw room coordinates and entry candidates stay in the corridor until an engine assignment", () => {
+  const f = roomPermissionFixture();
+  const raw = tag(3, 3.5, 1_000);
+  f.filter.ingest(raw, true);
+  assert.equal(f.displays().A.visible, true);
+  assert.equal(inDisplayArea(f.displays().A.position!, [corridor]), true);
+  assert.equal(inDisplayArea(f.displays().A.position!, [roomA]), false);
+  assert.deepEqual(raw, tag(3, 3.5, 1_000));
+  f.advance(2_000);
+  f.filter.ingest({ ...tag(3.2, 4, 2_000), regionInference: {
+    enabled: true, state: "ENTRY_CANDIDATE", regionId: null, candidateRegionId: "room-a", measurementKind: "uncertain",
+  } }, true);
+  for (let now = 2_000; now < 5_000; now += 16) {
+    f.animation.update(now);
+    const state = f.animation.getState("A")!;
+    assert.equal(inDisplayArea(p(state.renderedX, state.renderedY), [corridor]), true);
+    assert.ok(state.samples.every(sample => inDisplayArea(sample, [corridor])));
+  }
+  f.filter.dispose();
+});
+
+test("confirmed and inferred engine assignments permit only the assigned room", () => {
+  for (const state of ["IN_REGION", "INFERRED_IN_REGION", "EXIT_CANDIDATE"]) {
+    const f = roomPermissionFixture();
+    f.filter.ingest({ ...tag(3, 3.5, 1_000), positionSource: "REGION_CENTER",
+      regionInference: { enabled: true, state, regionId: "room-a" } });
+    assert.deepEqual(f.displays().A.position, p(3, 3.5));
+    assert.deepEqual([f.animation.getState("A")!.renderedX, f.animation.getState("A")!.renderedY], [3, 3.5]);
+    f.advance(2_000);
+    // Leaving the centre still cannot authorize a different room.
+    f.filter.ingest({ ...tag(5, 1.9, 2_000), regionInference: { enabled: true, state, regionId: "room-a" } });
+    f.advance(3_000);
+    f.filter.ingest({ ...tag(9, 1.9, 3_000), regionInference: { enabled: true, state, regionId: "room-a" } });
+    for (let now = 3_000; now < 7_000; now += 16) {
+      f.animation.update(now);
+      const position = f.animation.getState("A")!;
+      assert.equal(inDisplayArea(p(position.renderedX, position.renderedY), [roomB]), false);
+    }
+    f.filter.dispose();
+  }
+});
+
+test("corridor animation cannot take a shortcut through an unassigned room at a bend", () => {
+  const f = fixture();
+  const otherRoom = [p(2, 2), p(6, 2), p(6, 6), p(2, 6)];
+  const pair = (world: { x: number; y: number }) => ({ world, pixel: world });
+  f.filter.configure([elbow, otherRoom], 2_000, DEFAULT_REGIONS_CONFIG.map.mapId, [
+    { id: "corridor-bend", name: "Koridor", kind: "corridor", polygon: elbow.map(pair), roomCenter: null, color: "#fff", entrances: [] },
+    { id: "room", name: "Oda", kind: "room", polygon: otherRoom.map(pair), roomCenter: pair(p(4, 4)), color: "#fff", entrances: [] },
+  ]);
+  assert.equal(segmentInDisplayArea(p(1, 5), p(5, 1), [elbow, otherRoom]), true);
+  f.filter.ingest(tag(1, 5, 1_000), true);
+  f.advance(2_000);
+  f.filter.ingest(tag(5, 1, 2_000), true);
+  assert.equal(f.animation.getState("A")!.transitionKind, "non-routable-region-relocation");
+  for (let now = 2_000; now <= 4_000; now += 16) {
+    f.animation.update(now);
+    const position = f.animation.getState("A")!;
+    assert.equal(inDisplayArea(p(position.renderedX, position.renderedY), [elbow]), true);
+  }
+  assert.deepEqual([f.animation.getState("A")!.renderedX, f.animation.getState("A")!.renderedY], [5, 1]);
+  f.filter.dispose();
+});
+
+test("unassigned raw room coordinates do not produce a room label in the tag panel", () => {
+  const pair = (world: { x: number; y: number }) => ({ world, pixel: world });
+  const room: RegionDefinition = { id: "room-a", name: "Oda A", kind: "room", polygon: roomA.map(pair), roomCenter: pair(p(3, 3.5)), color: "#fff", entrances: [] };
+  const hallway: RegionDefinition = { id: "corridor-main", name: "Koridor", kind: "corridor", polygon: corridor.map(pair), roomCenter: null, color: "#fff", entrances: [] };
+  const config = { ...DEFAULT_REGIONS_CONFIG, regions: [room, hallway] };
+  const point = p(3, 3.5);
+  assert.equal(roomDecisionLabel(tag(point.x, point.y, 1_000), config), "Ölçülen · koridor");
+  assert.equal(roomDecisionLabel({ ...tag(point.x, point.y, 1_000), regionInference: {
+    enabled: true, state: "TRACKING_OUTSIDE", regionId: null, regionName: room.name,
+  } }, config), "Ölçülen · koridor");
+});
+
+test("room-only maps cannot display an unassigned tag inside a room", () => {
+  const f = fixture();
+  const pair = (world: { x: number; y: number }) => ({ world, pixel: world });
+  f.filter.configure([roomA], 2_000, DEFAULT_REGIONS_CONFIG.map.mapId, [
+    { id: "room-a", name: "Oda A", kind: "room", polygon: roomA.map(pair), roomCenter: pair(p(3, 3.5)), color: "#fff", entrances: [] },
+  ]);
+  f.filter.ingest(tag(3, 3.5, 1_000));
+  assert.equal(f.displays().A.visible, false);
+  assert.equal(f.animation.getState("A"), undefined);
+  f.filter.dispose();
+});
+
+test("revoking a room clears old room frames immediately even with animation disabled", () => {
+  for (const enabled of [true, false]) {
+    for (const state of ["TRACKING_OUTSIDE", "ENTRY_CANDIDATE", "LOCATION_LOST"]) {
+      const f = roomPermissionFixture();
+      f.animation.setConfig({ ...DEFAULT_POSITION_ANIMATION_CONFIG, enabled });
+      f.filter.ingest({ ...tag(3, 3.5, 1_000), positionSource: "REGION_CENTER",
+        regionInference: { enabled: true, state: "IN_REGION", regionId: "room-a" } });
+      f.advance(2_000);
+      const raw = { x: 3, y: 3.7, timestamp: new Date(1_000).toISOString() };
+      f.filter.ingest({ ...tag(3, 3.5, 1_000), publishedAt: new Date(2_000).toISOString(),
+        positionSource: "REGION_CENTER", rawPosition: raw,
+        regionInference: { enabled: true, state, regionId: null, lastKnownRegionId: "room-a", candidateRegionId: "room-b" } });
+      assert.equal(inDisplayArea(f.displays().A.position!, [corridor]), true);
+      const position = f.animation.getState("A")!;
+      assert.equal(inDisplayArea(p(position.renderedX, position.renderedY), [corridor]), true);
+      assert.ok(position.samples.every(sample => inDisplayArea(sample, [corridor])));
+      assert.equal(position.samples.at(-1)!.positionSource, "RAW");
+      assert.equal(position.relocationSequence, 1);
+      for (let now = 2_000; now < 9_000; now += 16) {
+        f.animation.update(now);
+        const frame = f.animation.getState("A")!;
+        assert.equal(inDisplayArea(p(frame.renderedX, frame.renderedY), [corridor]), true);
+      }
+      assert.equal(f.animation.getState("A")!.stale, enabled);
+      f.filter.dispose();
+    }
+  }
+});
+
+test("revoking an assignment cancels a pending room transition before it enters the room", () => {
+  const f = roomPermissionFixture();
+  f.filter.ingest(tag(3, 1, 1_000), true);
+  f.advance(2_000);
+  f.filter.ingest({ ...tag(3, 3.5, 2_000), positionSource: "REGION_CENTER",
+    regionInference: { enabled: true, state: "INFERRED_IN_REGION", regionId: "room-a" } });
+  assert.equal(f.animation.getState("A")!.transitionKind, "region-center-route");
+  f.advance(2_100);
+  f.filter.ingest({ ...tag(3, 1.2, 2_100), regionInference: { enabled: true, state: "TRACKING_OUTSIDE", regionId: null } }, true);
+  assert.equal(f.animation.getState("A")!.transitionKind, null);
+  for (let now = 2_100; now < 7_000; now += 16) {
+    f.animation.update(now);
+    const position = f.animation.getState("A")!;
+    assert.equal(inDisplayArea(p(position.renderedX, position.renderedY), [corridor]), true);
+  }
+  f.filter.dispose();
 });
 
 test("a jump into a disconnected valid region updates the target without teleporting the marker", () => {

@@ -4,6 +4,8 @@ Bu araç ayrı bir Node sürecinde **mevcut** `RegionPositionEngine` sınıfın�
 
 ## Yeni test
 
+12 Ekim Servis ek testleri: `test-ce530aaa-a117-4075-8191-7169508dec93` (Mustafa, `AD5D457F2924852A`, 531 paket) ve `test-ca88f73a-7a97-48ba-b6b5-de227bfb0124` (Tansiyon, `EC27D9C145F838EB`, 406 paket). Kullanıcı kodları açıkça verdi; bağımsız rotalar ayrı gruplarda, truth revizyon 1. Güncel Servis config'iyle replay edilmelidir. İlgili JSON/Markdown/HTML raporları `reports/necmettin-servis-ce530aaa-current-20261012/` ve `reports/necmettin-servis-ca88f73a-current-20261012/` içinde; ortak analiz `reports/servis-two-20261012-analysis.md`. Canlı testlerin ortasında config değişmiştir; ortak analiz bunu güncel ayarların sabit replay'inden ayrı gösterir.
+
 12 Ekim Servis `servis2` testi: `test-4192b569-b345-4a41-a028-32b342ab4710`. Kullanıcının belirttiği `cihaz` adı DB'de `EA0FC8F8CA447FF5` koduyla eşleştirildi; 344 ham paket aktarıldı. Kaynağın `Z` saatleri UTC olarak korundu, saat kaydırılmadı; katı ve ±2 saniye sınır toleranslı sonuç üretildi. Replay komutu: `node --import tsx tools/room-benchmark/cli.ts replay test-4192b569-b345-4a41-a028-32b342ab4710 --config config/maps/necmettin-servis/regions.json`. İlk rapor ve parametre incelemesi `reports/necmettin-servis-servis2-4192b569-20261012/analysis.md` içinde. Servis ayarları yoğun bakım ayarlarından ayrıdır.
 
 1. `datasets/<test-id>/truth.json` oluşturun. `test.from/to` ve `visits` açık UTC/ISO olmalı; yerel kayıt saatini `Europe/Istanbul` (+03:00) kabul edin. Oda aralıkları arasındaki zaman koridordur. `revision` ve `revisionReason` zorunludur.

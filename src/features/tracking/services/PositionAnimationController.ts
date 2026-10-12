@@ -28,6 +28,7 @@ interface NonRoutableRegionRelocation {
 }
 
 interface InternalTagAnimationState extends Omit<TagAnimationState, "transitionKind"> {
+  displayArea?: readonly DisplayPolygon[];
   lastReceivedAt: number;
   lastRenderTime: number;
   renderer?: PositionRenderer;
@@ -36,6 +37,7 @@ interface InternalTagAnimationState extends Omit<TagAnimationState, "transitionK
 }
 
 export interface IncomingAnimationPosition {
+  readonly displayArea?: readonly DisplayPolygon[];
   readonly measurementTimestamp?: number;
   readonly x: number;
   readonly y: number;
@@ -72,6 +74,38 @@ export class PositionAnimationController {
   public setDisplayArea(polygons: readonly DisplayPolygon[]): void {
     this.displayArea = polygons;
     this.states.clear(); // Geometry changes invalidate all queued paths.
+  }
+
+  /** Apply the latest engine room permission to queued samples and every frame.
+   * Revoking a room must take effect immediately, regardless of visual delay. */
+  public setTagDisplayArea(tagId: string, polygons: readonly DisplayPolygon[], fallback?: { x: number; y: number }, now = Date.now()): void {
+    const state = this.states.get(tagId);
+    if (!state) return;
+    if (state.displayArea === polygons) return;
+    state.displayArea = polygons;
+    const rendered = { x: state.renderedX, y: state.renderedY };
+    const renderedValid = inDisplayArea(rendered, polygons);
+    const queueValid = state.samples.every((sample, index) => inDisplayArea(sample, polygons)
+      && (index === 0 || segmentInDisplayArea(state.samples[index - 1], sample, polygons)));
+    const transitionValid = !state.transition || segmentInDisplayArea(rendered,
+      { x: state.transition.toX, y: state.transition.toY }, polygons);
+    const relocationValid = !state.relocation || inDisplayArea(state.relocation.destination, polygons);
+    if (renderedValid && queueValid && transitionValid && relocationValid) return;
+    const point = renderedValid ? rendered : fallback;
+    if (!point || !inDisplayArea(point, polygons)) { this.states.delete(tagId); return; }
+    const latest = state.samples.at(-1)!;
+    state.samples = [{ ...latest, ...point, positionSource: "RAW", regionId: null }];
+    state.transition = undefined;
+    state.relocation = undefined;
+    state.lastRenderTime = Number.NEGATIVE_INFINITY;
+    if (!renderedValid) {
+      state.renderedX = point.x;
+      state.renderedY = point.y;
+      state.relocationSequence += 1;
+    }
+    state.visualOpacity = 1;
+    state.lastRenderedAt = now;
+    state.renderer?.render(point.x, point.y, state.stale, 1);
   }
 
   public remove(tagId: string): void { this.states.delete(tagId); }
@@ -126,7 +160,8 @@ export class PositionAnimationController {
 
   public ingest(tagId: string, incoming: IncomingAnimationPosition): void {
     if (!Number.isFinite(incoming.x) || !Number.isFinite(incoming.y)) return;
-    if (this.displayArea && !inDisplayArea(incoming, this.displayArea)) return;
+    const displayArea = incoming.displayArea ?? this.states.get(tagId)?.displayArea ?? this.displayArea;
+    if (displayArea && !inDisplayArea(incoming, displayArea)) return;
     const receivedAt = Number.isFinite(incoming.receivedAt) ? incoming.receivedAt! : Date.now();
     const timestamp = Number.isFinite(incoming.timestamp) && incoming.timestamp! > 0
       ? incoming.timestamp!
@@ -139,9 +174,15 @@ export class PositionAnimationController {
       positionSource: incoming.positionSource ?? "RAW",
       regionId: incoming.regionId ?? null,
     };
+    const previousSample = this.states.get(tagId)?.samples.at(-1);
+    if (incoming.displayArea && this.states.get(tagId)?.displayArea !== incoming.displayArea
+      && (!previousSample || sample.timestamp >= previousSample.timestamp)) {
+      this.setTagDisplayArea(tagId, incoming.displayArea, sample, receivedAt);
+    }
     let state = this.states.get(tagId);
     if (!state) {
       state = {
+        displayArea,
         samples: [sample],
         renderedX: sample.x,
         renderedY: sample.y,
@@ -177,10 +218,10 @@ export class PositionAnimationController {
       if (!state.relocation.snapped) state.relocation = { ...state.relocation, destination: sample };
       return;
     }
-    const renderedSegmentIsValid = !this.displayArea
-      || segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, sample, this.displayArea);
-    const queuedSegmentIsValid = !this.displayArea || !latest || segmentInDisplayArea(latest, sample, this.displayArea);
-    if (this.displayArea && (!renderedSegmentIsValid || !queuedSegmentIsValid)) {
+    const renderedSegmentIsValid = !displayArea
+      || segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, sample, displayArea);
+    const queuedSegmentIsValid = !displayArea || !latest || segmentInDisplayArea(latest, sample, displayArea);
+    if (displayArea && (!renderedSegmentIsValid || !queuedSegmentIsValid)) {
       state.samples = [sample];
       state.lastReceivedAt = incoming.measurementTimestamp ?? receivedAt;
       state.stale = receivedAt - state.lastReceivedAt > this.config.stalePositionTimeoutMs;
@@ -374,8 +415,9 @@ export class PositionAnimationController {
         return;
       }
     }
-    if (this.displayArea && (!inDisplayArea({ x, y }, this.displayArea)
-      || (this.config.enabled && !segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, { x, y }, this.displayArea)))) {
+    const displayArea = state.displayArea ?? this.displayArea;
+    if (displayArea && (!inDisplayArea({ x, y }, displayArea)
+      || (this.config.enabled && !segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, { x, y }, displayArea)))) {
       // A non-routable relocation must never become a visible teleport. Keep the
       // last safe point until an interior sample supplies a traversable path.
       return;
@@ -448,8 +490,9 @@ export class PositionAnimationController {
       state.visualOpacity = 1;
       state.relocation = undefined;
       const queued = state.samples.at(-1);
-      if (queued && this.displayArea
-        && !segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, queued, this.displayArea)) {
+      const displayArea = state.displayArea ?? this.displayArea;
+      if (queued && displayArea
+        && !segmentInDisplayArea({ x: state.renderedX, y: state.renderedY }, queued, displayArea)) {
         this.startNonRoutableRegionRelocation(state, queued, now);
       }
     }
