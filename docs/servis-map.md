@@ -47,11 +47,15 @@ Harita ve oda/bölge editörü aynı kalibrasyonu kullanır. CAD duvarlarına g�
 odaları koridora dahil değildir. Ortadaki servis odalarının arasından ve
 altından geçen koridor devamı da tanımlıdır.
 
-Yoğun Bakım ile aynı ayarlar uygulanır:
+Oda giriş eşikleri Servis'e özeldir: en az **3 saniye** güvenilir iç kanıt
+ve **5 güvenilir ölçüm** gerekir. Saniyede bir ölçümde ilk iç ölçümden
+yaklaşık 4 saniye sonra koşullar sağlanır. Bu ayarlar diğer haritaları etkilemez.
+
+Diğer ayarlar Yoğun Bakım ile aynıdır:
 
 - Odalar arka dış duvarlarının ötesine 3 metre uzatılır; komşu odalar arasında 10 cm boşluk vardır.
 - Oda merkezleri fiziksel odaların içinde kalır; her odada 1,5 m genişliğinde, içeri yönlü koridor kapısı bulunur.
-- Genel motor, oda/kapı çıkarım, gösterim ve animasyon ayarları Yoğun Bakım yapılandırmasından alınır.
+- Oda giriş eşikleri dışında genel motor, oda/kapı çıkarım, gösterim ve animasyon ayarları Yoğun Bakım yapılandırmasından alınır.
 - `Servis` büyük alanında düzenlenmiş tek giriş/çıkış kapısı iki yönlüdür; bekleme süresi 30 saniyedir.
 
 Mevcut çizimleri yerinde tutarak motor kalibrasyonunu yeniden uygulamak için

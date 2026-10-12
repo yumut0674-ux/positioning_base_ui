@@ -110,12 +110,28 @@ class ChatContext(BaseModel):
         return _validate_iso_with_timezone(value)
 
 
+class ConversationTurn(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    question: str = Field(min_length=1, max_length=1000)
+    answer: str = Field(min_length=1, max_length=8000)
+
+
 class ChatRequest(BaseModel):
     model_config = ConfigDict(populate_by_name=True, extra="forbid")
 
     message: str = Field(min_length=1, max_length=1000)
     session_id: str | None = Field(default=None, alias="sessionId", min_length=1, max_length=100)
     context: ChatContext | None = None
+    # An explicit list (including []) uses chat-owned memory, never a cached session.
+    history: list[ConversationTurn] | None = Field(default=None, max_length=20)
+
+    @field_validator("history")
+    @classmethod
+    def bound_history(cls, value: list[ConversationTurn] | None) -> list[ConversationTurn] | None:
+        if value and sum(len(turn.question) + len(turn.answer) for turn in value) > 32000:
+            raise ValueError("Konuşma geçmişi çok uzun.")
+        return value
 
     @field_validator("message", mode="before")
     @classmethod
@@ -190,6 +206,7 @@ async def chat(request: ChatRequest, x_ai_evaluation_role: str | None = Header(d
             request.message,
             session_id=request.session_id,
             context=context,
+            history=[turn.model_dump() for turn in request.history] if request.history is not None else None,
             role=_evaluation_role(x_ai_evaluation_role),
         )
     except AgentProviderError as error:

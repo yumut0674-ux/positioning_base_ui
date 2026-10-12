@@ -3,9 +3,9 @@
     "outsideHoldMs": 2000
   },
   "engine": {
-    "entryEvidenceDurationMs": 1500,
+    "entryEvidenceDurationMs": 3000,
     "exitEvidenceDurationMs": 1500,
-    "entryConfirmationCount": 3,
+    "entryConfirmationCount": 5,
     "exitConfirmationCount": 2,
     "evidenceWindowMs": 12000,
     "roomSwitchConfirmationCount": 3,

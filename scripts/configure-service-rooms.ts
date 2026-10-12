@@ -130,7 +130,8 @@ const area: LargeAreaDefinition = {
   })),
 };
 const updated: RegionsConfig = { ...config,
-  engine: structuredClone(reference.engine), mapDisplay: structuredClone(reference.mapDisplay),
+  engine: { ...structuredClone(reference.engine), entryEvidenceDurationMs: 3000, entryConfirmationCount: 5 },
+  mapDisplay: structuredClone(reference.mapDisplay),
   positionAnimation: structuredClone(reference.positionAnimation), areaTracking: structuredClone(reference.areaTracking),
   regions: [corridor, ...rooms], largeAreas: [area],
 };

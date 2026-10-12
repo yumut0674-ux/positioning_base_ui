@@ -35,18 +35,18 @@ const cadRooms = compiled.regions.map(room => {
 });
 const epoch = Date.parse("2026-10-09T12:00:00Z");
 
-test("Servis has 18 rooms, one corridor and intensive-care motor, room and door settings", () => {
+test("Servis has 18 rooms, one corridor and its own entry thresholds with intensive-care defaults", () => {
   assert.equal(compiled.regions.length, 18);
   assert.equal(compiled.corridors.length, 1);
   assert.deepEqual(compiled.warnings, []);
-  assert.deepEqual(config.engine, reference.engine);
+  assert.deepEqual(config.engine, { ...reference.engine, entryEvidenceDurationMs: 3000, entryConfirmationCount: 5 });
   assert.deepEqual(config.positionAnimation, reference.positionAnimation);
   assert.deepEqual(config.mapDisplay, reference.mapDisplay);
   assert.deepEqual(compiled.areaTracking, referenceCompiled.areaTracking);
   assert.deepEqual(rooms.map(room => room.name), Array.from({ length: 18 }, (_, index) => `Oda ${index + 1}`));
   for (const [index, room] of compiled.regions.entries()) {
     const template = referenceCompiled.regions[index % referenceCompiled.regions.length];
-    assert.deepEqual(room.settings, template.settings);
+    assert.deepEqual(room.settings, { ...template.settings, entryEvidenceDurationMs: 3000, entryConfirmationCount: 5 });
     assert.equal(room.entrances.length, 1);
     assert.equal(room.entrances[0].widthMeters, template.entrances[0].widthMeters);
     assert.equal(room.entrances[0].connectsTo, "corridor-main");
@@ -111,7 +111,7 @@ test("bathroom wings stay with their rooms and the corridor excludes them and th
   }
 });
 
-test("every Servis room confirms entry and releases back to the corridor with the intensive-care policy", () => {
+test("every Servis room waits for five reliable measurements and three seconds before confirming entry", () => {
   for (const room of compiled.regions) {
     let now = epoch;
     const engine = new RegionPositionEngine(() => undefined, 250, () => now, false);
@@ -129,10 +129,13 @@ test("every Servis room confirms entry and releases back to the corridor with th
         timestamp: new Date(now).toISOString() })!;
     };
     try {
-      send(0, -1); send(1, 0.75); atCentre(2); atCentre(3);
-      assert.equal(atCentre(4).regionInference.regionId, room.id, room.name);
-      send(5, 0.75); send(6, -1); send(7, -1.5);
-      assert.equal(send(8, -2).regionInference.regionId, null, room.name);
+      send(0, -1);
+      for (let second = 1; second <= 4; second++) {
+        assert.equal(atCentre(second).regionInference.regionId, null, room.name);
+      }
+      assert.equal(atCentre(5).regionInference.regionId, room.id, room.name);
+      send(6, 0.75); send(7, -1); send(8, -1.5);
+      assert.equal(send(9, -2).regionInference.regionId, null, room.name);
     } finally { engine.disable(); }
   }
 });

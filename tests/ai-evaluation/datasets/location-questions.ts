@@ -38,4 +38,11 @@ export const locationQuestionCases: readonly LocationQuestionCase[] = [
   { id: "CURRENT-011", prompt: "Hasan'ın şu anki konumu nedir?", intent: "current", subject: "Hasan" },
   { id: "CURRENT-012", prompt: "Hasan nerede şu an?", intent: "current", subject: "Hasan" },
   { id: "CURRENT-013", prompt: "Hasan'ın güncel konumu nerede?", intent: "current", subject: "Hasan" },
+  { id: "CURRENT-014", prompt: "hasan şuan nerede", intent: "current", subject: "hasan" },
+  { id: "CURRENT-015", prompt: "Hasan şuanda nerede?", intent: "current", subject: "Hasan" },
+  { id: "CURRENT-016", prompt: "Şuan Hasan nerede?", intent: "current", subject: "Hasan" },
+  { id: "CURRENT-017", prompt: "Hasan nerede şuan?", intent: "current", subject: "Hasan" },
+  { id: "CURRENT-018", prompt: "Şuan nerede?", intent: "current", subject: null, selectedTagCode: "TAG-007" },
+  { id: "CURRENT-019", prompt: "Hasan'ın şuanki konumu ne?", intent: "current", subject: "Hasan" },
+  { id: "CURRENT-020", prompt: "Seçili etiket şuanda nerede?", intent: "current", subject: null, selectedTagCode: "TAG-007" },
 ];

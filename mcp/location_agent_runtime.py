@@ -279,6 +279,32 @@ def _build_context_prompt(context: Mapping[str, Any] | None, tag_lookup_result: 
     return "\n".join(lines)
 
 
+def _conversation_contents(history: list[Mapping[str, str]], role: str) -> list[types.Content]:
+    """Validate replayed text; history never grants tool access or a user role."""
+    if len(history) > 20:
+        raise AgentUserFacingError("Konuşma geçmişi çok uzun.")
+    contents: list[types.Content] = []
+    characters = 0
+    for turn in history:
+        question, answer = turn.get("question"), turn.get("answer")
+        if (
+            not isinstance(question, str) or not question.strip() or len(question) > 1000
+            or not isinstance(answer, str) or not answer.strip() or len(answer) > 8000
+        ):
+            raise AgentUserFacingError("Konuşma geçmişi geçersiz.")
+        characters += len(question) + len(answer)
+        if characters > 32000:
+            raise AgentUserFacingError("Konuşma geçmişi çok uzun.")
+        _, output_reason = safe_answer(answer)
+        if not decide_request(question, role).allow_model or output_reason:
+            continue
+        contents.extend([
+            types.Content(role="user", parts=[types.Part(text=question)]),
+            types.Content(role="model", parts=[types.Part(text=answer)]),
+        ])
+    return contents
+
+
 class LocationAgentRuntime:
     """Owns one Gemini client and one stdio MCP connection for the app lifespan."""
 
@@ -390,6 +416,7 @@ class LocationAgentRuntime:
         session_id: str | None = None,
         context: Mapping[str, Any] | None = None,
         role: str = "unauthenticated",
+        history: list[Mapping[str, str]] | None = None,
     ) -> AgentAnswer:
         self._ensure_started()
         cleaned_message = message.strip()
@@ -403,7 +430,18 @@ class LocationAgentRuntime:
             # Do not create a chat or expose an MCP tool for rejected input.
             return AgentAnswer(session_id=session_id or str(uuid4()), answer=decision.response or OUTPUT_SAFETY_MESSAGE)
 
-        resolved_session_id, session = await self._get_or_create_session(session_id, role=role)
+        if history is None:
+            # Compatibility for the terminal client and older evaluation clients.
+            resolved_session_id, session = await self._get_or_create_session(session_id, role=role)
+        else:
+            resolved_session_id = session_id or str(uuid4())
+            session = AgentSession(
+                chat=self._create_chat(
+                    allow_tools=decision.allow_tools,
+                    history=_conversation_contents(history, role),
+                ),
+                lock=asyncio.Lock(), last_access=time.monotonic(), role=role,
+            )
         async with session.lock:
             tag_lookup_result = await self._verify_context_tag(context) if decision.allow_tools else None
             prompt = "\n\n".join([
@@ -431,12 +469,13 @@ class LocationAgentRuntime:
         if not self._started or self._client is None or self._mcp_session is None:
             raise AgentNotReadyError("Gekon AI henüz hazır değil.")
 
-    def _create_chat(self, *, allow_tools: bool = False) -> Any:
+    def _create_chat(self, *, allow_tools: bool = False, history: list[types.Content] | None = None) -> Any:
         self._ensure_started()
         assert self._client is not None
         assert self._mcp_session is not None
         return self._client.aio.chats.create(
             model=self.model,
+            history=history or [],
             config=types.GenerateContentConfig(
                 system_instruction=build_agent_instructions(),
                 temperature=0,

@@ -4,6 +4,8 @@ import { Bot, Loader2, MessageCircle, SendHorizontal, Trash2, User, X } from "lu
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, KeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
 import styles from "./historyChatWidget.module.css";
+import { ASSISTANT_CLIENT_TIMEOUT_MS, ASSISTANT_UNAVAILABLE_CODE, ASSISTANT_UNAVAILABLE_MESSAGE } from "../services/assistantAvailability";
+import { conversationHistory, type ConversationTurn } from "../services/assistantConversation";
 
 const PANEL_WIDTH_STORAGE_KEY = "gekon-ai-panel-width";
 const DEFAULT_PANEL_WIDTH = 390;
@@ -75,14 +77,19 @@ type ChatMessage = {
   readonly role: "user" | "assistant";
   readonly content: string;
   readonly isError?: boolean;
+  readonly unavailable?: boolean;
+  readonly exchange?: ConversationTurn;
 };
 
 type AssistantApiResponse = {
   readonly data?: {
     readonly sessionId: string;
     readonly answer: string;
+    readonly locationSubject?: string;
   };
+  readonly meta?: { readonly provider?: "local" | "gemini" };
   readonly error?: string;
+  readonly code?: string;
 };
 
 type ResizeSession = {
@@ -222,6 +229,10 @@ export function GekonAiWidget({ context: suppliedContext, draftText, draftReques
     setMessages((current) => [...current, { id: createMessageId(), role: "assistant", content, isError: true }]);
     setLastError(content);
   }, []);
+  const appendUnavailable = useCallback(() => {
+    setMessages((current) => [...current, { id: createMessageId(), role: "assistant", content: ASSISTANT_UNAVAILABLE_MESSAGE, unavailable: true }]);
+    setLastError(ASSISTANT_UNAVAILABLE_MESSAGE);
+  }, []);
 
   const sendMessage = useCallback(async () => {
     const message = input.trim();
@@ -236,35 +247,49 @@ export function GekonAiWidget({ context: suppliedContext, draftText, draftReques
       const response = await fetch("/api/assistant", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({ message, sessionId, context }),
+        body: JSON.stringify({
+          message, sessionId, context,
+          history: conversationHistory(messages.flatMap((item) => item.exchange ? [item.exchange] : [])),
+        }),
+        signal: AbortSignal.timeout(ASSISTANT_CLIENT_TIMEOUT_MS),
       });
       const payload = await response.json().catch(() => ({})) as AssistantApiResponse;
-      if (!response.ok || !payload.data) {
-        appendAssistantError(payload.error ?? "Gekon AI şu anda yanıt veremiyor.");
+      if (payload.code === ASSISTANT_UNAVAILABLE_CODE || response.status >= 500) {
+        if (payload.data?.sessionId) setSessionId(payload.data.sessionId);
+        appendUnavailable();
+        return;
+      }
+      if (!response.ok) {
+        appendAssistantError(response.status === 400 ? "Mesajınızı kontrol edip tekrar gönderin." : ASSISTANT_UNAVAILABLE_MESSAGE);
+        return;
+      }
+      if (!payload.data || typeof payload.data.answer !== "string" || typeof payload.data.sessionId !== "string") {
+        appendUnavailable();
         return;
       }
       setSessionId(payload.data.sessionId);
+      const answer = toDisplayText(payload.data.answer);
       setMessages((current) => [...current, {
         id: createMessageId(),
         role: "assistant",
-        content: toDisplayText(payload.data!.answer),
+        content: answer,
+        exchange: {
+          question: message, answer, provider: payload.meta?.provider ?? "gemini",
+          ...(payload.data?.locationSubject ? { locationSubject: payload.data.locationSubject } : {}),
+        },
       }]);
     } catch {
-      appendAssistantError("Gekon AI bağlantısı kesildi.");
+      appendUnavailable();
     } finally {
       setLoading(false);
     }
-  }, [appendAssistantError, context, input, loading, sessionId]);
+  }, [appendAssistantError, appendUnavailable, context, input, loading, messages, sessionId]);
 
-  const clearConversation = async () => {
-    const currentSessionId = sessionId;
+  const clearConversation = () => {
     setMessages([]);
     setInput("");
     setLastError(null);
     setSessionId(undefined);
-    if (currentSessionId) {
-      await fetch(`/api/assistant?sessionId=${encodeURIComponent(currentSessionId)}`, { method: "DELETE" }).catch(() => undefined);
-    }
     textareaRef.current?.focus();
   };
 
@@ -360,7 +385,7 @@ export function GekonAiWidget({ context: suppliedContext, draftText, draftReques
                 <h2 id="gekon-ai-title">Gekon AI</h2>
                 <span className={`${styles.status} ${lastError ? styles.statusError : ""}`}>
                   <i aria-hidden="true" />
-                  {lastError ? "Gekon AI yanıt veremedi" : "Gekon AI hazır"}
+                  {lastError ? "Şu anda kullanılamıyor" : "Sorularınız için hazır"}
                 </span>
               </div>
             </div>

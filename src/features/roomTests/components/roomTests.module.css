@@ -53,22 +53,23 @@
 .groupHeading { display:flex;align-items:center;justify-content:space-between;margin:17px 0 9px;color:#7d95a5 }
 .groupHeading span { font-size:9px;font-weight:650;letter-spacing:.1em }
 .groupHeading small { font-size:9px }
-.areaGrid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px }
-.panel .area { display:flex;flex-direction:column;align-items:stretch;gap:5px;min-height:117px;padding:13px;border:1px solid #d1dfe8;border-radius:6px;background:linear-gradient(145deg,#fff,#f8fbfd);text-align:left;font-weight:400;opacity:1 }
+.areaGrid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px }
+.panel .area { display:flex;flex-direction:column;align-items:stretch;gap:4px;min-height:94px;padding:10px;border:1px solid #d1dfe8;border-radius:5px;background:linear-gradient(145deg,#fff,#f8fbfd);text-align:left;font-weight:400;opacity:1 }
 .panel .area:disabled { cursor:default;opacity:1 }
 .panel .area:hover:not(:disabled) { border-color:#78b5bd;background:#eff9fa }
-.areaTop { display:flex;align-items:center;justify-content:space-between;gap:5px;margin-bottom:8px }
-.areaIcon { display:grid;place-items:center;width:32px;height:32px;border-radius:5px;background:#eef4f8;color:#829cab }
+.areaTop { display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:6px }
+.areaIcon { display:grid;place-items:center;width:26px;height:26px;border-radius:4px;background:#eef4f8;color:#829cab }
+.areaIcon svg { width:16px;height:16px }
 .areaTop>span:last-child { font-size:9px;color:#99adb9;white-space:nowrap }
-.area strong { color:#34566b;font-size:12px;font-weight:650;overflow-wrap:anywhere }
-.area small { color:#91a5b2;font-size:9px;overflow-wrap:anywhere }
+.area strong { color:#34566b;font-size:12px;font-weight:650;line-height:1.25;overflow-wrap:anywhere }
+.area small { color:#91a5b2;font-size:9px;line-height:1.35;overflow-wrap:anywhere }
 .panel .activeArea { border-color:#0b9d99;background:#ecf9f5;box-shadow:0 0 0 2px #0b9d9915 }
 .activeArea .areaIcon { background:#d8f1e8;color:#098976 }
 .activeArea strong,.activeArea .areaTop>span:last-child { color:#078679 }
 .paths { grid-template-columns:repeat(2,minmax(0,1fr)) }
-.paths .area { min-height:92px;background:#f5f9fb }
+.paths .area { min-height:74px;background:#f5f9fb }
 .paths .areaTop { margin-bottom:2px }
-.paths .areaIcon { width:25px;height:25px }
+.paths .areaIcon { width:20px;height:20px }
 .cardFooter { display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 16px;border-top:1px solid #dce7ee;background:#f8fbfd }
 .cardFooter button { font-size:10px }
 .statusCard { padding:19px;background:linear-gradient(145deg,#153e51,#123343);border-color:#1a485a;color:#e6f4f7 }
@@ -161,8 +162,8 @@
 .routeList li::before { content:counter(step);display:grid;place-items:center;min-width:22px;height:22px;border-radius:4px;background:#e9f4f7;color:#247588;font-size:10px }
 .routeList li span { flex:1 }
 .srOnly { position:absolute;width:1px;height:1px;padding:0;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap }
-@media(min-width:1550px) { .content { grid-template-columns:minmax(0,1.8fr) minmax(320px,1fr) }.areaGrid { grid-template-columns:repeat(4,minmax(0,1fr)) }.paths { grid-template-columns:repeat(2,minmax(0,1fr)) }.log { height:355px } }
+@media(min-width:1550px) { .content { grid-template-columns:minmax(0,1.8fr) minmax(320px,1fr) }.areaGrid { grid-template-columns:repeat(5,minmax(0,1fr)) }.paths { grid-template-columns:repeat(2,minmax(0,1fr)) }.log { height:355px } }
 @media(max-width:1150px) { .identity { grid-template-columns:1fr 1fr }.tagVerification { grid-column:1/-1;flex-direction:row;align-items:center }.areaGrid { grid-template-columns:repeat(2,minmax(0,1fr)) }.content { grid-template-columns:minmax(0,1.25fr) minmax(280px,1fr) } }
 @media(max-width:850px) { .content { display:flex;flex-direction:column }.leftStack,.rightStack { display:contents }.content>.leftStack>.card { width:100% }.rightStack>.card { width:100% }.statusCard { order:-1 }.areaGrid { grid-template-columns:repeat(3,minmax(0,1fr)) }.paths { grid-template-columns:repeat(2,minmax(0,1fr)) }.toolbar { flex-wrap:wrap }.heading h1 { font-size:21px }.heading p { max-width:350px;line-height:1.5 }.footer { flex-wrap:wrap }.log { height:260px } }
-@media(max-width:550px) { .panel { overflow:visible;gap:10px }.heading { flex-wrap:wrap;gap:10px }.heading small { font-size:9px }.heading p { font-size:11px }.heading .actions { width:100% }.identity { grid-template-columns:1fr }.tagVerification { grid-column:auto;flex-wrap:wrap }.setup { padding:12px }.toolbar { padding:12px;gap:10px }.toolbar .actions { gap:6px }.toolbar button { font-size:10px;padding:8px }.planTools { grid-template-columns:1fr }.cardHeader { padding:13px;flex-wrap:wrap }.planTools { padding:0 13px }.areaGroups { padding:0 13px 13px }.interactionHint { margin:10px 13px 0 }.modeBar { padding:12px 13px 0 }.areaGrid { grid-template-columns:repeat(2,minmax(0,1fr)) }.paths { grid-template-columns:1fr }.panel .area { min-height:109px;padding:11px }.paths .area { min-height:86px }.cardFooter { padding:10px 12px;flex-wrap:wrap }.formGrid { grid-template-columns:1fr }.inlineForm { flex-wrap:wrap }.inlineForm label { flex-basis:40% }.dialogHeader,.dialogBody { padding:16px }.currentArea h2 { font-size:21px }.footer>div { justify-content:flex-start }.syncError { max-width:280px }.routeHint { flex-wrap:wrap }.routeHint button { width:100% } }
+@media(max-width:550px) { .panel { overflow:visible;gap:10px }.heading { flex-wrap:wrap;gap:10px }.heading small { font-size:9px }.heading p { font-size:11px }.heading .actions { width:100% }.identity { grid-template-columns:1fr }.tagVerification { grid-column:auto;flex-wrap:wrap }.setup { padding:12px }.toolbar { padding:12px;gap:10px }.toolbar .actions { gap:6px }.toolbar button { font-size:10px;padding:8px }.planTools { grid-template-columns:1fr }.cardHeader { padding:13px;flex-wrap:wrap }.planTools { padding:0 13px }.areaGroups { padding:0 13px 13px }.interactionHint { margin:10px 13px 0 }.modeBar { padding:12px 13px 0 }.areaGrid { grid-template-columns:repeat(2,minmax(0,1fr)) }.paths { grid-template-columns:1fr }.panel .area { min-height:87px;padding:9px }.paths .area { min-height:69px }.cardFooter { padding:10px 12px;flex-wrap:wrap }.formGrid { grid-template-columns:1fr }.inlineForm { flex-wrap:wrap }.inlineForm label { flex-basis:40% }.dialogHeader,.dialogBody { padding:16px }.currentArea h2 { font-size:21px }.footer>div { justify-content:flex-start }.syncError { max-width:280px }.routeHint { flex-wrap:wrap }.routeHint button { width:100% } }
 @media(prefers-reduced-motion:reduce) { .panel button,.dialog button { transition:none } }

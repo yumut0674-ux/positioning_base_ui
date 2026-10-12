@@ -139,7 +139,9 @@ test("hot replacement restores an enabled controller only after retirement compl
   for(let attempt=0;attempt<100&&!current.controller.isEnabled();attempt++)await new Promise(resolve=>setTimeout(resolve,20));
   try {
     assert.notEqual(current.controller,stale.controller);assert.equal(stale.controller.isDisposed(),true);
-    assert.equal(current.controller.isEnabled(),true);assert.equal(current.controller.status().maps?.["spor-koridor"]?.configLoaded,true);
+    assert.equal(current.controller.isEnabled(),true);assert.equal(current.controller.status().maps?.["necmettin-servis"]?.configLoaded,true);
+    assert.equal(current.controller.status().maps?.["spor-koridor"],undefined);
+    assert.equal(current.controller.status().maps?.["kat1-ortopedi"],undefined);
     assert.equal(current.revision,REGION_ENGINE_CONTROLLER_REVISION);assert.equal(trackingBuffer.listenerCount("position"),1);
   } finally {await current.controller.dispose();}
 });

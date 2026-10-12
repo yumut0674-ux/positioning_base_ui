@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import { z } from "zod";
 import { logger } from "@/src/server/logger";
 import { entityService, locationService } from "@/src/server/location";
-import { answerLocationQuestion, parseLocationQuestion } from "@/src/server/assistant/locationAnswer";
+import { answerLocationQuestionWithSubject } from "@/src/server/assistant/locationAnswer";
+import { conversationLocationQuestion, conversationLocationSubject, modelConversationHistory } from "@/src/server/assistant/conversationContext";
+import { conversationHistorySchema } from "@/src/features/assistant/services/assistantConversation";
+import { ASSISTANT_UNAVAILABLE_CODE, ASSISTANT_UNAVAILABLE_MESSAGE } from "@/src/features/assistant/services/assistantAvailability";
+import { assistantManagementRepository } from "@/src/server/assistant/assistantManagementRepository";
+import { AssistantExecutionError, runManagedAssistantRequest } from "@/src/server/assistant/assistantRequestService";
 
 export const runtime = "nodejs";
 
@@ -57,15 +62,16 @@ const assistantContextSchema = z.object({
 
 const assistantRequestSchema = z.object({
   message: z.string().trim().min(1).max(1000),
-  // This is a browser-local handle, never the ID sent to the Python runtime.
+  // Groups admin request records; conversation memory comes only from history.
   sessionId: z.string().trim().min(1).max(64).optional(),
+  history: conversationHistorySchema.default([]),
   context: assistantContextSchema.optional(),
 }).strict();
 
 const assistantResponseSchema = z.object({
   data: z.object({
     sessionId: z.string().min(1),
-    answer: z.string(),
+    answer: z.string().min(1).max(32_000),
   }),
   meta: z.object({
     provider: z.literal("gemini"),
@@ -74,7 +80,7 @@ const assistantResponseSchema = z.object({
 });
 
 function chatbotServiceUrl(path: string): URL {
-  const base = new URL(process.env.CHATBOT_SERVICE_URL ?? DEFAULT_CHATBOT_SERVICE_URL);
+  const base = new URL(process.env.CHATBOT_SERVICE_URL || DEFAULT_CHATBOT_SERVICE_URL);
   base.pathname = `${base.pathname.replace(/\/$/, "")}${path}`;
   base.search = "";
   return base;
@@ -115,25 +121,23 @@ function validationError(error: z.ZodError) {
   }, { status: 400 });
 }
 
-function upstreamUnavailable(status = 503) {
+function upstreamUnavailable(sessionId?: string) {
   return NextResponse.json({
-    error: "Gekon AI bağlantısı kesildi. Lütfen yerel servisi başlatın.",
-  }, { status });
+    error: ASSISTANT_UNAVAILABLE_MESSAGE,
+    code: ASSISTANT_UNAVAILABLE_CODE,
+    ...(sessionId ? { data: { sessionId, answer: ASSISTANT_UNAVAILABLE_MESSAGE } } : {}),
+    meta: { availability: "unavailable" },
+  }, { status: 503, headers: { "Cache-Control": "no-store" } });
 }
 
-function safeUpstreamError(status: number, payload?: unknown) {
+function upstreamExecutionError(status: number, payload?: unknown) {
   const detail = payload && typeof payload === "object" && "detail" in payload
     ? (payload as { detail: unknown }).detail
     : null;
   if (status === 502 && typeof detail === "string" && detail.startsWith("Gemini API kotası aşıldı.")) {
-    return NextResponse.json({
-      error: "Gekon AI kullanım kotası doldu. Sistem yöneticisinin Gemini API limitlerini kontrol etmesi gerekiyor.",
-    }, { status: 503 });
+    return new AssistantExecutionError("PROVIDER_QUOTA_EXCEEDED", "AI servisinin kullanım kotası aşıldı.", status);
   }
-  const responseStatus = status >= 500 ? 502 : 400;
-  return NextResponse.json({
-    error: "Gekon AI yanıtı tamamlanamadı. Lütfen biraz sonra tekrar deneyin.",
-  }, { status: responseStatus });
+  return new AssistantExecutionError("UPSTREAM_REJECTED", "AI servisi isteği tamamlayamadı.", status);
 }
 
 async function fetchWithTimeout(url: URL, init: RequestInit): Promise<Response> {
@@ -168,60 +172,51 @@ export async function POST(request: Request) {
   const publicSessionId = parsed.data.sessionId ?? randomUUID();
   const internalSessionId = `${namespace.id}:${publicSessionId}`;
 
-  const locationQuestion = parseLocationQuestion(parsed.data.message);
-  if (locationQuestion) {
+  const locationQuestion = conversationLocationQuestion(parsed.data.message, parsed.data.history);
+  const provider = locationQuestion ? "local" : "gemini";
+  const result = await runManagedAssistantRequest({
+    id: randomUUID(),
+    sessionKey: createHash("sha256").update(internalSessionId).digest("hex").slice(0, 24),
+    question: parsed.data.message,
+    mode: parsed.data.context?.mode,
+  }, provider, assistantManagementRepository, async () => {
+    if (locationQuestion) {
+      try {
+        const subject = conversationLocationSubject(parsed.data.message, locationQuestion, parsed.data.context?.tagCode, parsed.data.history);
+        const answer = await answerLocationQuestionWithSubject({ ...locationQuestion, subject: subject ?? null }, undefined, {
+          search: (query, limit) => entityService.search(query, limit),
+          current: (entityId) => locationService.current(entityId),
+          lastKnownRoom: (entityId) => locationService.lastKnownRoom(entityId),
+        });
+        return { ...answer, model: "verified-location" };
+      } catch { throw new AssistantExecutionError("LOCATION_SERVICE_ERROR", "Konum verisine ulaşılamadı."); }
+    }
+    let response: Response;
     try {
-      const answer = await answerLocationQuestion(locationQuestion, parsed.data.context?.tagCode, {
-        search: (query, limit) => entityService.search(query, limit),
-        current: (entityId) => locationService.current(entityId),
-        lastKnownRoom: (entityId) => locationService.lastKnownRoom(entityId),
+      response = await fetchWithTimeout(chatbotServiceUrl("/chat"), {
+        method: "POST", headers: { Accept: "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify({
+          message: parsed.data.message,
+          sessionId: internalSessionId,
+          history: modelConversationHistory(parsed.data.history),
+          context: minimizedContext(parsed.data.context),
+        }),
       });
-      return withClientCookie(NextResponse.json({
-        data: { sessionId: publicSessionId, answer },
-        meta: { provider: "local", model: "verified-location" },
-      }), namespace);
     } catch (error) {
-      logger.error("assistant.location_answer_failed", error);
-      return NextResponse.json({ error: "Konum verisine şu anda ulaşılamıyor. Lütfen biraz sonra tekrar deneyin." }, { status: 503 });
+      if (error instanceof Error && error.name === "AbortError") throw new AssistantExecutionError("UPSTREAM_TIMEOUT", "AI servisi zaman aşımına uğradı.");
+      throw new AssistantExecutionError("UPSTREAM_CONNECTION_ERROR", "AI servisine bağlantı kurulamadı.");
     }
-  }
-
-  try {
-    const response = await fetchWithTimeout(chatbotServiceUrl("/chat"), {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: parsed.data.message,
-        sessionId: internalSessionId,
-        context: minimizedContext(parsed.data.context),
-      }),
-    });
-
     const payload = await readJson(response);
-    if (!response.ok) {
-      logger.error("assistant.upstream_rejected", new Error(`HTTP ${response.status}`), { status: response.status });
-      return safeUpstreamError(response.status, payload);
-    }
-
+    if (!response.ok) throw upstreamExecutionError(response.status, payload);
     const safePayload = assistantResponseSchema.safeParse(payload);
-    if (!safePayload.success) {
-      logger.error("assistant.invalid_upstream_response", safePayload.error);
-      return NextResponse.json({
-        error: "Gekon AI beklenmeyen bir yanıt döndürdü.",
-      }, { status: 502 });
-    }
-
-    return withClientCookie(NextResponse.json({
-      ...safePayload.data,
-      data: { ...safePayload.data.data, sessionId: publicSessionId },
-    }, { status: 200 }), namespace);
-  } catch (error) {
-    logger.error("assistant.request_failed", error);
-    return upstreamUnavailable();
-  }
+    if (!safePayload.success) throw new AssistantExecutionError("INVALID_UPSTREAM_RESPONSE", "AI servisi geçerli bir cevap döndürmedi.");
+    return { answer: safePayload.data.data.answer, model: safePayload.data.meta.model };
+  });
+  if (!result.available) return withClientCookie(upstreamUnavailable(publicSessionId), namespace);
+  return withClientCookie(NextResponse.json({
+    data: { sessionId: publicSessionId, answer: result.answer, ...(result.locationSubject ? { locationSubject: result.locationSubject } : {}) },
+    meta: { provider: result.provider, model: result.model, availability: "available" },
+  }, { headers: { "Cache-Control": "no-store" } }), namespace);
 }
 
 export async function DELETE(request: Request) {
@@ -236,11 +231,12 @@ export async function DELETE(request: Request) {
   const namespace = clientNamespace(request);
   const internalSessionId = `${namespace.id}:${sessionId}`;
   try {
+    if (!(await assistantManagementRepository.settings()).enabled) return withClientCookie(new NextResponse(null, { status: 204 }), namespace);
     const response = await fetchWithTimeout(chatbotServiceUrl(`/chat/${encodeURIComponent(internalSessionId)}`), {
       method: "DELETE",
       headers: { Accept: "application/json" },
     });
-    if (!response.ok) return safeUpstreamError(response.status);
+    if (!response.ok) return upstreamUnavailable();
     return withClientCookie(new NextResponse(null, { status: 204 }), namespace);
   } catch (error) {
     logger.error("assistant.session_delete_failed", error, { sessionId });

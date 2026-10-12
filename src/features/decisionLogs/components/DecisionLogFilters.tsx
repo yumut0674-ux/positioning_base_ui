@@ -69,7 +69,7 @@ export function DecisionLogFilters({ value, live, disabled, error, onChange, onA
       <TagFilter value={value.tagCode} onChange={next => set("tagCode", next)} />
       <label>Başlangıç<input type="datetime-local" value={value.from} onChange={event => set("from", event.target.value)} /></label>
       <label>Bitiş<input type="datetime-local" value={value.to} onChange={event => set("to", event.target.value)} /></label>
-      <label>Harita / kat<input value={value.mapId} onChange={event => set("mapId", event.target.value)} placeholder="spor-koridor" /></label>
+      <label>Harita / kat<input value={value.mapId} onChange={event => set("mapId", event.target.value)} placeholder="necmettin-servis" /></label>
       <label>Oda<input value={value.regionId} onChange={event => set("regionId", event.target.value)} placeholder="room-03" /></label>
       <label>Karar türü<select value={value.eventType} onChange={event => set("eventType", event.target.value)}><option value="">Tümü</option>{EVENTS.map(event => <option key={event}>{event}</option>)}</select></label>
       <label>Ölçüm türü<select value={value.measurementKind} onChange={event => set("measurementKind", event.target.value)}><option value="">Tümü</option><option value="measured">Ölçülen</option><option value="estimated">Tahmini</option><option value="uncertain">Belirsiz</option></select></label>

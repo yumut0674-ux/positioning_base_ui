@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type WheelEvent as ReactWheelEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Circle, Group, Image as KonvaImage, Layer, Line, Rect, Stage, Text } from "react-konva";
 import type Konva from "konva";
 import useImage from "use-image";
@@ -13,6 +13,7 @@ import {
   MAP_VIEWPORT_LIMITS,
 } from "../config/mapConfig";
 import { CoordinateTransformService } from "../services/CoordinateTransformService";
+import { createMapTouchGesture, getMapTouchViewport, type MapTouchGesture, type MapTouchPoint } from "../services/mapTouchGesture";
 import { TagOverlay } from "./TagOverlay";
 import type { PositionAnimationController } from "@/src/features/tracking/services/PositionAnimationController";
 import type { TrackedTag } from "@/src/features/tracking/types/tracking.types";
@@ -29,7 +30,7 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
   const hostRef = useRef<HTMLDivElement>(null);
   const stageRef = useRef<Konva.Stage>(null);
   const panOriginRef = useRef({ x: 0, y: 0 });
-  const pinchRef = useRef<{ readonly distance: number; readonly center: { readonly x: number; readonly y: number }; readonly viewport: typeof viewport } | null>(null);
+  const touchGestureRef = useRef<MapTouchGesture | null>(null);
   const handledFocusRequestRef = useRef(0);
   const handledFitRequestRef = useRef(0);
   const hasUserAdjustedViewRef = useRef(false);
@@ -70,7 +71,7 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
     const fittedViewport = getFittedMapViewport(size, mapSize);
     if (!fittedViewport) return false;
     hasUserAdjustedViewRef.current = false;
-    pinchRef.current = null;
+    touchGestureRef.current = null;
     setViewport(fittedViewport);
     return true;
   }, [mapSize, setViewport, size]);
@@ -78,7 +79,7 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
   useEffect(() => {
     hasUserAdjustedViewRef.current = false;
     lastAutoFitSizeRef.current = null;
-    pinchRef.current = null;
+    touchGestureRef.current = null;
     cancelMeasurement();
   }, [cancelMeasurement, map.id]);
 
@@ -134,7 +135,7 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [cancelMeasurement, measurement.enabled]);
 
-  const handleWheel = useCallback((event: ReactWheelEvent<HTMLDivElement>) => {
+  const handleWheel = useCallback((event: WheelEvent) => {
     event.preventDefault();
     const bounds = hostRef.current?.getBoundingClientRect();
     if (!bounds) return;
@@ -168,55 +169,97 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
     }));
   }, [constrainViewport, fitToScreen, fittedViewport, setViewport, viewport]);
 
-  const createPinch = useCallback((event: TouchEvent) => {
-    const stage = stageRef.current;
-    if (!stage || event.touches.length !== 2) return null;
-    const [firstTouch, secondTouch] = [event.touches[0], event.touches[1]];
-    const bounds = stage.container().getBoundingClientRect();
-    const center = {
-      x: (firstTouch.clientX + secondTouch.clientX) / 2 - bounds.left,
-      y: (firstTouch.clientY + secondTouch.clientY) / 2 - bounds.top,
-    };
-    return {
-      center,
-      distance: Math.hypot(firstTouch.clientX - secondTouch.clientX, firstTouch.clientY - secondTouch.clientY),
-      viewport,
-    };
-  }, [viewport]);
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host) return;
+    host.addEventListener("wheel", handleWheel, { passive: false });
+    return () => host.removeEventListener("wheel", handleWheel);
+  }, [handleWheel]);
 
-  const handleTouchStart = useCallback((event: Konva.KonvaEventObject<TouchEvent>) => {
-    if (event.evt.touches.length === 2 && !measurement.enabled) pinchRef.current = createPinch(event.evt);
-  }, [createPinch, measurement.enabled]);
+  useEffect(() => {
+    const host = hostRef.current;
+    if (!host || measurement.enabled) return;
 
-  const handleTouchMove = useCallback((event: Konva.KonvaEventObject<TouchEvent>) => {
-    if (measurement.enabled || event.evt.touches.length !== 2) return;
-    const pinch = pinchRef.current ?? createPinch(event.evt);
-    if (!pinch || pinch.distance === 0) return;
-    pinchRef.current = pinch;
-    event.evt.preventDefault();
-    const nextScale = Math.min(MAP_VIEWPORT_LIMITS.maxZoom, Math.max(
-      Math.min(MAP_VIEWPORT_LIMITS.minZoom, fittedViewport?.scale ?? MAP_VIEWPORT_LIMITS.minZoom),
-      pinch.viewport.scale * (createPinch(event.evt)?.distance ?? pinch.distance) / pinch.distance,
-    ));
-    if (fittedViewport && nextScale <= fittedViewport.scale + 0.001) {
-      fitToScreen();
-      return;
-    }
-    const mapPoint = {
-      x: (pinch.center.x - pinch.viewport.x) / pinch.viewport.scale,
-      y: (pinch.center.y - pinch.viewport.y) / pinch.viewport.scale,
+    let startTouch: MapTouchPoint | null = null;
+    let suppressClick = false;
+    const readTouches = (event: TouchEvent): MapTouchPoint[] => {
+      const bounds = host.getBoundingClientRect();
+      return Array.from(event.touches, (touch) => ({
+        id: touch.identifier,
+        x: touch.clientX - bounds.left,
+        y: touch.clientY - bounds.top,
+      }));
     };
-    hasUserAdjustedViewRef.current = true;
-    setViewport(constrainViewport({
-      scale: nextScale,
-      x: pinch.center.x - mapPoint.x * nextScale,
-      y: pinch.center.y - mapPoint.y * nextScale,
-    }));
-  }, [constrainViewport, createPinch, fitToScreen, fittedViewport, measurement.enabled, setViewport]);
+    const preventDefault = (event: Event) => {
+      if (event.cancelable) event.preventDefault();
+    };
+    const handleTouchStart = (event: TouchEvent) => {
+      // Handle touches on the host, including HTML tag labels, before Konva
+      // starts its own drag. Mouse dragging still belongs to the stage.
+      event.stopPropagation();
+      const touches = readTouches(event);
+      if (event.touches.length === event.changedTouches.length) {
+        startTouch = touches[0] ?? null;
+        suppressClick = false;
+      }
+      touchGestureRef.current = createMapTouchGesture(touches, useIpsStore.getState().viewport);
+      if (touches.length > 1) {
+        suppressClick = true;
+        preventDefault(event);
+      }
+    };
+    const handleTouchMove = (event: TouchEvent) => {
+      event.stopPropagation();
+      const touches = readTouches(event);
+      const first = touches[0];
+      if (touches.length > 1 || (first && startTouch
+        && Math.hypot(first.x - startTouch.x, first.y - startTouch.y) > 3)) suppressClick = true;
+      if (!suppressClick) return;
+      preventDefault(event);
 
-  const handleTouchEnd = useCallback(() => {
-    pinchRef.current = null;
-  }, []);
+      const currentViewport = useIpsStore.getState().viewport;
+      const nextViewport = getMapTouchViewport(touchGestureRef.current, touches, currentViewport, size, mapSize);
+      hasUserAdjustedViewRef.current = true;
+      setViewport(nextViewport);
+      // Rebase on every move so reversing direction at a zoom or pan limit
+      // responds immediately, without lifting either finger.
+      touchGestureRef.current = createMapTouchGesture(touches, nextViewport);
+    };
+    const handleTouchEnd = (event: TouchEvent) => {
+      event.stopPropagation();
+      if (suppressClick) preventDefault(event);
+      const touches = event.type === "touchcancel" ? [] : readTouches(event);
+      startTouch = touches[0] ?? null;
+      touchGestureRef.current = createMapTouchGesture(touches, useIpsStore.getState().viewport);
+    };
+    const handleClick = (event: MouseEvent) => {
+      if (!suppressClick || event.detail === 0) return;
+      preventDefault(event);
+      event.stopPropagation();
+    };
+    const handlePointerDown = (event: PointerEvent) => {
+      if (event.pointerType !== "touch") suppressClick = false;
+    };
+
+    // React touch listeners are passive. Native capture listeners allow us to
+    // prevent page gestures and bypass Konva's suppression of moves while dragging.
+    const options = { capture: true, passive: false };
+    host.addEventListener("touchstart", handleTouchStart, options);
+    host.addEventListener("touchmove", handleTouchMove, options);
+    host.addEventListener("touchend", handleTouchEnd, options);
+    host.addEventListener("touchcancel", handleTouchEnd, options);
+    host.addEventListener("click", handleClick, true);
+    host.addEventListener("pointerdown", handlePointerDown, true);
+    return () => {
+      host.removeEventListener("touchstart", handleTouchStart, true);
+      host.removeEventListener("touchmove", handleTouchMove, true);
+      host.removeEventListener("touchend", handleTouchEnd, true);
+      host.removeEventListener("touchcancel", handleTouchEnd, true);
+      host.removeEventListener("click", handleClick, true);
+      host.removeEventListener("pointerdown", handlePointerDown, true);
+      touchGestureRef.current = null;
+    };
+  }, [mapSize, measurement.enabled, setViewport, size]);
 
   const handleMeasureClick = useCallback(() => {
     if (!measurement.enabled) return;
@@ -258,7 +301,7 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
     : null;
 
   return (
-    <div ref={hostRef} className="map-viewport" data-testid="map-viewport" data-can-pan={canPan} onWheel={handleWheel}>
+    <div ref={hostRef} className="map-viewport" data-testid="map-viewport" data-can-pan={canPan}>
       <Stage
         ref={stageRef}
         // Konva creates an internal canvas for every layer. It cannot draw to
@@ -268,10 +311,6 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
         height={Math.max(1, size.height)}
         onClick={handleMeasureClick}
         onTap={handleMeasureClick}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleTouchEnd}
-        onTouchCancel={handleTouchEnd}
         preventDefault={false}
         draggable={canPan}
         x={0}

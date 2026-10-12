@@ -8,8 +8,8 @@ const EXAMPLE_PAYLOAD = {
   tag_id: "A1B2C3D400000001",
   x: 1.25,
   y: 0.8,
-  zone_id: "zone-a",
-  zone_name: " Bölge A ",
+  zone_id: "servis",
+  zone_name: " Servis ",
   timestamp: "2026-07-21T14:30:15.123+03:00",
 } as const;
 
@@ -24,7 +24,7 @@ function jsonRequest(payload: unknown): Request {
 test("kaynak heartbeat'i ayrı token ve bilinen zone gerektirir", async () => {
   const oldToken = process.env.TRACKING_HEALTH_TOKEN;
   process.env.TRACKING_HEALTH_TOKEN = "test-health-secret";
-  const body = { type: "source_health", zone_id: "zone-a", status: "healthy", timestamp: new Date().toISOString() };
+  const body = { type: "source_health", zone_id: "servis", status: "healthy", timestamp: new Date().toISOString() };
   try {
     assert.equal((await POST(jsonRequest(body))).status, 401);
     const authorized = (payload: unknown) => new Request("http://localhost/api/tracking/ingest", {
@@ -56,9 +56,9 @@ test("örnek position payload'ı 202 ile kabul edilir ve gönderilen zaman korun
       x: 1.25,
       y: 0.8,
       timestamp: "2026-07-21T14:30:15.123+03:00",
-      sourceZoneId: "zone-a",
-      sourceZoneName: "Bölge A",
-      mapId: "spor-koridor",
+      sourceZoneId: "servis",
+      sourceZoneName: "Servis",
+      mapId: "necmettin-servis",
     });
   } finally {
     trackingBuffer.ingest = originalIngest;
@@ -70,12 +70,12 @@ test("null ve bilinmeyen zone kabul edilir fakat haritaya çözülmez", async ()
   const captured: TrackingPosition[] = [];
   trackingBuffer.ingest = async (position) => { captured.push(position); return false; };
   try {
-    for (const zone of [null, "not-configured"]) {
+    for (const zone of [null, "not-configured", "zone-a", "zone-b"]) {
       const response = await POST(jsonRequest({ ...EXAMPLE_PAYLOAD, zone_id: zone, zone_name: null }));
       assert.equal(response.status, 202);
       assert.equal((await response.json() as { mapId: unknown }).mapId, null);
     }
-    assert.deepEqual(captured.map((position) => position.mapId), [null, null]);
+    assert.deepEqual(captured.map((position) => position.mapId), [null, null, null, null]);
   } finally { trackingBuffer.ingest = originalIngest; }
 });
 

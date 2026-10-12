@@ -5,24 +5,19 @@ import type {
   ViewportState,
 } from "../types/map.types";
 import type { Size2D } from "@/src/shared/types/geometry";
+import serviceMap from "../../../../config/maps/necmettin-servis/map.json";
 
 export const MAP_FLOOR_PLAN: FloorPlanDefinition = {
-  id: "spor-koridor",
-  name: "spor",
-  building: "Spor Tesisi",
-  level: "Spor Koridoru",
-  imageUrl: "/maps/spor-koridor/floor-plan.png",
-  canvasSize: { width: 3840, height: 2160 },
-  worldSize: { width: 33.80736, height: 19.01664 },
+  id: serviceMap.id,
+  name: "Servis",
+  building: "Neü Tıp Fakültesi",
+  level: "Servis",
+  imageUrl: serviceMap.image.url,
+  canvasSize: { width: serviceMap.image.width, height: serviceMap.image.height },
+  worldSize: { width: serviceMap.world.widthMeters, height: serviceMap.world.heightMeters },
 };
 
-export const MAP_CALIBRATION: MapCalibration = {
-  worldOrigin: { x: 0, y: 0 },
-  canvasOrigin: { x: 812.16, y: 1735.14 },
-  pixelsPerMeter: 113.584734212,
-  invertYAxis: true,
-  rotationDegrees: 0,
-};
+export const MAP_CALIBRATION: MapCalibration = serviceMap.calibration;
 
 export const MAP_VIEWPORT_LIMITS = {
   minZoom: 0.38,

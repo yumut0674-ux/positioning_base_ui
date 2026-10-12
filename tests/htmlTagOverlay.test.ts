@@ -33,7 +33,7 @@ test("world coordinates are written as a compositor-friendly tag transform", () 
   renderHtmlTagPosition(target, coordinateTransform, 2, 3);
 
   assert.equal(target.style.transform, htmlTagPositionTransform(coordinateTransform.worldToCanvas({ x: 2, y: 3 })));
-  assert.match(target.style.transform, /^translate3d\(1039\.329468/);
+  assert.match(target.style.transform, /^translate3d\(315\.645094/);
 });
 
 test("detached HTML renderers are not updated by later positions", () => {

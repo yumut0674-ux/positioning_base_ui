@@ -25,7 +25,12 @@ import { useTagTrailSettingsStorage } from "@/src/features/tracking/hooks/useTag
 import { DecisionLogsPanel } from "@/src/features/decisionLogs/components/DecisionLogsPanel";
 import type { UiMode } from "./uiMode";
 
-const ADMIN_VIEWS = new Set<WorkspaceView>(["tags", "anchors", "regions", "analyses", "room-tests"]);
+const ADMIN_VIEWS = new Set<WorkspaceView>(["tags", "anchors", "regions", "analyses", "room-tests", "gekon-ai"]);
+
+const GekonAiAdminPanel = dynamic(
+  () => import("@/src/features/assistantAdmin/components/GekonAiAdminPanel").then((module) => module.GekonAiAdminPanel),
+  { ssr: false, loading: () => <div className="history-panel-loading-frame" role="status">Gekon AI yönetimi hazırlanıyor…</div> },
+);
 
 const RoomTestPanel = dynamic(
   () => import("@/src/features/roomTests/components/RoomTestPanel").then((module) => module.RoomTestPanel),
@@ -226,7 +231,7 @@ function LiveMapWorkspace({
       {mobileMenuOpen && <button type="button" className="mobile-sidebar-backdrop" aria-label="Menüyü kapat" onClick={() => setMobileMenuOpen(false)} />}
       <AppSidebar mode={mode} activeView={activeView} collapsed={sidebarCollapsed} mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} onViewChange={handleSidebarViewChange} roomTestRecording={roomTestRecording} />
       <main className="workspace">
-        {mode === "admin" && activeView === "anchors" ? <AnchorManagementPanel embedded /> : mode === "admin" && activeView === "tags" ? <TagManagementPanel embedded /> : mode === "admin" && activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : mode === "admin" && activeView === "analyses" ? <DecisionLogsPanel /> : activeView === "history" || activeView === "room-tests" ? null : <>
+        {mode === "admin" && activeView === "gekon-ai" ? <GekonAiAdminPanel /> : mode === "admin" && activeView === "anchors" ? <AnchorManagementPanel embedded /> : mode === "admin" && activeView === "tags" ? <TagManagementPanel embedded /> : mode === "admin" && activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : mode === "admin" && activeView === "analyses" ? <DecisionLogsPanel /> : activeView === "history" || activeView === "room-tests" ? null : <>
           <div className="workspace-heading live-map-heading">
             <div className="workspace-heading-content">
               <span>{liveTrackingVisible ? "CANLI OPERASYONLAR" : "HARİTA GÖRÜNÜMÜ"} / {(activeMap?.floorLabel ?? "HARİTA").toUpperCase()}</span>

@@ -314,10 +314,11 @@ function connect(config: PgConfig): Promise<net.Socket> {
   });
 }
 
-export async function queryPostgres(sql: string): Promise<PgRow[]> {
+export async function queryPostgres(sql: string, options: { timeoutMs?: number } = {}): Promise<PgRow[]> {
   const config = getConfig();
   const socket = await connect(config);
   const readMessage = createMessageReader(socket);
+  const queryTimer = options.timeoutMs ? setTimeout(() => socket.destroy(new Error("PostgreSQL query timed out")), options.timeoutMs) : undefined;
   let fields: PgField[] = [];
   let rows: PgRow[] = [];
 
@@ -349,6 +350,7 @@ export async function queryPostgres(sql: string): Promise<PgRow[]> {
       }
     }
   } finally {
+    if (queryTimer) clearTimeout(queryTimer);
     socket.end();
   }
 }

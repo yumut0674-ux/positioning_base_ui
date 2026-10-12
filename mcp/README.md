@@ -123,8 +123,8 @@ araçlarına bağlanmaz. Tarayıcı `POST /api/assistant` endpointine gider. “
 neredeydi” ve “şu an nerede” gibi tanınan tek varlık soruları burada doğrudan
 yerel entity/konum servisleriyle yanıtlanır; kişi ve konum verisi Gemini'ye
 gönderilmez. Diğer sorular yerel FastAPI asistanına iletilir. Endpoint her
-tarayıcı için HttpOnly bir ad alanı üretir; istemcinin verdiği oturum kimliği
-tek başına başka bir konuşmaya erişim için yeterli değildir.
+tarayıcı için HttpOnly bir ad alanı üretir; soru-cevap kayıtları bu ad alanı ve
+konuşma kimliğiyle ilişkilendirilir. Kimlik kullanılarak eski sohbet belleği okunmaz.
 
 Mevcut uygulamada doğrulanmış kullanıcı/rol aktarımı bulunmadığı için web
 istekleri varsayılan olarak `unauthenticated` kabul edilir. FastAPI akışında kişi,
@@ -136,6 +136,31 @@ koordinat ve rota bilgisi modele iletilmez. Hasta veya personel verisiyle çalı
 kurulum, üretime alınmadan önce güvenilir sunucu tarafı kimlik doğrulama,
 rol/birim kapsamı ve retrieval filtresi eklemelidir; istemci mesajındaki
 “adminim” ifadesi yetki kanıtı değildir.
+
+Web sohbetinin belleği, açık chat bileşenindeki mesaj listesidir. Her istekte
+`history` alanında son 20 tamamlanmış soru-cevap (toplam en fazla 32.000 karakter,
+cevap başına en fazla 8.000 karakter) taşınır. FastAPI bu geçmişle yeni bir Gemini
+chat oluşturur; web yanıtları sunucudaki oturum önbelleğine veya 30 dakikalık
+oturum süresine bağlı değildir. `sessionId` yalnızca yönetim kayıtlarını aynı
+konuşma altında ilişkilendirir. Terminal istemcisi eski oturum akışını kullanır.
+
+Yerel konum cevapları doğrulanan varlığın kodunu `locationSubject` olarak chat
+mesajına ekler. “O şimdi nerede?”, “peki en son neredeydi?” gibi devam soruları
+bu kodu yeniden arayıp güncel veriyi getirir; eski konum cevabı tekrar kullanılmaz.
+Yeni bir kişi sorulduğunda bağlam değişir; belirsiz veya bulunamayan kişi önceki
+kişiye geri düşmez. “Seçili etiket” / “bu etiket” soruları ekrandaki seçimi kullanır.
+Kişi ve konum içeren yerel soru-cevaplar Gemini geçmişine aktarılmaz.
+
+Paneli kapatıp açmak mevcut mesajları korur. “Konuşmayı temizle”, sayfayı yenileme
+ve chat bileşeninin kaldırılması konuşma belleğini sıfırlar. Yönetim kayıtları
+sohbet belleği olarak tekrar okunmaz.
+
+Konuşma belleği regresyon testleri (Gemini çağrısı yapmaz):
+
+```powershell
+npm run test:ai:location
+mcp\.venv\Scripts\python.exe tests\assistant_conversation_test.py -v
+```
 
 `assistant_policy.py` modelden önce prompt injection, gizli yapılandırma,
 klinik çıkarım ve yetkisiz veri erişimi isteklerini deterministik engeller.

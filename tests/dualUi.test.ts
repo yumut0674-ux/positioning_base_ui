@@ -26,6 +26,15 @@ test("demo navigation shows shared panels and omits management panels", () => {
 
   for (const label of ["Canlı Harita", "Rota Geçmişi", "Destek ve İletişim"])
     assert.match(html, new RegExp(label));
-  for (const label of ["İzlenen Varlıklar", "Referans İstasyonları", "Oda/Bölge", "Analizler", "Saha ayarları"])
+  for (const label of ["İzlenen Varlıklar", "Referans İstasyonları", "Oda/Bölge", "Analizler", "Saha ayarları", "Gekon AI"])
     assert.ok(!html.includes(label), `${label} should be absent from demo navigation`);
+});
+
+test("admin navigation exposes Gekon AI management", () => {
+  const html = renderToStaticMarkup(createElement(AppSidebar, {
+    mode: "admin", activeView: "gekon-ai", collapsed: false, mobileOpen: false,
+    onMobileClose: () => {}, onViewChange: () => {},
+  }));
+  assert.match(html, /Gekon AI/);
+  assert.match(html, /aria-label="Gekon AI"/);
 });

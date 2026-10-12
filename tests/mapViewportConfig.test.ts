@@ -77,14 +77,15 @@ test("tracking label focus uses a fifty percent map scale", () => {
   assert.equal(MAP_TAG_FOCUS_SCALE, 0.5);
 });
 
-test("uses the supplied plan origin with x horizontal and y inverted", () => {
+test("uses the service plan origin with x vertical and y horizontal", () => {
   const transform = new CoordinateTransformService(MAP_CALIBRATION);
 
   assert.deepEqual(MAP_FLOOR_PLAN.canvasSize, { width: 3840, height: 2160 });
-  assert.deepEqual(MAP_FLOOR_PLAN.worldSize, { width: 33.80736, height: 19.01664 });
-  assert.deepEqual(transform.worldToCanvas({ x: 0, y: 0 }), { x: 812.16, y: 1735.14 });
+  assert.equal(MAP_FLOOR_PLAN.id, "necmettin-servis");
+  assert.deepEqual(MAP_FLOOR_PLAN.worldSize, { width: 30.611038043874483, height: 54.4196231891102 });
+  assert.deepEqual(transform.worldToCanvas({ x: 0, y: 0 }), { x: 103.95674932228825, y: 950.4403526308 });
   const oneMeter = transform.worldToCanvas({ x: 1, y: 1 });
-  assert.ok(Math.abs(oneMeter.x - 925.744734212) < 0.000001);
-  assert.ok(Math.abs(oneMeter.y - 1621.555265788) < 0.000001);
-  assert.deepEqual(transform.canvasToWorld({ x: 812.16, y: 1735.14 }), { x: 0, y: 0 });
+  assert.ok(Math.abs(oneMeter.x - 174.5195311823511) < 0.000001);
+  assert.ok(Math.abs(oneMeter.y - 1021.0031344908628) < 0.000001);
+  assert.deepEqual(transform.canvasToWorld({ x: 103.95674932228825, y: 950.4403526308 }), { x: 0, y: 0 });
 });

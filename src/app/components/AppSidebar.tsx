@@ -1,12 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { BarChart3, Boxes, Building2, ClipboardList, Crosshair, Headset, Hexagon, Map, RadioTower, Route, Settings, X } from "lucide-react";
+import { BarChart3, Bot, Boxes, Building2, ClipboardList, Crosshair, Headset, Hexagon, Map, RadioTower, Route, Settings, X } from "lucide-react";
 import type { UiMode } from "../uiMode";
 
 const SIDEBAR_COLLAPSED_STORAGE_KEY = "ips-sidebar-collapsed";
 
-export type WorkspaceView = "map" | "tags" | "anchors" | "regions" | "history" | "support" | "analyses" | "room-tests";
+export type WorkspaceView = "map" | "tags" | "anchors" | "regions" | "history" | "support" | "analyses" | "room-tests" | "gekon-ai";
 
 type NavigationItem = { readonly label: string; readonly view: WorkspaceView; readonly icon: typeof Map };
 
@@ -17,6 +17,7 @@ const ADMIN_NAVIGATION: ReadonlyArray<NavigationItem> = [
   { label: "İzlenen Varlıklar", view: "tags", icon: Boxes },
   { label: "Referans İstasyonları", view: "anchors", icon: RadioTower },
   { label: "Oda/Bölge", view: "regions", icon: Hexagon },
+  { label: "Gekon AI", view: "gekon-ai", icon: Bot },
 ];
 
 const REVIEW_NAVIGATION: ReadonlyArray<NavigationItem> = [{ label: "Analizler", view: "analyses", icon: BarChart3 }, { label: "Oda Test Kaydı", view: "room-tests", icon: ClipboardList }];

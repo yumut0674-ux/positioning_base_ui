@@ -146,24 +146,21 @@ test("intensive care uses the selected origin with Y along the long horizontal a
 test("checked-in map catalog and live map config are valid", async () => {
   const service = new MapService(new FileMapRepository(mapsDirectory));
   const catalog = await service.getCatalog();
-  assert.equal(catalog.defaultMapId, "spor-koridor");
-  assert.equal(catalog.liveTrackingMapId, "spor-koridor");
-  assert.ok(catalog.maps.some((entry) => entry.id === "kat1-ortopedi" && entry.status === "active" && entry.liveTrackingEnabled));
-  const sportsCorridor = catalog.maps.find((entry) => entry.id === "spor-koridor");
-  assert.equal(sportsCorridor?.unitName, "spor");
-  assert.deepEqual(sportsCorridor?.trackingZoneIds, ["zone-a", "uwb-floor-1", "spor-koridor", "spor-2"]);
+  assert.equal(catalog.defaultMapId, "necmettin-servis");
+  assert.equal(catalog.liveTrackingMapId, "necmettin-servis");
+  assert.ok(catalog.maps.every((entry) => entry.buildingId !== "spor-tesisi"));
   assert.ok(catalog.maps.some((entry) => entry.status === "planned" && entry.configPath === null));
   const details = await service.getMapDetails(catalog.liveTrackingMapId);
-  assert.equal(details.image.url, "/maps/spor-koridor/floor-plan.png");
-  assert.equal(details.calibration.pixelsPerMeter, 113.584734212);
-  assert.deepEqual(details.calibration.canvasOrigin, { x: 812.16, y: 1735.14 });
+  assert.equal(details.image.url, "/maps/necmettin-servis/floor-plan-1e98c4840f0c.png");
+  assert.equal(details.calibration.pixelsPerMeter, 70.56278186006284);
+  assert.equal(details.calibration.rotationDegrees, 90);
 });
 
 test("multiple live maps are valid but duplicate active zone mappings are rejected", async () => {
   const catalog = await new FileMapRepository(mapsDirectory).readCatalog();
-  assert.equal(catalog.maps.filter((entry) => entry.liveTrackingEnabled).length, 4);
+  assert.equal(catalog.maps.filter((entry) => entry.liveTrackingEnabled).length, 2);
   const duplicate = structuredClone(catalog) as unknown as { maps: Array<Record<string, unknown>> } & Record<string, unknown>;
-  duplicate.maps[1].trackingZoneIds = ["zone-a"];
+  duplicate.maps[1].trackingZoneIds = ["servis"];
   const temporaryDirectory = await mkdtemp(path.join(os.tmpdir(), "gekon-map-zones-"));
   try {
     await writeFile(path.join(temporaryDirectory, "catalog.json"), JSON.stringify(duplicate), "utf8");
@@ -192,6 +189,12 @@ test("unknown, traversal and planned map requests have controlled errors", async
     () => service.getMapDetails("bilinmeyen-harita"),
     (error: unknown) => error instanceof MapRequestError && error.code === "MAP_NOT_FOUND" && error.status === 404,
   );
+  for (const mapId of ["spor-koridor", "kat1-ortopedi"]) {
+    await assert.rejects(
+      () => service.getMapDetails(mapId),
+      (error: unknown) => error instanceof MapRequestError && error.code === "MAP_NOT_FOUND" && error.status === 404,
+    );
+  }
   await assert.rejects(
     () => service.getMapDetails("../catalog"),
     (error: unknown) => error instanceof MapRequestError && error.code === "INVALID_MAP_ID" && error.status === 400,

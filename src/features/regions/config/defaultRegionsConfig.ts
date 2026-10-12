@@ -1,18 +1,21 @@
 import { MAP_CALIBRATION, MAP_FLOOR_PLAN } from "@/src/features/map/config/mapConfig";
+import { CoordinateTransformService } from "@/src/features/map/services/CoordinateTransformService";
 import type { CalibrationPoint, RegionsConfig } from "../types/region.types";
 import { DEFAULT_POSITION_ANIMATION_CONFIG } from "@/src/features/tracking/config/positionAnimationConfig";
 import { DEFAULT_REGION_ENGINE_SETTINGS } from "./regionInferenceSettings";
+
+const systemCoordinateTransform = new CoordinateTransformService(MAP_CALIBRATION);
 
 export const SYSTEM_MAP_CALIBRATION_POINTS: readonly CalibrationPoint[] = [
   { id: "origin", pixel: MAP_CALIBRATION.canvasOrigin, world: MAP_CALIBRATION.worldOrigin },
   {
     id: "x-axis",
-    pixel: { x: MAP_CALIBRATION.canvasOrigin.x + MAP_CALIBRATION.pixelsPerMeter, y: MAP_CALIBRATION.canvasOrigin.y },
+    pixel: systemCoordinateTransform.worldToCanvas({ x: MAP_CALIBRATION.worldOrigin.x + 1, y: MAP_CALIBRATION.worldOrigin.y }),
     world: { x: MAP_CALIBRATION.worldOrigin.x + 1, y: MAP_CALIBRATION.worldOrigin.y },
   },
   {
     id: "y-axis",
-    pixel: { x: MAP_CALIBRATION.canvasOrigin.x, y: MAP_CALIBRATION.canvasOrigin.y - MAP_CALIBRATION.pixelsPerMeter },
+    pixel: systemCoordinateTransform.worldToCanvas({ x: MAP_CALIBRATION.worldOrigin.x, y: MAP_CALIBRATION.worldOrigin.y + 1 }),
     world: { x: MAP_CALIBRATION.worldOrigin.x, y: MAP_CALIBRATION.worldOrigin.y + 1 },
   },
 ];
