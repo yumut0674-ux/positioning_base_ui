@@ -533,7 +533,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-02-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -636,7 +636,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-03-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -739,7 +739,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-04-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -842,7 +842,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-05-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -945,7 +945,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-06-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -1048,7 +1048,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-07-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -1151,7 +1151,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-08-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -1254,7 +1254,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-09-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -1357,7 +1357,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-10-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -1460,7 +1460,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-11-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -1563,7 +1563,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-12-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -1666,7 +1666,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-13-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -1769,7 +1769,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-14-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -1872,7 +1872,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-15-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -1975,7 +1975,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-16-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -2078,7 +2078,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-17-corridor-door",
           "label": "Koridor kapısı"
         }
@@ -2181,7 +2181,7 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
-          "approachDepthMeters": 1,
+          "approachDepthMeters": 1.2,
           "id": "room-18-corridor-door",
           "label": "Koridor kapısı"
         }
