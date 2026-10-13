@@ -20,6 +20,14 @@ export function DecisionLogDetail({ item, loading, error, onBack }: { readonly i
     <section><h3>Kapı ve kanıt</h3><dl><dt>Kapı kimliği</dt><dd>{show(e?.doorId)}</dd><dt>Kapıya uzaklık</dt><dd>{number(e?.doorDistanceMeters,2," m")}</dd><dt>Mesafe eşiği</dt><dd>{number(e?.allowedDoorDistanceMeters,2," m")}</dd><dt>Ölçüm sayısı</dt><dd>{show(e?.collectedMeasurements)} / {show(e?.requiredMeasurements)}</dd><dt>Kanıt süresi</dt><dd>{show(e?.collectedDurationMs," ms")} / {show(e?.requiredDurationMs," ms")}</dd><dt>Donanım kalitesi</dt><dd>{show(trace?.input.quality)}</dd></dl>
       {e?.score && <div className={styles.scoreGrid}>{Object.entries(e.score).map(([key,value])=><div key={key}><span>{key}</span><strong>{number(value,2)}</strong></div>)}</div>}
     </section>
+    {e?.stepDistance && <section><h3>Nokta mesafesi filtresi</h3><dl>
+      <dt>Referansa uzaklık / eşik</dt><dd>{number(e.stepDistance.distanceMeters,2," m")} / {number(e.stepDistance.maximumDistanceMeters,2," m")}</dd>
+      <dt>Karşılaştırma referansı</dt><dd>{number(e.stepDistance.reference.x)} / {number(e.stepDistance.reference.y)} · {new Date(e.stepDistance.reference.measuredAt).toLocaleString("tr-TR")}</dd>
+      <dt>Yeni konum aday ölçümleri</dt><dd>{e.stepDistance.candidateCount} / {e.stepDistance.requiredCount}</dd>
+      <dt>Aday süresi</dt><dd>{show(e.stepDistance.candidateDurationMs," ms")} / {show(e.stepDistance.requiredDurationMs," ms")}</dd>
+      <dt>Takip referansı</dt><dd>{e.stepDistance.referenceReset ? "Yeniden kuruldu; sonraki ölçümle oda kanıtı başlayacak" : "Yeni konum doğrulaması bekleniyor"}</dd>
+      <dt>Oda kanıtına dahil</dt><dd>Hayır</dd>
+    </dl></section>}
     <section><h3>Gerekçeler</h3><div className={styles.reasons}>{trace?.reasons.length ? trace.reasons.map(reason=><div key={`${reason.code}-${reason.message}`}><code>{reason.code}</code><p>{reason.message}</p></div>) : <p>Yapılandırılmış gerekçe bulunmuyor.</p>}</div></section>
     <section><h3>Sürümler</h3><dl><dt>Motor</dt><dd>{item.engineVersion}</dd><dt>Konfigürasyon</dt><dd>{item.configVersion}</dd></dl></section>
     <details className={styles.raw}><summary><ChevronDown size={14}/> Ham JSON <button type="button" onClick={event=>{event.preventDefault();void copy();}}>{copied?<Check size={14}/>:<Clipboard size={14}/>} {copied?"Kopyalandı":"JSON kopyala"}</button></summary><pre>{JSON.stringify(item.payload,null,2)}</pre></details>

@@ -4,7 +4,7 @@
   },
   "engine": {
     "entryEvidenceDurationMs": 2000,
-    "exitEvidenceDurationMs": 1000,
+    "exitEvidenceDurationMs": 1500,
     "entryConfirmationCount": 5,
     "exitConfirmationCount": 2,
     "evidenceWindowMs": 12000,
@@ -32,6 +32,12 @@
     "wallEvidenceWeight": 0.1,
     "maximumSpeedMetersPerSecond": 3,
     "movementToleranceMeters": 0.25,
+    "maximumStepDistanceMeters": 10,
+    "relocationClusterRadiusMeters": 1,
+    "relocationConfirmationCount": 2,
+    "relocationConfirmationDurationMs": 1500,
+    "relocationMaximumGapMs": 2000,
+    "relocationCandidateWindowMs": 6000,
     "lostAfterMs": 30000,
     "relocationAfterMs": 15000,
     "regularCoverageStaleMultiplier": 3,
@@ -404,6 +410,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -420,15 +430,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1.2,
           "id": "room-01-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-02",
@@ -507,6 +513,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -523,15 +533,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-02-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-03",
@@ -610,6 +616,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -626,15 +636,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-03-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-04",
@@ -713,6 +719,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -729,15 +739,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-04-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-05",
@@ -816,6 +822,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -832,15 +842,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-05-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-06",
@@ -919,6 +925,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -935,15 +945,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-06-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-07",
@@ -1022,6 +1028,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -1038,15 +1048,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-07-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-08",
@@ -1125,6 +1131,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -1141,15 +1151,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-08-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-09",
@@ -1228,6 +1234,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -1244,15 +1254,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-09-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-10",
@@ -1331,6 +1337,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -1347,15 +1357,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-10-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-11",
@@ -1434,6 +1440,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -1450,15 +1460,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-11-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-12",
@@ -1537,6 +1543,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -1553,15 +1563,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-12-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-13",
@@ -1640,6 +1646,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -1656,15 +1666,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-13-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-14",
@@ -1743,6 +1749,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -1759,15 +1769,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-14-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-15",
@@ -1846,6 +1852,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -1862,15 +1872,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-15-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-16",
@@ -1949,6 +1955,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -1965,15 +1975,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-16-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-17",
@@ -2052,6 +2058,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -2068,15 +2078,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-17-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     },
     {
       "id": "room-18",
@@ -2155,6 +2161,10 @@
         }
       },
       "kind": "room",
+      "inference": {
+        "coverage": "silent",
+        "silentEntryMaxDistanceMeters": 1.2
+      },
       "entrances": [
         {
           "pixel": {
@@ -2171,15 +2181,11 @@
             "y": 0
           },
           "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
           "id": "room-18-corridor-door",
-          "label": "Koridor kapısı",
-          "approachDepthMeters": 2
+          "label": "Koridor kapısı"
         }
-      ],
-      "inference": {
-        "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
-      }
+      ]
     }
   ],
   "largeAreas": [

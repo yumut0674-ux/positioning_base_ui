@@ -122,11 +122,14 @@ Kararda şunlar değerlendirilir:
 - Süreklilik: Güçlü iç ölçümler yeterli zamana yayılmalıdır.
 - Duvar uzaklığı: Duvara yakın noktalar daha düşük ağırlık alır.
 - Hareket hızı: Kısa sürede fiziksel olarak aşırı uzak noktaya sıçrama kanıt sayılmaz.
+- Nokta mesafesi: Son takip referansından **10 metreden uzak** yeni ölçüm, hız uygun olsa bile oda kanıtına alınmaz. Uzun ölçüm aralığı bu sınırı kaldırmaz. Eşik Genel → Mesafe filtresi bölümünden değiştirilebilir; `0` kapatır.
 - Kalite: Gönderilmişse donanımın `quality` değeri dikkate alınır.
 - Kapı geçişi: Geçişin açıklık içinde ve doğru yönde olup olmadığı kontrol edilir.
 - Önceki oda: Kısa süreli komşu oda sıçramasında mevcut atama hemen değiştirilmez.
 
 Varsayılan giriş için **en az iki güçlü ölçüm ve bu ölçümler arasında en az 1.500 ms** gerekir. Bir saniyede bir ölçüm gelen örnekte 0., 1. ve 2. saniyedeki üç ölçümle koşul sağlanabilir. Bu yüzden “iki paket geldi, oda kesinleşti” kuralı doğru değildir. Gecikme, duvar yakınlığı veya kayıp paketler süreyi uzatabilir.
+
+Mesafe filtresinde uzak konum için ayrı bir doğrulama vardır: **2 güncel/kaliteli aday ve en az 1,5 saniye**. Adaylar ilk noktanın 1 m çevresinde kalmalı, aralarındaki boşluk 2 saniyeyi aşmamalı ve kendi aralarında hız kontrolünden geçmelidir. Normal referansa geri dönüş adayı iptal eder; tutarsızlık veya kalite sorunu aday dizisini yeniden başlatır. Doğrulama tamamlandığında yalnız karşılaştırma referansı yenilenir, güncel oda ataması kaldırılır ve eski kanıt temizlenir. Aday noktalar oda kanıtı değildir; oda değerlendirmesi sonraki geçerli ölçümlerle başlar. Bu ölçüm sayısı oda giriş ölçüm sayısından bağımsızdır. Retlerde kabul edilen ölçüm zamanı ilerlemez; eski konumun geçerliliği uzatılmaz. Karar ayrıntısındaki **Nokta mesafesi filtresi** bölümünde mesafe/eşik ve aday doğrulaması görülebilir.
 
 İlk kez bir odanın içinde görülen tag, kapı geçmişi olmadan da tutarlı iç ölçümlerle doğrulanabilir. Kapı yokken de oda tespiti bu yolla çalışır. Silent odalarda hız/gecikme/kalite filtrelerinden geçmiş, koridor poligonu içinde ve oda duvarından `exitMarginMeters` kadar uzaktaki sürekli ölçümler çıkışı kapı geçişi olmadan doğrular. Kapı geçişi yalnız ek skor kanıtıdır. Regular/intermittent odaların required/preferred politikaları değişmez.
 
@@ -191,15 +194,16 @@ Bu filtre ham ölçüm geçmişini, oda kararını veya tag'in canlı/pasif hesa
 
 ### Küçük titreşimleri azaltma
 
-Koridor gösteriminde uyarlanan üstel hareketli ortalama kullanılır. Katsayı küçük hareketlerde 0,18, büyük hareketlerde en fazla 0,30'dur. 0,18 metrelik küçük titreşimler bastırılır; fiziksel olarak gerçekçi olmayan ani sıçrama ikinci ölçümle doğrulanana kadar tutulur:
+Koridor gösteriminde önce son 3 saniyedeki geçerli ölçümlerin aritmetik ortalaması alınır; tag başına en fazla 64 ölçüm tutulur. İşaret bu ortalamaya uyarlanan üstel hareketli ortalamayla ilerler. Katsayı küçük hareketlerde 0,12, büyük hareketlerde en fazla 0,22'dir. 0,18 metrelik küçük titreşimler bastırılır; fiziksel olarak gerçekçi olmayan ani sıçrama ikinci ölçümle doğrulanana kadar tutulur. Aynı zaman damgalı yayınlar ortalamaya yeniden eklenmez. İki saniyeyi aşan ölçüm boşluğunda veya harita/oda geçişinde eski ortalama temizlenir:
 
 ```text
-Yeni gösterim = Önceki gösterim + Katsayı × (Yeni ölçüm − Önceki gösterim)
+Ortalama hedef = Son 3 saniyedeki geçerli ölçümlerin ortalaması
+Yeni gösterim = Önceki gösterim + Katsayı × (Ortalama hedef − Önceki gösterim)
 ```
 
 Aynı işlem X ve Y için yapılır. İşaretin titreşimi azalır; karşılığında ölçümü takip etmesi bir miktar gecikir. Motor güncel oda ataması vermedikçe ham koordinat oda içinde olsa bile işaret koridor içine yansıtılır. Oda adayı ve son bilinen oda, işareti odaya taşımak için yeterli değildir.
 
-Harita filtresi bu işlemi yalnızca başlangıcı, bitişi ve aradaki doğru parçası geçerli alan içinde kalıyorsa uygular. Alan dışından dönüşte eski konumla yumuşatma yapılmaz. Katsayı mevcut panelde kullanıcı ayarı olarak sunulmaz.
+Harita filtresi bu işlemi yalnızca başlangıcı, ortalama hedefe doğru hesaplanan nokta ve aradaki doğru parçası geçerli alan içinde kalıyorsa uygular. Koridor kıvrımında ortalama alan dışına düşerse kullanılmaz ve eski ortalama temizlenir. Alan dışından dönüşte eski konumla yumuşatma yapılmaz. Katsayı mevcut panelde kullanıcı ayarı olarak sunulmaz.
 
 ### Konumlar arasını animasyonla gösterme
 

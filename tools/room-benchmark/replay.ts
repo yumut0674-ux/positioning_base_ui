@@ -3,14 +3,14 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { RegionPositionEngine, ROOM_ENGINE_VERSION } from '../../src/server/regionEngine/RegionPositionEngine';
 import { compileRegionsConfig } from '../../src/server/regionEngine/configLoader';
-import type { ProcessedPosition } from '../../src/server/regionEngine/types';
+import type { ProcessedPosition, DecisionTrace } from '../../src/server/regionEngine/types';
 import type { RegionsConfig } from '../../src/features/regions/types/region.types';
 import { compareRows, deliveryMs, iso, ms, sha256, type Manifest, type RawRow, type Truth } from './model';
 import { readDataset } from './importer';
 import { score } from './score';
 import { spatialEvidence, type SpatialVisitEvidence } from './spatialEvidence';
 
-export interface Decision { at:string; tagCode:string; state:string; roomId:string|null; eventType:string|null; reasonCodes:string[];
+export interface Decision { at:string; tagCode:string; state:string; roomId:string|null; eventType:string|null; reasonCodes:string[]; evidence?:DecisionTrace['evidence'];
   synthetic:boolean; input:{measuredAt:string; receivedAt?:string; x:number; y:number; quality?:number; signalGapMs?:number}; decisionId?:string }
 export interface Run { schemaVersion:1; testId:string; engineVersion:string; git:{commit:string;dirty:boolean;status:string};
   config:{path:string;sha256:string;version:string;context:string}; dataset:{source:string;caveat:string;sha256:string;rowCount:number;candidateTags:Record<string,number>;timing:string;quality:Manifest['quality'];truthRevision:number;truthSha256:string;warmupMs:number;observationMs:number};
@@ -26,7 +26,8 @@ export function replayRows(rows: RawRow[], truth: Truth, config: ReturnType<type
     const trace=p.decisionTrace;
     decisions.push({at:p.publishedAt!,tagCode:p.tagCode,state:p.regionInference.state,roomId:p.regionInference.regionId,
       eventType:trace?.eventType??null,reasonCodes:trace?.reasons.map(r=>r.code)??[],synthetic:!!p.synthetic,
-      input:trace?.input??{measuredAt:p.timestamp,x:p.rawPosition?.x??p.x,y:p.rawPosition?.y??p.y},decisionId:p.decisionId});
+      input:trace?.input??{measuredAt:p.timestamp,x:p.rawPosition?.x??p.x,y:p.rawPosition?.y??p.y},decisionId:p.decisionId,
+      ...(trace?.evidence?{evidence:trace.evidence}:{})});
   },settings.tickMs,()=>clock,false);
   engine.enable(config);
   const sorted=[...rows].sort(compareRows), groups=truth.groups;

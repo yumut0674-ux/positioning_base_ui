@@ -1,0 +1,24 @@
+{
+  "test_id": "test-f93aa2c0-e0fc-4130-b0c5-3d1207fd120a",
+  "test_name": "Oda testi",
+  "tag_id": "9C76E417B4CB5ECF",
+  "tag_codes": ["9C76E417B4CB5ECF"],
+  "timezone": "Europe/Istanbul",
+  "started_at": "2026-10-13T07:03:47.523Z",
+  "ended_at": null,
+  "rooms": [
+    {"room":"room-08","entered_at":"2026-10-13T07:04:06.107Z","exited_at":"2026-10-13T07:04:44.691Z","duration_seconds":38.584},
+    {"room":"room-16","entered_at":"2026-10-13T07:04:51.386Z","exited_at":"2026-10-13T07:05:34.685Z","duration_seconds":43.299},
+    {"room":"room-17","entered_at":"2026-10-13T07:05:40.351Z","exited_at":"2026-10-13T07:06:24.194Z","duration_seconds":43.843},
+    {"room":"room-08","entered_at":"2026-10-13T07:06:34.005Z","exited_at":"2026-10-13T07:07:15.922Z","duration_seconds":41.917},
+    {"room":"room-08","entered_at":"2026-10-13T07:07:39.639Z","exited_at":"2026-10-13T07:08:38.499Z","duration_seconds":58.860},
+    {"room":"room-07","entered_at":"2026-10-13T07:08:49.774Z","exited_at":"2026-10-13T07:09:20.730Z","duration_seconds":30.956},
+    {"room":"room-05","entered_at":"2026-10-13T07:09:33.772Z","exited_at":"2026-10-13T07:09:57.593Z","duration_seconds":23.821},
+    {"room":"room-04","entered_at":"2026-10-13T07:10:05.960Z","exited_at":"2026-10-13T07:10:37.131Z","duration_seconds":31.171},
+    {"room":"room-02","entered_at":"2026-10-13T07:10:49.407Z","exited_at":"2026-10-13T07:11:46.355Z","duration_seconds":56.948},
+    {"room":"room-13","entered_at":"2026-10-13T07:11:46.355Z","exited_at":"2026-10-13T07:12:41.154Z","duration_seconds":54.799},
+    {"room":"room-07","entered_at":"2026-10-13T07:13:02.395Z","exited_at":"2026-10-13T07:13:35.896Z","duration_seconds":33.501},
+    {"room":"room-17","entered_at":"2026-10-13T07:13:52.639Z","exited_at":"2026-10-13T07:14:18.886Z","duration_seconds":26.247},
+    {"room":"room-08","entered_at":"2026-10-13T07:14:28.021Z","exited_at":"2026-10-13T07:14:54.157Z","duration_seconds":26.136}
+  ]
+}

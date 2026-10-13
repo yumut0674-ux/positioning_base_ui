@@ -41,6 +41,15 @@ export interface TimeoutCoverageSettings {
   readonly regularCoverageStaleMultiplier: number; readonly intermittentCoverageStaleMultiplier: number;
   readonly silentCoverageStaleMultiplier: number; readonly lostAfterStaleMultiplier: number;
 }
+/** Map-wide physical jump filtering; candidate points never count as room evidence. */
+export interface StepDistanceFilterSettings {
+  readonly maximumStepDistanceMeters: number;
+  readonly relocationClusterRadiusMeters: number;
+  readonly relocationConfirmationCount: number;
+  readonly relocationConfirmationDurationMs: number;
+  readonly relocationMaximumGapMs: number;
+  readonly relocationCandidateWindowMs: number;
+}
 export interface DoorInferenceSettings {
   readonly enabled: boolean; readonly direction: DoorDirection; readonly evidenceMode: DoorEvidenceMode;
   readonly entryEvidenceWeight: number; readonly exitEvidenceWeight: number;
@@ -49,12 +58,12 @@ export interface DoorInferenceSettings {
   readonly missingDoorEvidenceDurationMultiplier: number; readonly missingDoorEvidenceCountMultiplier: number;
   readonly allowEstimatedEntryAfterSignalLoss: boolean; readonly allowEstimatedExitAfterSignalLoss: boolean;
 }
-export type GlobalRegionEngineSettings = DecisionEvidenceSettings & EvidenceScoreSettings & MeasurementFilterSettings & TimeoutCoverageSettings & {
+export type GlobalRegionEngineSettings = DecisionEvidenceSettings & EvidenceScoreSettings & MeasurementFilterSettings & TimeoutCoverageSettings & StepDistanceFilterSettings & {
   readonly maxTags: number; readonly historySize: number;
   readonly doorDefaults?: Partial<DoorInferenceSettings>;
   readonly evidenceDurationMs?: number;
 };
-export type RoomInferenceSettings = Partial<Omit<GlobalRegionEngineSettings, "maxTags" | "historySize" | "doorDefaults" | "evidenceDurationMs">> & {
+export type RoomInferenceSettings = Partial<Omit<GlobalRegionEngineSettings, "maxTags" | "historySize" | "doorDefaults" | "evidenceDurationMs" | keyof StepDistanceFilterSettings>> & {
   readonly coverage?: RegionCoverage; readonly wallBandMeters?: number; readonly sharedWallBandMeters?: number;
   readonly silentEntryMaxDistanceMeters?: number;
   readonly doorDefaults?: Partial<DoorInferenceSettings>;

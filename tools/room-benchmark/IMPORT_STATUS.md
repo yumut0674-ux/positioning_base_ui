@@ -1,10 +1,24 @@
 # Saha verisi aktarım durumu — 2026-09-24
 
+## 2026-10-12 Servis — akşam iki yeni test
+
+Kullanıcının açık kodları SELECT ad eşleşmesiyle doğrulandı: `5c71fd2a` / Mustafa (`AD5D457F2924852A`) **1.086** satır, `bd53fa7f` / cihaz (`EA0FC8F8CA447FF5`) **450** satır. Tam test ID'leri kendi dataset klasörlerinde korunuyor. Truth revizyon 1, 30 sn ısınma + 60 sn gözlem; Z saatleri UTC olarak korundu. received_at, ölçüm zamanı ve koordinat eksikliği veya negatif zaman anomalisi yok. Kalite 1.536 satırın tamamında boş. >5 sn teslim boşlukları 27 ve 5; Mustafa'nın ilk üç ziyaretini kapsayan boşluk 160,008 sn. Ham SHA-256 değerleri manifestlerde; raw dosyaları değişmez. Diğer aday taglar puanlanmadı. cihaz kaydının 9 açık koridor aralığı oda ziyareti sayılmadı; 7 gerçek oda ziyareti değerlendirildi.
+
+Motor `room-evidence-9`, güncel Servis `aed0c3f67f66ef77`: Mustafa 11/17 yakalama, katı doğru oda %24,665 (43 sn doğrulanmış + 154,75 sn tahmini), koridorda oda 48 sn, gerçek odada yanlış oda 22,5 sn. cihaz 4/7, %42,824 (1,75 + 43,75 sn), koridorda oda 29,75 sn, gerçek odada yanlış oda 11,5 sn. ±2 sn sınır toleranslı doğru oda oranları %24,293 ve %50,160. DB canlı kaydı farklı config'ler içeriyor: Mustafa `fb44c4d5d60cc465` → `aed0c3f67f66ef77`, cihaz `1bb52386568d2067`. DB'de kayıtlı canlı ziyaret yakalamaları 11/17 ve 5/7; bunlar güncel sabit replay ile aynı deney olarak sunulmadı.
+
+Standart JSON/Markdown/HTML, config snapshotları ve ziyaret çizelgeleri `reports/necmettin-servis-5c71fd2a-current-20261012/` ve `reports/necmettin-servis-bd53fa7f-current-20261012/` içinde. Ortak neden analizi ve kontrollü parametre deneyleri `reports/servis-late-two-20261012-analysis.md`; ham/karar ayrıntıları eş adlı JSON'da. Güncel ve deney replay'leri tekrarda deterministik; benchmark/Servis/çıkış testleri 23/23 geçti, nonincremental typecheck geçti. Canlı motor/config/UI veya DB yazma akışı değiştirilmedi; çalışma öncesi kullanıcı değişiklikleri korundu.
+
 ## 2026-10-12 Servis — Mustafa ve Tansiyon
 
 İki test kullanıcı tarafından açık tag kodlarıyla verildi; SELECT ile adları doğrulandı, diğer adaylar puanlanmadı. `ce530aaa` / Mustafa (`AD5D457F2924852A`) 531 satır, `ca88f73a` / Tansiyon (`EC27D9C145F838EB`) 406 satır. Truth revizyon 1; UTC saatleri korunuyor. Her testte 30 sn ısınma ve 60 sn gözlem var. received_at/ölçüm/koordinat eksikliği ve negatif zaman anomalisi yok; 937 kalite değeri eksik. Büyük teslim boşlukları sırasıyla 4 ve 2. SHA-256 değerleri manifestlerde.
 
 Motor `room-evidence-9`, güncel Servis configVersion `c61e258497587aa6` ile sabit replay: Mustafa 4/9 ziyaret, katı doğru oda %9,608 (8 sn doğrulanmış + 4,25 sn tahmini); Tansiyon 2/6, %7,190 (1,5 + 4 sn). Canlı tarihsel kararlarda test ortasında `3bf2a7e064ec0ac9` → `c61e258497587aa6` geçişi var; yeni sürümün ilk kayıtlı kararı 18:56:43.232 Europe/Istanbul. Sabit replay gerçek canlı deneyle eşdeğer sayılmadı. Ayrıntılar `reports/servis-two-20261012-analysis.md`; standart raporlar `reports/necmettin-servis-ce530aaa-current-20261012/` ve `reports/necmettin-servis-ca88f73a-current-20261012/` altında. Çalışma boyunca canlı config değiştirilmedi.
+
+## 2026-10-13 Servis — f93aa2c0 — ham veri yok, puanlanmadı
+
+`test-f93aa2c0-e0fc-4130-b0c5-3d1207fd120a`: kullanıcı açık tag kodu `9C76E417B4CB5ECF` ve 13 ziyareti verdi. SELECT ile aynı kodun `tagVerified:true` test oturumu ve tüm oda saatleri doğrulandı. Oturum `running`, bitiş boş; kısmi truth revizyon 1 son kapanmış ziyaret çıkışına (`2026-10-13T07:14:54.157Z`) kadar hazırlandı. Kaynak JSON ve `availability.json` eklendi; raw/manifest **oluşturulmadı**. Bu tagın tüm zamanlardaki ham konum ve kayıtlı karar sayısı 0, güncel `tags` kaydı yok. Kod biçimi ve ölçüm/teslim saatleri ayrıca kontrol edildi. Aynı aralıkta başka bir tagın 74 Servis paketi var; başka tag bu teste eşlenmedi.
+
+Kullanıcı panelde hareketi gördüğünü doğruladı. Kaynak kodda ham yayın kayıt kontrolünden önce yapılır; kayıtlı olmayan tagın ham geçmişi ve motor kararları kalıcı DB kaydına alınmaz. Bu nedenle 13 ziyaret **başarısız sayılmadı**, doğruluk/yakalama/gecikme metrikleri bilinmiyor. Önce gerçek paket arşivi gerekir. Güncel disk motoru `room-evidence-10`, Servis configVersion `7a7a74d7f8c40ac0`. Test planı snapshotı `59c473fecb97678f` saklandı; tek fark mesafe filtresi 5 → 10 m. Ayrıntılar `reports/servis-f93aa2c0-audit-20261013/analysis.md`, JSON ve statik HTML aynı klasörde. Üretim motoru/harita veya DB yazma akışı değiştirilmedi.
 
 ## 2026-10-12 Servis — servis2
 

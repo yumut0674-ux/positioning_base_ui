@@ -78,11 +78,11 @@ function room(number: number, bay: number, top: boolean): RegionDefinition {
   if (!doorwayTemplate) throw new Error(`${template.name}: reference corridor door is missing`);
   return {
     ...template, id, name: roomNames[number - 1],
-    inference: { ...template.inference, coverage: "silent", silentEntryMaxDistanceMeters: 1 },
+    inference: { ...template.inference, coverage: "silent", silentEntryMaxDistanceMeters: 1.2 },
     polygon: boundary.map(([x, y]) => pair(x, y)),
     roomCenter: pair((walls[bay] + walls[bay + 1]) / 2, top ? (topRear + 17.08890959210326) / 2 : (bottomRear + 7.8889095921034) / 2),
     entrances: [{ ...doorwayTemplate, id: `${id}-corridor-door`, ...pair(doorwayX, bathroomFront),
-      inwardNormal: normal(direction), connectsTo: "corridor-main", approachDepthMeters: 2 }],
+      inwardNormal: normal(direction), connectsTo: "corridor-main", approachDepthMeters: 1 }],
   };
 }
 for (let bay = 0; bay < 10; bay++) rooms.push(room(bay + 1, bay, true));
@@ -124,7 +124,8 @@ const area: LargeAreaDefinition = {
   })),
 };
 const generated: RegionsConfig = { ...config,
-  engine: { ...structuredClone(reference.engine), entryEvidenceDurationMs: 2000, entryConfirmationCount: 5, maximumSpeedMetersPerSecond: 3 },
+  engine: { ...structuredClone(reference.engine), entryEvidenceDurationMs: 2000, exitEvidenceDurationMs: 1500,
+    entryConfirmationCount: 5, maximumSpeedMetersPerSecond: 3, maximumStepDistanceMeters: 10 },
   mapDisplay: structuredClone(reference.mapDisplay),
   positionAnimation: structuredClone(reference.positionAnimation), areaTracking: structuredClone(reference.areaTracking),
   regions: [corridor, ...rooms], largeAreas: [area],

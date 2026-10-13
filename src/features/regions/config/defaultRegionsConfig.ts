@@ -22,7 +22,7 @@ export const SYSTEM_MAP_CALIBRATION_POINTS: readonly CalibrationPoint[] = [
 
 export const DEFAULT_REGIONS_CONFIG: RegionsConfig = {
   mapDisplay: { outsideHoldMs: 2_000 },
-  engine: DEFAULT_REGION_ENGINE_SETTINGS,
+  engine: { ...DEFAULT_REGION_ENGINE_SETTINGS, maximumStepDistanceMeters: 10, relocationConfirmationCount: 2 },
   map: {
     source: "system",
     mapId: MAP_FLOOR_PLAN.id,

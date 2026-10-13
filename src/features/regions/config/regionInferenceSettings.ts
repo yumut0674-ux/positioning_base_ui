@@ -1,5 +1,8 @@
 import type { DoorInferenceOverrides, DoorInferenceSettings, GlobalRegionEngineSettings, RegionDefinition, ResolvedDoorSettings, ResolvedRoomSettings, RoomInferenceSettings } from "../types/region.types";
 
+export const STEP_DISTANCE_SETTING_KEYS = ["maximumStepDistanceMeters", "relocationClusterRadiusMeters", "relocationConfirmationCount",
+  "relocationConfirmationDurationMs", "relocationMaximumGapMs", "relocationCandidateWindowMs"] as const;
+
 export const DEFAULT_DOOR_INFERENCE_SETTINGS: DoorInferenceSettings = Object.freeze({
   enabled: true, direction: "bidirectional", evidenceMode: "preferred",
   entryEvidenceWeight: 1, exitEvidenceWeight: 1, entryConfidenceBonus: 0.25, exitConfidenceBonus: 0,
@@ -22,6 +25,8 @@ export const DEFAULT_REGION_ENGINE_SETTINGS: GlobalRegionEngineSettings = Object
   confirmedInsideScore: 0.85, inferredInsideMaximumScore: 0.65, invalidMeasurementMaximumScore: 0.5,
   minimumHardwareQuality: 0.25, reliableEvidenceWeight: 0.5, wallEvidenceWeight: 0.1,
   maximumSpeedMetersPerSecond: 4, movementToleranceMeters: 0.25,
+  maximumStepDistanceMeters: 0, relocationClusterRadiusMeters: 1, relocationConfirmationCount: 2,
+  relocationConfirmationDurationMs: 1_500, relocationMaximumGapMs: 2_000, relocationCandidateWindowMs: 6_000,
   lostAfterMs: 30_000, relocationAfterMs: 15_000,
   regularCoverageStaleMultiplier: 3, intermittentCoverageStaleMultiplier: 5,
   silentCoverageStaleMultiplier: 8, lostAfterStaleMultiplier: 4,

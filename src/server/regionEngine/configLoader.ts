@@ -3,13 +3,14 @@ import path from "node:path";
 import { createHash } from "node:crypto";
 import { pointInPolygon, wallDistance } from "./geometry";
 import type { AreaGateDefinition, CoordinatePair, DoorInferenceSettings, RegionEntrance, RegionsConfig, ResolvedRoomSettings } from "@/src/features/regions/types/region.types";
-import { resolveDoorSettings, resolveGlobalSettings, resolveRoomSettings } from "../../features/regions/config/regionInferenceSettings";
+import { resolveDoorSettings, resolveGlobalSettings, resolveRoomSettings, STEP_DISTANCE_SETTING_KEYS } from "../../features/regions/config/regionInferenceSettings";
 import embeddedRegionsConfig from "../../../config/regions.json";
 import type { CompiledCorridor, CompiledDoor, CompiledRegion, CompiledRegionsConfig } from "./types";
 
 const COUNTS = new Set(["entryConfirmationCount", "exitConfirmationCount", "roomSwitchConfirmationCount", "maxTags", "historySize"]);
 const MULTIPLIERS = new Set(["relocationEvidenceDurationMultiplier", "outsideReleaseDurationMultiplier", "regularCoverageStaleMultiplier", "intermittentCoverageStaleMultiplier", "silentCoverageStaleMultiplier", "lostAfterStaleMultiplier"]);
 const SCORE_FIELDS = new Set(["baseScore", "maximumScore", "durationContributionMaximum", "measurementContributionPerSample", "measurementContributionMaximum", "doorEntryBonus", "doorExitBonus", "confirmedInsideScore", "inferredInsideMaximumScore", "invalidMeasurementMaximumScore", "minimumHardwareQuality", "reliableEvidenceWeight", "wallEvidenceWeight"]);
+const STEP_DISTANCE_FIELDS = new Set<string>(STEP_DISTANCE_SETTING_KEYS);
 
 function finite(value: unknown, field: string, min = 0, max = 3_600_000): number {
   if (typeof value !== "number" || !Number.isFinite(value) || value < min || value > max) throw new Error(`${field}: geçersiz değer`);
@@ -19,6 +20,13 @@ function finite(value: unknown, field: string, min = 0, max = 3_600_000): number
 function validateSettings(settings: Record<string, unknown>, label: string, allowSystem: boolean): void {
   for (const [key, value] of Object.entries(settings)) {
     if (value === undefined || key === "doorDefaults" || key === "coverage") continue;
+    if (STEP_DISTANCE_FIELDS.has(key)) {
+      if (!allowSystem) throw new Error(`${label}/${key}: yalnızca global seviyede kullanılabilir`);
+      const minimum = key === "maximumStepDistanceMeters" ? 0 : key === "relocationConfirmationCount" ? 2 : Number.EPSILON;
+      finite(value, `${label}/${key}`, minimum, key.endsWith("Ms") ? 3_600_000 : 100);
+      if (key === "relocationConfirmationCount" && !Number.isInteger(value)) throw new Error(`${label}/${key}: tam sayı gerekli`);
+      continue;
+    }
     if (!allowSystem && (key === "maxTags" || key === "historySize" || key === "evidenceDurationMs")) throw new Error(`${label}/${key}: yalnızca global seviyede kullanılabilir`);
     if (key === "silentEntryMaxDistanceMeters") { finite(value, `${label}/${key}`, 0, 20); continue; }
     if (typeof value !== "number") continue;
@@ -85,6 +93,12 @@ export function compileRegionsConfig(config: RegionsConfig): CompiledRegionsConf
   validateSettings((config.engine ?? {}) as Record<string, unknown>, "Global ayarlar", true);
   validateDoorSettings(config.engine?.doorDefaults, "Global kapı varsayılanları");
   const global = resolveGlobalSettings(config.engine);
+  if (global.maximumStepDistanceMeters > 0 && global.relocationClusterRadiusMeters > global.maximumStepDistanceMeters) {
+    throw new Error("Yeniden konumlanma yarıçapı azami nokta mesafesini aşamaz");
+  }
+  if (global.relocationConfirmationDurationMs > global.relocationCandidateWindowMs) {
+    throw new Error("Yeniden konumlanma doğrulama süresi aday penceresini aşamaz");
+  }
   const historySize = global.historySize;
   const globalRoom = resolveRoomSettings(config.engine);
   validateResolved(globalRoom, "Global ayarlar", historySize);

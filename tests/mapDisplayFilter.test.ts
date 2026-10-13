@@ -146,8 +146,8 @@ test("RAW map presentation suppresses jitter and requires confirmation for a sud
   assert.deepEqual(f.displays().A.position, p(5, 5));
 
   f.filter.ingest(tag(9.2, 9.1, 1_300), true);
-  assert.ok(f.displays().A.position!.x > 6);
-  assert.ok(f.displays().A.position!.x < 9.2);
+  assert.ok(f.displays().A.position!.x > 5.5);
+  assert.ok(f.displays().A.position!.x < 6.3);
   f.filter.dispose();
 });
 

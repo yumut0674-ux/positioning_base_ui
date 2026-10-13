@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { DEFAULT_DOOR_INFERENCE_SETTINGS, resolveDoorSettings, resolveGlobalSettings, resolveRoomSettings } from "../config/regionInferenceSettings";
+import { DEFAULT_DOOR_INFERENCE_SETTINGS, resolveDoorSettings, resolveGlobalSettings, resolveRoomSettings, STEP_DISTANCE_SETTING_KEYS } from "../config/regionInferenceSettings";
 import type { DoorInferenceSettings, GlobalRegionEngineSettings, RegionDefinition, RegionEntrance, RegionsConfig, RoomInferenceSettings } from "../types/region.types";
 import type { RegionEngineStatusResponse } from "../services/regionEngineApi";
 import styles from "./regions.module.css";
@@ -23,6 +23,12 @@ const FIELDS: readonly Field[] = [
   { key: "lostAfterMs", label: "Konum kayıp süresi", group: "Sinyal kaybı", seconds: true, min: 0, step: .1 },
   { key: "relocationAfterMs", label: "Yeniden konumlanma eşiği", group: "Sinyal kaybı", seconds: true, min: 0, step: .1 },
   { key: "maximumSpeedMetersPerSecond", label: "Azami hız (m/sn)", group: "Ölçüm filtresi", min: 0, step: .1 },
+  { key: "maximumStepDistanceMeters", label: "Azami nokta mesafesi (m, 0: kapalı)", group: "Mesafe filtresi", min: 0, max: 100, step: .1 },
+  { key: "relocationConfirmationCount", label: "Yeni konum doğrulama ölçümü", group: "Mesafe filtresi", min: 2, max: 100, step: 1 },
+  { key: "relocationConfirmationDurationMs", label: "Yeni konum doğrulama süresi", group: "Mesafe filtresi", seconds: true, min: .001, step: .1 },
+  { key: "relocationClusterRadiusMeters", label: "Yeni konum aday yarıçapı (m)", group: "Mesafe filtresi", min: .01, max: 100, step: .1 },
+  { key: "relocationMaximumGapMs", label: "Aday ölçümler arası azami boşluk", group: "Mesafe filtresi", seconds: true, min: .001, step: .1 },
+  { key: "relocationCandidateWindowMs", label: "Yeni konum aday penceresi", group: "Mesafe filtresi", seconds: true, min: .001, step: .1 },
   { key: "movementToleranceMeters", label: "Hareket toleransı (m)", group: "Ölçüm filtresi", min: 0, step: .05 },
   { key: "minimumHardwareQuality", label: "Asgari donanım kalitesi", group: "Ölçüm filtresi", min: 0, max: 1, step: .05 },
   { key: "reliableEvidenceWeight", label: "Güvenilir kanıt ağırlığı", group: "Ölçüm filtresi", min: 0, max: 10, step: .05 },
@@ -46,7 +52,8 @@ const FIELDS: readonly Field[] = [
   { key: "maxTags", label: "Azami tag", group: "Sistem ayarları", min: 1, step: 1 },
   { key: "historySize", label: "Geçmiş tamponu", group: "Sistem ayarları", min: 1, step: 1 },
 ];
-const ROOM_FIELDS = FIELDS.filter(field => field.key !== "maxTags" && field.key !== "historySize" && field.key !== "evidenceDurationMs");
+const GLOBAL_ONLY_FIELDS = new Set<string>(["maxTags", "historySize", "evidenceDurationMs", ...STEP_DISTANCE_SETTING_KEYS]);
+const ROOM_FIELDS = FIELDS.filter(field => !GLOBAL_ONLY_FIELDS.has(field.key));
 
 function shown(field: Field, value: number) { return field.seconds ? value / 1000 : value; }
 function stored(field: Field, value: number) { return field.seconds ? value * 1000 : value; }

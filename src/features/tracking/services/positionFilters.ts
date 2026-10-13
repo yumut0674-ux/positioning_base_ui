@@ -2,6 +2,10 @@ import type { Point2D } from "@/src/shared/types/geometry";
 import type { PositionFilter } from "../types/tracking.types";
 
 export interface AdaptivePositionFilterConfig {
+  /** Gosterim hedefi bu zaman penceresindeki gecerli olcumlerin ortalamasidir. */
+  readonly measurementWindowMs: number;
+  /** Yuksek paket hizinda tag basina tutulacak en fazla olcum. */
+  readonly maximumMeasurementSamples: number;
   /** Hareket yokken UWB olcum gurultusunu tamamen bastiran yaricap. */
   readonly jitterRadiusMeters: number;
   /** Yavas harekette uygulanan EMA katsayisi. */
@@ -21,9 +25,11 @@ export interface AdaptivePositionFilterConfig {
 }
 
 export const DEFAULT_ADAPTIVE_POSITION_FILTER_CONFIG: AdaptivePositionFilterConfig = {
+  measurementWindowMs: 3_000,
+  maximumMeasurementSamples: 64,
   jitterRadiusMeters: 0.18,
-  smoothingAlpha: 0.18,
-  movingAlpha: 0.3,
+  smoothingAlpha: 0.12,
+  movingAlpha: 0.22,
   movingDistanceMeters: 1.5,
   maximumSpeedMetersPerSecond: 4.5,
   outlierMinimumDistanceMeters: 1.2,
@@ -64,6 +70,7 @@ export class ExponentialMovingAverageFilter implements PositionFilter {
  * Harita sunumuna ozel, tag basina kullanilan durumlu filtre.
  *
  * - Sabit duran tag'in kucuk UWB titresimlerini bir dead-band icinde tutar.
+ * - Son gecerli olcumlerin ortalamasini alarak tek paket yon degisimlerini azaltir.
  * - Hareket hizlandikca EMA katsayisini arttirip gereksiz goruntu gecikmesini azaltir.
  * - Fiziksel olarak gercekci olmayan tek bir sivri olcumu ikinci olcume kadar bekletir.
  *
@@ -72,6 +79,7 @@ export class ExponentialMovingAverageFilter implements PositionFilter {
 export class AdaptivePositionFilter {
   private lastMeasurement?: TimedPoint;
   private pendingOutlier?: TimedPoint;
+  private measurements: TimedPoint[] = [];
 
   public constructor(
     private readonly config: AdaptivePositionFilterConfig = DEFAULT_ADAPTIVE_POSITION_FILTER_CONFIG,
@@ -80,6 +88,7 @@ export class AdaptivePositionFilter {
   public reset(point?: Point2D, timestamp = 0): void {
     this.lastMeasurement = point ? { ...point, timestamp } : undefined;
     this.pendingOutlier = undefined;
+    this.measurements = this.lastMeasurement ? [this.lastMeasurement] : [];
   }
 
   public next(current: Point2D, incoming: Point2D, timestamp: number): Point2D {
@@ -90,6 +99,10 @@ export class AdaptivePositionFilter {
 
     if (previous) {
       const elapsedMs = measuredAt - previous.timestamp;
+      // Synthetic publications and late packets cannot reweight the average or
+      // advance the presentation without a new physical measurement.
+      if (elapsedMs <= 0) return current;
+      if (elapsedMs > this.config.speedCheckMaximumGapMs) this.measurements = [];
       const travelled = distance(previous, incoming);
       const speed = elapsedMs > 0 ? travelled / (elapsedMs / 1_000) : 0;
       const suspicious = elapsedMs > 0
@@ -106,12 +119,21 @@ export class AdaptivePositionFilter {
           this.pendingOutlier = nextMeasurement;
           return current;
         }
+        // Two nearby measurements confirm relocation. Average the new cluster,
+        // rather than pulling it back toward the old stationary history.
+        this.measurements = [pending!];
       }
     }
 
     this.lastMeasurement = nextMeasurement;
     this.pendingOutlier = undefined;
-    const displacement = distance(current, incoming);
+    this.measurements.push(nextMeasurement);
+    const windowStart = measuredAt - this.config.measurementWindowMs;
+    while (this.measurements.length > 1 && (this.measurements[0].timestamp < windowStart
+      || this.measurements.length > this.config.maximumMeasurementSamples)) this.measurements.shift();
+    const total = this.measurements.reduce((sum, point) => ({ x: sum.x + point.x, y: sum.y + point.y }), { x: 0, y: 0 });
+    const average = { x: total.x / this.measurements.length, y: total.y / this.measurements.length };
+    const displacement = distance(current, average);
     if (displacement <= this.config.jitterRadiusMeters) return current;
 
     const motion = clamp01(
@@ -121,8 +143,8 @@ export class AdaptivePositionFilter {
     const alpha = this.config.smoothingAlpha
       + (this.config.movingAlpha - this.config.smoothingAlpha) * motion;
     return {
-      x: current.x + (incoming.x - current.x) * alpha,
-      y: current.y + (incoming.y - current.y) * alpha,
+      x: current.x + (average.x - current.x) * alpha,
+      y: current.y + (average.y - current.y) * alpha,
     };
   }
 }

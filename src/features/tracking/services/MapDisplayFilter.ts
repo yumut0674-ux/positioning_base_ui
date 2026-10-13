@@ -120,7 +120,11 @@ export class MapDisplayFilter {
       // path. Room centres and re-entry points must remain exact.
       if (state.smooth && state.lastValid && !resume && !snap
         && segmentInDisplayArea(state.lastValid, point, allowedArea)) {
-        point = state.stabilizer.next(state.lastValid, point, tag.timestamp);
+        const averaged = state.stabilizer.next(state.lastValid, point, tag.timestamp);
+        // The mean of valid points can lie outside a concave corridor. Never
+        // queue that mean or draw a shortcut through an unassigned room.
+        if (segmentInDisplayArea(state.lastValid, averaged, allowedArea)) point = averaged;
+        else state.stabilizer.reset(point, tag.timestamp);
       } else state.stabilizer.reset(point, tag.timestamp);
       this.animation.ingest(tag.id, { ...point, timestamp: tag.timestamp, receivedAt: now,
         measurementTimestamp: tag.timestamp, positionSource: this.rooms && !assignedRoom ? "RAW" : tag.positionSource ?? "RAW",

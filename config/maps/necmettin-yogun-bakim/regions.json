@@ -3,6 +3,8 @@
     "outsideHoldMs": 2000
   },
   "engine": {
+    "maximumStepDistanceMeters": 10,
+    "relocationConfirmationCount": 2,
     "entryEvidenceDurationMs": 1500,
     "exitEvidenceDurationMs": 1000,
     "entryConfirmationCount": 3,

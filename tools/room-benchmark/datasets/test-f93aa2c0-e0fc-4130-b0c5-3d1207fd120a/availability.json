@@ -1,0 +1,19 @@
+{
+  "testId": "test-f93aa2c0-e0fc-4130-b0c5-3d1207fd120a",
+  "status": "unscored-missing-raw",
+  "sourceEndedAt": null,
+  "evaluationIsPartial": true,
+  "evaluationCutoff": "2026-10-13T07:14:54.157Z",
+  "selectedTag": "9C76E417B4CB5ECF",
+  "tagMatch": "user-explicit-and-test-session-verified",
+  "registeredInTagsAtInspection": false,
+  "rawRowCount": 0,
+  "recordedDecisionCount": 0,
+  "rawSha256": null,
+  "timing": "unavailable",
+  "quality": "unavailable",
+  "truthRevision": 1,
+  "truthSha256": "9619f2ac0c91a605632e908ec9938573c89d80d99494870a653837cf47b0f70f",
+  "sourceSha256": "44ea24d3e3dbbe6bb5f991eeaa2425986758200002b57fa49b281a84cf9d70a0",
+  "note": "Kaynak/truth hazırdır. raw.jsonl ve manifest.json oluşturulmadı; boş veri seti başarılı aktarım veya %0 doğruluk olarak sunulmaz."
+}

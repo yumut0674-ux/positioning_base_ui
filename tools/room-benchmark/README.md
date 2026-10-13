@@ -1,8 +1,40 @@
 # Çevrimdışı oda benchmarkı
 
+## Entegre filtre parametre taraması (13 Ekim 2026)
+
+`experiments/sweep-integrated-filter.ts`, gerçek güncel motor ile Servis/yoğun bakımın doğrulanmış veri kümelerinde 19 ayrı filtre profilini iki kez oynatır. Komut: `node --import tsx tools/room-benchmark/experiments/sweep-integrated-filter.ts YENI-RUN-ID`. Her koşuda aynı veri/truth/harita korunur; yalnız mesafe, küme, sayı, süre, aday boşluğu veya pencere parametreleri yerel config kopyasında değişir. Snapshotlar ayrı SHA/configVersion ile kaydedilir. Kaynak ve harita hash'leri değişirse deney geçersiz olur. Seçilen profillerin tam karar raporlarını aynı fingerprint ile tekrar üretmek için `experiments/replay-sweep-selection.ts` kullanılır.
+
+19 profillik çalışma: [analiz](reports/integrated-filter-parameter-sweep-20261013/analysis.md), [HTML](reports/integrated-filter-parameter-sweep-20261013/analysis.html). Bu veri üzerinde en iyi tek değişiklik Servis mesafe sınırını 5 → 10 m yapmak oldu: 25/43 → 27/43 yakalama, 80,75 → 39,75 sn yanlış oda. Tansiyon testindeki bir tahmini ziyaret kazanımı kayboldu; filtresiz temel sonuçla kıyas ve diğer hata türleri raporda gösterilir. Alternatif 5 m / 2 m küme / 2 nokta / 1 sn / 4 sn boşluk / 6 sn pencere koridor yanlış gösterimini daha fazla azaltır, fakat doğru oda süresi daha düşüktür. Bunlar çevrimdışı önerilerdir; canlı config değiştirilmedi. Puanlı yoğun bakım testinde bütün profiller aynı sonucu verdi; yeni veriyle doğrulama gerekir.
+
+## Entegre filtre / hastane analizi (13 Ekim 2026)
+
+Güncel `room-evidence-10` ve gerçek `StepDistanceFilter`, Servis ile yoğun bakımın 7 veri kümesinde yeniden oynatıldı. 6 test puanlandı; doğrulanmamış `2a7fecc4` yalnız karar raporu üretir. Komut: `node --import tsx tools/room-benchmark/experiments/run-integrated-filter-study.ts YENI-RUN-ID`. Aynı motor/config için güncel filtre ve yalnız rapor klasöründeki kopyada kapatılmış filtre karşılaştırılır. Eski deney adaptörü kullanılmaz; her koşu iki kez doğrulanır. Replay raporları artık motorun `evidence` tanı alanını (mesafe adayı ve giriş süreleri dahil) saklar; skor algoritması değişmedi.
+
+Analiz: [Markdown](reports/integrated-filter-hospital-20261013/analysis.md), [HTML](reports/integrated-filter-hospital-20261013/analysis.html). Ayrıntılı koşular `reports/integrated-filter-hospital-20261013-<test-kısa-id>-current/` ve `-filter-off/` içindedir. 5 m / 2 nokta / 1,5 sn ayarında Servis yakalama 27/43 → 25/43; yanlış oda 41,5 → 80,75 sn oldu. Puanlı yoğun bakım testinde mesafe reddi oluşmadı, sonuç değişmedi. Reddedilen ölçümün eski odayı canlandırması ve aday expiry saatleri için iki karakterizasyon testi `experiments/integrated-filter-probes.test.ts` içindedir; bu davranışlar üretimde değiştirilmedi. Genel doğrulamada 97 testten 95'i geçti; iki motor rota regresyonu ve genel typecheck'in takıldığı mevcut rapor dosyası analizde açıklanır. Çalışma kapsamının typecheck'i: `node node_modules/typescript/bin/tsc -p tools/room-benchmark/experiments/tsconfig.integrated-study.json --noEmit`.
+
+## Mesafe filtresi deneyi (13 Ekim 2026)
+
+`experiments/distance-relocation.ts`, aktif motoru import eden çevrimdışı mesafe/yeniden konumlanma prototipidir. Üretim motoruna entegre değildir. Parametreler: D=3 m, ilk aday çevresinde R=1 m, N=3, T=1.500 ms, G=2.000 ms, W=6.000 ms. Aday B/C/D oda kanıtı olmaz; D yalnız filtre referansını değiştirir ve public `removeVehicle` ile eski motor kanıtını temizler. E yeni oda kanıtını başlatır. Mesafe reddi için kullanılan deney adaptörü ve sonuçların sınırları raporda açıklanır.
+
+Yeni ve boş bir run ID ile çalıştırın:
+
+```powershell
+node --import tsx tools/room-benchmark/experiments/run-distance-study.ts --scope service --run-id YENI-SERVIS-ID
+node --import tsx tools/room-benchmark/experiments/run-distance-study.ts --scope other --run-id YENI-DIGER-ID
+node --import tsx --test tools/room-benchmark/experiments/distance-relocation.test.ts
+```
+
+Servis koşusu D=2/3/5 m, R=0,5/1,5 m, daha hızlı/yavaş aday onayı ve ön-kontrol profilini karşılaştırır; diğer haritalar off/D3/D5 kullanır. Senaryolar iki kez replay edilerek karar/metrik eşitliği doğrulanır. DB bağlantısı gerekmez. Aynı ham veri, truth ve harita üzerinde her koşunun yeni temel sonucu hesaplanır; motor/harita hash değişimi koşuyu geçersiz kılar. Parametreleri değiştirerek yeni deney yapılabilir; eski rapor klasörü üzerine yazılmaz.
+
+Nihai analiz: [Markdown](reports/distance-relocation-analysis-20261013.md), [statik HTML](reports/distance-relocation-analysis-20261013.html). Ayrıntılar `reports/distance-relocation-servis-final-20261013/` ve `reports/distance-relocation-other-final-20261013/` içindedir. Rapor üreticisi `experiments/report-distance-study.cjs` bu sabit çalışmanın yorumlarını içerir; farklı sonuçlar için yorumlar yeniden incelenmelidir. Bu deneyde 3 m profilinde Servis yakalaması 27/43 → 22/43 oldu; global uygulama önerilmedi. Ham veriler ve üretilmiş raporlar klasörün `.gitignore` kurallarıyla korunur.
+
 Bu araç ayrı bir Node sürecinde **mevcut** `RegionPositionEngine` sınıfını kullanır. Canlı controller, API, SSE, `trackingBuffer` ve veritabanı yazma kodu yüklenmez. `import` dışında veritabanına bağlanmaz. DB dışa aktarımı yalnızca `SELECT` kullanır; mümkünse sadece okuma yetkili `POSTGRES_USER` ile çalıştırın. DB geçmişi yalnız kayıtlı tag'ları içeriyor olabilir ve canlı motorun gördüğü her ham olayı kapsadığı varsayılmaz.
 
 ## Yeni test
+
+13 Ekim Servis `test-f93aa2c0-e0fc-4130-b0c5-3d1207fd120a`: 13 oda ziyareti, açık tag `9C76E417B4CB5ECF`, kaynak UTC saatleri ve truth revizyon 1 eklendi. `ended_at:null` ve kayıtlı oturum `running`; truth değerlendirme sınırı son kapanmış oda çıkışı `07:14:54.157Z`, gerçek test bitişi değildir. Tagın ham geçmişi, kayıtlı motor kararı ve güncel tag kaydı bulunmadı. `availability.json` durumu `unscored-missing-raw`; raw/manifest oluşturulmadı ve %0 başarı sayılmadı. Kullanıcı panelde hareket gördüğünü doğruladı. Kayıtlı olmayan taglar panele/motora iletilebilir, ancak mevcut kalıcı kayıt akışı bunları arşivlemez. İnceleme: [Markdown](reports/servis-f93aa2c0-audit-20261013/analysis.md), [HTML](reports/servis-f93aa2c0-audit-20261013/analysis.html). Oturumdaki harita snapshotı `59c473fecb97678f`, güncel harita `7a7a74d7f8c40ac0`; tek fark mesafe sınırı 5 → 10 m. Geçmiş ham arşiv bulunursa SELECT import/replay yapılabilir; tagı sonradan kaydetmek kaybolan geçmişi geri getirmez.
+
+12 Ekim akşamı Servis testleri: `test-5c71fd2a-af35-40d8-ba88-ade771f2c493` (Mustafa, `AD5D457F2924852A`, 17 ziyaret, 1.086 ham paket) ve `test-bd53fa7f-9d16-4f10-8471-6e1f50664d85` (cihaz, `EA0FC8F8CA447FF5`, 7 oda ziyareti + 9 açık koridor aralığı, 450 paket). Açık tag kodları ve UTC milisaniyeleri korundu; truth revizyon 1. Koridor etiketleri source/truth içinde saklandı ve oda ziyareti sayılmadı. Güncel `room-evidence-9` / Servis `aed0c3f67f66ef77` sabit replay raporları `reports/necmettin-servis-5c71fd2a-current-20261012/` ve `reports/necmettin-servis-bd53fa7f-current-20261012/` altında; ortak ziyaret/ham veri/karar/parametre analizi `reports/servis-late-two-20261012-analysis.md`. Canlı kayıtlı config sürümleri ayrıca gösterilir; farklı config'ler eşdeğer deney sayılmaz. Hız 4, giriş 1,5 sn / 3 ve yaklaşma 2 m deneyleri yalnız çevrimdışı kopyalarda yapıldı; canlı ayarlar değiştirilmedi.
 
 12 Ekim Servis ek testleri: `test-ce530aaa-a117-4075-8191-7169508dec93` (Mustafa, `AD5D457F2924852A`, 531 paket) ve `test-ca88f73a-7a97-48ba-b6b5-de227bfb0124` (Tansiyon, `EC27D9C145F838EB`, 406 paket). Kullanıcı kodları açıkça verdi; bağımsız rotalar ayrı gruplarda, truth revizyon 1. Güncel Servis config'iyle replay edilmelidir. İlgili JSON/Markdown/HTML raporları `reports/necmettin-servis-ce530aaa-current-20261012/` ve `reports/necmettin-servis-ca88f73a-current-20261012/` içinde; ortak analiz `reports/servis-two-20261012-analysis.md`. Canlı testlerin ortasında config değişmiştir; ortak analiz bunu güncel ayarların sabit replay'inden ayrı gösterir.
 

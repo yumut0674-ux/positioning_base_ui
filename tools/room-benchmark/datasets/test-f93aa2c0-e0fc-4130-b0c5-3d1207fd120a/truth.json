@@ -1,0 +1,151 @@
+{
+  "testId": "test-f93aa2c0-e0fc-4130-b0c5-3d1207fd120a",
+  "testName": "Servis — Oda testi — 9C76E417B4CB5ECF",
+  "site": "Necmettin Hastanesi — Servis",
+  "timezone": "Europe/Istanbul",
+  "revision": 1,
+  "revisionReason": "Kullanıcının UTC milisaniyeli 13 ziyareti ve açık tag kodu, SELECT ile kayıtlı test oturumunda doğrulandı. ended_at null/running: puanlama son tamamlanmış oda çıkışıyla sınırlıdır; gerçek bitiş saati uydurulmadı.",
+  "sourceEndedAt": null,
+  "evaluationEndBasis": "last-completed-user-visit",
+  "evaluationIsPartial": true,
+  "recordedSessionStatus": "running",
+  "test": {
+    "from": "2026-10-13T07:03:47.523Z",
+    "to": "2026-10-13T07:14:54.157Z"
+  },
+  "visits": [
+    {
+      "roomId": "room-08",
+      "from": "2026-10-13T07:04:06.107Z",
+      "to": "2026-10-13T07:04:44.691Z"
+    },
+    {
+      "roomId": "room-16",
+      "from": "2026-10-13T07:04:51.386Z",
+      "to": "2026-10-13T07:05:34.685Z"
+    },
+    {
+      "roomId": "room-17",
+      "from": "2026-10-13T07:05:40.351Z",
+      "to": "2026-10-13T07:06:24.194Z"
+    },
+    {
+      "roomId": "room-08",
+      "from": "2026-10-13T07:06:34.005Z",
+      "to": "2026-10-13T07:07:15.922Z"
+    },
+    {
+      "roomId": "room-08",
+      "from": "2026-10-13T07:07:39.639Z",
+      "to": "2026-10-13T07:08:38.499Z"
+    },
+    {
+      "roomId": "room-07",
+      "from": "2026-10-13T07:08:49.774Z",
+      "to": "2026-10-13T07:09:20.730Z"
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-10-13T07:09:33.772Z",
+      "to": "2026-10-13T07:09:57.593Z"
+    },
+    {
+      "roomId": "room-04",
+      "from": "2026-10-13T07:10:05.960Z",
+      "to": "2026-10-13T07:10:37.131Z"
+    },
+    {
+      "roomId": "room-02",
+      "from": "2026-10-13T07:10:49.407Z",
+      "to": "2026-10-13T07:11:46.355Z"
+    },
+    {
+      "roomId": "room-13",
+      "from": "2026-10-13T07:11:46.355Z",
+      "to": "2026-10-13T07:12:41.154Z"
+    },
+    {
+      "roomId": "room-07",
+      "from": "2026-10-13T07:13:02.395Z",
+      "to": "2026-10-13T07:13:35.896Z"
+    },
+    {
+      "roomId": "room-17",
+      "from": "2026-10-13T07:13:52.639Z",
+      "to": "2026-10-13T07:14:18.886Z"
+    },
+    {
+      "roomId": "room-08",
+      "from": "2026-10-13T07:14:28.021Z",
+      "to": "2026-10-13T07:14:54.157Z"
+    }
+  ],
+  "corridorIntervals": [
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T07:04:44.691Z",
+      "to": "2026-10-13T07:04:51.386Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T07:05:34.685Z",
+      "to": "2026-10-13T07:05:40.351Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T07:06:24.194Z",
+      "to": "2026-10-13T07:06:34.005Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T07:07:15.922Z",
+      "to": "2026-10-13T07:07:39.639Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T07:08:38.499Z",
+      "to": "2026-10-13T07:08:49.774Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T07:09:20.730Z",
+      "to": "2026-10-13T07:09:33.772Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T07:09:57.593Z",
+      "to": "2026-10-13T07:10:05.960Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T07:10:37.131Z",
+      "to": "2026-10-13T07:10:49.407Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T07:12:41.154Z",
+      "to": "2026-10-13T07:13:02.395Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T07:13:35.896Z",
+      "to": "2026-10-13T07:13:52.639Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T07:14:18.886Z",
+      "to": "2026-10-13T07:14:28.021Z"
+    }
+  ],
+  "groups": [
+    {
+      "id": "servis-f93aa2c0",
+      "tagCodes": [
+        "9C76E417B4CB5ECF"
+      ],
+      "note": "Tag kullanıcı JSON kaydında açıktır; DB test oturumunda aynı kod tagVerified=true. Güncel tags tablosunda ad kaydı bulunmadı; başka tag atanmadı."
+    }
+  ],
+  "recordedPlanHash": "15f4e2072c9d4f91d3d5439491593383d5f8df652edc9d52d83cc34286f7e9b8",
+  "note": "Kısmi test: kaynak ended_at null; son tamamlanmış ziyaret çıkışı 2026-10-13T07:14:54.157Z yalnız değerlendirme sınırıdır. Sonraki 60 sn gözlem puanlanmaz. Z UTC; Europe/Istanbul gösterim +03:00. Saatler korunur; katı ve ±2 sn sınır toleransı. DB koridor seçimleri oda aralıkları arasındaki konumu doğrular."
+}

@@ -1,4 +1,5 @@
 import type { TrackingPosition } from "../trackingBuffer";
+import type { StepDistanceTrace } from "./StepDistanceFilter";
 import type { AreaSourceHealth, PendingAreaExitDiagnostic } from "./AreaTransitionEngine";
 import type { ResolvedDoorSettings, ResolvedRoomSettings } from "../../features/regions/types/region.types";
 
@@ -53,6 +54,7 @@ export interface DecisionTrace {
     readonly signalGapMs?: number;
   };
   readonly evidence?: {
+    readonly stepDistance?: StepDistanceTrace;
     readonly doorId?: string;
     readonly doorDistanceMeters?: number;
     readonly allowedDoorDistanceMeters?: number;
