@@ -1,0 +1,6 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {"incremental": false},
+  "include": ["../cli.ts", "compare-icu-friday.ts", "icu-friday.test.ts", "visit-diagnostics.ts"],
+  "exclude": ["../../../node_modules", "../reports"]
+}

@@ -1,0 +1,13 @@
+{
+  "test_id": "test-4255236f-db12-4a1c-bc09-5e11c51d5d2a",
+  "test_name": "Yoğunbakım testi",
+  "tag_id": "9C76E417B4CB5ECF",
+  "tag_codes": ["9C76E417B4CB5ECF"],
+  "timezone": "Europe/Istanbul",
+  "started_at": "2026-10-13T08:54:53.840Z",
+  "ended_at": "2026-10-13T08:56:59.804Z",
+  "rooms": [
+    {"room": "room-06", "entered_at": "2026-10-13T08:55:02.721Z", "exited_at": "2026-10-13T08:55:34.780Z", "duration_seconds": 32.059},
+    {"room": "room-02", "entered_at": "2026-10-13T08:56:02.844Z", "exited_at": "2026-10-13T08:56:25.917Z", "duration_seconds": 23.073}
+  ]
+}

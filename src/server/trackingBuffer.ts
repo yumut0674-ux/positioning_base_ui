@@ -62,13 +62,14 @@ export class TrackingBuffer extends EventEmitter {
   private readonly timer?: ReturnType<typeof setInterval>;
 
   public constructor(private readonly query = queryPostgres, private readonly now: () => number = Date.now, automaticFlush = true,
-    private readonly readPdopSettings: (mapId: string | null) => Promise<PdopFilterSettings> = mapId => mapTrackingFilterSettings.read(mapId)) {
+    private readonly readPdopSettings?: (mapId: string | null) => Promise<PdopFilterSettings>) {
     super();
     if (automaticFlush) { this.timer = setInterval(() => { void this.flush(); }, 5_000); this.timer.unref?.(); }
   }
 
   public async ingest(position: TrackingPosition): Promise<boolean> {
-    if (position.pdop != null && (!Number.isFinite(position.pdop) || !isPositionPdopAccepted(position.pdop, await this.readPdopSettings(position.mapId ?? null)))) return false;
+    if (position.pdop != null && (!Number.isFinite(position.pdop) || !isPositionPdopAccepted(position.pdop,
+      await (this.readPdopSettings ? this.readPdopSettings(position.mapId ?? null) : mapTrackingFilterSettings.read(position.mapId ?? null))))) return false;
     position = { ...position, pdop: position.pdop ?? null, receivedAt: new Date(this.now()).toISOString() };
     if (position.sourceZoneId == null) this.nullZoneCount++;
     else if (position.mapId == null) this.unresolvedZoneCount++;
@@ -158,7 +159,13 @@ declare global {
   var __uwbTrackingBuffer: TrackingBuffer | undefined;
 }
 
-// Vinext/Vite can re-evaluate server modules during development. Keep one
-// buffer instance so timers and listeners do not accumulate after hot reloads.
-export const trackingBuffer = globalThis.__uwbTrackingBuffer ?? new TrackingBuffer();
-globalThis.__uwbTrackingBuffer ??= trackingBuffer;
+// Keep queue, timers and listeners during HMR while installing current ingest/flush behavior.
+export function installGlobalTrackingBuffer(): TrackingBuffer {
+  const existing = globalThis.__uwbTrackingBuffer;
+  if (existing && Object.getPrototypeOf(existing) !== TrackingBuffer.prototype) Object.setPrototypeOf(existing, TrackingBuffer.prototype);
+  const buffer = existing ?? new TrackingBuffer();
+  globalThis.__uwbTrackingBuffer = buffer;
+  return buffer;
+}
+
+export const trackingBuffer = installGlobalTrackingBuffer();

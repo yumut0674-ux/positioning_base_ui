@@ -43,8 +43,9 @@ export function MapPdopFilterEditor({ mapId }: { mapId: string }) {
     finally { setSaving(false); }
   };
 
-  return <section className={styles.pdopFilter} aria-label="Harita PDOP filtresi">
-    <h2>Harita PDOP filtresi</h2>
+  return <details className={styles.pdopFilter} aria-label="Harita PDOP filtresi">
+    <summary><strong>Harita PDOP filtresi</strong><span>{saved ? saved.enabled ? `Açık · Üst sınır ${saved.maximumPdop}` : "Kapalı" : "Yükleniyor…"}</span></summary>
+    <div className={styles.filterGroupBody}>
     <p>Seçili haritanın tüm konumlarına uygulanır.</p>
     <label><span>PDOP filtresi</span><select value={String(enabled)} disabled={!saved || saving} onChange={event => { setEnabled(event.target.value === "true"); setMessage(""); }}>
       <option value="true">Açık</option><option value="false">Kapalı</option>
@@ -58,5 +59,6 @@ export function MapPdopFilterEditor({ mapId }: { mapId: string }) {
     {error && <p role="alert" className={styles.pdopError}>{error}</p>}
     {!saved && error && <button type="button" onClick={() => setReload(value => value + 1)}>Tekrar yükle</button>}
     {message && <p role="status">{message}</p>}
-  </section>;
+    </div>
+  </details>;
 }

@@ -1,0 +1,34 @@
+{
+  "testId": "test-36f6f20f-65cb-49f4-b704-71912f20c01d",
+  "testName": "Yoğun Bakım — Oda testi — 36f6f20f",
+  "site": "Necmettin Hastanesi — Yoğun Bakım",
+  "timezone": "Europe/Istanbul",
+  "revision": 1,
+  "revisionReason": "Kullanıcının UTC milisaniyeli oda ziyaretleri ve açık tag kodu korunarak eklendi; test oturumu SELECT ile kontrol edildi.",
+  "test": {
+    "from": "2026-10-13T08:54:54.058Z",
+    "to": "2026-10-13T08:55:55.002Z"
+  },
+  "visits": [
+    {
+      "roomId": "room-02",
+      "from": "2026-10-13T08:55:16.756Z",
+      "to": "2026-10-13T08:55:25.086Z"
+    },
+    {
+      "roomId": "room-06",
+      "from": "2026-10-13T08:55:39.574Z",
+      "to": "2026-10-13T08:55:49.639Z"
+    }
+  ],
+  "groups": [
+    {
+      "id": "icu-36f6f20f",
+      "tagCodes": [
+        "9A8FA14BB93426F1"
+      ],
+      "note": "Kullanıcının açık tag kodu; eşzamanlı diğer test farklı tag ve bağımsız rotadır."
+    }
+  ],
+  "note": "Z saatleri UTC olarak korunur, yerel gösterim Europe/Istanbul. Oda aralıkları arasındaki süre koridor. Ham DB geçmişi eksiksiz canlı akış değildir; PDOP nedeniyle kalıcı kayıt öncesi elenen paketler geri getirilemez."
+}

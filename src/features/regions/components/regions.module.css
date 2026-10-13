@@ -31,20 +31,37 @@
 .headerActions .primary:hover { color: #fff; background: #06685e; }
 .editor { flex: 1; min-height: 0; display: grid; grid-template-columns: 210px minmax(0, 1fr) 355px; overflow: hidden; border: 1px solid #bfd0dd; border-radius: 6px; background: rgba(255,255,255,.88); box-shadow: 0 20px 55px rgba(53,75,100,.12); }
 .zonePanel, .properties { min-width: 0; min-height: 0; display: flex; flex-direction: column; background: rgba(249,252,255,.96); }
-.zonePanel { border-right: 1px solid #cbd9e3; }
-.pdopFilter { flex: 0 0 auto; padding: 11px 13px; border-bottom: 1px solid #d6e2ea; background: #edf8f5; }
-.pdopFilter h2 { margin: 0 0 6px; color: #33536a; font-size: 11px; }
-.pdopFilter p { margin: 6px 0; color: #647a90; font-size: 9px; line-height: 1.5; }
-.pdopFilter label { display: block; margin-top: 8px; }
-.pdopFilter label > span { display: block; margin-bottom: 5px; color: #455e76; font-size: 9px; }
-.pdopFilter input, .pdopFilter select { box-sizing: border-box; width: 100%; height: 32px; padding: 0 8px; border: 1px solid #c9d9e5; border-radius: 5px; background: #fff; color: #26394f; font-size: 10px; }
+.zonePanel { overflow-y: auto; border-right: 1px solid #cbd9e3; }
+.mapFilters { flex: 0 0 auto; min-width: 0; border-bottom: 1px solid #c9dedb; background: #edf8f5; }
+.mapFiltersHeading { display: flex; align-items: center; gap: 8px; padding: 12px 11px; color: #087f73; cursor: pointer; list-style: none; }
+.mapFiltersHeading::-webkit-details-marker { display: none; }
+.mapFiltersHeading > div { flex: 1; min-width: 0; }
+.mapFiltersHeading strong { display: block; color: #33536a; font-size: 11px; }
+.mapFiltersHeading span { display: block; margin-top: 5px; color: #647a90; font-size: 8px; line-height: 1.4; }
+.mapFiltersHeading > svg { flex: 0 0 auto; }
+.mapFilters[open] > .mapFiltersHeading { border-bottom: 1px solid #c9dedb; }
+.mapFilters[open] > .mapFiltersHeading .mapFiltersChevron { transform: rotate(180deg); }
+.mapFilterBody { max-height: min(280px, 32dvh); overflow-y: auto; padding: 8px; overscroll-behavior: contain; scrollbar-gutter: stable; }
+.filterGroup, .pdopFilter { margin-bottom: 7px; border: 1px solid #ccdfdc; border-radius: 5px; background: #fff; }
+.filterGroup > summary, .pdopFilter > summary { padding: 9px 8px; color: #33536a; font-size: 10px; cursor: pointer; }
+.filterGroup > summary span, .pdopFilter > summary span { display: block; margin: 5px 0 0 12px; color: #087f73; font-size: 9px; line-height: 1.4; }
+.filterGroup[open] > summary, .pdopFilter[open] > summary { border-bottom: 1px solid #dce9e7; background: #f5fbfa; }
+.filterGroupBody { padding: 0 9px 9px; }
+.filterGroupBody p, .filterSaveHelp { margin: 8px 0; color: #647a90; font-size: 9px; line-height: 1.5; }
+.filterGroupBody label { display: block; margin-top: 9px; }
+.filterGroupBody label > span { display: block; margin-bottom: 5px; color: #455e76; font-size: 9px; line-height: 1.4; }
+.filterGroupBody input, .filterGroupBody select { box-sizing: border-box; width: 100%; height: 32px; padding: 0 8px; border: 1px solid #c9d9e5; border-radius: 5px; background: #fff; color: #26394f; font-size: 10px; }
+.filterAdvanced { margin-top: 11px; padding-top: 8px; border-top: 1px solid #dce9e7; }
+.filterAdvanced > summary { color: #455e76; font-size: 9px; line-height: 1.4; cursor: pointer; }
+.mapFilters summary:focus-visible, .filterGroupBody input:focus-visible, .filterGroupBody select:focus-visible { outline: 2px solid #087f73; outline-offset: 2px; }
+.filterSaveHelp { padding: 0 2px; }
 .pdopFilter button { width: 100%; min-height: 32px; margin-top: 6px; border: 1px solid #087f73; border-radius: 5px; background: #087f73; color: #fff; font-size: 9px; cursor: pointer; }
 .pdopFilter input:disabled, .pdopFilter select:disabled { background: #edf3f6; color: #7d8d9c; }
 .pdopFilter button:disabled { opacity: .5; cursor: default; }
 .pdopFilter input:focus-visible, .pdopFilter select:focus-visible, .pdopFilter button:focus-visible { outline: 2px solid #087f73; outline-offset: 2px; }
 .pdopFilter .pdopError { color: #b23e4c; }
 .properties { padding-bottom: 13px; overflow-y: auto; border-left: 1px solid #cbd9e3; }
-.panelTitle { min-height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 13px; border-bottom: 1px solid #d6e2ea; }
+.panelTitle { flex: 0 0 auto; min-height: 50px; display: flex; align-items: center; justify-content: space-between; padding: 0 13px; border-bottom: 1px solid #d6e2ea; }
 .panelTitle span, .mapInfo > span { display: block; color: #7a8da1; font: 7px ui-monospace, monospace; letter-spacing: .13em; }
 .panelTitle strong { display: block; margin-top: 4px; color: #30465d; font-size: 10px; }
 .panelTitle button { width: 29px; height: 29px; padding: 0; }
@@ -93,7 +110,7 @@
 .parameterHelpEmpty strong { color: #3f5d73; font-size: 10px; }
 .parameterHelpEmpty span { margin-top: 5px; font-size: 9px; line-height: 1.5; }
 .srOnly { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
-.zoneList { flex: 1; min-height: 0; overflow-y: auto; padding: 7px; }
+.zoneList { flex: 1 0 72px; min-height: 72px; overflow-y: auto; padding: 7px; }
 .zoneList > button { position: relative; width: 100%; min-height: 50px; display: grid; grid-template-columns: 8px minmax(0,1fr); align-items: center; gap: 10px; margin-bottom: 4px; padding: 8px; border: 1px solid transparent; border-radius: 5px; background: transparent; text-align: left; cursor: pointer; }
 .zoneList > button:hover { border-color: #d2e1e9; background: #f0f7fa; }
 .zoneList > .selectedZone { border-color: #b8ddd8; background: linear-gradient(90deg, #e3f7f4, #f0f8fc); }
@@ -115,12 +132,7 @@
 .empty svg { margin-bottom: 10px; color: #8abdb7; }
 .empty strong { color: #526980; font-size: 10px; }
 .empty span { margin-top: 5px; color: #8295a8; font-size: 8px; line-height: 1.5; }
-.displayWaitConfig { padding: 11px 13px 12px; border-bottom: 1px solid #d6e2ea; background: #f4f9fc; }
-.displayWaitConfig label { display: block; color: #647a90; font-size: 9px; font-weight: 600; line-height: 1.35; }
-.displayWaitConfig input { box-sizing: border-box; width: 100%; height: 32px; margin-top: 7px; padding: 0 9px; border: 1px solid #c9d9e5; border-radius: 5px; outline: none; background: #fff; color: #26394f; font: 9px ui-monospace, monospace; }
-.displayWaitConfig input:focus { border-color: rgba(0,168,150,.55); box-shadow: 0 0 0 3px rgba(0,168,150,.08); }
-.displayWaitConfig p { margin: 7px 0 0; color: #758a9e; font-size: 8px; line-height: 1.5; }
-.mapInfo { padding: 12px 13px; border-top: 1px solid #d6e2ea; background: #f4f9fc; }
+.mapInfo { flex: 0 0 auto; padding: 12px 13px; border-top: 1px solid #d6e2ea; background: #f4f9fc; }
 .mapInfo strong, .mapInfo small { display: block; }
 .mapInfo strong { margin-top: 6px; color: #2f4b63; font: 9px ui-monospace, monospace; }
 .mapInfo small { margin-top: 4px; color: #778ba0; font: 8px ui-monospace, monospace; }
@@ -273,12 +285,13 @@
   .headerActions button svg { flex: 0 0 auto; }
   .editor { display: flex; flex-direction: column; min-height: 0; overflow: visible; border-radius: 6px; }
   .zonePanel, .properties { width: 100%; min-height: auto; border: 0; }
-  .zonePanel { border-bottom: 1px solid #cbd9e3; }
+  .zonePanel { overflow: visible; border-bottom: 1px solid #cbd9e3; }
+  .mapFilterBody { max-height: min(320px, 40dvh); }
   .panelTitle { min-height: 46px; padding: 0 11px; }
   .zoneList { flex: 0 0 auto; display: flex; gap: 6px; overflow-x: auto; overflow-y: hidden; padding: 8px; }
   .zoneList > button { flex: 0 0 min(210px, 68vw); min-height: 54px; margin: 0; }
   .zoneList .empty { min-width: 100%; }
-  .displayWaitConfig, .mapInfo { display: none; }
+  .mapInfo { display: none; }
   .map { order: 2; width: 100%; height: min(62dvh, 500px); min-height: 330px; touch-action: none; }
   .tools { top: 8px; left: 8px; right: 8px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 4px; padding: 4px; }
   .tools button { min-height: 42px; padding: 0; }

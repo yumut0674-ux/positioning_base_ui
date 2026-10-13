@@ -7,7 +7,7 @@ import { DEFAULT_PDOP_FILTER_SETTINGS, isPositionPdopAccepted, parsePdopFilterSe
 import { MapTrackingFilterSettings, mapTrackingFilterSettings, TrackingFilterConfigurationError } from "../src/server/trackingFilterSettings";
 import { createTrackingFilterHandlers } from "../src/server/trackingFilterHttp";
 import { mapService } from "../src/server/maps/mapService";
-import { TrackingBuffer } from "../src/server/trackingBuffer";
+import { TrackingBuffer, installGlobalTrackingBuffer } from "../src/server/trackingBuffer";
 import { RegionPositionEngine } from "../src/server/regionEngine/RegionPositionEngine";
 import { compileRegionsConfig } from "../src/server/regionEngine/configLoader";
 import type { RegionsConfig } from "../src/features/regions/types/region.types";
@@ -38,6 +38,27 @@ test("kapatılan PDOP filtresi sonlu sayıları kabul eder; null ve sıfır koru
   for (const value of [{ enabled: "true", maximumPdop: 70 }, { enabled: true, maximumPdop: "70" },
     { enabled: true, maximumPdop: -1 }, { enabled: true, maximumPdop: Infinity }, { enabled: true, maximumPdop: NaN },
     { enabled: true, maximumPdop: 70, hdop: 10 }, {}, null]) assert.throws(() => parsePdopFilterSettings(value));
+});
+
+test("hot reload PDOP davranışını güncellerken mevcut tamponu, kuyruğu ve dinleyicileri korur", async () => {
+  const original = globalThis.__uwbTrackingBuffer;
+  const buffer = new TrackingBuffer(async () => [{ tag_code: "PDOP-HMR" }], Date.now, false);
+  let events = 0;
+  buffer.on("position", () => events++);
+  const position = { tagCode: "PDOP-HMR", x: 1, y: 2, pdop: 10, timestamp: new Date().toISOString(), mapId: intensiveCare };
+  try {
+    await buffer.ingest(position);
+    assert.equal(buffer.status().queueSize, 1);
+    const oldPrototype = Object.create(Object.getPrototypeOf(TrackingBuffer.prototype)) as TrackingBuffer;
+    oldPrototype.ingest = async () => false;
+    Object.setPrototypeOf(buffer, oldPrototype);
+    globalThis.__uwbTrackingBuffer = buffer;
+    assert.equal(installGlobalTrackingBuffer(), buffer);
+    assert.equal(await buffer.ingest({ ...position, pdop: 70 }), true);
+    assert.equal(buffer.status().queueSize, 2);
+    assert.equal(buffer.listenerCount("position"), 1);
+    assert.equal(events, 2);
+  } finally { buffer.stop(); globalThis.__uwbTrackingBuffer = original; }
 });
 
 test("PDOP ayarları harita bazında kalıcıdır; kaydetme cache'e hemen yansır ve diğer haritayı değiştirmez", async () => {

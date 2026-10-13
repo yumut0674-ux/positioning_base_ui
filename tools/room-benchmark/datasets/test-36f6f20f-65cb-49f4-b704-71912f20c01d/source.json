@@ -1,0 +1,13 @@
+{
+  "test_id": "test-36f6f20f-65cb-49f4-b704-71912f20c01d",
+  "test_name": "Oda testi",
+  "tag_id": "9A8FA14BB93426F1",
+  "tag_codes": ["9A8FA14BB93426F1"],
+  "timezone": "Europe/Istanbul",
+  "started_at": "2026-10-13T08:54:54.058Z",
+  "ended_at": "2026-10-13T08:55:55.002Z",
+  "rooms": [
+    {"room": "room-02", "entered_at": "2026-10-13T08:55:16.756Z", "exited_at": "2026-10-13T08:55:25.086Z", "duration_seconds": 8.33},
+    {"room": "room-06", "entered_at": "2026-10-13T08:55:39.574Z", "exited_at": "2026-10-13T08:55:49.639Z", "duration_seconds": 10.065}
+  ]
+}

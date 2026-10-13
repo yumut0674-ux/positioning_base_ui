@@ -1,5 +1,52 @@
 # Çevrimdışı oda benchmarkı
 
+## 9 Ekim Cuma motoru/ayarları ile 13 Ekim karşılaştırması
+
+[Karşılaştırma HTML](reports/yogun-bakim-friday-vs-current-20261013/analysis.html), [Markdown](reports/yogun-bakim-friday-vs-current-20261013/analysis.md). Dört yoğun bakım datasetinde 11 profil iki kez oynatıldı; 8 Ekim tagı belirsiz dataset puanlanmadı. Cuma kaynaklarının SHA-256 değerleri o günkü raporla eşleşti, eski Hasan kararları ve metrikleri yeniden üretildi. Cuma ilk (2 nokta) / Cuma son (3 nokta) ayrı gösterilir. Bugünkü iki testte Cuma son ayarı aynı oda başarısını verdi; Cuma ilk ayarı yalnız Cafer Oda 2'yi toparladı. Motor/config etkisi ayrı profillerle ölçüldü; üretim ayarları değişmedi.
+
+Tarihsel karşılaştırma yalnız değişmez Git snapshotlarını kullanır; elle uyarlanan ikinci motor oluşturulmaz. Varsayılan `replay` hâlâ aktif `RegionPositionEngine` importudur. Snapshot `.snapshot`, çalıştırma çıktısı `.js` olarak rapor klasöründe tutulur; eski tipler proje typecheck'ine karışmaz. Her yeni deneyde farklı RUN-ID kullan:
+
+```powershell
+node tools/room-benchmark/experiments/prepare-icu-friday.cjs YENI-RUN-ID
+node --import tsx tools/room-benchmark/experiments/compare-icu-friday.ts YENI-RUN-ID
+node tools/room-benchmark/experiments/validate-icu-friday.cjs YENI-RUN-ID
+node tools/room-benchmark/experiments/finalize-icu-friday.cjs YENI-RUN-ID
+```
+
+Kaynak/çalıştırma/config hash'leri `provenance.json`, profil sonuçları `study.json`, gerçek test/typecheck çıktıları `validation-results.json`, bütünlük ve izolasyon doğrulaması `verification.json` içinde kaydedilir. DB bağlantısı gerekmez. Yeni doğrulamada ilgili kaynağın hash'i değişmişse sonlandırıcı eski test sonucunu kabul etmez.
+
+## 13 Ekim — iki yeni Yoğun Bakım testi
+
+`test-36f6f20f-65cb-49f4-b704-71912f20c01d` (cafer, `9A8FA14BB93426F1`, 255 satır) ve `test-4255236f-db12-4a1c-bc09-5e11c51d5d2a` (bilgisayar, `9C76E417B4CB5ECF`, 299 satır) eklendi. Bağımsız rotalar ayrı puanlandı; UTC milisaniyeleri, truth revizyon 1, 30 sn ısınma ve 60 sn gözlem korunur. İki veri kümesinde received_at ve PDOP mevcut; tüm raw satırlar yoğun bakım haritasına ait.
+
+Güncel `room-evidence-10` / `98a9f1072bbf5a4e`, harita PDOP sınırı 70: cafer 0/2 /%0; bilgisayar 2/2 /%24,545. Mesafe filtresini kapatmak süre sonucunu değiştirmedi. PDOP ≤10/7/5 bilgisayarın Oda 6 ziyaretini kaybettirdi; Servis eşiği yoğun bakıma otomatik taşınmamalı. Giriş iki nokta veya duvar 0,05 m yalnız cafer Oda 2'yi toparladı ve koridor maliyetini artırdı. Eski hasan verisi de aynı aktif motorla farklı config snapshotlarında tekrar oynatıldı; eski motor kopyalanmadı. 8 Ekim belirsiz tag testi puanlanmadı.
+
+[Neden analizi](reports/yogun-bakim-pdop-two-20261013/interpretation.md), [statik HTML ve dört nokta çizimi](reports/yogun-bakim-pdop-two-20261013/analysis.html). Karar çizelgeleri ve profil JSON'ları aynı klasörde. Yeni replay örneği:
+
+```powershell
+node --import tsx tools/room-benchmark/cli.ts replay test-36f6f20f-65cb-49f4-b704-71912f20c01d --config config/maps/necmettin-yogun-bakim/regions.json --run-id YENI-ICU-ID
+node --import tsx tools/room-benchmark/cli.ts replay test-4255236f-db12-4a1c-bc09-5e11c51d5d2a --config config/maps/necmettin-yogun-bakim/regions.json --run-id YENI-ICU-ID-2
+node node_modules/typescript/bin/tsc -p tools/room-benchmark/experiments/tsconfig.icu-pdop.json --noEmit
+```
+
+## 13 Ekim — iki yeni Servis testi ve PDOP
+
+`344ab34d` (5 ziyaret, 429 ham satır) ve `9a7debf0` (14 ziyaret, 580 satır) veri kümeleri eklendi. Kullanıcının belirttiği `9C76E417B4CB5ECF` kodu DB'de `bilgisayar` adıyla kayıtlı; başka aday tag puanlanmaz. Kaynak UTC milisaniyeleri, truth revizyon 1, 30 sn ısınma ve 60 sn gözlem korunur. İlk testte tüm PDOP alanları NULL; ikinci testte 579/580 satırda PDOP vardır.
+
+Ziyaret tabloları ve eşik deneyleri: [sonuçlar](reports/servis-pdop-two-latest-20261013/analysis.md). Kaçırılma nedenleri ve öneriler: [yorum](reports/servis-pdop-two-latest-20261013/interpretation.md). Açılabilir rapor: [HTML](reports/servis-pdop-two-latest-20261013/analysis.html). Güncel motor `room-evidence-10`, Servis configVersion `a255e5826bbb57d8`; 3/5 ve 9/14 yakalama. Uzun testte Oda 8 yalnız 26 ms tahminle yakalanmış sayılır; süreye göre başarısı %0'dır. Bunu kalıcı başarı olarak yorumlamayın.
+
+İçe aktarım `pdop` sütununu SELECT ile algılar; eski DB/JSONL girdilerinde eksik PDOP kabul edilir ve bilinmeyen olarak raporlanır. Replay, mevcut saf `isPositionPdopAccepted` kuralını motora teslimden önce uygular; elenmiş pakette de sanal tick ilerler. Harita config'inin yanındaki `tracking-filter.json` salt okunur yüklenir; yoksa shared varsayılan kullanılır. Şema/kural hatası sessizce varsayılana dönmez. Komut seçenekleri yalnız çevrimdışı deneyi değiştirir:
+
+```powershell
+node --import tsx tools/room-benchmark/cli.ts replay test-9a7debf0-57ad-4df2-802b-ae92e4c20b13 --config config/maps/necmettin-servis/regions.json --run-id YENI-RUN-ID
+node --import tsx tools/room-benchmark/cli.ts replay test-9a7debf0-57ad-4df2-802b-ae92e4c20b13 --config config/maps/necmettin-servis/regions.json --pdop-max 7 --run-id YENI-PDOP-7-ID
+node --import tsx tools/room-benchmark/cli.ts replay test-9a7debf0-57ad-4df2-802b-ae92e4c20b13 --config config/maps/necmettin-servis/regions.json --pdop-off --run-id YENI-OFF-ID
+node --import tsx --test tools/room-benchmark/benchmark.test.ts tools/room-benchmark/pdop.test.ts
+node node_modules/typescript/bin/tsc -p tools/room-benchmark/experiments/tsconfig.service-pdop.json --noEmit
+```
+
+Canlıda PDOP yüzünden elenen paketler DB geçmişine yazılmadan atılır. `--pdop-off` bunları geri getiremez; sadece kayıtlı veride eşik etkisi karşılaştırılır. Kural SHA, harita PDOP dosyası SHA/yokluğu, etkinlik/eşik rapora kaydedilir; `compare` farklı PDOP politikalarını aynı deney diye kıyaslamaz. Testte PDOP ≤7 yakalamayı 10/14'e çıkardı; ≤5 yanlış oda sürelerini daha fazla azaltırken yakalamayı 8/14'e indirdi. Henüz genel canlı ayar önerisi değildir.
+
 ## Servis çıkış eşiği deneyi (13 Ekim 2026)
 
 `node --import tsx tools/room-benchmark/experiments/study-service-exit.ts YENI-RUN-ID` yalnız kayıtlı ve tag eşleşmesi doğrulanmış Servis veri kümelerini güncel motorla oynatır. Güncel ayar, 2,5 sn / 3, 1,5 sn / 4, 2,5 sn / 4 ve 3 sn / 4 profilleri yerel config kopyalarında kıyaslanır; her koşu iki kez doğrulanır. Üretim config'i değişmez; veri/truth/config SHA-256, motor/commit ve zamanlama bilgileri rapora yazılır. Raw/manifest olmayan testler açıkça dışlanır. Typecheck: `node node_modules/typescript/bin/tsc -p tools/room-benchmark/experiments/tsconfig.service-exit.json --noEmit`. İlk çalışma: [analiz](reports/servis-exit-harder-20261013/analysis.md), [yorum](reports/servis-exit-harder-20261013/interpretation.md). Beş Servis testinde 27/43 yakalama değişmedi; 2,5 sn / 3 yalnız 1,25 sn doğru tahmin kazandırırken koridorda oda süresini 135 → 160,25 sn artırdı. Bu çalışma çıkışı genel olarak zorlaştırmayı desteklemiyor.

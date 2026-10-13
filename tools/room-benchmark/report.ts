@@ -30,7 +30,7 @@ export function markdown(run:Run):string {
     `Veri: ${run.dataset.source} · SHA-256 ${run.dataset.sha256} · ${run.dataset.rowCount} satır · zamanlama ${run.dataset.timing}`,
     `Truth: revizyon ${run.dataset.truthRevision} · SHA-256 ${run.dataset.truthSha256}`,
     `Simülasyon: tick ${run.simulation.tickMs} ms, örnek ${run.simulation.sampleMs} ms, sınır toleransı ±${run.simulation.boundaryToleranceMs} ms; aynı anda önce tick, sonra DB id`,
-    `Replay edilen paket: ${run.dataset.rowCount}; üretilen motor kararı: ${run.decisions.length}`,
+    `Ham dosyadaki paket: ${run.dataset.rowCount}; replay teslim aralığına düşen paket: ${run.preprocessing?run.preprocessing.pdop.knownValues+run.preprocessing.pdop.unknownValues:'eski raporda ayrı kaydedilmedi'}; üretilen motor kararı: ${run.decisions.length}`,
     '',`Genel doğru durum (oda + koridor): ${m.successPercent===null?'puanlanmadı':m.successPercent+'%'}`,
     `Yalnız gerçek oda aralıklarında doğru oda: ${m.roomOnlySuccessPercent===null?'puanlanmadı':m.roomOnlySuccessPercent+'%'} (doğrulanmış + tahmini; payda ${round(m.actualRoomMs/1000)} tag-saniye)`,
     `Puanlanmayan tag'lar: ${run.unscoredTags.join(', ')||'yok'}`,
@@ -42,7 +42,8 @@ export function markdown(run:Run):string {
   const pdop=run.preprocessing?.pdop;
   if(pdop)out.splice(out.indexOf('## Oda / tag sonuçları'),0,
     `PDOP ön filtresi: ${pdop.enabled?'açık':'kapalı'}, eşik ${pdop.limit}; bilinen ${pdop.knownValues}, eksik/bilinmeyen ${pdop.unknownValues}, motor öncesi elenen ${pdop.rejected.length}. NULL/eksik değer kalite başarısı sayılmaz; üretim kuralına göre kabul edilir.`,
-    `PDOP kuralı: ${pdop.sourcePath??'shared/tracking/pdop'} · SHA-256 ${pdop.sourceSha256??'replayRows tanı çıktısında yok'}. ${pdop.caveat??'DB öncesinde elenmiş paketlerin etkisi bu arşivden ölçülemez.'}`,'');
+    `PDOP kuralı: ${pdop.sourcePath??'shared/tracking/pdop'} · SHA-256 ${pdop.sourceSha256??'replayRows tanı çıktısında yok'}. ${pdop.caveat??'DB öncesinde elenmiş paketlerin etkisi bu arşivden ölçülemez.'}`,
+    `PDOP ayar kaynağı: ${pdop.settingsSource??'doğrudan replay ayarı'} · ${pdop.settingsPath??'—'} · SHA-256 ${pdop.settingsSha256??'—'}.`,'');
   for(const [tag,v] of Object.entries(m.tags)) for(const [room,c] of Object.entries(v.rooms)) {
     const t=v.roomsTolerant[room];
     out.push(`| ${tag} | ${room} | ${round(c.correctConfirmedMs/1000)} s | ${round(c.correctInferredMs/1000)} s | ${round(c.wrongRoomMs/1000)} s | ${t?pct(t.correctConfirmedMs+t.correctInferredMs,t.totalMs):'—'} |`);
@@ -82,7 +83,7 @@ export async function readRun(file:string):Promise<Run> {return JSON.parse(await
 export function compare(a:Run,b:Run):string {
   const keys:[string,unknown,unknown][]=[['test',a.testId,b.testId],['veri',a.dataset.sha256,b.dataset.sha256],['truth revizyonu',a.dataset.truthRevision,b.dataset.truthRevision],['truth SHA',a.dataset.truthSha256,b.dataset.truthSha256],['config SHA',a.config.sha256,b.config.sha256],['tick',a.simulation.tickMs,b.simulation.tickMs],['örnekleme',a.simulation.sampleMs,b.simulation.sampleMs],['tolerans',a.simulation.boundaryToleranceMs,b.simulation.boundaryToleranceMs]];
   const differences=keys.filter(([,x,y])=>x!==y).map(([key,x,y])=>`${key}: ${x} → ${y}`);
-  for(const key of ['enabled','limit','sourceSha256'] as const){
+  for(const key of ['enabled','limit','sourceSha256','settingsSha256'] as const){
     const x=a.preprocessing?.pdop[key],y=b.preprocessing?.pdop[key];
     if(x!==y)differences.push(`PDOP ${key}: ${x??'eski raporda yok'} → ${y??'eski raporda yok'}`);
   }

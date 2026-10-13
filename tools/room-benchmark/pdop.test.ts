@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {compileRegionsConfig} from '../../src/server/regionEngine/configLoader';
-import {replayRows} from './replay';
+import {replayRows,readReplayPdopSettings} from './replay';
 import {compare} from './report';
 import type {RawRow,Truth} from './model';
 const config=compileRegionsConfig(JSON.parse(readFileSync(new URL('../../config/maps/spor-koridor/regions.json',import.meta.url),'utf8')));
@@ -44,4 +44,23 @@ test('offline PDOP profiles keep rejected rows in the source and compare rejects
   const base={testId:'t',engineVersion:'v',git:{commit:'c',dirty:false,status:''},config:{sha256:'a'},dataset:{sha256:'b',truthRevision:1,truthSha256:'d'},
     simulation:{tickMs:1000,sampleMs:250,boundaryToleranceMs:2000},metrics:{tags:{}}};
   assert.throws(()=>compare({...base,preprocessing:lower.preprocessing} as never,{...base,preprocessing:off.preprocessing} as never),/PDOP/);
+});
+test('map PDOP file is read without the live configuration service; a missing file uses shared defaults',async()=>{
+  const selected=await readReplayPdopSettings(new URL('fixtures/pdop/regions.json',import.meta.url).pathname.replace(/^\/(?=[A-Za-z]:)/,''));
+  assert.deepEqual(selected.settings,{enabled:true,maximumPdop:7});
+  assert.equal(selected.source,'map-file');
+  assert.match(selected.sha256!,/^[0-9a-f]{64}$/);
+  const missing=await readReplayPdopSettings(new URL('fixtures/pdop-no-map-file/regions.json',import.meta.url).pathname.replace(/^\/(?=[A-Za-z]:)/,''));
+  assert.deepEqual(missing.settings,{enabled:true,maximumPdop:20});
+  assert.equal(missing.sha256,null);
+});
+test('rejected measurement diagnostics retain the incoming PDOP instead of the tracking reference PDOP',()=>{
+  const first=row(1,1000,2),jump={...row(2,1050,9),x:room.x+100};
+  const actual=replayRows([first,jump],truth,config,settings);
+  const rejected=actual.decisions.find(d=>!d.synthetic&&d.eventType==='MEASUREMENT_REJECTED');
+  assert.ok(rejected);
+  assert.equal(rejected.input.pdop,9);
+  assert.equal(rejected.input.measuredAt,jump.created_at);
+  const off=replayRows([{...first,pdop:Infinity}],truth,config,{...settings,pdopEnabled:false});
+  assert.equal(off.preprocessing.pdop.rejected.length,1);
 });

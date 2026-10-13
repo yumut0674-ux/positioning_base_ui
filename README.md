@@ -103,7 +103,8 @@ Invoke-RestMethod `
 
 Beklenen cevap: gövdesiz `204 No Content`.
 
-PDOP değeri 20'den büyükse paket işlenmeden atılır ve yine `204` döner.
+PDOP değeri kaynak haritanın üst sınırından büyükse paket işlenmeden atılır
+ve yine `204` döner. Varsayılan sınır 20, Yoğun Bakım haritasında 70'tir.
 Kabul edilen paket canlı SSE'ye yayınlanır; PostgreSQL geçmişine yazılması
 için tag'i UI üzerinden veya `POST /api/tags` ile kaydedin.
 
@@ -280,7 +281,8 @@ Kurallar:
 - `tag_id` trim edilir ve uppercase normalize edilir.
 - `x` ve `y` sonlu number olmalıdır.
 - `pdop` sonlu number veya `null` olmalıdır. Eski göndericilerde alan eksikse `null` kabul edilir; hiçbir aşamada `0` değerine dönüştürülmez.
-- `pdop > 20` paketleri harita çözümü, SSE, oda/bölge motoru ve geçmiş kuyruğundan önce tamamen elenir. `20` dahil daha küçük değerler ve `null`, mevcut diğer filtrelere devam eder. Elenen paket tag'ın son kabul edilmiş konumunu, PDOP değerini veya son veri zamanını güncellemez.
+- Paket önce `zone_id` ile haritaya çözülür. Haritanın PDOP filtresi açıksa üst sınırdan büyük paketler SSE, oda/bölge motoru ve geçmiş kuyruğundan önce tamamen elenir. Sınıra eşit değerler ve `null`, mevcut diğer filtrelere devam eder. Elenen paket tag'ın son kabul edilmiş konumunu, PDOP değerini veya son veri zamanını güncellemez.
+- PDOP filtresi harita bazında açılıp kapatılır ve üst sınırı değiştirilir. Varsayılan `enabled:true, maximumPdop:20`; `necmettin-yogun-bakim` için başlangıç sınırı 70'tir. Haritası bilinmeyen/null zone için varsayılan 20 filtresi uygulanır.
 - Kabul edilen konum ve PDOP, aynı string `tag_id` üzerinden birlikte güncellenir; canlı ham/işlenmiş akışlarda ve geçmişte `pdop` olarak taşınır.
 - `zone_id` string veya `null`, en fazla 100 karakterdir; `zone_name` string veya `null`, en fazla 160 karakterdir. String değerler trim edilir ve boş string `null` olur.
 - `zone_id`, `config/maps/catalog.json` içindeki aktif/seçilebilir map'in `trackingZoneIds` listesi üzerinden `mapId` değerine çözülür. `zone_name` eşleme için kullanılmaz; yalnız kaynak snapshot açıklamasıdır.
@@ -311,6 +313,47 @@ başarısız HTTP gönderimleri otomatik tekrar denenmez.
 PDOP filtresini geçen paketler canlı SSE'ye yayınlanır. Tag registry içinde
 bulunanlar PostgreSQL'e yazılmak üzere kuyruğa alınır; kayıtlı olmayanlar
 geçmişe yazılmaz. Yapısal olarak geçersiz payload `400` döndürür.
+
+### Harita PDOP filtresini yönetme
+
+Haritayı seçin, **Oda/Bölge Paneli → Harita filtreleri → Harita PDOP filtresi** alanında Açık/Kapalı
+ve PDOP üst sınırını seçin, **PDOP filtresini kaydet** düğmesine basın.
+Bu kayıt yalnız seçili haritanın yeni konum paketlerine uygulanır. Motor
+yeniden başlatılmaz; mevcut oda kararları, kanıt sayıları ve hareket
+referansları sıfırlanmaz. PDOP filtresi kapalıyken hız, mesafe ve oda/kapı
+filtreleri normal çalışmaya devam eder. Önceden elenen paketler geri işlenmez.
+
+**Harita filtreleri** paneli ve alt grupları başlangıçta kapalıdır. Açık panelin
+içeriği kendi içinde kaydırılır; oda ve büyük alan listeleri için alan korunur.
+Aynı panelde mevcut mesafe eşiği, yeni konum doğrulama ölçümü/süresi ve aday
+ayarları, azami hız, hareket toleransı, asgari donanım kalitesi ve alan dışı
+gösterim bekleme süresi düzenlenebilir. Bunlar seçili haritanın mevcut `engine`
+ve `mapDisplay` ayarlarına bağlıdır; üstteki **Kaydet** ile mevcut doğrulama ve
+uygulama akışından geçer. Oda bazındaki özel hız/kalite ayarları korunur.
+Mesafe eşiğinde `0`, mevcut davranışa uygun olarak filtreyi kapatır.
+
+Ayarlar oda motoru config'inden bağımsız olarak
+`config/maps/<mapId>/tracking-filter.json` dosyasında kalıcı saklanır.
+Panelden kaydetme aynı sunucuda hemen uygulanır; dosyanın elle değiştirilmesi
+en fazla bir saniyelik cache sonrasında okunur. Geçersiz filtre dosyası sessizce
+yok sayılmaz; konum isteği `503` döndürür ve konum işlemez.
+
+```http
+GET /api/maps/necmettin-yogun-bakim/tracking-filter
+PUT /api/maps/necmettin-yogun-bakim/tracking-filter
+Content-Type: application/json
+```
+
+```json
+{
+  "enabled": true,
+  "maximumPdop": 70
+}
+```
+
+Üst sınır sıfır veya daha büyük sonlu sayı olmalıdır. `pdop` API alanı
+değişmez; ayrıca `hdop` alanı beklenmez. Filtreyi kapatmak için `enabled:false`
+kaydedilir, son üst sınır değeri korunur.
 
 Tracking buffer davranışı:
 
@@ -384,9 +427,11 @@ node test_api\simulate_tags.js
 
 ## Region Position Engine
 
-Region engine, raw ingest akışını değiştirmeden oda/bölge çıkarımı yapan
-opsiyonel moddur. UI'daki "Oda Tespit Modu" açıldığında veya API ile enable
-edildiğinde:
+Region engine, raw ingest akışını değiştirmeden oda/bölge çıkarımı yapar.
+Sunucu başlatma kancası (`instrumentation.ts`) motoru ilk sayfa veya API isteği
+işlenmeden önce otomatik açar; oda/bölge panelini açmak gerekmez. UI'daki
+"Oda Tespit Modu" veya API ile çalışma sırasında kapatılıp tekrar açılabilir.
+Sistem yeniden başlatıldığında motor tekrar açık başlar. Motor açıldığında:
 
 1. Her canlı map için `config/maps/{mapId}/regions.json` okunur ve ayrı world-coordinate polygon index'i/state machine oluşturulur.
 2. Raw position event'leri memory state machine tarafından tüketilir.
@@ -526,6 +571,7 @@ Operasyon endpoint'leri:
 | `/api/anchors/{id}/logs?limit=100` | `GET` | Anchor health loglarını getirir. |
 | `/api/regions` | `GET`, `PUT` | Region config okur veya kaydeder. |
 | `/api/maps/{mapId}/regions` | `GET`, `PUT` | Map bazlı region config okur veya atomic kaydeder. |
+| `/api/maps/{mapId}/tracking-filter` | `GET`, `PUT` | Haritanın PDOP filtresini motoru reload etmeden okur veya kaydeder. |
 | `/api/maps/{mapId}/regions/validate` | `POST` | URL mapId/config mapId eşleşmesi dahil config doğrular. |
 | `/api/region-engine/status` | `GET`, `PUT` | Region engine durumunu okur veya değiştirir. |
 | `/api/region-engine/config` | `PUT` | Çalışan engine config'ini reload eder. |
@@ -801,7 +847,7 @@ Invoke-RestMethod "http://127.0.0.1:3000/api/location/entities/search?q=TAG-001&
 
 ### Ingest `204` dönüyor fakat geçmiş kaydı oluşmuyor
 
-- `pdop > 20` paketleri canlı yayına ve geçmişe alınmaz; bu paketlerin `204` dönmesi beklenen davranıştır.
+- Haritanın etkin PDOP üst sınırını aşan paketler canlı yayına ve geçmişe alınmaz; bu paketlerin `204` dönmesi beklenen davranıştır.
 - PDOP filtresini geçen geçerli payload canlı SSE'ye yayınlanır.
 - Tag `tags` tablosunda kayıtlı olmadığı için geçmişe yazılmadı.
 - UI'dan tag ekleyin veya `POST /api/tags` kullanın.

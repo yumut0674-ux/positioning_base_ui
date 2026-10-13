@@ -1,12 +1,11 @@
 import { useMemo, useState } from "react";
 import { DEFAULT_DOOR_INFERENCE_SETTINGS, resolveDoorSettings, resolveGlobalSettings, resolveRoomSettings, STEP_DISTANCE_SETTING_KEYS } from "../config/regionInferenceSettings";
-import type { DoorInferenceSettings, GlobalRegionEngineSettings, RegionDefinition, RegionEntrance, RegionsConfig, RoomInferenceSettings } from "../types/region.types";
+import type { DoorInferenceSettings, RegionDefinition, RegionEntrance, RegionsConfig, RoomInferenceSettings } from "../types/region.types";
 import type { RegionEngineStatusResponse } from "../services/regionEngineApi";
+import { NumberField, POSITION_FILTER_FIELDS, shown, type Field } from "./RegionFilterFields";
 import styles from "./regions.module.css";
 
 type Tab = "global" | "room" | "door" | "diagnostics";
-type NumericKey = Exclude<keyof GlobalRegionEngineSettings, "doorDefaults">;
-interface Field { readonly key: NumericKey; readonly label: string; readonly group: string; readonly seconds?: boolean; readonly min?: number; readonly max?: number; readonly step?: number; }
 const FIELDS: readonly Field[] = [
   { key: "entryEvidenceDurationMs", label: "Giriş kanıt süresi", group: "Giriş/çıkış kararları", seconds: true, min: 0, step: .1 },
   { key: "exitEvidenceDurationMs", label: "Çıkış kanıt süresi", group: "Giriş/çıkış kararları", seconds: true, min: 0, step: .1 },
@@ -22,15 +21,7 @@ const FIELDS: readonly Field[] = [
   { key: "outsideReleaseDurationMultiplier", label: "Dışarı bırakma süre çarpanı", group: "Sinyal kaybı", min: .01, step: .1 },
   { key: "lostAfterMs", label: "Konum kayıp süresi", group: "Sinyal kaybı", seconds: true, min: 0, step: .1 },
   { key: "relocationAfterMs", label: "Yeniden konumlanma eşiği", group: "Sinyal kaybı", seconds: true, min: 0, step: .1 },
-  { key: "maximumSpeedMetersPerSecond", label: "Azami hız (m/sn)", group: "Ölçüm filtresi", min: 0, step: .1 },
-  { key: "maximumStepDistanceMeters", label: "Azami nokta mesafesi (m, 0: kapalı)", group: "Mesafe filtresi", min: 0, max: 100, step: .1 },
-  { key: "relocationConfirmationCount", label: "Yeni konum doğrulama ölçümü", group: "Mesafe filtresi", min: 2, max: 100, step: 1 },
-  { key: "relocationConfirmationDurationMs", label: "Yeni konum doğrulama süresi", group: "Mesafe filtresi", seconds: true, min: .001, step: .1 },
-  { key: "relocationClusterRadiusMeters", label: "Yeni konum aday yarıçapı (m)", group: "Mesafe filtresi", min: .01, max: 100, step: .1 },
-  { key: "relocationMaximumGapMs", label: "Aday ölçümler arası azami boşluk", group: "Mesafe filtresi", seconds: true, min: .001, step: .1 },
-  { key: "relocationCandidateWindowMs", label: "Yeni konum aday penceresi", group: "Mesafe filtresi", seconds: true, min: .001, step: .1 },
-  { key: "movementToleranceMeters", label: "Hareket toleransı (m)", group: "Ölçüm filtresi", min: 0, step: .05 },
-  { key: "minimumHardwareQuality", label: "Asgari donanım kalitesi", group: "Ölçüm filtresi", min: 0, max: 1, step: .05 },
+  ...POSITION_FILTER_FIELDS,
   { key: "reliableEvidenceWeight", label: "Güvenilir kanıt ağırlığı", group: "Ölçüm filtresi", min: 0, max: 10, step: .05 },
   { key: "wallEvidenceWeight", label: "Duvar kanıt ağırlığı", group: "Ölçüm filtresi", min: 0, max: 10, step: .05 },
   { key: "exitMarginMeters", label: "Çıkış payı (m)", group: "Ölçüm filtresi", min: 0, step: .05 },
@@ -54,13 +45,6 @@ const FIELDS: readonly Field[] = [
 ];
 const GLOBAL_ONLY_FIELDS = new Set<string>(["maxTags", "historySize", "evidenceDurationMs", ...STEP_DISTANCE_SETTING_KEYS]);
 const ROOM_FIELDS = FIELDS.filter(field => !GLOBAL_ONLY_FIELDS.has(field.key));
-
-function shown(field: Field, value: number) { return field.seconds ? value / 1000 : value; }
-function stored(field: Field, value: number) { return field.seconds ? value * 1000 : value; }
-function NumberField({ field, value, onChange, disabled = false }: { field: Field; value: number; onChange: (value: number) => void; disabled?: boolean }) {
-  return <label><span>{field.label}{field.seconds ? " (sn)" : ""}</span><input type="number" value={shown(field, value)} min={field.min} max={field.max} step={field.step ?? "any"} disabled={disabled}
-    onChange={event => Number.isFinite(event.target.valueAsNumber) && onChange(stored(field, event.target.valueAsNumber))} /></label>;
-}
 
 function DoorDefaultsEditor({ value, onChange, title }: { value: DoorInferenceSettings; onChange: (key: keyof DoorInferenceSettings, value: DoorInferenceSettings[keyof DoorInferenceSettings]) => void; title: string }) {
   const numberFields: readonly [keyof DoorInferenceSettings, string, boolean][] = [
