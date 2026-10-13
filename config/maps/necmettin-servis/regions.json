@@ -6,7 +6,7 @@
     "entryEvidenceDurationMs": 2000,
     "exitEvidenceDurationMs": 1500,
     "entryConfirmationCount": 5,
-    "exitConfirmationCount": 2,
+    "exitConfirmationCount": 3,
     "evidenceWindowMs": 12000,
     "roomSwitchConfirmationCount": 3,
     "roomSwitchEvidenceDurationMs": 1500,
@@ -412,7 +412,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -515,7 +515,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -618,7 +618,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -721,7 +721,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -824,7 +824,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -927,7 +927,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -1030,7 +1030,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -1133,7 +1133,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -1236,7 +1236,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -1339,7 +1339,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -1442,7 +1442,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -1545,7 +1545,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -1648,7 +1648,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -1751,7 +1751,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -1854,7 +1854,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -1957,7 +1957,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -2060,7 +2060,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {
@@ -2163,7 +2163,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1.2
+        "silentEntryMaxDistanceMeters": 1
       },
       "entrances": [
         {

@@ -4,11 +4,13 @@ import { zoneMapResolver } from "@/src/server/maps/zoneMapResolver";
 import { regionEngineController } from "@/src/server/regionEngine/controller";
 import { AreaTransitionPersistenceError } from "@/src/server/regionEngine/areaTransitionRepository";
 import { timingSafeEqual } from "node:crypto";
+import { isPositionPdopAccepted } from "@/src/shared/tracking/pdop";
+import { mapTrackingFilterSettings, TrackingFilterConfigurationError } from "@/src/server/trackingFilterSettings";
 
 export const runtime = "nodejs";
 
 const EXPECTED_FIELDS = ["type", "tag_id", "x", "y", "timestamp"] as const;
-const ZONE_FIELDS = ["zone_id", "zone_name"] as const;
+const OPTIONAL_FIELDS = ["quality", "pdop", "zone_id", "zone_name"] as const;
 const ISO_DATE_TIME = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|[+-]\d{2}:\d{2})$/;
 const encoder = new TextEncoder();
 
@@ -19,6 +21,7 @@ type IngestBody = {
   readonly y?: unknown;
   readonly timestamp?: unknown;
   readonly quality?: unknown;
+  readonly pdop?: unknown;
   readonly zone_id?: unknown;
   readonly zone_name?: unknown;
 };
@@ -52,7 +55,7 @@ export function parsePositionPayload(value: unknown): TrackingPosition {
 
   const input = value as IngestBody;
   const unexpectedFields = Object.keys(input).filter(
-    (field) => field !== "quality" && !EXPECTED_FIELDS.includes(field as (typeof EXPECTED_FIELDS)[number]) && !ZONE_FIELDS.includes(field as (typeof ZONE_FIELDS)[number]),
+    (field) => !EXPECTED_FIELDS.includes(field as (typeof EXPECTED_FIELDS)[number]) && !OPTIONAL_FIELDS.includes(field as (typeof OPTIONAL_FIELDS)[number]),
   );
   if (unexpectedFields.length > 0) {
     throw new Error(`Beklenmeyen alanlar: ${unexpectedFields.join(", ")}`);
@@ -79,6 +82,7 @@ export function parsePositionPayload(value: unknown): TrackingPosition {
     tagCode: input.tag_id.trim().toUpperCase(),
     x: input.x,
     y: input.y,
+    pdop: validatePdop(input.pdop),
     timestamp: input.timestamp,
     sourceZoneId,
     sourceZoneName,
@@ -119,6 +123,12 @@ function validateQuality(value: unknown): number {
   return value;
 }
 
+function validatePdop(value: unknown): number | null {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== "number" || !Number.isFinite(value)) throw new Error("pdop sonlu bir number veya null olmalıdır");
+  return value;
+}
+
 export async function POST(request: Request) {
   try {
     const contentType = request.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase() ?? "";
@@ -137,12 +147,14 @@ export async function POST(request: Request) {
     }
     const parsed = parsePositionPayload(payload);
     const resolution = await zoneMapResolver.resolve(parsed.sourceZoneId ?? null);
+    // Resolve the source map first; discard poor geometry before events, inference or history.
+    if (!isPositionPdopAccepted(parsed.pdop, await mapTrackingFilterSettings.read(resolution.mapId))) return new Response(null, { status: 204 });
     const position = { ...parsed, mapId: resolution.mapId };
-    const buffered = await trackingBuffer.ingest(position);
-    return NextResponse.json({ accepted: 1, buffered: buffered ? 1 : 0, mapId: resolution.mapId, resolved: resolution.resolved }, { status: 202 });
+    await trackingBuffer.ingest(position);
+    return new Response(null, { status: 204 });
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : "Geçersiz konum verisi" },
-      { status: error instanceof AreaTransitionPersistenceError ? 503 : 400 });
+      { status: error instanceof AreaTransitionPersistenceError || error instanceof TrackingFilterConfigurationError ? 503 : 400 });
   }
 }
 

@@ -1,0 +1,6 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {"incremental": false},
+  "include": ["../cli.ts", "../pdop.test.ts", "audit-service-pdop-two.ts", "import-service-pdop-two.ts", "analyze-service-pdop-two.ts"],
+  "exclude": ["../../../node_modules", "../reports"]
+}

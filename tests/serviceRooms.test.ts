@@ -36,7 +36,7 @@ const cadRooms = compiled.regions.map(room => {
 });
 const epoch = Date.parse("2026-10-09T12:00:00Z");
 
-test("Servis has 18 silent rooms with 1.2 m door proximity and its own entry thresholds", () => {
+test("Servis has 18 silent rooms with 1 m door proximity, 1.2 m approach depth and its own entry thresholds", () => {
   assert.equal(compiled.regions.length, 18);
   assert.equal(compiled.corridors.length, 1);
   assert.deepEqual(compiled.warnings, []);
@@ -50,20 +50,20 @@ test("Servis has 18 silent rooms with 1.2 m door proximity and its own entry thr
     "217", "216", "215", "214", "213", "212", "211", "210"]);
   for (const [index, room] of compiled.regions.entries()) {
     const template = referenceCompiled.regions[index % referenceCompiled.regions.length];
-    assert.deepEqual(room.settings, { ...template.settings, coverage: "silent", silentEntryMaxDistanceMeters: 1.2,
+    assert.deepEqual(room.settings, { ...template.settings, coverage: "silent", silentEntryMaxDistanceMeters: 1,
       entryEvidenceDurationMs: 2000, exitEvidenceDurationMs: 1500,
       entryConfirmationCount: 5, maximumSpeedMetersPerSecond: 3, maximumStepDistanceMeters: 10 });
     assert.equal(room.entrances.length, 1);
     assert.equal(room.entrances[0].widthMeters, template.entrances[0].widthMeters);
     assert.equal(room.entrances[0].connectsTo, "corridor-main");
-    assert.equal(room.entrances[0].approachDepthMeters, 1);
+    assert.equal(room.entrances[0].approachDepthMeters, 1.2);
     assert.deepEqual(room.entrances[0].settings, template.entrances[0].settings);
   }
 });
 
-test("each Servis door retains its 1.2 m signal-loss threshold independently of nearby doors", () => {
+test("each Servis door retains its one-metre signal-loss threshold independently of nearby doors", () => {
   for (const room of compiled.regions) {
-    for (const distance of [1.19, 1.21]) {
+    for (const distance of [1, 1.01]) {
       let now = epoch;
       const published: ReturnType<RegionPositionEngine["ingest"]>[] = [];
       const engine = new RegionPositionEngine(position => published.push(position), 250, () => now, false);
@@ -81,7 +81,7 @@ test("each Servis door retains its 1.2 m signal-loss threshold independently of 
         now = epoch + 8001;
         engine.tick();
         const decision = published.at(-1)!;
-        if (distance <= 1.2) {
+        if (distance === 1) {
           assert.equal(decision.regionInference.regionId, room.id, room.name);
           assert.equal(decision.regionInference.state, "INFERRED_IN_REGION", room.name);
           assert.equal(decision.regionInference.measurementKind, "estimated", room.name);
@@ -94,9 +94,9 @@ test("each Servis door retains its 1.2 m signal-loss threshold independently of 
   }
 });
 
-test("1.2 m proximity prevents inference in the corridor between opposing moved doors", () => {
+test("one-metre proximity prevents inference in the corridor between opposing moved doors", () => {
   for (const room of compiled.regions) {
-    for (const distance of [1, 1.01, 1.19, 1.21, 1.5, 2, 2.01]) {
+    for (const distance of [1, 1.01, 1.5, 2, 2.01]) {
       let now = epoch;
       const published: ReturnType<RegionPositionEngine["ingest"]>[] = [];
       const engine = new RegionPositionEngine(position => published.push(position), 250, () => now, false);
@@ -104,8 +104,8 @@ test("1.2 m proximity prevents inference in the corridor between opposing moved 
       const door = room.entrances[0];
       const point = { x: door.x - door.inwardNormal!.x * distance, y: door.y - door.inwardNormal!.y * distance };
       // The completed main corridor is 3.6 m wide; points beyond this
-      // room's 1.2 m limit remain beyond the opposite door's limit.
-      const expectedRegionId = distance <= 1.2 ? room.id : null;
+      // room's one-metre limit remain beyond the opposite door's limit.
+      const expectedRegionId = distance === 1 ? room.id : null;
       try {
         assert.ok(pointInPolygon(point, compiled.corridors[0]), room.name);
         engine.ingest({ tagCode: room.id, ...point, quality: 1, timestamp: new Date(now).toISOString() });

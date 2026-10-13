@@ -63,6 +63,7 @@ export interface TagAssignment {
 }
 
 export interface PositionRecord {
+  readonly pdop?: number | null;
   readonly decision?: import("../regionEngine/types").ProcessedPosition;
   readonly tagCode: string;
   readonly x: number;
@@ -75,8 +76,9 @@ export interface PositionRecord {
 }
 
 export interface ResolvedPosition {
+  readonly pdop?: number | null;
   readonly roomDecision?: import("../regionEngine/types").ProcessedPosition["regionInference"];
-  readonly rawPosition?: { readonly x: number; readonly y: number; readonly timestamp: string };
+  readonly rawPosition?: { readonly x: number; readonly y: number; readonly pdop?: number | null; readonly timestamp: string };
   readonly publishedAt?: string;
   readonly engineVersion?: string;
   readonly configVersion?: string;

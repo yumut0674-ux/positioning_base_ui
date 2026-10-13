@@ -73,6 +73,22 @@ test("map bilgisi olmayan eski kayıt güvenli biçimde katı belirsiz bırakır
   assert.equal(result.data.position.mapId, null);
 });
 
+test("güncel, zaman noktasındaki ve geçmiş konumlar PDOP null ile sıfırı ayrı korur", async () => {
+  for (const pdop of [1.83, 20, 0, null]) {
+    const positions = new FakePositions();
+    const record = { ...positions.latestPosition!, pdop };
+    positions.latestPosition = record;
+    positions.nearest = async () => record;
+    positions.history = async () => ({ positions: [record], sourcePointCount: 1, processingTruncated: false });
+    const service = new LocationService(new FakeEntities(), positions);
+    assert.equal((await service.current(28, now)).data.position.pdop, pdop);
+    assert.equal((await service.atTime(28, record.observedAt, 30, now)).data.position?.pdop, pdop);
+    const history = await service.history({ entityId: 28, from: "2026-07-19T00:00:00Z", to: "2026-07-20T00:00:00Z", format: "route_points", limit: 100 }, now);
+    assert.ok("points" in history.data);
+    assert.equal(history.data.points[0]?.pdop, pdop);
+  }
+});
+
 test("tag başka ürüne atanmış olsa bile aralıktaki tarihsel atamalar birlikte kullanılır", async () => {
   const entities = new FakeEntities();
   const positions = new FakePositions();

@@ -23,11 +23,11 @@ function resolvedPosition(record: PositionRecord, zoneResolver: ZoneResolver) {
   if (record.decision) {
     const d = record.decision;
     const mapId = d.mapId ?? record.mapId ?? null;
-    return { x: d.x, y: d.y, zoneName: decisionZone(d), floorPlanId: mapId, mapId, sourceZoneId: d.sourceZoneId ?? record.sourceZoneId ?? null, sourceZoneName: d.sourceZoneName ?? record.sourceZoneName ?? null, roomDecision: d.regionInference,
+    return { x: d.x, y: d.y, pdop: d.pdop ?? null, zoneName: decisionZone(d), floorPlanId: mapId, mapId, sourceZoneId: d.sourceZoneId ?? record.sourceZoneId ?? null, sourceZoneName: d.sourceZoneName ?? record.sourceZoneName ?? null, roomDecision: d.regionInference,
       rawPosition: d.rawPosition, publishedAt: d.publishedAt, engineVersion: d.engineVersion, configVersion: d.configVersion };
   }
   return {
-    x: record.x, y: record.y, zoneName: record.mapId ? zoneResolver(record.x, record.y, record.mapId) : "Kat belirlenemedi",
+    x: record.x, y: record.y, pdop: record.pdop ?? null, zoneName: record.mapId ? zoneResolver(record.x, record.y, record.mapId) : "Kat belirlenemedi",
     floorPlanId: record.mapId ?? null, mapId: record.mapId ?? null, sourceZoneId: record.sourceZoneId ?? null, sourceZoneName: record.sourceZoneName ?? null,
   } as const;
 }

@@ -161,7 +161,7 @@ test("map-specific region config rejects URL/config mismatches and path traversa
   assert.equal((await getMapRegions("../secret")).status, 400);
 });
 
-test("browser SSE gateway preserves map and source-zone fields", () => {
+test("browser SSE gateway preserves map, source-zone and PDOP fields", () => {
   const original = Object.getOwnPropertyDescriptor(globalThis, "EventSource");
   let listener: ((event: { data: string }) => void) | undefined;
   let closed = false;
@@ -176,6 +176,10 @@ test("browser SSE gateway preserves map and source-zone fields", () => {
     const disconnect = new SseTrackingGateway("/stream").connect((position) => { received = position; });
     listener?.({ data: JSON.stringify({ tagCode: "TAG-1", x: 1, y: 2, timestamp: "2026-01-01T00:00:00Z", mapId: "map-b", sourceZoneId: "zone-b", sourceZoneName: "Zone B" }) });
     assert.deepEqual(received && { mapId: (received as { mapId: unknown }).mapId, sourceZoneId: (received as { sourceZoneId: unknown }).sourceZoneId, sourceZoneName: (received as { sourceZoneName: unknown }).sourceZoneName }, { mapId: "map-b", sourceZoneId: "zone-b", sourceZoneName: "Zone B" });
+    for (const pdop of [1.83, 20, 0, null, undefined]) {
+      listener?.({ data: JSON.stringify({ tagCode: "TAG-1", x: 1, y: 2, pdop, timestamp: "2026-01-01T00:00:00Z" }) });
+      assert.equal((received as { pdop: unknown }).pdop, pdop ?? null);
+    }
     disconnect();
     assert.equal(closed, true);
   } finally {

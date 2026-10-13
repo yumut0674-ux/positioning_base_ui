@@ -98,23 +98,14 @@ Invoke-RestMethod `
   -Method Post `
   -Uri "http://127.0.0.1:3000/api/tracking/ingest" `
   -ContentType "application/json" `
-  -Body '{"type":"position","tag_id":"TAG-001","x":8.8,"y":7.8,"zone_id":"zone-a","zone_name":"Bölge A","timestamp":"2026-07-26T12:00:00+03:00"}'
+  -Body '{"type":"position","tag_id":"TAG-001","x":8.8,"y":7.8,"pdop":1.83,"zone_id":"zone-a","zone_name":"Bölge A","timestamp":"2026-07-26T12:00:00+03:00"}'
 ```
 
-Beklenen cevap:
+Beklenen cevap: gövdesiz `204 No Content`.
 
-```json
-{
-  "accepted": 1,
-  "buffered": 1,
-  "mapId": "spor-koridor",
-  "resolved": true
-}
-```
-
-`buffered: 0` cevabı, event'in canlı SSE'ye yayınlandığını fakat tag kayıtlı
-olmadığı için PostgreSQL geçmişine yazılmadığını gösterir. Tag'i UI üzerinden
-veya `POST /api/tags` ile ekleyin.
+PDOP değeri 20'den büyükse paket işlenmeden atılır ve yine `204` döner.
+Kabul edilen paket canlı SSE'ye yayınlanır; PostgreSQL geçmişine yazılması
+için tag'i UI üzerinden veya `POST /api/tags` ile kaydedin.
 
 ## Ortam değişkenleri
 
@@ -263,7 +254,7 @@ POST /api/tracking/ingest
 Content-Type: application/json
 ```
 
-Payload tam olarak şu alanları içermelidir:
+Her istekte tek bir konum kaydı gönderilir:
 
 ```json
 {
@@ -271,6 +262,7 @@ Payload tam olarak şu alanları içermelidir:
   "tag_id": "TAG-001",
   "x": 8.8,
   "y": 7.8,
+  "pdop": 1.83,
   "zone_id": "zone-a",
   "zone_name": "Bölge A",
   "timestamp": "2026-07-26T12:00:00+03:00"
@@ -281,12 +273,15 @@ Kurallar:
 
 - `Content-Type` `application/json` olmalıdır.
 - JSON gövdesi tek nesne olmalıdır.
-- Ek alan kabul edilmez.
+- Tanımlanmamış ek alan kabul edilmez. Mevcut `quality` alanı isteğe bağlı olarak 0–1 aralığında desteklenir; PDOP ile ayrı değerlerdir.
 - Yeni producer sözleşmesinde `zone_id` ve `zone_name` key'leri de gönderilir. Expand/migrate rollout aşamasında eski producer payload'ları bu iki alan yokmuş gibi `null` kabul edilir; producer geçişi ve metrik izlemesi tamamlanınca strict enforcement açılabilir.
 - `type` yalnızca `"position"` olabilir.
 - `tag_id` boş olmayan string olmalı, en fazla 100 karakter olmalıdır.
 - `tag_id` trim edilir ve uppercase normalize edilir.
 - `x` ve `y` sonlu number olmalıdır.
+- `pdop` sonlu number veya `null` olmalıdır. Eski göndericilerde alan eksikse `null` kabul edilir; hiçbir aşamada `0` değerine dönüştürülmez.
+- `pdop > 20` paketleri harita çözümü, SSE, oda/bölge motoru ve geçmiş kuyruğundan önce tamamen elenir. `20` dahil daha küçük değerler ve `null`, mevcut diğer filtrelere devam eder. Elenen paket tag'ın son kabul edilmiş konumunu, PDOP değerini veya son veri zamanını güncellemez.
+- Kabul edilen konum ve PDOP, aynı string `tag_id` üzerinden birlikte güncellenir; canlı ham/işlenmiş akışlarda ve geçmişte `pdop` olarak taşınır.
 - `zone_id` string veya `null`, en fazla 100 karakterdir; `zone_name` string veya `null`, en fazla 160 karakterdir. String değerler trim edilir ve boş string `null` olur.
 - `zone_id`, `config/maps/catalog.json` içindeki aktif/seçilebilir map'in `trackingZoneIds` listesi üzerinden `mapId` değerine çözülür. `zone_name` eşleme için kullanılmaz; yalnız kaynak snapshot açıklamasıdır.
 - Null veya bilinmeyen zone yapısal olarak geçerliyse kabul edilir, `mapId:null` olur, listede “Kat belirlenemedi” görünür ve hiçbir haritada çizilmez.
@@ -308,26 +303,19 @@ etkin map'te tanımlanamaz:
 canlılık kararı her katalog girdisinin kendi `liveTrackingEnabled` değerinden
 verilir.
 
-Başarılı cevap:
+Başarılı cevap: gövdesiz `204 No Content`. PDOP nedeniyle elenen geçerli
+paketler de `204` ile sonlandırılır. Konum istekleri Authorization veya API
+anahtarı gerektirmez. Göndericinin varsayılan zaman aşımı 2 saniyedir ve
+başarısız HTTP gönderimleri otomatik tekrar denenmez.
 
-```json
-{
-  "accepted": 1,
-  "buffered": 1,
-  "mapId": "spor-koridor",
-  "resolved": true
-}
-```
-
-Cevap anlamları:
-
-- `accepted: 1`: Payload valid, event memory buffer ve SSE akışına kabul edildi.
-- `buffered: 1`: Tag registry içinde bulundu ve PostgreSQL'e yazılmak üzere kuyruğa alındı.
-- `buffered: 0`: Tag registry içinde yok. Canlı SSE yayınlanır, fakat geçmişe yazılmaz.
+PDOP filtresini geçen paketler canlı SSE'ye yayınlanır. Tag registry içinde
+bulunanlar PostgreSQL'e yazılmak üzere kuyruğa alınır; kayıtlı olmayanlar
+geçmişe yazılmaz. Yapısal olarak geçersiz payload `400` döndürür.
 
 Tracking buffer davranışı:
 
 - Buffer her 5 saniyede bir toplu insert dener.
+- `tag_location_history.pdop` nullable `DOUBLE PRECISION` olarak saklanır. Mevcut veriler `NULL` kalır. `npm run migrate:rooms` yeni `0010_tracking_pdop.sql` migration'ını da uygular; buffer flush sırasında sütunu idempotent olarak oluşturur.
 - PostgreSQL insert başarısız olursa batch memory kuyruğuna geri alınır.
 - Process kapanırsa memory kuyruğundaki henüz flush edilmemiş kayıtlar kaybolabilir.
 - Kayıtlı tag listesi 30 saniye cache'lenir. Yeni tag eklendikten sonra cache
@@ -348,6 +336,7 @@ SSE event adı `position` değeridir. Event data shape:
   "tagCode": "TAG-001",
   "x": 8.8,
   "y": 7.8,
+  "pdop": 1.83,
   "timestamp": "2026-07-26T12:00:00+03:00",
   "sourceZoneId": "zone-a",
   "sourceZoneName": "Bölge A",
@@ -810,9 +799,10 @@ Invoke-RestMethod "http://127.0.0.1:3000/api/location/entities/search?q=TAG-001&
   verdiğini doğrulayın.
 - Bu istemci TLS kullanmadığı için TLS zorunlu endpoint'lere doğrudan bağlanamaz.
 
-### Ingest `accepted: 1, buffered: 0` dönüyor
+### Ingest `204` dönüyor fakat geçmiş kaydı oluşmuyor
 
-- Payload valid ve canlı SSE'ye yayınlandı.
+- `pdop > 20` paketleri canlı yayına ve geçmişe alınmaz; bu paketlerin `204` dönmesi beklenen davranıştır.
+- PDOP filtresini geçen geçerli payload canlı SSE'ye yayınlanır.
 - Tag `tags` tablosunda kayıtlı olmadığı için geçmişe yazılmadı.
 - UI'dan tag ekleyin veya `POST /api/tags` kullanın.
 - Manuel DB insert yaptıysanız tag cache için en fazla 30 saniye bekleyin veya

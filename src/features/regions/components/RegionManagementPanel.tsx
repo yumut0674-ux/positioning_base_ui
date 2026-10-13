@@ -28,6 +28,7 @@ import styles from "./regions.module.css";
 import { RegionInferenceEditor } from "./RegionInferenceEditor";
 import { ParameterHelpPanel } from "./ParameterHelpPanel";
 import { RawTagLayer } from "./RawTagLayer";
+import { MapPdopFilterEditor } from "./MapPdopFilterEditor";
 import { createRawTagMarkers } from "../services/rawTagPresentation";
 import { EMPTY_AREA_VISIBILITY, areaVisibilityKey, isAreaVisible, isGateVisible, readAreaVisibility, toggleAreaVisibility, visibleSelection, type AreaEditorVisibility } from "../services/areaEditorVisibility";
 import type { AreaGateDefinition, LargeAreaDefinition } from "../types/region.types";
@@ -547,6 +548,7 @@ export function RegionManagementPanel() {
 
       <div className={styles.editor}>
         <aside className={styles.zonePanel}>
+          <MapPdopFilterEditor key={activeMapId} mapId={activeMapId} />
           <div className={styles.displayWaitConfig}>
             <label htmlFor="outside-hold-ms">Alan dışı gösterim bekleme süresi (ms)</label>
             <input id="outside-hold-ms" type="number" min={0} max={3600000} step={100}

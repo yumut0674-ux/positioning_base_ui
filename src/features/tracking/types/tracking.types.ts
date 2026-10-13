@@ -5,6 +5,7 @@ export const TAG_LIVE_TIMEOUT_MS = 10_000;
 export type TagStatus = "active" | "idle" | "warning" | "offline";
 
 export interface TrackedTag extends Point2D {
+  readonly pdop?: number | null;
   readonly mapId?: string | null;
   readonly sourceZoneId?: string | null;
   readonly sourceZoneName?: string | null;
@@ -22,6 +23,7 @@ export interface TrackedTag extends Point2D {
 }
 
 export interface PositionMessage extends Point2D {
+  readonly pdop?: number | null;
   readonly mapId?: string | null;
   readonly sourceZoneId?: string | null;
   readonly sourceZoneName?: string | null;
@@ -44,7 +46,7 @@ export interface PositionMessage extends Point2D {
     readonly validUntil?: string;
     readonly uncertainAfter?: string;
   };
-  readonly rawPosition?: { readonly x: number; readonly y: number; readonly timestamp: string; readonly mapId?: string | null; readonly sourceZoneId?: string | null; readonly sourceZoneName?: string | null };
+  readonly rawPosition?: { readonly x: number; readonly y: number; readonly pdop?: number | null; readonly timestamp: string; readonly mapId?: string | null; readonly sourceZoneId?: string | null; readonly sourceZoneName?: string | null };
   readonly lastRawDataTimestamp?: string;
 }
 

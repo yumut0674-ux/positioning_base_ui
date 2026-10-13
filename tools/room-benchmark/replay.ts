@@ -9,24 +9,32 @@ import { compareRows, deliveryMs, iso, ms, sha256, type Manifest, type RawRow, t
 import { readDataset } from './importer';
 import { score } from './score';
 import { spatialEvidence, type SpatialVisitEvidence } from './spatialEvidence';
+import {isPositionPdopAccepted,MAX_POSITION_PDOP} from '../../src/shared/tracking/pdop';
 
 export interface Decision { at:string; tagCode:string; state:string; roomId:string|null; eventType:string|null; reasonCodes:string[]; evidence?:DecisionTrace['evidence'];
-  synthetic:boolean; input:{measuredAt:string; receivedAt?:string; x:number; y:number; quality?:number; signalGapMs?:number}; decisionId?:string }
+  synthetic:boolean; input:{measuredAt:string; receivedAt?:string; x:number; y:number; quality?:number; pdop?:number|null; signalGapMs?:number}; decisionId?:string }
+export interface ReplayPreprocessing {pdop:{enabled:boolean;limit:number;knownValues:number;unknownValues:number;
+  rejected:{id:string;tagCode:string;measuredAt:string|null;deliveredAt:string;pdop:number|null;x:number|null;y:number|null;reasonCode:string}[];
+  sourcePath?:string;sourceSha256?:string;caveat?:string}}
 export interface Run { schemaVersion:1; testId:string; engineVersion:string; git:{commit:string;dirty:boolean;status:string};
-  config:{path:string;sha256:string;version:string;context:string}; dataset:{source:string;caveat:string;sha256:string;rowCount:number;candidateTags:Record<string,number>;timing:string;quality:Manifest['quality'];truthRevision:number;truthSha256:string;warmupMs:number;observationMs:number};
+  config:{path:string;sha256:string;version:string;context:string}; dataset:{source:string;caveat:string;sha256:string;rowCount:number;candidateTags:Record<string,number>;timing:string;quality:Manifest['quality'];pdop?:Manifest['pdop'];truthRevision:number;truthSha256:string;warmupMs:number;observationMs:number};
   simulation:{tickMs:number;sampleMs:number;boundaryToleranceMs:number;tickOrigin:string;equalTimeOrder:string};
   unscoredTags:string[]; decisions:Decision[]; metrics:ReturnType<typeof score>;
-  rawSpatialEvidence?:SpatialVisitEvidence[] }
+  rawSpatialEvidence?:SpatialVisitEvidence[];preprocessing?:ReplayPreprocessing }
+export type ReplayResult={decisions:Decision[];metrics:ReturnType<typeof score>;unscoredTags:string[];preprocessing:ReplayPreprocessing};
 const git = (args:string[]):string => { try { return execFileSync('git',args,{encoding:'utf8'}).trim(); } catch { return 'unavailable'; } };
-export function replayRows(rows: RawRow[], truth: Truth, config: ReturnType<typeof compileRegionsConfig>, settings:{tickMs:number;sampleMs:number;boundaryToleranceMs:number;warmupMs:number;observationMs:number}):{decisions:Decision[];metrics:ReturnType<typeof score>;unscoredTags:string[]} {
+export function replayRows(rows: RawRow[], truth: Truth, config: ReturnType<typeof compileRegionsConfig>, settings:{tickMs:number;sampleMs:number;boundaryToleranceMs:number;warmupMs:number;observationMs:number;pdopEnabled?:boolean;pdopMax?:number}):ReplayResult {
   const decisions:Decision[]=[];
+  const limit=settings.pdopMax??MAX_POSITION_PDOP;
+  if(!Number.isFinite(limit)||limit<0)throw new Error('Geçersiz PDOP eşiği');
+  const preprocessing:ReplayPreprocessing={pdop:{enabled:settings.pdopEnabled??true,limit,knownValues:0,unknownValues:0,rejected:[]}};
   let clock=ms(truth.test.from)-settings.warmupMs;
   const end=ms(truth.test.to)+settings.observationMs, start=clock;
   const engine=new RegionPositionEngine((p:ProcessedPosition)=>{
     const trace=p.decisionTrace;
     decisions.push({at:p.publishedAt!,tagCode:p.tagCode,state:p.regionInference.state,roomId:p.regionInference.regionId,
       eventType:trace?.eventType??null,reasonCodes:trace?.reasons.map(r=>r.code)??[],synthetic:!!p.synthetic,
-      input:trace?.input??{measuredAt:p.timestamp,x:p.rawPosition?.x??p.x,y:p.rawPosition?.y??p.y},decisionId:p.decisionId,
+      input:{...(trace?.input??{measuredAt:p.timestamp,x:p.rawPosition?.x??p.x,y:p.rawPosition?.y??p.y}),pdop:p.rawPosition?.pdop??p.pdop??null},decisionId:p.decisionId,
       ...(trace?.evidence?{evidence:trace.evidence}:{})});
   },settings.tickMs,()=>clock,false);
   engine.enable(config);
@@ -40,27 +48,38 @@ export function replayRows(rows: RawRow[], truth: Truth, config: ReturnType<type
       if (delivered>end) continue;
       if (delivered<start) continue;
       while (tick<=delivered) { clock=tick;engine.tick();tick+=settings.tickMs; }
+      clock=delivered;
+      if(row.pdop==null)preprocessing.pdop.unknownValues++;else preprocessing.pdop.knownValues++;
+      const pdopAccepted=limit===MAX_POSITION_PDOP?isPositionPdopAccepted(row.pdop):row.pdop==null||(Number.isFinite(row.pdop)&&row.pdop<=limit);
+      if(preprocessing.pdop.enabled&&!pdopAccepted){
+        preprocessing.pdop.rejected.push({id:row.id,tagCode:row.tag_code,measuredAt:row.created_at,deliveredAt:iso(new Date(delivered).toISOString()),pdop:row.pdop??null,x:row.x,y:row.y,reasonCode:'PDOP_REJECTED_BEFORE_ENGINE'});
+        continue;
+      }
       if (row.x===null || row.y===null || !Number.isFinite(row.x) || !Number.isFinite(row.y) || !row.created_at) continue;
       clock=delivered;
       engine.ingest({tagCode:row.tag_code,x:row.x,y:row.y,timestamp:row.created_at,
         ...(row.received_at?{receivedAt:row.received_at}:{}),...(row.quality===null?{}:{quality:row.quality}),
+        ...('pdop' in row?{pdop:row.pdop}:{}),
         mapId:row.map_id,sourceZoneId:row.zone_id,sourceZoneName:row.zone_name});
     }
     while (tick<=end) { clock=tick;engine.tick();tick+=settings.tickMs; }
   } finally { engine.disable(); }
-  return {decisions,unscoredTags,metrics:score(truth,decisions,rows,settings.sampleMs,settings.boundaryToleranceMs)};
+  return {decisions,unscoredTags,preprocessing,metrics:score(truth,decisions,rows,settings.sampleMs,settings.boundaryToleranceMs)};
 }
-export async function runTest(id:string, options:{configPath:string;tickMs:number;sampleMs:number;boundaryToleranceMs:number}):Promise<Run> {
+export async function runTest(id:string, options:{configPath:string;tickMs:number;sampleMs:number;boundaryToleranceMs:number;pdopEnabled?:boolean;pdopMax?:number}):Promise<Run> {
   const {truth,manifest,rows,truthSha256}=await readDataset(id);
   const configBytes=await readFile(options.configPath), config=compileRegionsConfig(JSON.parse(configBytes.toString()) as RegionsConfig);
   const result=replayRows(rows,truth,config,{...options,warmupMs:manifest.warmupMs,observationMs:manifest.observationMs});
+  result.preprocessing.pdop.sourcePath=path.resolve('src/shared/tracking/pdop.ts');
+  result.preprocessing.pdop.sourceSha256=await sha256(await readFile(result.preprocessing.pdop.sourcePath));
+  result.preprocessing.pdop.caveat=manifest.pdop?.caveat??'Geçmiş raw dosyasında PDOP bulunmayabilir. Elenmiş canlı paketler DB replay ile geri getirilemez.';
   const unmatched=Object.keys(manifest.candidateTags).filter(tag=>!truth.groups.some(group=>group.tagCodes.includes(tag)));
   result.unscoredTags=[...new Set([...result.unscoredTags,...unmatched])].sort();
   const status=git(['status','--short']);
   return {schemaVersion:1,testId:id,engineVersion:ROOM_ENGINE_VERSION,git:{commit:git(['rev-parse','HEAD']),dirty:!!status,status},
     config:{path:path.resolve(options.configPath),sha256:await sha256(configBytes),version:config.version??'unversioned',
       context:manifest.source.includes('SENTETİK')?'anonim sentetik fixture + güncel harita':'geçmiş veri + güncel harita (geçmiş harita snapshotı sağlanmadı)'},
-    dataset:{source:manifest.source,caveat:manifest.caveat,sha256:manifest.sha256,rowCount:manifest.rowCount,candidateTags:manifest.candidateTags,timing:manifest.timing,quality:manifest.quality,truthRevision:truth.revision,truthSha256,warmupMs:manifest.warmupMs,observationMs:manifest.observationMs},
+    dataset:{source:manifest.source,caveat:manifest.caveat,sha256:manifest.sha256,rowCount:manifest.rowCount,candidateTags:manifest.candidateTags,timing:manifest.timing,quality:manifest.quality,...(manifest.pdop?{pdop:manifest.pdop}:{}),truthRevision:truth.revision,truthSha256,warmupMs:manifest.warmupMs,observationMs:manifest.observationMs},
     simulation:{tickMs:options.tickMs,sampleMs:options.sampleMs,boundaryToleranceMs:options.boundaryToleranceMs,tickOrigin:iso(new Date(ms(truth.test.from)-manifest.warmupMs).toISOString()),equalTimeOrder:'tick then packet by database id'},
     ...result,rawSpatialEvidence:spatialEvidence(rows,truth,config)};
 }

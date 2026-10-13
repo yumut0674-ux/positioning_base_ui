@@ -1,6 +1,8 @@
 import { EventEmitter } from "node:events";
 import { queryPostgres } from "./postgresClient";
 import { logger } from "./logger";
+import { isPositionPdopAccepted, type PdopFilterSettings } from "../shared/tracking/pdop";
+import { mapTrackingFilterSettings } from "./trackingFilterSettings";
 
 export type TrackingPosition = {
   readonly tagCode: string;
@@ -9,6 +11,8 @@ export type TrackingPosition = {
   readonly timestamp: string;
   readonly receivedAt?: string;
   readonly quality?: number;
+  /** Missing legacy measurements have unknown geometry quality, represented as null. */
+  readonly pdop?: number | null;
   /** Optional only for internal rollout compatibility; ingest always supplies an explicit value. */
   readonly sourceZoneId?: string | null;
   readonly sourceZoneName?: string | null;
@@ -27,6 +31,7 @@ CREATE INDEX IF NOT EXISTS idx_tag_location_history_tag_time
   ON tag_location_history (tag_code, created_at DESC);
 ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS received_at TIMESTAMPTZ;
 ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS quality DOUBLE PRECISION;
+ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS pdop DOUBLE PRECISION;
 ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS zone_id VARCHAR(100);
 ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS zone_name VARCHAR(160);
 ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS map_id VARCHAR(100);
@@ -56,13 +61,15 @@ export class TrackingBuffer extends EventEmitter {
   private knownZoneCount = 0;
   private readonly timer?: ReturnType<typeof setInterval>;
 
-  public constructor(private readonly query = queryPostgres, private readonly now: () => number = Date.now, automaticFlush = true) {
+  public constructor(private readonly query = queryPostgres, private readonly now: () => number = Date.now, automaticFlush = true,
+    private readonly readPdopSettings: (mapId: string | null) => Promise<PdopFilterSettings> = mapId => mapTrackingFilterSettings.read(mapId)) {
     super();
     if (automaticFlush) { this.timer = setInterval(() => { void this.flush(); }, 5_000); this.timer.unref?.(); }
   }
 
   public async ingest(position: TrackingPosition): Promise<boolean> {
-    position = { ...position, receivedAt: new Date(this.now()).toISOString() };
+    if (position.pdop != null && (!Number.isFinite(position.pdop) || !isPositionPdopAccepted(position.pdop, await this.readPdopSettings(position.mapId ?? null)))) return false;
+    position = { ...position, pdop: position.pdop ?? null, receivedAt: new Date(this.now()).toISOString() };
     if (position.sourceZoneId == null) this.nullZoneCount++;
     else if (position.mapId == null) this.unresolvedZoneCount++;
     else { this.knownZoneCount++; this.mappedPositionCount++; }
@@ -108,9 +115,9 @@ export class TrackingBuffer extends EventEmitter {
     const batch = this.queue.splice(0, this.queue.length);
     try {
       const nullable = (value: string | null) => value === null ? "NULL" : sqlString(value);
-      const values = batch.map((position) => `(${sqlString(position.tagCode)}, ${position.x}, ${position.y}, ${sqlString(position.timestamp)}::timestamptz, ${position.receivedAt ? `${sqlString(position.receivedAt)}::timestamptz` : "NULL"}, ${position.quality ?? "NULL"}, ${nullable(position.sourceZoneId ?? null)}, ${nullable(position.sourceZoneName ?? null)}, ${nullable(position.mapId ?? null)})`).join(",\n");
+      const values = batch.map((position) => `(${sqlString(position.tagCode)}, ${position.x}, ${position.y}, ${sqlString(position.timestamp)}::timestamptz, ${position.receivedAt ? `${sqlString(position.receivedAt)}::timestamptz` : "NULL"}, ${position.quality ?? "NULL"}, ${nullable(position.sourceZoneId ?? null)}, ${nullable(position.sourceZoneName ?? null)}, ${nullable(position.mapId ?? null)}, ${position.pdop ?? "NULL"})`).join(",\n");
       await this.query(`${schemaSql}
-INSERT INTO tag_location_history (tag_code, x, y, created_at, received_at, quality, zone_id, zone_name, map_id)
+INSERT INTO tag_location_history (tag_code, x, y, created_at, received_at, quality, zone_id, zone_name, map_id, pdop)
 VALUES ${values};`);
       this.lastPersistenceError = null;
       this.lastSuccessfulFlushAt = new Date(this.now()).toISOString();

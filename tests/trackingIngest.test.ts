@@ -1,13 +1,16 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { GET, POST } from "../app/api/tracking/ingest/route";
+import { GET, POST, parsePositionPayload } from "../app/api/tracking/ingest/route";
 import { trackingBuffer, type TrackingPosition } from "../src/server/trackingBuffer";
+import { zoneMapResolver } from "../src/server/maps/zoneMapResolver";
+import { mapTrackingFilterSettings } from "../src/server/trackingFilterSettings";
 
 const EXAMPLE_PAYLOAD = {
   type: "position",
   tag_id: "A1B2C3D400000001",
   x: 1.25,
   y: 0.8,
+  pdop: 1.83,
   zone_id: "servis",
   zone_name: " Servis ",
   timestamp: "2026-07-21T14:30:15.123+03:00",
@@ -40,7 +43,7 @@ test("kaynak heartbeat'i ayrı token ve bilinen zone gerektirir", async () => {
   }
 });
 
-test("örnek position payload'ı 202 ile kabul edilir ve gönderilen zaman korunur", async () => {
+test("örnek position payload'ı boş 204 ile kabul edilir; konum, PDOP ve zaman korunur", async () => {
   const originalIngest = trackingBuffer.ingest.bind(trackingBuffer);
   let captured: TrackingPosition | undefined;
   trackingBuffer.ingest = async (position) => {
@@ -50,11 +53,13 @@ test("örnek position payload'ı 202 ile kabul edilir ve gönderilen zaman korun
 
   try {
     const response = await POST(jsonRequest(EXAMPLE_PAYLOAD));
-    assert.equal(response.status, 202);
+    assert.equal(response.status, 204);
+    assert.equal(await response.text(), "");
     assert.deepEqual(captured, {
       tagCode: "A1B2C3D400000001",
       x: 1.25,
       y: 0.8,
+      pdop: 1.83,
       timestamp: "2026-07-21T14:30:15.123+03:00",
       sourceZoneId: "servis",
       sourceZoneName: "Servis",
@@ -72,8 +77,8 @@ test("null ve bilinmeyen zone kabul edilir fakat haritaya çözülmez", async ()
   try {
     for (const zone of [null, "not-configured", "zone-a", "zone-b"]) {
       const response = await POST(jsonRequest({ ...EXAMPLE_PAYLOAD, zone_id: zone, zone_name: null }));
-      assert.equal(response.status, 202);
-      assert.equal((await response.json() as { mapId: unknown }).mapId, null);
+      assert.equal(response.status, 204);
+      assert.equal(await response.text(), "");
     }
     assert.deepEqual(captured.map((position) => position.mapId), [null, null, null, null]);
   } finally { trackingBuffer.ingest = originalIngest; }
@@ -90,7 +95,7 @@ test("negatif koordinatlar geçerlidir", async () => {
   trackingBuffer.ingest = async () => true;
   try {
     const response = await POST(jsonRequest({ ...EXAMPLE_PAYLOAD, x: -1.25, y: -0.8 }));
-    assert.equal(response.status, 202);
+    assert.equal(response.status, 204);
   } finally {
     trackingBuffer.ingest = originalIngest;
   }
@@ -115,14 +120,91 @@ test("ingest POST aynı route üzerindeki SSE akışına position eventi yayınl
 
   try {
     const response = await POST(jsonRequest(EXAMPLE_PAYLOAD));
-    assert.equal(response.status, 202);
+    assert.equal(response.status, 204);
     const event = decoder.decode((await reader.read()).value);
     assert.match(event, /event: position/);
     assert.match(event, /"tagCode":"A1B2C3D400000001"/);
+    assert.match(event, /"pdop":1\.83/);
     assert.match(event, /"timestamp":"2026-07-21T14:30:15.123\+03:00"/);
   } finally {
     trackingBuffer.ingest = originalIngest;
     abortController.abort();
+  }
+});
+
+test("PDOP 20 dahil, sıfır, null ve eski eksik alan konumla birlikte kabul edilir", async () => {
+  const originalIngest = trackingBuffer.ingest;
+  const captured: TrackingPosition[] = [];
+  trackingBuffer.ingest = async (position) => { captured.push(position); return true; };
+  try {
+    for (const pdop of [20, 0, null, undefined]) {
+      const response = await POST(jsonRequest({ ...EXAMPLE_PAYLOAD, pdop, tag_id: "0000ABCDEF000001", zone_name: "Bölge A" }));
+      assert.equal(response.status, 204);
+      assert.equal(await response.text(), "");
+      assert.equal(captured.at(-1)?.pdop, pdop ?? null);
+      assert.equal(captured.at(-1)?.tagCode, "0000ABCDEF000001");
+      assert.equal(captured.at(-1)?.sourceZoneName, "Bölge A");
+    }
+  } finally { trackingBuffer.ingest = originalIngest; }
+});
+
+test("PDOP harita çözümünden sonra tüm konum işlemlerinden önce elenir", async () => {
+  const originalIngest = trackingBuffer.ingest;
+  const originalResolve = zoneMapResolver.resolve;
+  let ingested = 0, resolved = 0;
+  trackingBuffer.ingest = async () => { ingested++; return true; };
+  zoneMapResolver.resolve = async () => { resolved++; return { mapId: "necmettin-servis", resolved: true }; };
+  try {
+    for (const pdop of [20.000001, 21, 1_000_000]) {
+      const response = await POST(jsonRequest({ ...EXAMPLE_PAYLOAD, pdop, quality: 1 }));
+      assert.equal(response.status, 204);
+      assert.equal(await response.text(), "");
+    }
+    assert.equal(resolved, 3);
+    assert.equal(ingested, 0);
+  } finally {
+    trackingBuffer.ingest = originalIngest;
+    zoneMapResolver.resolve = originalResolve;
+  }
+});
+
+test("yoğun bakım isteği 70 dahil kabul edilir; daha büyük PDOP işlem görmez", async () => {
+  const originalIngest = trackingBuffer.ingest;
+  const captured: TrackingPosition[] = [];
+  trackingBuffer.ingest = async position => { captured.push(position); return true; };
+  try {
+    for (const pdop of [21, 70, 70.000001]) {
+      assert.equal((await POST(jsonRequest({ ...EXAMPLE_PAYLOAD, zone_id: "neuyogun", pdop }))).status, 204);
+    }
+    assert.deepEqual(captured.map(p => [p.mapId, p.pdop]), [["necmettin-yogun-bakim", 21], ["necmettin-yogun-bakim", 70]]);
+    assert.equal((await POST(jsonRequest({ ...EXAMPLE_PAYLOAD, zone_id: null, pdop: 21 }))).status, 204);
+    assert.equal(captured.length, 2);
+  } finally { trackingBuffer.ingest = originalIngest; }
+});
+
+test("harita PDOP filtresi kapalıyken büyük sonlu değerler normal veri akışına devam eder", async () => {
+  const originalIngest = trackingBuffer.ingest;
+  const originalRead = mapTrackingFilterSettings.read;
+  let captured: TrackingPosition | undefined;
+  trackingBuffer.ingest = async position => { captured = position; return true; };
+  mapTrackingFilterSettings.read = async mapId => {
+    assert.equal(mapId, "necmettin-servis");
+    return { enabled: false, maximumPdop: 20 };
+  };
+  try {
+    assert.equal((await POST(jsonRequest({ ...EXAMPLE_PAYLOAD, pdop: 999 }))).status, 204);
+    assert.equal(captured?.pdop, 999);
+  } finally { trackingBuffer.ingest = originalIngest; mapTrackingFilterSettings.read = originalRead; }
+});
+
+test("PDOP string, boolean, nesne ve sonlu olmayan sayı olamaz", async () => {
+  for (const pdop of ["1.83", true, {}, []]) {
+    const response = await POST(jsonRequest({ ...EXAMPLE_PAYLOAD, pdop }));
+    assert.equal(response.status, 400);
+    assert.match((await response.json() as { error: string }).error, /pdop/);
+  }
+  for (const pdop of [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY]) {
+    assert.throws(() => parsePositionPayload({ ...EXAMPLE_PAYLOAD, pdop }), /pdop/);
   }
 });
 

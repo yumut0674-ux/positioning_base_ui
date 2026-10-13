@@ -24,6 +24,7 @@ export class SocketTrackingGateway implements TrackingGateway {
 }
 
 export type SsePositionPayload = {
+  readonly pdop?: number | null;
   readonly mapId?: string | null;
   readonly sourceZoneId?: string | null;
   readonly sourceZoneName?: string | null;
@@ -63,6 +64,7 @@ export class SseTrackingGateway implements TrackingGateway {
           id: payload.tagCode,
           x: payload.x,
           y: payload.y,
+          pdop: payload.pdop ?? null,
           timestamp,
           positionSource: payload.positionSource,
           regionInference: payload.regionInference,

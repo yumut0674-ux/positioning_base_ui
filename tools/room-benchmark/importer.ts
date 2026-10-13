@@ -15,6 +15,7 @@ const mapped = (r: Record<string,string|null>): RawRow => ({
   created_at: r.created_at ? iso(r.created_at) : null, received_at: r.received_at ? iso(r.received_at) : null,
   quality: r.quality === null ? null : Number(r.quality), map_id: r.map_id,
   zone_id: r.zone_id, zone_name: r.zone_name,
+  ...('pdop' in r?{pdop:r.pdop===null?null:Number(r.pdop)}:{}),
 });
 export async function readTruth(id: string): Promise<Truth> {
   const truth = JSON.parse(await readFile(path.join(datasetDir(id),'truth.json'),'utf8')) as Truth;
@@ -67,13 +68,19 @@ export async function importTest(id: string, tags: string[], warmupMs=30_000, ob
   if (!tags.length) throw new Error('Tag seçimi gerekli. Önce candidates komutunu çalıştırın; eşleşmeyi truth.json içine elle kaydedin.');
   for (const tag of tags) if (!(tag in candidates)) throw new Error(`Tag aralıkta yok: ${tag}`);
   const from=new Date(ms(truth.test.from)-warmupMs).toISOString(), to=new Date(ms(truth.test.to)+observationMs).toISOString();
-  // The local client executes exactly this one SELECT. No schema helper is imported.
-  const rows=(await queryPostgres(`SELECT id::text, tag_code, x::text, y::text, created_at::text, received_at::text, quality::text, map_id, zone_id, zone_name FROM tag_location_history WHERE created_at >= ${q(from)}::timestamptz AND created_at <= ${q(to)}::timestamptz AND tag_code IN (${tags.map(q).join(',')}) ORDER BY created_at, id`)).map(mapped).sort(compareRows);
+  // Capability inspection and export are SELECT-only. No schema helper is imported.
+  const columns=await queryPostgres("SELECT column_name FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='tag_location_history' AND column_name='pdop'");
+  const hasPdop=columns.length>0;
+  const rows=(await queryPostgres(`SELECT id::text, tag_code, x::text, y::text, created_at::text, received_at::text, quality::text, map_id, zone_id, zone_name${hasPdop?', pdop::text':''} FROM tag_location_history WHERE created_at >= ${q(from)}::timestamptz AND created_at <= ${q(to)}::timestamptz AND tag_code IN (${tags.map(q).join(',')}) ORDER BY created_at, id`)).map(mapped).sort(compareRows);
   if (!rows.length) throw new Error('Seçili tag için satır yok');
   const raw=Buffer.from(rows.map(r=>JSON.stringify(r)).join('\n')+'\n');
   const sha=await sha256(raw), quality=inspectRows(rows);
   const mapIds: Record<string,number>={}; for (const r of rows) mapIds[r.map_id??'(eksik)']=(mapIds[r.map_id??'(eksik)']??0)+1;
   const manifest:Manifest={testId:id,source:'tag_location_history SELECT; DB kayıtları canlı motorun gördüğü tüm ham olayları kapsamayabilir',timezone:'Europe/Istanbul',importedAt:new Date().toISOString(),warmupMs,observationMs,selectedTags:tags,candidateTags:candidates,rowCount:rows.length,sha256:sha,timing:quality.missingReceivedAt?'approximate':'exact',mapIds,quality,caveat:'Kayıtlı tag/DB satırları canlı akışın eksiksiz kopyası değildir; geçmiş harita snapshotı yoksa güncel harita kullanılır.'};
+  const known=rows.flatMap(r=>r.pdop==null?[]:[r.pdop]);
+  manifest.pdop={columnAvailable:hasPdop,knownValues:known.length,missingValues:rows.length-known.length,
+    minimum:known.length?known.reduce((m,v)=>Math.min(m,v),Infinity):null,maximum:known.length?known.reduce((m,v)=>Math.max(m,v),-Infinity):null,above20:known.filter(v=>v>20).length,
+    caveat:'PDOP filtresi kalıcı kayıttan önce uygulandığında elenen paketler bu arşivde yoktur. NULL/eksik PDOP kabul edilir; iyi kalite kanıtı sayılmaz.'};
   await mkdir(dir,{recursive:true});
   await writeFile(path.join(dir,'raw.jsonl'),raw,{flag:'wx'});
   await writeFile(path.join(dir,'manifest.json'),JSON.stringify(manifest,null,2)+'\n',{flag:'wx'});

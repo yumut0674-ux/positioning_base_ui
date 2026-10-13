@@ -39,6 +39,10 @@ export function markdown(run:Run):string {
     '','## Oda / tag sonuçları','',
     '| Tag | Oda | Katı doğrulanmış | Katı tahmini | Yanlış oda | Sınır toleranslı başarı |','|---|---|---:|---:|---:|---:|'];
   if(m.successPercent===null) out.splice(out.indexOf('## Oda / tag sonuçları'),0,'Puanlama nedeni: truth.json içindeki groups boş veya doğrulanmış tag yok. Motor kararları üretildi; oda doğruluğu hesaplanmadı.','');
+  const pdop=run.preprocessing?.pdop;
+  if(pdop)out.splice(out.indexOf('## Oda / tag sonuçları'),0,
+    `PDOP ön filtresi: ${pdop.enabled?'açık':'kapalı'}, eşik ${pdop.limit}; bilinen ${pdop.knownValues}, eksik/bilinmeyen ${pdop.unknownValues}, motor öncesi elenen ${pdop.rejected.length}. NULL/eksik değer kalite başarısı sayılmaz; üretim kuralına göre kabul edilir.`,
+    `PDOP kuralı: ${pdop.sourcePath??'shared/tracking/pdop'} · SHA-256 ${pdop.sourceSha256??'replayRows tanı çıktısında yok'}. ${pdop.caveat??'DB öncesinde elenmiş paketlerin etkisi bu arşivden ölçülemez.'}`,'');
   for(const [tag,v] of Object.entries(m.tags)) for(const [room,c] of Object.entries(v.rooms)) {
     const t=v.roomsTolerant[room];
     out.push(`| ${tag} | ${room} | ${round(c.correctConfirmedMs/1000)} s | ${round(c.correctInferredMs/1000)} s | ${round(c.wrongRoomMs/1000)} s | ${t?pct(t.correctConfirmedMs+t.correctInferredMs,t.totalMs):'—'} |`);
@@ -78,6 +82,10 @@ export async function readRun(file:string):Promise<Run> {return JSON.parse(await
 export function compare(a:Run,b:Run):string {
   const keys:[string,unknown,unknown][]=[['test',a.testId,b.testId],['veri',a.dataset.sha256,b.dataset.sha256],['truth revizyonu',a.dataset.truthRevision,b.dataset.truthRevision],['truth SHA',a.dataset.truthSha256,b.dataset.truthSha256],['config SHA',a.config.sha256,b.config.sha256],['tick',a.simulation.tickMs,b.simulation.tickMs],['örnekleme',a.simulation.sampleMs,b.simulation.sampleMs],['tolerans',a.simulation.boundaryToleranceMs,b.simulation.boundaryToleranceMs]];
   const differences=keys.filter(([,x,y])=>x!==y).map(([key,x,y])=>`${key}: ${x} → ${y}`);
+  for(const key of ['enabled','limit','sourceSha256'] as const){
+    const x=a.preprocessing?.pdop[key],y=b.preprocessing?.pdop[key];
+    if(x!==y)differences.push(`PDOP ${key}: ${x??'eski raporda yok'} → ${y??'eski raporda yok'}`);
+  }
   if(differences.length) throw new Error(`Farklı deneyler karşılaştırılamaz:\n${differences.join('\n')}`);
   const out=[`# ${a.testId}: ${a.engineVersion} → ${b.engineVersion}`,'',`Commit: ${a.git.commit} → ${b.git.commit}`,'','| Oda | Eski doğru s | Yeni doğru s | Fark s | Eski yanlış s | Yeni yanlış s |','|---|---:|---:|---:|---:|---:|'];
   for(const id of ['room-03','room-05','room-06']) {

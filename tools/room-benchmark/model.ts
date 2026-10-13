@@ -2,6 +2,7 @@ export interface RawRow {
   id: string; tag_code: string; x: number | null; y: number | null;
   created_at: string | null; received_at: string | null; quality: number | null;
   map_id: string | null; zone_id: string | null; zone_name: string | null;
+  pdop?: number | null;
 }
 export interface Visit { roomId: string; from: string; to: string }
 export interface Truth {
@@ -19,6 +20,7 @@ export interface Manifest {
     missingQuality: number; timingAnomalies: number; anomalyRows: {id:string;tagCode:string;createdAt:string;receivedAt:string;deltaMs:number}[];
     largeGaps: { tagCode: string; from: string; to: string; ms: number }[] };
   caveat: string;
+  pdop?: {columnAvailable:boolean;knownValues:number;missingValues:number;minimum:number|null;maximum:number|null;above20:number;caveat:string};
 }
 export const iso = (value: string): string => {
   const ms = Date.parse(value);

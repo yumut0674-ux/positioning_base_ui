@@ -1,5 +1,9 @@
 # Çevrimdışı oda benchmarkı
 
+## Servis çıkış eşiği deneyi (13 Ekim 2026)
+
+`node --import tsx tools/room-benchmark/experiments/study-service-exit.ts YENI-RUN-ID` yalnız kayıtlı ve tag eşleşmesi doğrulanmış Servis veri kümelerini güncel motorla oynatır. Güncel ayar, 2,5 sn / 3, 1,5 sn / 4, 2,5 sn / 4 ve 3 sn / 4 profilleri yerel config kopyalarında kıyaslanır; her koşu iki kez doğrulanır. Üretim config'i değişmez; veri/truth/config SHA-256, motor/commit ve zamanlama bilgileri rapora yazılır. Raw/manifest olmayan testler açıkça dışlanır. Typecheck: `node node_modules/typescript/bin/tsc -p tools/room-benchmark/experiments/tsconfig.service-exit.json --noEmit`. İlk çalışma: [analiz](reports/servis-exit-harder-20261013/analysis.md), [yorum](reports/servis-exit-harder-20261013/interpretation.md). Beş Servis testinde 27/43 yakalama değişmedi; 2,5 sn / 3 yalnız 1,25 sn doğru tahmin kazandırırken koridorda oda süresini 135 → 160,25 sn artırdı. Bu çalışma çıkışı genel olarak zorlaştırmayı desteklemiyor.
+
 ## Entegre filtre parametre taraması (13 Ekim 2026)
 
 `experiments/sweep-integrated-filter.ts`, gerçek güncel motor ile Servis/yoğun bakımın doğrulanmış veri kümelerinde 19 ayrı filtre profilini iki kez oynatır. Komut: `node --import tsx tools/room-benchmark/experiments/sweep-integrated-filter.ts YENI-RUN-ID`. Her koşuda aynı veri/truth/harita korunur; yalnız mesafe, küme, sayı, süre, aday boşluğu veya pencere parametreleri yerel config kopyasında değişir. Snapshotlar ayrı SHA/configVersion ile kaydedilir. Kaynak ve harita hash'leri değişirse deney geçersiz olur. Seçilen profillerin tam karar raporlarını aynı fingerprint ile tekrar üretmek için `experiments/replay-sweep-selection.ts` kullanılır.

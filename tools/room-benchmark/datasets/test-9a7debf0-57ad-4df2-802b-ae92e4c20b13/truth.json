@@ -1,0 +1,166 @@
+{
+  "testId": "test-9a7debf0-57ad-4df2-802b-ae92e4c20b13",
+  "testName": "Servis — Oda testi — 9a7debf0",
+  "site": "Necmettin Hastanesi — Servis",
+  "timezone": "Europe/Istanbul",
+  "revision": 1,
+  "revisionReason": "Kullanıcının UTC milisaniyeli oda ziyaretleri ve açık tag kodu korunarak eklendi; test oturumu salt okunur kontrol edildi.",
+  "test": {
+    "from": "2026-10-13T08:39:53.953Z",
+    "to": "2026-10-13T08:47:57.185Z"
+  },
+  "visits": [
+    {
+      "roomId": "room-18",
+      "from": "2026-10-13T08:40:20.524Z",
+      "to": "2026-10-13T08:40:25.516Z"
+    },
+    {
+      "roomId": "room-08",
+      "from": "2026-10-13T08:40:34.624Z",
+      "to": "2026-10-13T08:41:26.424Z"
+    },
+    {
+      "roomId": "room-16",
+      "from": "2026-10-13T08:41:30.349Z",
+      "to": "2026-10-13T08:41:46.579Z"
+    },
+    {
+      "roomId": "room-07",
+      "from": "2026-10-13T08:41:57.547Z",
+      "to": "2026-10-13T08:42:10.390Z"
+    },
+    {
+      "roomId": "room-07",
+      "from": "2026-10-13T08:42:20.393Z",
+      "to": "2026-10-13T08:42:38.173Z"
+    },
+    {
+      "roomId": "room-04",
+      "from": "2026-10-13T08:42:55.764Z",
+      "to": "2026-10-13T08:43:07.729Z"
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-10-13T08:43:15.032Z",
+      "to": "2026-10-13T08:43:31.039Z"
+    },
+    {
+      "roomId": "room-14",
+      "from": "2026-10-13T08:43:36.062Z",
+      "to": "2026-10-13T08:43:47.151Z"
+    },
+    {
+      "roomId": "room-04",
+      "from": "2026-10-13T08:43:52.411Z",
+      "to": "2026-10-13T08:44:01.844Z"
+    },
+    {
+      "roomId": "room-13",
+      "from": "2026-10-13T08:44:11.088Z",
+      "to": "2026-10-13T08:45:07.609Z"
+    },
+    {
+      "roomId": "room-13",
+      "from": "2026-10-13T08:45:31.355Z",
+      "to": "2026-10-13T08:45:59.838Z"
+    },
+    {
+      "roomId": "room-02",
+      "from": "2026-10-13T08:46:10.331Z",
+      "to": "2026-10-13T08:46:42.212Z"
+    },
+    {
+      "roomId": "room-03",
+      "from": "2026-10-13T08:46:50.072Z",
+      "to": "2026-10-13T08:47:20.827Z"
+    },
+    {
+      "roomId": "room-04",
+      "from": "2026-10-13T08:47:29.651Z",
+      "to": "2026-10-13T08:47:42.983Z"
+    }
+  ],
+  "groups": [
+    {
+      "id": "servis-9a7debf0",
+      "tagCodes": [
+        "9C76E417B4CB5ECF"
+      ],
+      "note": "Tag kodu kullanıcı test kaydında açıkça verilmiştir; her test bağımsız rota grubudur."
+    }
+  ],
+  "corridorIntervals": [
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:40:25.516Z",
+      "to": "2026-10-13T08:40:34.624Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:41:26.424Z",
+      "to": "2026-10-13T08:41:30.349Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:41:46.579Z",
+      "to": "2026-10-13T08:41:57.547Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:42:10.390Z",
+      "to": "2026-10-13T08:42:20.393Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:42:38.173Z",
+      "to": "2026-10-13T08:42:55.764Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:43:07.729Z",
+      "to": "2026-10-13T08:43:15.032Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:43:31.039Z",
+      "to": "2026-10-13T08:43:36.062Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:43:47.151Z",
+      "to": "2026-10-13T08:43:52.411Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:44:01.844Z",
+      "to": "2026-10-13T08:44:11.088Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:45:07.609Z",
+      "to": "2026-10-13T08:45:31.355Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:45:59.838Z",
+      "to": "2026-10-13T08:46:10.331Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:46:42.212Z",
+      "to": "2026-10-13T08:46:50.072Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:47:20.827Z",
+      "to": "2026-10-13T08:47:29.651Z"
+    },
+    {
+      "regionId": "corridor-main",
+      "from": "2026-10-13T08:47:42.983Z",
+      "to": "2026-10-13T08:47:57.185Z"
+    }
+  ],
+  "note": "Kaynak source.json içinde değişmez tutulur. Z UTC; yerel gösterim Europe/Istanbul. Oda ziyaretleri arasındaki süre koridor; katı ve ±2 sn sınır toleranslı sonuç. Geçmiş DB girdileri PDOP filtresinden geçmiş olabilir; DB sonrası filtreyi kapatmak elenmiş paketleri geri getirmez."
+}
