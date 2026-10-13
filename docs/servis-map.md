@@ -47,7 +47,9 @@ ve 213–210 ile ortak koridor tanımlıdır. Görsel ve bölge adları 12 Ekim 
 tarihli adlandırmayla güncellenmiştir. Oda ön sınırları banyo çıkıntılarının
 koridora bakan uçlarıyla aynı hizaya tamamlanmıştır; aradaki koridor
 girintilerinin oda hizasında kalan kısımları ilgili odalara dahildir.
-Oda kapıları da aynı doğrultuda koridora doğru 1 metre taşınmıştır;
+Oda kapıları aynı doğrultuda koridora doğru toplam 1,10 metre taşınmıştır;
+kapı noktaları güncel oda sınırlarının 10 cm dışında, koridor içindedir.
+Son 10 cm kaydırmada oda ve koridor sınırları değiştirilmemiştir;
 1 metre sessiz giriş yakınlık hesabı bu yeni kapı noktalarından yapılır.
 Karşılıklı kapıların yakınlık alanları kesiştiğinde sinyal kesintisi
 tahmini mevcut motor kuralına göre en yakın uygun kapıyı seçer.

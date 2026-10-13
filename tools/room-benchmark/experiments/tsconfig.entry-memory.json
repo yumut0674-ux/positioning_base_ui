@@ -1,0 +1,6 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {"incremental": false},
+  "include": ["entry-memory.ts", "entry-memory.test.ts", "entry-pattern.test.ts", "study-entry-memory.ts", "interpret-entry-memory.ts", "interpret-entry-pattern.ts", "../benchmark.test.ts"],
+  "exclude": ["../../../node_modules", "../reports"]
+}

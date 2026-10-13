@@ -794,8 +794,15 @@ npm run typecheck
 npm run lint
 npm run test
 npm run test:tracking
+npm run test:maps
 npm run test:mcp
 ```
+
+`test:maps`, Servis ve Yoğun Bakım'ın birbirinden bağımsız harita ayarlarını
+doğrular. Servis çıkış doğrulamasında 3, Yoğun Bakım'da 2 ölçüm kullanılır;
+testler haritaların diğer ayarlarının eşit olmasını gerektirmez. Artık
+kullanılmayan spor koridorun eski geometri testleri bu pakete dahil değildir;
+ayrı `npm run test:maps:legacy` komutunda korunur.
 
 Temel servis smoke testleri:
 

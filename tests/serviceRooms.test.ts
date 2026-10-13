@@ -5,17 +5,16 @@ import { cleanRegionsConfig } from "../app/api/regions/route";
 import { createAffineTransform } from "../src/features/regions/services/affineTransform";
 import { CoordinateTransformService } from "../src/features/map/services/CoordinateTransformService";
 import { resolveGlobalSettings } from "../src/features/regions/config/regionInferenceSettings";
-import type { RegionsConfig } from "../src/features/regions/types/region.types";
+import type { GlobalRegionEngineSettings, RegionsConfig } from "../src/features/regions/types/region.types";
 import { compileRegionsConfig } from "../src/server/regionEngine/configLoader";
 import { crossesDoor, pointInPolygon, wallDistance } from "../src/server/regionEngine/geometry";
 import { RegionPositionEngine } from "../src/server/regionEngine/RegionPositionEngine";
 import { AreaTransitionEngine, type AreaTransitionEvent } from "../src/server/regionEngine/AreaTransitionEngine";
 
 const config = JSON.parse(readFileSync("config/maps/necmettin-servis/regions.json", "utf8")) as RegionsConfig;
-const reference = JSON.parse(readFileSync("config/maps/necmettin-yogun-bakim/regions.json", "utf8")) as RegionsConfig;
 const source = JSON.parse(readFileSync("config/maps/necmettin-servis/source.floorplan.json", "utf8"));
-const compiled = compileRegionsConfig(cleanRegionsConfig(config, "necmettin-servis"));
-const referenceCompiled = compileRegionsConfig(reference);
+const cleanedConfig = cleanRegionsConfig(config, "necmettin-servis");
+const compiled = compileRegionsConfig(cleanedConfig);
 const rooms = config.regions.filter(region => region.kind === "room");
 const transform = createAffineTransform(config.map.calibration.points);
 const map = JSON.parse(readFileSync("config/maps/necmettin-servis/map.json", "utf8"));
@@ -35,29 +34,41 @@ const cadRooms = compiled.regions.map(room => {
   } };
 });
 const epoch = Date.parse("2026-10-09T12:00:00Z");
+const serviceThresholds = {
+  entryEvidenceDurationMs: 2000, exitEvidenceDurationMs: 1500,
+  entryConfirmationCount: 5, exitConfirmationCount: 3,
+  maximumSpeedMetersPerSecond: 3, maximumStepDistanceMeters: 10,
+} as const;
 
-test("Servis has 18 silent rooms with 1 m door proximity, 1.2 m approach depth and its own entry thresholds", () => {
+function assertServiceThresholds(settings: Pick<GlobalRegionEngineSettings, keyof typeof serviceThresholds>, label: string) {
+  for (const key of Object.keys(serviceThresholds) as (keyof typeof serviceThresholds)[]) {
+    assert.equal(settings[key], serviceThresholds[key], `${label}/${key}`);
+  }
+}
+
+test("Servis has 18 silent rooms with 1 m door proximity, configured door geometry and its own entry/exit thresholds", () => {
   assert.equal(compiled.regions.length, 18);
   assert.equal(compiled.corridors.length, 1);
   assert.deepEqual(compiled.warnings, []);
-  assert.deepEqual(resolveGlobalSettings(config.engine), resolveGlobalSettings({ ...reference.engine, entryEvidenceDurationMs: 2000, exitEvidenceDurationMs: 1500,
-    entryConfirmationCount: 5,
-    maximumSpeedMetersPerSecond: 3, maximumStepDistanceMeters: 10 }));
-  assert.deepEqual(config.positionAnimation, reference.positionAnimation);
-  assert.deepEqual(config.mapDisplay, reference.mapDisplay);
-  assert.deepEqual(compiled.areaTracking, referenceCompiled.areaTracking);
+  assertServiceThresholds(resolveGlobalSettings(config.engine), "Servis");
+  assertServiceThresholds(compiled.rules, "Servis/compiled");
+  assert.deepEqual(cleanedConfig.positionAnimation, config.positionAnimation);
+  assert.deepEqual(cleanedConfig.mapDisplay, config.mapDisplay);
   assert.deepEqual(rooms.map(room => room.name), ["Dr Odası", "201", "202", "203", "204", "205", "206", "207", "208", "209",
     "217", "216", "215", "214", "213", "212", "211", "210"]);
-  for (const [index, room] of compiled.regions.entries()) {
-    const template = referenceCompiled.regions[index % referenceCompiled.regions.length];
-    assert.deepEqual(room.settings, { ...template.settings, coverage: "silent", silentEntryMaxDistanceMeters: 1,
-      entryEvidenceDurationMs: 2000, exitEvidenceDurationMs: 1500,
-      entryConfirmationCount: 5, maximumSpeedMetersPerSecond: 3, maximumStepDistanceMeters: 10 });
+  for (const room of compiled.regions) {
+    assertServiceThresholds(room.settings, room.name ?? room.id);
+    assert.equal(room.settings.coverage, "silent");
+    assert.equal(room.settings.silentEntryMaxDistanceMeters, 1);
     assert.equal(room.entrances.length, 1);
-    assert.equal(room.entrances[0].widthMeters, template.entrances[0].widthMeters);
+    const configuredDoor = config.regions.find(candidate => candidate.id === room.id)?.entrances.find(door => door.id === room.entrances[0].id);
+    assert.ok(configuredDoor, room.name);
+    assert.equal(room.entrances[0].widthMeters, configuredDoor.widthMeters);
     assert.equal(room.entrances[0].connectsTo, "corridor-main");
-    assert.equal(room.entrances[0].approachDepthMeters, 1.2);
-    assert.deepEqual(room.entrances[0].settings, template.entrances[0].settings);
+    assert.equal(room.entrances[0].approachDepthMeters, configuredDoor.approachDepthMeters ?? 2);
+    assert.equal(room.entrances[0].settings.enabled, true);
+    assert.equal(room.entrances[0].settings.direction, "bidirectional");
+    assert.equal(room.entrances[0].settings.evidenceMode, "preferred");
   }
 });
 
@@ -164,8 +175,10 @@ test("completed room fronts include corridor recesses and keep bathrooms and uti
     const direction = top ? 1 : -1;
     const originalFront = top ? 15.28890959210326 : 9.6889095921034;
     const cadDoor = motorToCad(door);
-    assert.ok(Math.abs(cadDoor.y - (originalFront - direction)) < 1e-8, `${room.name}: door moves one metre towards the corridor`);
-    assert.ok(wallDistance(door, room) < 1e-8, `${room.name}: door is on the completed front`);
+    assert.ok(Math.abs(cadDoor.y - (originalFront - direction * 1.1)) < 1e-8, `${room.name}: door is ten centimetres outside the completed front`);
+    assert.ok(Math.abs(wallDistance(door, room) - 0.1) < 1e-8, `${room.name}: door is ten centimetres from the room boundary`);
+    assert.ok(pointInPolygon(door, corridor), `${room.name}: door point is in the corridor`);
+    assert.equal(pointInPolygon(door, room), false, `${room.name}: door point is outside the room`);
     assert.ok(pointInPolygon({ x: door.x + door.inwardNormal.x * 0.4, y: door.y }, room));
     assert.ok(pointInPolygon({ x: door.x - door.inwardNormal.x * 0.4, y: door.y }, corridor));
     // This point was in the corridor recess beside the bathroom before the update.
@@ -242,13 +255,15 @@ test("every Servis room requires both five reliable measurements and two seconds
   }
 });
 
-test("configured Servis gates record area entry and observed exit using the intensive-care wait settings", () => {
+test("configured Servis gates record area entry and observed exit using their own wait settings", () => {
   assert.equal(compiled.largeAreas.length, 1);
   assert.equal(compiled.largeAreas[0].name, "Servis");
   assert.ok(compiled.largeAreas[0].gates.length > 0);
   const edge = motorToCad(compiled.largeAreas[0].polygon[0]).x;
   for (const [index, gate] of compiled.largeAreas[0].gates.entries()) {
-    assert.equal(gate.waitMs, referenceCompiled.largeAreas[0].gates[index % referenceCompiled.largeAreas[0].gates.length].waitMs);
+    const configuredGate = config.largeAreas?.flatMap(area => area.gates).find(candidate => candidate.id === gate.id);
+    assert.ok(configuredGate, gate.id);
+    assert.equal(gate.waitMs, configuredGate.waitMs);
     assert.equal(gate.role, "bidirectional");
     const events: AreaTransitionEvent[] = [];
     const engine = new AreaTransitionEngine(new Map([[config.map.mapId, compiled]]), event => events.push(event));

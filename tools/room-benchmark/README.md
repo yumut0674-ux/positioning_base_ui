@@ -1,5 +1,30 @@
 # Çevrimdışı oda benchmarkı
 
+## Kullanıcının 2 iç → dış → 2 iç önerisi
+
+```powershell
+node --import tsx tools/room-benchmark/experiments/study-entry-memory.ts YENI-RUN-ID pattern
+node --import tsx --test tools/room-benchmark/experiments/entry-pattern.test.ts tools/room-benchmark/experiments/entry-memory.test.ts tools/room-benchmark/benchmark.test.ts
+```
+
+`pattern` modu güncel motor, önceki aday hafızası ve altı dizi profilini aynı Servis/yoğun bakım arşivlerinde iki kez kıyaslar. Ana `user-evidence-2-1-2-return3000-window6000` profili iki güçlü iç → tek dış → iki güçlü iç kanıt arar; zayıf duvar ölçümü sayıyı artırmaz ve güçlü diziyi silmez. Son beş **kabul edilmiş ham ölçümde** tam `IIOII` isteyen daha katı profil ayrı gösterilir. Serviste bu alternatif giriş yolu dört güçlü ölçümü yeterli sayar; normal 5 nokta yolu korunur. 5 nokta şartını alternatifte de koruyan 5/6 profili ayrıca vardır. Normal giriş/çıkış/oda değişimi ve bütün filtreler aktif motorda kalır; üretim config'i değişmez. Dizi varyantları klonlanan runtime config'inde ayrı `configVersion` taşır, kaynak harita SHA'sı ayrıca saklanır.
+
+[Analiz](reports/entry-pattern-hospital-20261013-final/interpretation.md), [statik HTML](reports/entry-pattern-hospital-20261013-final/interpretation.html). 160 deterministik replay ve 24 ilgili test doğrulandı. Ana öneri Serviste 39/62 → 40/62; doğru oda %24,137 → %24,695; +9,25 sn doğru oda (+4,75 kesin / +4,5 tahmini), +0,75 sn koridor hatası verdi. Yoğun bakım 6/9 kaldı; +1,25 sn kesin doğruya karşı +2,25 sn koridor ve bir geç yanlış doğrulama oluştu. Cafer'in ikinci dönüş noktası gerçek çıkıştan 420 ms sonra motora ulaşıyor. Daha katı ham pencere profili bu geç kararı engelliyor. `visit-details.json` tüm ziyaretlerin ham/ölçüm/teslim/karar/sonraki boşluk zincirini, `matched-evidence.json` gerçek IIOII kanıtlarını içerir. `interpret-entry-pattern.ts` bu tarihli config fingerprintlerini doğrular; farklı motor/config için yorum yeniden hazırlanmalıdır.
+
+## Tek dış ölçümden sonra giriş kanıtını koruma deneyi (13 Ekim 2026)
+
+`experiments/entry-memory.ts`, aktif motoru import eden çevrimdışı aday hafızası adaptörüdür. Aynı odanın iç kanıtı bir kısa dış ölçüm boyunca korunabilir; dış/filtre reddi/zayıf duvar ölçümü iç kanıt sayılmaz. İkinci kabul edilmiş dış nokta, farklı oda veya süre aşımı hafızayı temizler. Sayı/süre/kapı kontrolleri aktif motorda kalır; üretim entegrasyonu yapılmaz. Adaptör yalnız kendi motor örneğinin public `getVehicleState` tanı nesnesindeki aday başlangıcını geri yükler, bu nedenle motor tanı yapısına bağlıdır.
+
+```powershell
+node --import tsx tools/room-benchmark/experiments/study-entry-memory.ts YENI-RUN-ID
+node --import tsx --test tools/room-benchmark/experiments/entry-memory.test.ts tools/room-benchmark/benchmark.test.ts
+node node_modules/typescript/bin/tsc -p tools/room-benchmark/experiments/tsconfig.entry-memory.json --noEmit
+```
+
+Çalışma yalnız ham arşivi ve doğrulanmış tag eşleşmesi olan Servis/yoğun bakım testlerini kullanır. Aynı config/PDOP ile güncel profil, tek dış nokta için 1,5/3 sn dönüş ve 6/12 sn pencere, ayrıca daha serbest bir duyarlılık kontrolü iki kez oynatılır. Gerçek replaylerin tamamında interval/listener/ağ/DB bağlantısı engellenir; kaynak, config, veri/truth ve benchmark dışındaki Git diff hashleri doğrulanır. Raporlar üzerine yazılmaz. Motorun süre kanıtı ilk–son güçlü iç ölçüm farkı olarak kalır; kısa dış aralık da bu farka dahildir.
+
+[Sonuç yorumu](reports/entry-memory-hospital-20261013-verified/interpretation.md), [statik HTML](reports/entry-memory-hospital-20261013-verified/interpretation.html), [bütün profiller](reports/entry-memory-hospital-20261013-verified/analysis.html). 3 sn / 6 sn profil Serviste 39/62 → 42/62 yakalama ve +38,5 sn doğru oda sağlar (+10 sn kesin, +28,5 sn tahmini); koridorda oda +3 sn. Yoğun bakımda 6/9 → 7/9 görünse de Cafer kazanımı yalnız 124 ms'dir ve +2,75 sn koridor maliyeti getirir. Daha dar 1,5 sn profil daha düşük maliyetlidir. Puanlanmayan 2a7fecc4 ve arşivi eksik f93aa2c0 sonuçlara katılmaz. `interpret-entry-memory.ts` bu sabit deneyin metnini üretir ve fingerprint/metrik uyuşmazlığında durur; yeni motor/ayar sonuçlarında yorum yeniden hazırlanmalıdır.
+
 ## 9 Ekim Cuma motoru/ayarları ile 13 Ekim karşılaştırması
 
 [Karşılaştırma HTML](reports/yogun-bakim-friday-vs-current-20261013/analysis.html), [Markdown](reports/yogun-bakim-friday-vs-current-20261013/analysis.md). Dört yoğun bakım datasetinde 11 profil iki kez oynatıldı; 8 Ekim tagı belirsiz dataset puanlanmadı. Cuma kaynaklarının SHA-256 değerleri o günkü raporla eşleşti, eski Hasan kararları ve metrikleri yeniden üretildi. Cuma ilk (2 nokta) / Cuma son (3 nokta) ayrı gösterilir. Bugünkü iki testte Cuma son ayarı aynı oda başarısını verdi; Cuma ilk ayarı yalnız Cafer Oda 2'yi toparladı. Motor/config etkisi ayrı profillerle ölçüldü; üretim ayarları değişmedi.

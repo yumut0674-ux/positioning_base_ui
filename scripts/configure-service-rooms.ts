@@ -43,6 +43,7 @@ const topFront = 15.28890959210326;
 const bottomFront = 9.6889095921034;
 const rearExtension = 3;
 const halfGap = 0.05;
+const doorCorridorOffset = 0.1;
 const bottomBays = [0, 1, 2, 3, 6, 7, 8, 9];
 // Labels follow the image: top row left to right, then bottom row left to right.
 const roomNames = ["Dr Odası", "201", "202", "203", "204", "205", "206", "207", "208", "209",
@@ -81,7 +82,7 @@ function room(number: number, bay: number, top: boolean): RegionDefinition {
     inference: { ...template.inference, coverage: "silent", silentEntryMaxDistanceMeters: 1 },
     polygon: boundary.map(([x, y]) => pair(x, y)),
     roomCenter: pair((walls[bay] + walls[bay + 1]) / 2, top ? (topRear + 17.08890959210326) / 2 : (bottomRear + 7.8889095921034) / 2),
-    entrances: [{ ...doorwayTemplate, id: `${id}-corridor-door`, ...pair(doorwayX, bathroomFront),
+    entrances: [{ ...doorwayTemplate, id: `${id}-corridor-door`, ...pair(doorwayX, bathroomFront - direction * doorCorridorOffset),
       inwardNormal: normal(direction), connectsTo: "corridor-main", approachDepthMeters: 1.2 }],
   };
 }
@@ -132,7 +133,7 @@ const generated: RegionsConfig = { ...config,
 };
 // Updating existing geometry must not regenerate manually edited gates,
 // room centres, names or inference settings. Door positions are projected
-// onto the new front along their existing inward normal, retaining their
+// ten centimetres outside the new front along their existing inward normal, retaining their
 // lateral position. Repeating this update does not move a door again.
 const updated: RegionsConfig = updateFronts ? { ...config, regions: config.regions.map(region => {
   if (region.id === corridor.id) return { ...region, polygon: corridor.polygon };

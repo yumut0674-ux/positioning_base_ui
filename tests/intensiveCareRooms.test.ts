@@ -17,6 +17,7 @@ test("intensive care loads seven rooms without engine warnings and survives edit
   assert.equal(compiled.regions.length, 7);
   assert.equal(compiled.corridors.length, 1);
   assert.deepEqual(compiled.warnings, []);
+  assert.equal(compiled.rules.exitConfirmationCount, 2);
   assert.deepEqual(rooms.map((room) => room.name), Array.from({ length: 7 }, (_, i) => `Oda ${i + 1}`));
 });
 
