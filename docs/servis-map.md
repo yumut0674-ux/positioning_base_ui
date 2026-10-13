@@ -65,7 +65,7 @@ Diğer ayarlar Yoğun Bakım ile aynıdır:
 
 - Odalar arka dış duvarlarının ötesine 3 metre uzatılır; komşu odalar arasında 10 cm boşluk vardır.
 - Oda merkezleri fiziksel odaların içinde kalır; her odada 1,5 m genişliğinde, içeri yönlü koridor kapısı bulunur.
-- Oda giriş eşikleri ve 1 metrelik sessiz giriş yakınlık sınırı dışında genel motor, oda/kapı çıkarım, gösterim ve animasyon ayarları Yoğun Bakım yapılandırmasından alınır. Kapı yaklaşma derinliği ayrı bir ayardır ve tüm 18 odada 1,2 metredir.
+- Oda giriş eşikleri ve 1 metrelik sessiz giriş yakınlık sınırı dışında genel motor, oda/kapı çıkarım, gösterim ve animasyon ayarları Yoğun Bakım yapılandırmasından alınır. Kapı yaklaşma derinliği ayrı bir ayardır ve tüm 18 odada 1,3 metredir.
 - `Servis` büyük alanında düzenlenmiş tek giriş/çıkış kapısı iki yönlüdür; bekleme süresi 30 saniyedir.
 
 Mevcut çizimleri yerinde tutarak motor kalibrasyonunu yeniden uygulamak için
