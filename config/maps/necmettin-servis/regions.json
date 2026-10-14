@@ -412,7 +412,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -515,7 +515,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -618,7 +618,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -721,7 +721,8 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3,
+        "wallBandMeters": 0.35
       },
       "entrances": [
         {
@@ -824,7 +825,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -927,7 +928,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -1030,7 +1031,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -1133,7 +1134,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -1236,7 +1237,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -1339,7 +1340,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -1442,7 +1443,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -1545,7 +1546,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -1648,7 +1649,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -1751,7 +1752,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -1854,7 +1855,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -1957,7 +1958,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -2060,7 +2061,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
@@ -2163,7 +2164,7 @@
       "kind": "room",
       "inference": {
         "coverage": "silent",
-        "silentEntryMaxDistanceMeters": 1
+        "silentEntryMaxDistanceMeters": 1.3
       },
       "entrances": [
         {
