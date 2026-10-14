@@ -8,6 +8,11 @@ Bu doküman operasyon ekibinin yerel kurulum, PostgreSQL hazırlığı, ingest
 payload sözleşmesi, port yönetimi, region engine kullanımı, yedekleme, servis
 başlatma ve hata giderme adımlarını tek yerden takip edebilmesi için yazıldı.
 
+Terminalden tarih/saat aralığı ve tag seçerek bütün kayıtlı konum/motor
+verilerini Git dışındaki `.data/exports` klasörüne almak için
+`npm run export:data` çalıştırın. [Yerel benchmark veri arşivi rehberi](tools/data-export/README.md)
+JSONL/CSV dosyalarını ve veritabanına yeniden bağlanmadan benchmark'a aktarmayı açıklar.
+
 ## İçindekiler
 
 - [Sistem özeti](#sistem-özeti)

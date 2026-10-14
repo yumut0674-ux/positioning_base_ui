@@ -354,3 +354,81 @@ export async function queryPostgres(sql: string, options: { timeoutMs?: number }
     socket.end();
   }
 }
+
+export interface PgReadOnlySnapshot {
+  query(sql: string): Promise<PgRow[]>;
+  stream(sql: string, onRow: (row: PgRow) => Promise<void>): Promise<void>;
+}
+
+/** A dedicated connection: all reads share one snapshot, and cursors bound result memory. */
+export async function withPostgresReadOnlySnapshot<T>(
+  work: (client: PgReadOnlySnapshot) => Promise<T>,
+  options: { batchSize?: number; timeoutMs?: number; signal?: AbortSignal } = {},
+): Promise<T> {
+  const batchSize = options.batchSize ?? 1000;
+  const timeoutMs = options.timeoutMs ?? 60_000;
+  if (!Number.isInteger(batchSize) || batchSize < 1 || batchSize > 10_000) throw new Error("Invalid PostgreSQL cursor batch size");
+  if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 600_000) throw new Error("Invalid PostgreSQL query timeout");
+  options.signal?.throwIfAborted();
+  const config = getConfig();
+  const socket = await connect(config);
+  const readMessage = createMessageReader(socket);
+  const abort = () => socket.destroy(new Error("Veri aktarımı iptal edildi."));
+  options.signal?.addEventListener("abort", abort, { once: true });
+  let cursorIndex = 0;
+  let busy = false;
+
+  const timed = async <R>(operation: () => Promise<R>): Promise<R> => {
+    options.signal?.throwIfAborted();
+    const timer = setTimeout(() => socket.destroy(new Error("PostgreSQL query timed out")), timeoutMs);
+    try { return await operation(); } finally { clearTimeout(timer); }
+  };
+  const query = async (sql: string): Promise<PgRow[]> => {
+    if (busy) throw new Error("Snapshot queries must run sequentially");
+    if (sql.includes("\0")) throw new Error("SQL must not contain a null byte");
+    busy = true;
+    try {
+      return await timed(async () => {
+        socket.write(message("Q", cstring(sql)));
+        let fields: PgField[] = [];
+        const rows: PgRow[] = [];
+        while (true) {
+          const packet = await readMessage();
+          if (packet.type === "T") fields = parseRowDescription(packet.payload);
+          else if (packet.type === "D") rows.push(parseDataRow(packet.payload, fields));
+          else if (packet.type === "E") throw new Error(parseError(packet.payload));
+          else if (packet.type === "Z") return rows;
+        }
+      });
+    } finally { busy = false; }
+  };
+  try {
+    await timed(async () => {
+      socket.write(startupMessage(config));
+      await authenticate(socket, config, readMessage);
+    });
+    await query("BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY");
+    await query("SET LOCAL TIME ZONE 'UTC'");
+    await query("SET LOCAL standard_conforming_strings = on");
+    await query(`SET LOCAL statement_timeout = ${timeoutMs}`);
+    const result = await work({
+      query,
+      stream: async (sql, onRow) => {
+        const cursor = `uwb_export_${++cursorIndex}`;
+        await query(`DECLARE ${cursor} NO SCROLL CURSOR FOR ${sql}`);
+        while (true) {
+          const rows = await query(`FETCH FORWARD ${batchSize} FROM ${cursor}`);
+          for (const row of rows) { options.signal?.throwIfAborted(); await onRow(row); }
+          if (rows.length < batchSize) break;
+        }
+        await query(`CLOSE ${cursor}`);
+      },
+    });
+    await query("COMMIT");
+    return result;
+  } finally {
+    options.signal?.removeEventListener("abort", abort);
+    // Disconnect also rolls back an interrupted transaction and closes its cursors.
+    socket.destroy();
+  }
+}

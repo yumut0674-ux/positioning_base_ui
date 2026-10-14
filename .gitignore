@@ -40,6 +40,7 @@ yarn-error.log*
 # typescript
 next-env.d.ts
 /dist/
+# Local benchmark DB exports and durable runtime data (never commit).
 /.data/
 
 # Cloudflare Tunnel local credentials and machine-specific config

@@ -1,5 +1,23 @@
 # Çevrimdışı oda benchmarkı
 
+## Terminalden tarih/tag seçerek veri arşivi
+
+`npm run export:data`, tarih/saat aralığını sorar, o aralıktaki tagları listeler
+ve seçilen tagların bütün kayıtlı konum ölçümlerini, tam motor payload'larını,
+alan olaylarını ve ilgili test kayıtlarını `.data/exports/<arşiv-id>/` altına
+JSONL/CSV olarak yazar. Klasör Git dışındadır. [Kullanım rehberi](../data-export/README.md).
+
+Mevcut bağımsız truth dosyası için DB'ye bağlanmadan içe aktarım:
+
+```powershell
+node --import tsx tools/room-benchmark/cli.ts import test-GERCEK-UUID --tags TAG1 --archive ".data/exports/ARSIV-ID"
+```
+
+Arşiv testin ön/son gözlem penceresini kapsamalıdır; ham dosyanın SHA-256,
+boyut ve satır sayısı doğrulanır. Mevcut datasetler üzerine yazılmaz.
+Kaydedilmiş motor çıktıları arşivin `decisions.jsonl` dosyasında korunur;
+replay bunlardan bağımsız olarak yeniden hesaplanan çıktıyı üretir.
+
 ## Kullanıcının 2 iç → dış → 2 iç önerisi
 
 ```powershell
