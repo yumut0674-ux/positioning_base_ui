@@ -3,8 +3,6 @@
     "outsideHoldMs": 2000
   },
   "engine": {
-    "maximumStepDistanceMeters": 10,
-    "relocationConfirmationCount": 2,
     "entryEvidenceDurationMs": 1500,
     "exitEvidenceDurationMs": 1000,
     "entryConfirmationCount": 3,
@@ -34,6 +32,12 @@
     "wallEvidenceWeight": 0.1,
     "maximumSpeedMetersPerSecond": 8,
     "movementToleranceMeters": 0.25,
+    "maximumStepDistanceMeters": 10,
+    "relocationClusterRadiusMeters": 1,
+    "relocationConfirmationCount": 2,
+    "relocationConfirmationDurationMs": 1500,
+    "relocationMaximumGapMs": 2000,
+    "relocationCandidateWindowMs": 6000,
     "lostAfterMs": 30000,
     "relocationAfterMs": 15000,
     "regularCoverageStaleMultiplier": 3,
@@ -122,7 +126,6 @@
     {
       "id": "corridor-main",
       "name": "Koridor",
-      "kind": "corridor",
       "color": "#64748b",
       "polygon": [
         {
@@ -207,12 +210,12 @@
         }
       ],
       "roomCenter": null,
+      "kind": "corridor",
       "entrances": []
     },
     {
       "id": "room-01",
       "name": "Oda 1",
-      "kind": "room",
       "color": "#2563eb",
       "polygon": [
         {
@@ -266,10 +269,13 @@
           "y": 20.583188000000057
         }
       },
+      "kind": "room",
+      "inference": {
+        "sharedWallBandMeters": 0.35,
+        "wallBandMeters": 0.25
+      },
       "entrances": [
         {
-          "id": "room-01-corridor-door",
-          "label": "Koridor kapısı",
           "pixel": {
             "x": 3470.75,
             "y": 678
@@ -283,14 +289,16 @@
             "x": -1,
             "y": 0
           },
-          "connectsTo": "corridor-main"
+          "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
+          "id": "room-01-corridor-door",
+          "label": "Koridor kapısı"
         }
       ]
     },
     {
       "id": "room-02",
       "name": "Oda 2",
-      "kind": "room",
       "color": "#7c3aed",
       "polygon": [
         {
@@ -344,10 +352,13 @@
           "y": 17.527863000000046
         }
       },
+      "kind": "room",
+      "inference": {
+        "sharedWallBandMeters": 0.35,
+        "wallBandMeters": 0.25
+      },
       "entrances": [
         {
-          "id": "room-02-corridor-door",
-          "label": "Koridor kapısı",
           "pixel": {
             "x": 2977,
             "y": 678
@@ -361,14 +372,16 @@
             "x": -1,
             "y": 0
           },
-          "connectsTo": "corridor-main"
+          "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
+          "id": "room-02-corridor-door",
+          "label": "Koridor kapısı"
         }
       ]
     },
     {
       "id": "room-03",
       "name": "Oda 3",
-      "kind": "room",
       "color": "#db2777",
       "polygon": [
         {
@@ -422,10 +435,13 @@
           "y": 14.322479000000037
         }
       },
+      "kind": "room",
+      "inference": {
+        "sharedWallBandMeters": 0.35,
+        "wallBandMeters": 0.25
+      },
       "entrances": [
         {
-          "id": "room-03-corridor-door",
-          "label": "Koridor kapısı",
           "pixel": {
             "x": 2459,
             "y": 678
@@ -439,14 +455,16 @@
             "x": -1,
             "y": 0
           },
-          "connectsTo": "corridor-main"
+          "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
+          "id": "room-03-corridor-door",
+          "label": "Koridor kapısı"
         }
       ]
     },
     {
       "id": "room-04",
       "name": "Oda 4",
-      "kind": "room",
       "color": "#ea580c",
       "polygon": [
         {
@@ -500,10 +518,13 @@
           "y": 11.117095000000024
         }
       },
+      "kind": "room",
+      "inference": {
+        "sharedWallBandMeters": 0.35,
+        "wallBandMeters": 0.25
+      },
       "entrances": [
         {
-          "id": "room-04-corridor-door",
-          "label": "Koridor kapısı",
           "pixel": {
             "x": 1941,
             "y": 678
@@ -517,14 +538,16 @@
             "x": -1,
             "y": 0
           },
-          "connectsTo": "corridor-main"
+          "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
+          "id": "room-04-corridor-door",
+          "label": "Koridor kapısı"
         }
       ]
     },
     {
       "id": "room-05",
       "name": "Oda 5",
-      "kind": "room",
       "color": "#ca8a04",
       "polygon": [
         {
@@ -578,10 +601,13 @@
           "y": 7.9117110000000155
         }
       },
+      "kind": "room",
+      "inference": {
+        "sharedWallBandMeters": 0.35,
+        "wallBandMeters": 0.25
+      },
       "entrances": [
         {
-          "id": "room-05-corridor-door",
-          "label": "Koridor kapısı",
           "pixel": {
             "x": 1423,
             "y": 678
@@ -595,14 +621,16 @@
             "x": -1,
             "y": 0
           },
-          "connectsTo": "corridor-main"
+          "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
+          "id": "room-05-corridor-door",
+          "label": "Koridor kapısı"
         }
       ]
     },
     {
       "id": "room-06",
       "name": "Oda 6",
-      "kind": "room",
       "color": "#059669",
       "polygon": [
         {
@@ -656,10 +684,13 @@
           "y": 4.706327000000005
         }
       },
+      "kind": "room",
+      "inference": {
+        "sharedWallBandMeters": 0.35,
+        "wallBandMeters": 0.25
+      },
       "entrances": [
         {
-          "id": "room-06-corridor-door",
-          "label": "Koridor kapısı",
           "pixel": {
             "x": 905,
             "y": 678
@@ -673,14 +704,16 @@
             "x": -1,
             "y": 0
           },
-          "connectsTo": "corridor-main"
+          "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
+          "id": "room-06-corridor-door",
+          "label": "Koridor kapısı"
         }
       ]
     },
     {
       "id": "room-07",
       "name": "Oda 7",
-      "kind": "room",
       "color": "#0891b2",
       "polygon": [
         {
@@ -734,10 +767,13 @@
           "y": 1.521053999999995
         }
       },
+      "kind": "room",
+      "inference": {
+        "sharedWallBandMeters": 0.35,
+        "wallBandMeters": 0.25
+      },
       "entrances": [
         {
-          "id": "room-07-corridor-door",
-          "label": "Koridor kapısı",
           "pixel": {
             "x": 390.25,
             "y": 678
@@ -751,7 +787,10 @@
             "x": -1,
             "y": 0
           },
-          "connectsTo": "corridor-main"
+          "connectsTo": "corridor-main",
+          "approachDepthMeters": 1,
+          "id": "room-07-corridor-door",
+          "label": "Koridor kapısı"
         }
       ]
     }
@@ -813,42 +852,42 @@
           "polygon": [
             {
               "pixel": {
-                "x": 53.69844861021332,
-                "y": 910
+                "x": -149.12,
+                "y": 810.2
               },
               "world": {
-                "x": 1.3507975999999813,
-                "y": -0.5615269999999994
+                "x": 0.733,
+                "y": -1.817
               }
             },
             {
               "pixel": {
-                "x": 215.30155138978668,
-                "y": 910
+                "x": 192.77,
+                "y": 884.24
               },
               "world": {
-                "x": 1.350797599999975,
-                "y": 0.4384730000000039
+                "x": 1.191,
+                "y": 0.299
               }
             },
             {
               "pixel": {
-                "x": 215.30155138978668,
-                "y": 1120
+                "x": 197.6,
+                "y": 1171.51
               },
               "world": {
-                "x": 2.6502775999999475,
-                "y": 0.4384730000000088
+                "x": 2.969,
+                "y": 0.329
               }
             },
             {
               "pixel": {
-                "x": 53.69844861021332,
-                "y": 1120
+                "x": -150.72,
+                "y": 1330.87
               },
               "world": {
-                "x": 2.6502775999999537,
-                "y": -0.5615269999999943
+                "x": 3.955,
+                "y": -1.826
               }
             }
           ]
@@ -862,42 +901,42 @@
           "polygon": [
             {
               "pixel": {
-                "x": 3624.6984486102133,
-                "y": 910
+                "x": 3667.7,
+                "y": 814.52
               },
               "world": {
-                "x": 1.3507975999998285,
-                "y": 21.53582100000007
+                "x": 0.76,
+                "y": 21.802
               }
             },
             {
               "pixel": {
-                "x": 3786.3015513897867,
-                "y": 910
+                "x": 3963.8,
+                "y": 725.58
               },
               "world": {
-                "x": 1.3507975999998214,
-                "y": 22.535821000000073
+                "x": 0.21,
+                "y": 23.634
               }
             },
             {
               "pixel": {
-                "x": 3786.3015513897867,
-                "y": 1120
+                "x": 3985.02,
+                "y": 1251.81
               },
               "world": {
-                "x": 2.650277599999794,
-                "y": 22.535821000000077
+                "x": 3.466,
+                "y": 23.765
               }
             },
             {
               "pixel": {
-                "x": 3624.6984486102133,
-                "y": 1120
+                "x": 3666.09,
+                "y": 1205.27
               },
               "world": {
-                "x": 2.650277599999801,
-                "y": 21.535821000000073
+                "x": 3.178,
+                "y": 21.792
               }
             }
           ]
