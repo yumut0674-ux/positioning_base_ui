@@ -1,7 +1,7 @@
 {
   "id": "necmettin-yogun-bakim",
   "image": {
-    "url": "/maps/necmettin-yogun-bakim/floor-plan.png",
+    "url": "/maps/necmettin-yogun-bakim/floor-plan-9b40600eb2b7.png",
     "width": 3840,
     "height": 2160
   },
@@ -22,7 +22,7 @@
     "invertYAxis": true,
     "rotationDegrees": 90
   },
-  "updatedAt": "2026-10-08T13:17:36.000Z",
+  "updatedAt": "2026-10-14T12:32:08.687Z",
   "status": "active",
   "liveTrackingEnabled": true
 }

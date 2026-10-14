@@ -120,7 +120,14 @@ test(`${mapId} loads in the room editor with its own image and calibration`, asy
   assert.ok(Math.abs(world.x - 10) < 1e-8);
   assert.ok(Math.abs(world.y - 5) < 1e-8);
   if (mapId === "necmettin-servis") assert.equal(config.regions.filter((region) => region.kind === "room").length, 18);
-  else assert.equal(config.regions.filter((region) => region.kind === "room").length, 7);
+  else {
+    assert.equal(config.regions.filter((region) => region.kind === "room").length, 8);
+    assert.equal(details.image.url, "/maps/necmettin-yogun-bakim/floor-plan-9b40600eb2b7.png");
+    const png = await readFile(path.join(process.cwd(), "public", details.image.url));
+    assert.equal(createHash("sha256").update(png).digest("hex"), "9b40600eb2b7a46175d26f797599309a1c8920f023622d78d92ac43e69515d67");
+    assert.equal(png.readUInt32BE(16), details.image.width);
+    assert.equal(png.readUInt32BE(20), details.image.height);
+  }
 });
 }
 
