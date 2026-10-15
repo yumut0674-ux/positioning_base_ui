@@ -4,6 +4,7 @@ import path from "node:path";
 import type { Content, TableCell, TDocumentDefinitions } from "pdfmake/interfaces";
 import type { RouteReportData } from "./routeReportService";
 import type { ReportRow } from "./routeReport";
+import { DEFAULT_SYSTEM_SETTINGS } from "../../features/settings/types/settings.types";
 
 const dateFormat = new Intl.DateTimeFormat("tr-TR", { timeZone: "Europe/Istanbul", day: "2-digit", month: "2-digit", year: "numeric" });
 const timeFormat = new Intl.DateTimeFormat("tr-TR", { timeZone: "Europe/Istanbul", hour: "2-digit", minute: "2-digit", hourCycle: "h23" });
@@ -33,7 +34,7 @@ function splitAtMidnight(row: ReportRow): ReportRow[] {
   return result;
 }
 
-export async function createRouteReportPdf(report: RouteReportData): Promise<Uint8Array> {
+export async function createRouteReportPdf(report: RouteReportData, minimumDurationMs = DEFAULT_SYSTEM_SETTINGS.reports.routeHistoryMinDurationMs): Promise<Uint8Array> {
   // pdfmake is CommonJS; let Node load it without Vite transforming fontkit's require calls.
   const nodeRequire = createRequire(path.join(process.cwd(), "package.json"));
   const PdfPrinter = nodeRequire("pdfmake") as typeof import("pdfmake");
@@ -54,12 +55,17 @@ export async function createRouteReportPdf(report: RouteReportData): Promise<Uin
   for (const tag of report.tags) {
     content.push({ text: tag.displayName === tag.tagCode ? tag.tagCode : `${tag.displayName} · ${tag.tagCode}`, style: "tagHeading", margin: [0, 10, 0, 7] });
     if (!tag.hasRecords) content.push({ text: report.room ? "Bu tag için seçilen odada hesaplanabilir kalış yok." : "Bu tag için seçilen aralıkta konum kaydı yok.", color: "#555555", margin: [0, 0, 0, 7] });
+    const rows = tag.rows.flatMap(splitAtMidnight).filter(row => Date.parse(row.to) - Date.parse(row.from) >= minimumDurationMs);
+    if (!rows.length) {
+      if (tag.hasRecords) content.push({ text: "Seçilen minimum süreyi karşılayan kayıt yok.", color: "#555555", margin: [0, 0, 0, 7] });
+      continue;
+    }
     const body: TableCell[][] = [["Tarih", "Giriş saati", "Çıkış saati", "Kat", "Oda", "Kalış süresi"].map(text => ({ text, bold: true, fillColor: "#E6E6E6", color: "#111111", margin: [3, 5, 3, 5] }))];
-    for (const row of tag.rows.flatMap(splitAtMidnight)) {
+    for (const row of rows) {
       const from = Date.parse(row.from), to = Date.parse(row.to);
       body.push([
         formatDate(row.from), formatTime(row.from), formatTime(row.to), row.floor, row.room,
-        row.gap || row.room === "—" || row.room === "Koridor" ? "—" : duration(from, to),
+        row.gap || row.room === "—" ? "—" : duration(from, to),
       ].map(text => ({ text, margin: [3, 4, 3, 4], color: row.gap ? "#555555" : "#111111" })));
     }
     content.push({ table: { headerRows: 1, widths: [77, 63, 63, 82, "*", 70], body, dontBreakRows: true },

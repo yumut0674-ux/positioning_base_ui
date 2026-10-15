@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { createRequire } from "node:module";
+import type { RouteReportData } from "../src/server/reports/routeReportService";
 import { buildTagReport, filterTagReportToRoom, type ReportDecision, type ReportRow } from "../src/server/reports/routeReport";
 import { createRouteReportPdf } from "../src/server/reports/routeReportPdf";
 import { loadRouteReport, RouteReportError, validateRouteReportRequest } from "../src/server/reports/routeReportService";
@@ -125,4 +127,39 @@ test("PDF is multipage with a repeated table header and Turkish text", async () 
   const pdf = await createRouteReportPdf({ from, to: rows.at(-1)!.to, generatedAt: to, tags: [{ tagCode: "TAG-001", displayName: "Örnek Tag", rows, hasRecords: true }] });
   assert.equal(Buffer.from(pdf.subarray(0, 5)).toString("ascii"), "%PDF-");
   assert.ok((Buffer.from(pdf).toString("latin1").match(/\/Type\s*\/Page\b/g) ?? []).length >= 2);
+});
+
+test("PDF shows corridor durations and applies the configurable minimum to every displayed row", async context => {
+  const PdfPrinter = createRequire(import.meta.url)("pdfmake") as typeof import("pdfmake");
+  const printer = context.mock.method(PdfPrinter.prototype, "createPdfKitDocument");
+  let cursor = Date.parse(from);
+  const rows = [
+    ["Kısa oda", 59_999], ["Tam dakika", 60_000], ["Koridor", 59_999], ["Koridor", 120_000],
+    ["Veri yok", 59_999], ["Veri yok", 120_000], ["—", 59_999], ["—", 120_000],
+  ].map(([room, milliseconds]): ReportRow => {
+    const start = cursor;
+    cursor += Number(milliseconds);
+    return { from: new Date(start).toISOString(), to: new Date(cursor).toISOString(), mapId: "Kat 1", roomId: null, floor: "Kat 1", room: String(room), gap: room === "Veri yok" };
+  });
+  const report: RouteReportData = { from, to, generatedAt: to, tags: [{ tagCode: "TAG-001", displayName: "Test", rows, hasRecords: true }] };
+  async function render(data: RouteReportData, minimum?: number) {
+    const pdf = await createRouteReportPdf(data, minimum);
+    assert.equal(Buffer.from(pdf.subarray(0, 5)).toString("ascii"), "%PDF-");
+    const definition = printer.mock.calls.at(-1)!.arguments[0];
+    const content = definition.content as { text?: string; table?: { body: { text: string }[][] } }[];
+    return { content, rows: content.flatMap(item => item.table?.body.slice(1).map(cells => cells.map(cell => cell.text)) ?? []) };
+  }
+
+  const standard = await render(report);
+  assert.deepEqual(standard.rows.map(cells => [cells[4], cells[5]]), [["Tam dakika", "1 dk"], ["Koridor", "2 dk"], ["Veri yok", "—"], ["—", "—"]]);
+  assert.deepEqual((await render(report, 120_000)).rows.map(cells => cells[4]), ["Koridor", "Veri yok", "—"]);
+  assert.equal((await render(report, 0)).rows.length, rows.length);
+  const empty = await render(report, 86_400_000);
+  assert.equal(empty.rows.length, 0);
+  assert.ok(empty.content.some(item => item.text === "Seçilen minimum süreyi karşılayan kayıt yok."));
+  assert.equal(report.tags[0].rows.length, 8);
+
+  const midnight = { ...rows[3], from: "2026-09-25T20:59:30Z", to: "2026-09-25T21:01:00Z" };
+  const split = await render({ ...report, tags: [{ ...report.tags[0], rows: [midnight] }] });
+  assert.deepEqual(split.rows.map(cells => [cells[0], cells[1], cells[2], cells[5]]), [["26.09.2026", "00:00", "00:01", "1 dk"]]);
 });

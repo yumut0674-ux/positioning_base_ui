@@ -4,7 +4,9 @@ import { FileSystemSettings, SystemSettingsStorageError, systemSettings } from "
 
 export function createSettingsHandlers(settings: FileSystemSettings = systemSettings, changed: () => Promise<void> = async () => {}) {
   const errorResponse = (error: unknown) => Response.json({ error: error instanceof ZodError
-    ? "Gizleme süresi 1 ile 86400 saniye arasında bir tam sayı olmalıdır."
+    ? error.issues.some(issue => issue.path[0] === "reports")
+      ? "Rapora dahil edilecek en kısa süre 0 ile 86400 saniye arasında bir tam sayı olmalıdır."
+      : "Gizleme süresi 1 ile 86400 saniye arasında bir tam sayı olmalıdır."
     : error instanceof Error ? error.message : "Ayar isteği başarısız." }, { status: error instanceof SystemSettingsStorageError ? 503 : 400 });
   return {
     async get(): Promise<Response> {

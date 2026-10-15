@@ -2,5 +2,8 @@
   "version": 1,
   "tracking": {
     "noDataHideAfterMs": 60000
+  },
+  "reports": {
+    "routeHistoryMinDurationMs": 60000
   }
 }

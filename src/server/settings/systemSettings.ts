@@ -47,4 +47,8 @@ export class FileSystemSettings {
 }
 
 type SettingsHost = NodeJS.Process & { __uwbSystemSettings?: FileSystemSettings };
-export const systemSettings = (process as SettingsHost).__uwbSystemSettings ??= new FileSystemSettings();
+const settingsHost = process as SettingsHost;
+// Hot reload must not retain methods that still use an older settings schema.
+export const systemSettings = settingsHost.__uwbSystemSettings = settingsHost.__uwbSystemSettings instanceof FileSystemSettings
+  ? settingsHost.__uwbSystemSettings
+  : new FileSystemSettings();

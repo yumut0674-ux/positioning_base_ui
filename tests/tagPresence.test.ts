@@ -6,6 +6,7 @@ import type { PositionMessage } from "../src/features/tracking/types/tracking.ty
 import type { LastObservedLocation } from "../src/features/tracking/types/tagPresence.types";
 import type { RegionsConfig } from "../src/features/regions/types/region.types";
 import { DEFAULT_REGIONS_CONFIG } from "../src/features/regions/config/defaultRegionsConfig";
+import { DEFAULT_SYSTEM_SETTINGS } from "../src/features/settings/types/settings.types";
 
 const epoch = Date.parse("2026-10-15T00:00:00Z");
 const location: LastObservedLocation = { mapId: "map-a", mapName: "1. Kat", floorLabel: "1. Kat", regionId: "A", regionName: "Oda 103", kind: "room" };
@@ -91,9 +92,9 @@ test("disabling the engine, losing a room, reconfiguring or moving floors remove
 
 test("changing the global timeout re-evaluates existing tags without restarting room inference", () => {
   const f = fixture(); f.observe(); f.advance(45_000);
-  f.service.setSettings({ version: 1, tracking: { noDataHideAfterMs: 30_000 } });
+  f.service.setSettings({ ...DEFAULT_SYSTEM_SETTINGS, tracking: { noDataHideAfterMs: 30_000 } });
   assert.equal(f.state().hiddenForNoData, true);
-  f.service.setSettings({ version: 1, tracking: { noDataHideAfterMs: 120_000 } });
+  f.service.setSettings({ ...DEFAULT_SYSTEM_SETTINGS, tracking: { noDataHideAfterMs: 120_000 } });
   assert.equal(f.state().hiddenForNoData, false);
 });
 

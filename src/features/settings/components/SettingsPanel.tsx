@@ -1,9 +1,9 @@
 "use client";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Check, Clock3, Info, Loader2, Radio, RotateCcw, Save, Settings2, ShieldCheck } from "lucide-react";
+import { Check, Clock3, FileText, Info, Loader2, Radio, RotateCcw, Save, Settings2, ShieldCheck } from "lucide-react";
 import { useState, type FormEvent } from "react";
-import { fetchSystemSettings, saveSystemSettings } from "../services/settingsApi";
+import { fetchSystemSettings, normalizeSystemSettingsResponse, saveSystemSettings } from "../services/settingsApi";
 import type { SystemSettings, SystemSettingsResponse } from "../types/settings.types";
 import styles from "./settings.module.css";
 
@@ -16,6 +16,7 @@ type SettingsEditorProps = {
 // New categories add an editor here and their own group in the settings schema.
 export const SETTINGS_CATEGORIES = [
   { id: "tracking", title: "Takip ve konum", description: "Tagların canlı haritadaki davranışı", icon: Radio, Editor: TrackingSettingsEditor },
+  { id: "reports", title: "Raporlar", description: "Rota geçmişi PDF raporları", icon: FileText, Editor: ReportSettingsEditor },
 ] as const;
 
 export function TrackingSettingsEditor({ settings, saving, onSave }: SettingsEditorProps) {
@@ -51,9 +52,40 @@ export function TrackingSettingsEditor({ settings, saving, onSave }: SettingsEdi
   </form>;
 }
 
+export function ReportSettingsEditor({ settings, saving, onSave }: SettingsEditorProps) {
+  const savedSeconds = settings.reports.routeHistoryMinDurationMs / 1_000;
+  const [seconds, setSeconds] = useState(String(savedSeconds));
+  const [error, setError] = useState("");
+  const value = Number(seconds);
+  const valid = seconds.trim() !== "" && Number.isInteger(value) && value >= 0 && value <= 86_400;
+  const dirty = value !== savedSeconds || !valid;
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!valid) { setError("0 ile 86400 arasında tam saniye girin."); return; }
+    setError("");
+    try { await onSave({ ...settings, reports: { ...settings.reports, routeHistoryMinDurationMs: value * 1_000 } }); }
+    catch (failure) { setError(failure instanceof Error ? failure.message : "Ayar kaydedilemedi."); }
+  }
+
+  return <form className={styles.card} onSubmit={submit} aria-labelledby="report-settings-title">
+    <div className={styles.cardHeading}><span className={styles.cardIcon}><FileText size={21} /></span><div><h3 id="report-settings-title">Rota geçmişi raporu</h3><p>PDF raporunda gösterilecek kayıtların en kısa süresini belirleyin.</p></div></div>
+    <div className={styles.editorGrid}>
+      <div className={styles.fieldGroup}>
+        <label className={styles.field} htmlFor="route-report-min-seconds"><span>Rapora dahil edilecek en kısa süre</span><div className={styles.numberField}><input id="route-report-min-seconds" type="number" inputMode="numeric" min="0" max="86400" step="1" value={seconds} disabled={saving} aria-describedby="route-report-min-help" onChange={event => { setSeconds(event.target.value); setError(""); }} /><span>saniye</span></div></label>
+        <p id="route-report-min-help" className={styles.help}>Bu süreden kısa oda, koridor, belirsiz konum ve veri yok satırları PDF raporuna eklenmez. Süreye eşit kayıtlar gösterilir. Tüm kayıtları göstermek için 0 girin.</p>
+        <div className={styles.presets} aria-label="Rapor süreleri">{[0, 30, 60, 120, 300].map(preset => <button key={preset} type="button" disabled={saving} aria-pressed={value === preset} onClick={() => { setSeconds(String(preset)); setError(""); }}>{preset === 0 ? "Tümü" : preset < 60 ? `${preset} sn` : `${preset / 60} dk`}</button>)}</div>
+      </div>
+      <aside className={styles.preview} aria-label="Rapor ayarının etkisi"><small>RAPORA DAHİL EDİLEN SÜRELER</small><p className={styles.help}>{!valid ? "Geçerli bir süre girin." : value === 0 ? "Tüm sürelerdeki kayıtlar gösterilir." : `${value % 60 === 0 ? `${value / 60} dakika` : `${value} saniye`} ve üzerindeki kayıtlar gösterilir.`}</p></aside>
+    </div>
+    {error && <p className={styles.error} role="alert">{error}</p>}
+    <footer className={styles.cardFooter}><span><Info size={15} />Yeni oluşturulan PDF raporları için geçerlidir.</span><div><button type="button" className={styles.secondary} disabled={!dirty || saving} onClick={() => { setSeconds(String(savedSeconds)); setError(""); }}><RotateCcw size={14} />Değişiklikleri geri al</button><button type="submit" className={styles.primary} disabled={!dirty || !valid || saving}>{saving ? <Loader2 size={15} className={styles.spin} /> : <Save size={15} />}{saving ? "Kaydediliyor…" : "Değişiklikleri kaydet"}</button></div></footer>
+  </form>;
+}
+
 export function SettingsPanel() {
   const client = useQueryClient();
-  const query = useQuery({ queryKey: ["system-settings"], queryFn: fetchSystemSettings, staleTime: 0 });
+  const query = useQuery({ queryKey: ["system-settings"], queryFn: fetchSystemSettings, staleTime: 0, select: normalizeSystemSettingsResponse });
   const [activeCategory, setActiveCategory] = useState<string>(SETTINGS_CATEGORIES[0].id);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -76,8 +108,8 @@ export function SettingsPanel() {
       <div className={styles.content}><div className={styles.sectionHeading}><h2>{category.title}</h2><p>{category.description}</p></div>
         {query.isPending && <div className={styles.loading} role="status"><Loader2 size={20} />Ayarlar yükleniyor…</div>}
         {query.isError && <div className={styles.error} role="alert"><p>{query.error.message}</p><button type="button" className={styles.secondary} onClick={() => { void query.refetch(); }}>Yeniden dene</button></div>}
-        {query.data && <Editor key={`${category.id}-${query.data.settings.tracking.noDataHideAfterMs}`} settings={query.data.settings} saving={saving} onSave={save} />}
-        {saved && <p className={styles.success} role="status"><Check size={16} />Ayar kaydedildi ve mevcut taglara uygulandı.</p>}
+        {query.data && <Editor key={`${category.id}-${category.id === "reports" ? query.data.settings.reports.routeHistoryMinDurationMs : query.data.settings.tracking.noDataHideAfterMs}`} settings={query.data.settings} saving={saving} onSave={save} />}
+        {saved && <p className={styles.success} role="status"><Check size={16} />{category.id === "reports" ? "Ayar kaydedildi. Yeni oluşturulan raporlarda kullanılacak." : "Ayar kaydedildi ve mevcut taglara uygulandı."}</p>}
       </div>
     </div>
   </section>;

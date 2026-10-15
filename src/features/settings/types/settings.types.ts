@@ -6,12 +6,16 @@ export const systemSettingsSchema = z.object({
   tracking: z.object({
     noDataHideAfterMs: z.number().int().min(1_000).max(86_400_000).multipleOf(1_000),
   }).strict(),
+  reports: z.object({
+    routeHistoryMinDurationMs: z.number().int().min(0).max(86_400_000).multipleOf(1_000),
+  }).strict().default({ routeHistoryMinDurationMs: 60_000 }),
 }).strict();
 
 export type SystemSettings = z.infer<typeof systemSettingsSchema>;
 export const DEFAULT_SYSTEM_SETTINGS: SystemSettings = {
   version: 1,
   tracking: { noDataHideAfterMs: 60_000 },
+  reports: { routeHistoryMinDurationMs: 60_000 },
 };
 
 export interface SystemSettingsResponse {
