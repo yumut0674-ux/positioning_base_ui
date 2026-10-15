@@ -10,7 +10,7 @@ import { mapTrackingFilterSettings, TrackingFilterConfigurationError } from "@/s
 export const runtime = "nodejs";
 
 const EXPECTED_FIELDS = ["type", "tag_id", "x", "y", "timestamp"] as const;
-const OPTIONAL_FIELDS = ["quality", "pdop", "zone_id", "zone_name"] as const;
+const OPTIONAL_FIELDS = ["quality", "pdop", "zone_id", "zone_name", "motion_label"] as const;
 const ISO_DATE_TIME = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|[+-]\d{2}:\d{2})$/;
 const encoder = new TextEncoder();
 
@@ -24,6 +24,7 @@ type IngestBody = {
   readonly pdop?: unknown;
   readonly zone_id?: unknown;
   readonly zone_name?: unknown;
+  readonly motion_label?: unknown;
 };
 
 function isIsoDateTime(value: string): boolean {
@@ -86,6 +87,7 @@ export function parsePositionPayload(value: unknown): TrackingPosition {
     timestamp: input.timestamp,
     sourceZoneId,
     sourceZoneName,
+    motionLabel: validateMotionLabel(input.motion_label),
     mapId: null,
   };
 }
@@ -120,6 +122,14 @@ function normalizeNullableString(value: unknown, field: string, maxLength: numbe
 
 function validateQuality(value: unknown): number {
   if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > 1) throw new Error("quality 0-1 aralığında olmalıdır");
+  return value;
+}
+
+function validateMotionLabel(value: unknown): NonNullable<TrackingPosition["motionLabel"]> {
+  if (value === undefined) return "unknown";
+  if (value !== "moving" && value !== "stationary" && value !== "unknown") {
+    throw new Error('motion_label "moving", "stationary" veya "unknown" olmalıdır');
+  }
   return value;
 }
 

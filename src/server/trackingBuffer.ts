@@ -16,6 +16,8 @@ export type TrackingPosition = {
   /** Optional only for internal rollout compatibility; ingest always supplies an explicit value. */
   readonly sourceZoneId?: string | null;
   readonly sourceZoneName?: string | null;
+  /** Source metadata only; never evidence for motion, quality, health or region decisions. */
+  readonly motionLabel?: "moving" | "stationary" | "unknown";
   readonly mapId?: string | null;
 };
 
