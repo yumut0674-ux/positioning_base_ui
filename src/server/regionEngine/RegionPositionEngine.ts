@@ -4,7 +4,7 @@ import { crossesDoor, pointInPolygon, wallDistance, type DoorCrossingResult } fr
 import { StepDistanceFilter, type StepDistanceTrace } from "./StepDistanceFilter";
 import type { CompiledDoor, CompiledRegion, CompiledRegionsConfig, DecisionEventType, DecisionSeverity, DecisionTrace, EvidenceScoreComponents, ProcessedPosition, RegionEngineStatus, RoomSwitchCandidate, RoomTransitionTrace, SilentDoorProximityCandidate, VehicleRegionState, VehicleRegionStatus } from "./types";
 
-export const ROOM_ENGINE_VERSION = "room-evidence-10";
+export const ROOM_ENGINE_VERSION = "room-evidence-11";
 interface Evidence { at: number; raw: TrackingPosition; room: string | null; weight: number }
 type ReliableLocation = { kind: "room"; regionId: string } | { kind: "corridor" } | null;
 interface State extends VehicleRegionStatus {
@@ -179,6 +179,8 @@ export class RegionPositionEngine {
   }
   public ingest(raw: TrackingPosition): ProcessedPosition | undefined {
     if (!this.enabled || !this.config) return;
+    // Stationary coordinates must not create state, refresh evidence or move filter references.
+    if (raw.motionLabel === "stationary") return;
     let v = this.vehicles.get(raw.tagCode);
     const at = Date.parse(raw.timestamp), now = this.now();
     if (!Number.isFinite(at) || !Number.isFinite(raw.x) || !Number.isFinite(raw.y) || at > now + 2000) { v?.distanceFilter.clearCandidate(); return; }

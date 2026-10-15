@@ -105,6 +105,7 @@ export function MapViewport({ map, tags, liveTrackingVisible, positionAnimation 
     if (size.width <= 0 || size.height <= 0) return;
     handledFocusRequestRef.current = mapFocusRequest;
     const selectedTag = selectedTagId ? tagsById[selectedTagId] : undefined;
+    if (selectedTagId && useIpsStore.getState().tagPresenceById[selectedTagId]?.hiddenForNoData) return;
     if (!selectedTag) {
       fitToScreen();
       return;

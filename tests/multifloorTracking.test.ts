@@ -10,7 +10,8 @@ import { DEFAULT_REGIONS_CONFIG } from "../src/features/regions/config/defaultRe
 import type { RegionsConfig } from "../src/features/regions/types/region.types";
 import { compileRegionsConfig, regionsConfigPathForMap } from "../src/server/regionEngine/configLoader";
 import { RegionPositionEngine, ROOM_ENGINE_VERSION } from "../src/server/regionEngine/RegionPositionEngine";
-import { trackingBuffer } from "../src/server/trackingBuffer";
+import { TrackingBuffer, trackingBuffer } from "../src/server/trackingBuffer";
+import { tagPresenceRuntime } from "../src/server/tracking/tagPresenceRuntime";
 import { SseTrackingGateway } from "../src/features/tracking/services/TrackingGateway";
 import type { MapRepository } from "../src/server/maps/mapRepository";
 import type { MapCatalog, MapDetails } from "../src/server/maps/map.types";
@@ -96,6 +97,55 @@ test("region engine manager isolates maps, clears the old map and rejects a dela
   assert.deepEqual(ingestedA.map((item) => item.tagCode), ["TAG-1"]);
   assert.deepEqual(ingestedB.map((item) => item.tagCode), ["TAG-2", "TAG-1"]);
   assert.deepEqual(removedA, ["TAG-1"]);
+});
+
+test("stationary raw data updates presence, history and areas without reaching rooms or clearing their map", async () => {
+  const controller = new RegionEngineController();
+  const roomsA: TrackingPosition[] = [], roomsB: TrackingPosition[] = [], areas: TrackingPosition[] = [], raw: TrackingPosition[] = [];
+  const removedA: string[] = [], removedB: string[] = [], queries: string[] = [];
+  const fakeEngine = (ingested: TrackingPosition[], removed: string[]) => ({
+    ingest: (position: TrackingPosition) => { ingested.push(position); },
+    removeVehicle: (tagCode: string) => { removed.push(tagCode); },
+  });
+  const internal = controller as unknown as {
+    enabled: boolean;
+    engines: Map<string, { engine: ReturnType<typeof fakeEngine>; warnings: readonly string[] }>;
+    areaEngine: { ingest: (position: TrackingPosition) => void };
+  };
+  internal.enabled = true;
+  internal.engines.set("map-a", { engine: fakeEngine(roomsA, removedA), warnings: [] });
+  internal.engines.set("map-b", { engine: fakeEngine(roomsB, removedB), warnings: [] });
+  internal.areaEngine = { ingest: position => { areas.push(position); } };
+  const tagCode = "STATIONARY-ROOM-GATE", firstAt = Date.now() - 10_000;
+  let now = firstAt;
+  const buffer = new TrackingBuffer(async sql => {
+    queries.push(sql);
+    return sql.startsWith("SELECT") ? [{ tag_code: tagCode }] : [];
+  }, () => now, false);
+  buffer.on("position", position => { raw.push(position); controller.ingest(position); });
+  const send = async (offset: number, mapId: string, motionLabel?: TrackingPosition["motionLabel"]) => {
+    now = firstAt + offset;
+    return buffer.ingest({ tagCode, mapId, motionLabel, x: offset, y: 5, timestamp: new Date(now).toISOString() });
+  };
+  try {
+    assert.equal(await send(0, "map-a", "moving"), true);
+    assert.equal(await send(1000, "map-b", "stationary"), true);
+    assert.deepEqual(removedA, []);
+    assert.equal(roomsA.length, 1); assert.equal(roomsB.length, 0);
+    assert.equal(tagPresenceRuntime.service.get(tagCode)!.lastRawMeasuredAt, now);
+    assert.equal(tagPresenceRuntime.service.get(tagCode)!.raw.motionLabel, "stationary");
+    assert.equal(await send(2000, "map-a", "unknown"), true);
+    assert.equal(await send(3000, "map-a"), true);
+    assert.equal(await send(4000, "map-b", "moving"), true);
+    assert.deepEqual(roomsA.map(position => position.motionLabel), ["moving", "unknown", undefined]);
+    assert.deepEqual(roomsB.map(position => position.motionLabel), ["moving"]);
+    assert.deepEqual(removedA, [tagCode]); assert.deepEqual(removedB, []);
+    assert.equal(raw.length, 5); assert.deepEqual(areas, raw);
+    assert.equal(buffer.status().queueSize, 5);
+    await buffer.flush();
+    assert.match(queries.at(-1)!, /1000, 5/);
+    assert.equal(buffer.status().queueSize, 0);
+  } finally { buffer.stop(); }
 });
 
 test("runtime controller installs only RegionPositionEngine and exposes the active engine version", () => {

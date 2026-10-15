@@ -14,6 +14,49 @@ export function decisionZone(p: ProcessedPosition): string {
   if (d.regionId) return `${d.regionName ?? d.regionId}${d.measurementKind === "estimated" ? " (tahmin)" : ""}`;
   return "Koridor";
 }
+
+/** Keep visit endpoints and extend freshness through uninterrupted measurements. */
+export function compactDecisionHistory(decisions: readonly ProcessedPosition[]): ProcessedPosition[] {
+  const byTag = new Map<string, ProcessedPosition[]>();
+  for (const decision of decisions) {
+    const list = byTag.get(decision.tagCode) ?? [];
+    list.push(decision);
+    byTag.set(decision.tagCode, list);
+  }
+  const result: ProcessedPosition[] = [];
+  const withoutTrace = (p: ProcessedPosition): ProcessedPosition => {
+    const point = { ...p };
+    delete point.decisionTrace;
+    delete point.rawPosition;
+    return point;
+  };
+  const key = (p: ProcessedPosition) => JSON.stringify([p.mapId, p.sourceZoneId, p.sourceZoneName,
+    p.regionInference.state, p.regionInference.regionId, p.regionInference.regionName, p.regionInference.measurementKind]);
+  for (const list of byTag.values()) {
+    list.sort((a, b) => Date.parse(a.publishedAt!) - Date.parse(b.publishedAt!));
+    let first = list[0], last = first;
+    const close = () => {
+      const point = withoutTrace(first);
+      result.push({ ...point, regionInference: { ...first.regionInference,
+        validUntil: last.regionInference.validUntil, uncertainAfter: last.regionInference.uncertainAfter } });
+      if (last !== first) {
+        result.push(withoutTrace(last));
+      }
+    };
+    for (const current of list.slice(1)) {
+      const at = Date.parse(current.publishedAt!);
+      if (key(current) !== key(last)
+        || (last.regionInference.validUntil && at >= Date.parse(last.regionInference.validUntil))
+        || (last.regionInference.uncertainAfter && at >= Date.parse(last.regionInference.uncertainAfter))) {
+        close();
+        first = current;
+      }
+      last = current;
+    }
+    close();
+  }
+  return result.sort((a, b) => Date.parse(a.publishedAt!) - Date.parse(b.publishedAt!));
+}
 export function projectHistory(raw: readonly PositionRecord[], decisions: readonly ProcessedPosition[], includeEvents: boolean): PositionRecord[] {
   const byTag = new Map<string, ProcessedPosition[]>();
   const exact = new Map<string, ProcessedPosition>();

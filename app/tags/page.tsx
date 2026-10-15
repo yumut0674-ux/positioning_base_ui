@@ -14,14 +14,17 @@ import {
   TAG_TRAIL_MIN_DURATION_MS,
 } from "@/src/features/tracking/services/tagTrailSettings";
 import styles from "../anchors/anchors.module.css";
+import { TagLastSeen } from "@/src/features/tracking/components/TagLastSeen";
+import { useTagPresenceClock } from "@/src/features/tracking/hooks/useTagPresenceClock";
+import { TAG_ACTIVITY_LABELS, tagActivityPresentation, type TagActivity } from "@/src/features/tracking/services/tagActivityPresentation";
+import { buildTagQuickList } from "@/src/features/tracking/services/tagQuickList";
 
 const EMPTY_TAG: TagDefinition = { id: "", displayName: "", status: "active" };
 const REGISTRATION_STATUS_OPTIONS = ["active", "inactive"];
-const LIVE_STATUS_OPTIONS = ["active", "offline"];
+const LIVE_STATUS_OPTIONS: TagActivity[] = ["moving", "stationary", "offline"];
 
 function statusLabel(status: string) { return status === "active" ? "Aktif" : "Pasif"; }
-function statusClass(status: string) { return status === "active" ? "good" : "offline"; }
-function Status({ status }: { readonly status: string }) { return <span className={`${styles.status} ${styles[statusClass(status)]}`}><i />{statusLabel(status)}</span>; }
+function Status({ presentation }: { readonly presentation: ReturnType<typeof tagActivityPresentation> }) { return <span className={`${styles.status} ${styles[presentation.isLiveColor ? "good" : "offline"]}`}><i />{presentation.label}</span>; }
 
 function TagTrailSettingsCard() {
   const titleId = useId();
@@ -60,6 +63,8 @@ function TagTrailSettingsCard() {
 }
 
 export function TagManagementPanel({ embedded = false }: { readonly embedded?: boolean }) {
+  const presenceById = useIpsStore(state => state.tagPresenceById);
+  const now = useTagPresenceClock();
   const tagDefinitions = useIpsStore((state) => state.tagDefinitions);
   const trackedTags = useIpsStore((state) => state.tags);
   const observedTags = useIpsStore((state) => state.observedTags);
@@ -75,16 +80,18 @@ export function TagManagementPanel({ embedded = false }: { readonly embedded?: b
   const [deleting, setDeleting] = useState(false);
 
   const registeredTags = useMemo(() => Object.values(tagDefinitions), [tagDefinitions]);
-  const liveStatus = (tagId: string) => observedTags[tagId]?.status === "active" || trackedTags[tagId]?.status === "active" ? "active" : "offline";
+  const allTags = useMemo(() => buildTagQuickList(tagDefinitions, trackedTags, observedTags), [tagDefinitions, trackedTags, observedTags]);
+  const presentations = useMemo(() => Object.fromEntries(allTags.map(tag => [tag.id, tagActivityPresentation(tag, presenceById[tag.id], now)])), [allTags, presenceById, now]);
+  const presentationForTag = (tagId: string) => presentations[tagId] ?? tagActivityPresentation(undefined);
   const visibleTags = registeredTags.filter((tag) => {
     const matchesSearch = `${tag.id} ${tag.displayName}`.toLowerCase().includes(search.toLowerCase());
-    return matchesSearch && (filter === "all" || liveStatus(tag.id) === filter);
+    return matchesSearch && (filter === "all" || presentationForTag(tag.id).activity === filter);
   });
-  const unknownTags = useMemo(() => Object.values(observedTags).filter((tag) => {
+  const unknownTags = allTags.filter((tag) => {
     const matchesSearch = `${tag.id} ${tag.name}`.toLowerCase().includes(search.toLowerCase());
-    return !tagDefinitions[tag.id] && matchesSearch && (filter === "all" || tag.status === filter);
-  }), [filter, observedTags, search, tagDefinitions]);
-  const activeCount = registeredTags.filter((tag) => liveStatus(tag.id) === "active").length;
+    return !tagDefinitions[tag.id] && matchesSearch && (filter === "all" || presentationForTag(tag.id).activity === filter);
+  });
+  const activeCount = registeredTags.filter((tag) => presentationForTag(tag.id).activity !== "offline").length;
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -118,22 +125,22 @@ export function TagManagementPanel({ embedded = false }: { readonly embedded?: b
 
       <section className={styles.metrics} aria-label="Takip etiketi özeti">
         <div className={styles.metric}><span className={styles.metricIcon}><Boxes size={19} /></span><div><small>KAYITLI ETİKET</small><strong>{registeredTags.length}</strong><em>Veritabanı tanımı bulunan</em></div></div>
-        <div className={styles.metric}><span className={`${styles.metricIcon} ${styles.goodIcon}`}><CheckCircle2 size={19} /></span><div><small>AKTİF</small><strong>{activeCount}</strong><em>Son 10 sn veri aldı</em></div></div>
+        <div className={styles.metric}><span className={`${styles.metricIcon} ${styles.goodIcon}`}><CheckCircle2 size={19} /></span><div><small>VERİ ALINAN</small><strong>{activeCount}</strong><em>Son 10 sn veri aldı</em></div></div>
         <div className={styles.metric}><span className={`${styles.metricIcon} ${styles.offlineIcon}`}><TriangleAlert size={19} /></span><div><small>PASİF</small><strong>{registeredTags.length - activeCount}</strong><em>Canlı veri bekleniyor</em></div></div>
-        <div className={styles.metric}><span className={styles.metricIcon}><ShieldCheck size={19} /></span><div><small>KAYITSIZ</small><strong>{unknownTags.length}</strong><em>Yalnızca canlı akışta</em></div></div>
+        <div className={styles.metric}><span className={styles.metricIcon}><ShieldCheck size={19} /></span><div><small>KAYITSIZ</small><strong>{unknownTags.length}</strong><em>Akışta keşfedilen</em></div></div>
       </section>
 
       <TagTrailSettingsCard />
 
       <section className={styles.tableCard}>
-        <div className={styles.toolbar}><div className={styles.search}><Search size={17} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Takip etiketi kodu veya görünen isim ara…" aria-label="Takip etiketi ara" /></div><label className={styles.filter}><span>Canlı durum</span><select value={filter} onChange={(event) => setFilter(event.target.value)}><option value="all">Tümü</option>{LIVE_STATUS_OPTIONS.map((status) => <option key={status} value={status}>{statusLabel(status)}</option>)}</select></label></div>
+        <div className={styles.toolbar}><div className={styles.search}><Search size={17} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Takip etiketi kodu veya görünen isim ara…" aria-label="Takip etiketi ara" /></div><label className={styles.filter}><span>Hareket durumu</span><select value={filter} onChange={(event) => setFilter(event.target.value)}><option value="all">Tümü</option>{LIVE_STATUS_OPTIONS.map((status) => <option key={status} value={status}>{TAG_ACTIVITY_LABELS[status]}</option>)}</select></label></div>
         {error && <div className={styles.error}><TriangleAlert size={16} /> {error}</div>}
-        <div className={styles.tableWrap}><table><thead><tr><th>Takip Etiketi</th><th>Görünen İsim</th><th>Canlı Durum</th><th aria-label="İşlemler" /></tr></thead><tbody>
-          {visibleTags.map((tag, index) => <motion.tr key={tag.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(index * .035, .2) }}><td><div className={styles.anchorIdentity}><span><Boxes size={16} /></span><div><code>{tag.id}</code><strong>Donanım kimliği</strong></div></div></td><td><strong>{tag.displayName || "İsimsiz takip etiketi"}</strong></td><td><Status status={liveStatus(tag.id)} /></td><td><div className={styles.rowActions}><button type="button" title="Düzenle" onClick={() => { setForm({ ...tag }); setIsNew(false); setFormOpen(true); }}><Pencil size={16} /></button><button type="button" className={styles.deleteButton} title="Sil" onClick={() => setDeleteTarget(tag)}><Trash2 size={16} /></button></div></td></motion.tr>)}
-          {unknownTags.map((tag) => <motion.tr className={styles.unregisteredRow} key={tag.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}><td><div className={styles.anchorIdentity}><span><Boxes size={16} /></span><div><code>{tag.id}</code><strong>Donanım kimliği</strong></div></div></td><td><strong className={styles.unregisteredName}>Kayıtlı değil</strong></td><td><Status status={tag.status} /></td><td><div className={styles.rowActions}><button type="button" className={styles.registerButton} onClick={() => { setForm({ id: tag.id, displayName: "", status: "active" }); setIsNew(true); setFormOpen(true); }}>Kaydet</button></div></td></motion.tr>)}
-          {visibleTags.length + unknownTags.length === 0 && <tr><td colSpan={4}><div className={styles.empty}><Search size={22} /> Eşleşen takip etiketi bulunamadı.</div></td></tr>}
+        <div className={styles.tableWrap}><table><thead><tr><th>Takip Etiketi</th><th>Görünen İsim</th><th>Hareket Durumu</th><th>Son görüldüğü yer</th><th aria-label="İşlemler" /></tr></thead><tbody>
+          {visibleTags.map((tag, index) => <motion.tr key={tag.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(index * .035, .2) }}><td><div className={styles.anchorIdentity}><span><Boxes size={16} /></span><div><code>{tag.id}</code><strong>Donanım kimliği</strong></div></div></td><td><strong>{tag.displayName || "İsimsiz takip etiketi"}</strong></td><td><Status presentation={presentationForTag(tag.id)} /></td><td><TagLastSeen presence={presenceById[tag.id]} now={now} /></td><td><div className={styles.rowActions}><button type="button" title="Düzenle" onClick={() => { setForm({ ...tag }); setIsNew(false); setFormOpen(true); }}><Pencil size={16} /></button><button type="button" className={styles.deleteButton} title="Sil" onClick={() => setDeleteTarget(tag)}><Trash2 size={16} /></button></div></td></motion.tr>)}
+          {unknownTags.map((tag) => <motion.tr className={styles.unregisteredRow} key={tag.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}><td><div className={styles.anchorIdentity}><span><Boxes size={16} /></span><div><code>{tag.id}</code><strong>Donanım kimliği</strong></div></div></td><td><strong className={styles.unregisteredName}>Kayıtlı değil</strong></td><td><Status presentation={presentationForTag(tag.id)} /></td><td><TagLastSeen presence={presenceById[tag.id]} now={now} /></td><td><div className={styles.rowActions}><button type="button" className={styles.registerButton} onClick={() => { setForm({ id: tag.id, displayName: "", status: "active" }); setIsNew(true); setFormOpen(true); }}>Kaydet</button></div></td></motion.tr>)}
+          {visibleTags.length + unknownTags.length === 0 && <tr><td colSpan={5}><div className={styles.empty}><Search size={22} /> Eşleşen takip etiketi bulunamadı.</div></td></tr>}
         </tbody></table></div>
-        <footer className={styles.tableFooter}><span><Boxes size={14} /> {visibleTags.length} kayıtlı, {unknownTags.length} kayıt dışı takip etiketi gösteriliyor</span><span>Canlı durumlar canlı konum akışından alınır</span></footer>
+        <footer className={styles.tableFooter}><span><Boxes size={14} /> {visibleTags.length} kayıtlı, {unknownTags.length} kayıt dışı takip etiketi gösteriliyor</span><span>Hareket durumu konum akışından alınır</span></footer>
       </section>
     </section>
 

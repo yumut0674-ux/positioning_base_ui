@@ -10,7 +10,8 @@ export function bindMapDisplayTracking(filter: MapDisplayFilter, engineEnabled: 
     previous = state; // publish() writes presentation state synchronously.
     const reconfigure = !old || old.regionsConfig !== state.regionsConfig || old.activeMapId !== state.activeMapId;
     const source = engineEnabled ? state.tags : state.observedTags;
-    if (!reconfigure && source === (engineEnabled ? old?.tags : old?.observedTags)) return;
+    if (!reconfigure && source === (engineEnabled ? old?.tags : old?.observedTags) && state.tagPresenceById === old?.tagPresenceById) return;
+    filter.setHiddenTagIds(new Set(Object.values(state.tagPresenceById).filter(tag => tag.hiddenForNoData).map(tag => tag.tagCode)));
     if (reconfigure) {
       const config = state.regionsConfig && (!state.activeMapId || state.regionsConfig.map.mapId === state.activeMapId)
         ? state.regionsConfig : null;

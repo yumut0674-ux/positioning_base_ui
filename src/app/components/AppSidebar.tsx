@@ -6,7 +6,7 @@ import type { UiMode } from "../uiMode";
 
 const SIDEBAR_COLLAPSED_STORAGE_KEY = "ips-sidebar-collapsed";
 
-export type WorkspaceView = "map" | "tags" | "anchors" | "regions" | "history" | "support" | "analyses" | "room-tests" | "gekon-ai";
+export type WorkspaceView = "map" | "tags" | "anchors" | "regions" | "history" | "support" | "analyses" | "room-tests" | "gekon-ai" | "settings";
 
 type NavigationItem = { readonly label: string; readonly view: WorkspaceView; readonly icon: typeof Map };
 
@@ -72,7 +72,7 @@ export function AppSidebar({ mode, activeView, collapsed, mobileOpen, onMobileCl
         {item(SUPPORT_NAVIGATION)}
       </nav>
       <div className="sidebar-footer">
-        {mode === "admin" && <><button><Building2 size={17} /><span>Saha ayarları</span></button><button><Settings size={17} /><span>Sistem</span></button></>}
+        {mode === "admin" && <><button><Building2 size={17} /><span>Saha ayarları</span></button>{item({ label: "Ayarlar", view: "settings", icon: Settings })}</>}
         <div className="sidebar-system"><Crosshair size={15} /><div><strong>UWB MOTORU</strong><span><i /> ÇALIŞIYOR</span></div></div>
       </div>
     </aside>

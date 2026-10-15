@@ -55,7 +55,7 @@ function requiredDoorConfig(base: RegionsConfig, coverage: "silent" | "regular" 
     inference: { ...region.inference, coverage, silentEntryMaxDistanceMeters: coverage === "silent" ? distance : undefined,
       doorDefaults: { ...region.inference?.doorDefaults, evidenceMode: "required" as const } } })) };
 }
-test("source motion labels never change room decisions, filters or signal-loss inference", () => {
+test("moving, unknown and absent motion labels preserve room decisions, filters and signal-loss inference", () => {
   const run = (motionLabel: TrackingPosition["motionLabel"]) => {
     let now = epoch;
     const published: ProcessedPosition[] = [];
@@ -81,7 +81,58 @@ test("source motion labels never change room decisions, filters or signal-loss i
   assert.ok(baseline.some(p => p.regionInference.state === "IN_REGION"));
   assert.ok(baseline.some(p => p.decisionTrace?.eventType === "MEASUREMENT_REJECTED"));
   assert.ok(baseline.some(p => p.regionInference.state === "INFERRED_IN_REGION"));
-  for (const label of ["moving", "stationary", "unknown"] as const) assert.deepEqual(run(label), baseline);
+  for (const label of ["moving", "unknown"] as const) assert.deepEqual(run(label), baseline);
+});
+
+test("stationary measurements cannot initialize room state; moving resumes normal inference", () => {
+  let now = epoch;
+  const published: ProcessedPosition[] = [];
+  const engine = new RegionPositionEngine(p => published.push(p), 250, () => now, false);
+  engine.enable(compileRegionsConfig(scenarioConfig() as RegionsConfig));
+  try {
+    for (const t of [0, 1000, 2000]) {
+      now = epoch + t;
+      assert.equal(engine.ingest({ tagCode: "T", x: 3, y: 3, timestamp: new Date(now).toISOString(), motionLabel: "stationary" }), undefined);
+    }
+    now += 10_000; engine.tick();
+    assert.equal(engine.getVehicleState("T"), undefined);
+    assert.equal(published.length, 0);
+    const resumed = engine.ingest({ tagCode: "T", x: 3, y: 3, timestamp: new Date(now).toISOString(), motionLabel: "moving" });
+    assert.ok(resumed);
+    assert.equal(engine.getVehicleState("T")!.history.length, 1);
+  } finally { engine.disable(); }
+});
+
+test("stationary coordinates cannot alter room evidence or distance references, including timer inference", () => {
+  const run = (includeStationary: boolean) => {
+    let now = epoch;
+    const published: ProcessedPosition[] = [];
+    const engine = new RegionPositionEngine(p => published.push(p), 250, () => now, false);
+    const base = scenarioConfig() as RegionsConfig;
+    engine.enable(compileRegionsConfig(silentProximityConfig({ ...base, engine: { ...base.engine, maximumStepDistanceMeters: 10 } })));
+    try {
+      for (const t of [0, 1000, 2000]) {
+        now = epoch + t;
+        engine.ingest({ tagCode: "T", x: 3, y: 3, timestamp: new Date(now).toISOString(), motionLabel: "moving" });
+      }
+      assert.equal(engine.getVehicleState("T")!.activeRegionId, "A");
+      const before = JSON.stringify(engine.getVehicleState("T"));
+      const publicationCount = published.length;
+      for (const [t, x, y] of [[3000, 9, 3], [4000, 100, 100], [5000, 100, 100], [6000, 3, -1], [7000, 3, 3]]) {
+        now = epoch + t;
+        if (includeStationary) assert.equal(engine.ingest({ tagCode: "T", x, y, timestamp: new Date(now).toISOString(), motionLabel: "stationary" }), undefined);
+      }
+      assert.equal(JSON.stringify(engine.getVehicleState("T")), before);
+      assert.equal(published.length, publicationCount);
+      for (const t of [9000, 70000]) { now = epoch + t; engine.tick(); }
+      assert.equal(published.at(-1)!.regionInference.state, "LOCATION_LOST");
+      now = epoch + 71000;
+      assert.ok(engine.ingest({ tagCode: "T", x: 3, y: 3, timestamp: new Date(now).toISOString(), motionLabel: "unknown" }));
+      assert.equal(engine.getVehicleState("T")!.lastRawDataTimestamp, now);
+      return published;
+    } finally { engine.disable(); }
+  };
+  assert.deepEqual(run(true), run(false));
 });
 
 test("disabled engine does not mutate input",()=>{const s=setup();s.engine.disable();assert.equal(s.point(0,1,1),undefined);});

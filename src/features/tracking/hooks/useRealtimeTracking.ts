@@ -17,15 +17,11 @@ import { TAG_LIVE_TIMEOUT_MS } from "../types/tracking.types";
 import type { RegionsConfig } from "@/src/features/regions/types/region.types";
 import { REGIONS_CONFIG_UPDATED_EVENT } from "@/src/features/regions/services/regionsConfig";
 import { useMapDisplayTracking } from "./useMapDisplayTracking";
-
-const TAG_COLORS = ["#5de4c7", "#f6c760", "#7aa2f7", "#dc7b8b", "#b892ff"];
-
-function colorForTag(tagId: string): string {
-  const sum = [...tagId].reduce((total, character) => total + character.charCodeAt(0), 0);
-  return TAG_COLORS[sum % TAG_COLORS.length];
-}
+import { useTagPresenceTracking } from "./useTagPresenceTracking";
+import { colorForTag } from "../services/tagColor";
 
 export function useRealtimeTracking(): PositionAnimationController {
+  useTagPresenceTracking();
   const upsertTag = useIpsStore((state) => state.upsertTag);
   const observeTag = useIpsStore((state) => state.observeTag);
   const refreshTagActivity = useIpsStore((state) => state.refreshTagActivity);
@@ -156,6 +152,8 @@ export function useRealtimeTracking(): PositionAnimationController {
     const currentObserved = useIpsStore.getState().observedTags[tagId];
     if (currentObserved && incoming.timestamp <= currentObserved.timestamp) return;
     const observed = {
+      motionLabel: incoming.motionLabel,
+      receivedAt: incoming.receivedAt,
       mapId: incoming.mapId,
       sourceZoneId: incoming.sourceZoneId,
       sourceZoneName: incoming.sourceZoneName,
@@ -189,6 +187,8 @@ export function useRealtimeTracking(): PositionAnimationController {
       const current = useIpsStore.getState().tags[tagId];
       const measuredAt = incoming.lastRawDataTimestamp ? Date.parse(incoming.lastRawDataTimestamp) : incoming.timestamp;
       const next = {
+        motionLabel: incoming.motionLabel,
+        receivedAt: incoming.receivedAt,
         mapId: incoming.mapId,
         sourceZoneId: incoming.sourceZoneId,
         sourceZoneName: incoming.sourceZoneName,

@@ -8,6 +8,9 @@ import { htmlTagViewportTransform } from "../services/htmlTagOverlay";
 import { HtmlTagNode } from "./HtmlTagNode";
 import { TagTrailLayer } from "./TagTrailLayer";
 import styles from "./htmlTagOverlay.module.css";
+import { tagActivityPresentation } from "@/src/features/tracking/services/tagActivityPresentation";
+import { useTagPresenceClock } from "@/src/features/tracking/hooks/useTagPresenceClock";
+import { withLatestTagObservation } from "@/src/features/tracking/services/tagQuickList";
 
 interface TagOverlayProps {
   readonly width: number;
@@ -33,6 +36,9 @@ function TagOverlayComponent({
   onSelect,
 }: TagOverlayProps) {
   const displays = useIpsStore((state) => state.mapTagDisplays);
+  const presenceById = useIpsStore((state) => state.tagPresenceById);
+  const observedTags = useIpsStore((state) => state.observedTags);
+  const now = useTagPresenceClock();
   const config = useIpsStore((state) => state.regionsConfig);
   const activeMapId = useIpsStore((state) => state.activeMapId);
   const trailSettings = useIpsStore((state) => state.tagTrailSettings);
@@ -61,6 +67,7 @@ function TagOverlayComponent({
           <HtmlTagNode
             key={tag.id}
             tag={tag}
+            liveColor={tagActivityPresentation(withLatestTagObservation(tag, observedTags[tag.id]), presenceById[tag.id], now).isLiveColor}
             transform={transform}
             positionAnimation={positionAnimation}
             selected={tag.id === selectedTagId}

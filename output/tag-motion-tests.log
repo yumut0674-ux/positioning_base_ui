@@ -1,0 +1,929 @@
+TAP version 13
+# Subtest: live-map tag label uses the display name instead of the hardware id
+ok 1 - live-map tag label uses the display name instead of the hardware id
+  ---
+  duration_ms: 1.281
+  type: 'test'
+  ...
+# Subtest: HTML tag overlay uses the same translation and scale as the Konva viewport
+ok 2 - HTML tag overlay uses the same translation and scale as the Konva viewport
+  ---
+  duration_ms: 0.1858
+  type: 'test'
+  ...
+# Subtest: world coordinates are written as a compositor-friendly tag transform
+ok 3 - world coordinates are written as a compositor-friendly tag transform
+  ---
+  duration_ms: 0.2411
+  type: 'test'
+  ...
+# Subtest: detached HTML renderers are not updated by later positions
+ok 4 - detached HTML renderers are not updated by later positions
+  ---
+  duration_ms: 0.6052
+  type: 'test'
+  ...
+# Subtest: default selection survives empty or obsolete browser storage
+ok 5 - default selection survives empty or obsolete browser storage
+  ---
+  duration_ms: 1.4516
+  type: 'test'
+  ...
+# Subtest: catalog groups floors and keeps planned units visible but disabled
+ok 6 - catalog groups floors and keeps planned units visible but disabled
+  ---
+  duration_ms: 1.3785
+  type: 'test'
+  ...
+# Subtest: live coordinates are authorized only for the catalog live map
+ok 7 - live coordinates are authorized only for the catalog live map
+  ---
+  duration_ms: 0.241
+  type: 'test'
+  ...
+# Subtest: quick tracking selection waits for the requested map before focusing
+ok 8 - quick tracking selection waits for the requested map before focusing
+  ---
+  duration_ms: 0.6115
+  type: 'test'
+  ...
+# Subtest: zone resolver maps only catalog zone ids and leaves null/unknown unresolved
+ok 9 - zone resolver maps only catalog zone ids and leaves null/unknown unresolved
+  ---
+  duration_ms: 1.6961
+  type: 'test'
+  ...
+# Subtest: route segments split on every map transition and never add cross-floor distance
+ok 10 - route segments split on every map transition and never add cross-floor distance
+  ---
+  duration_ms: 0.8385
+  type: 'test'
+  ...
+# Subtest: store follows only the selected tag across maps and rejects delayed old-floor packets
+ok 11 - store follows only the selected tag across maps and rejects delayed old-floor packets
+  ---
+  duration_ms: 0.5432
+  type: 'test'
+  ...
+# Subtest: region engine manager isolates maps, clears the old map and rejects a delayed floor switch
+ok 12 - region engine manager isolates maps, clears the old map and rejects a delayed floor switch
+  ---
+  duration_ms: 0.3923
+  type: 'test'
+  ...
+# Subtest: runtime controller installs only RegionPositionEngine and exposes the active engine version
+ok 13 - runtime controller installs only RegionPositionEngine and exposes the active engine version
+  ---
+  duration_ms: 4.7369
+  type: 'test'
+  ...
+# Subtest: hot reload retires a stale global controller and retains exactly one tracking listener
+ok 14 - hot reload retires a stale global controller and retains exactly one tracking listener
+  ---
+  duration_ms: 19.4643
+  type: 'test'
+  ...
+# {"level":"error","event":"area_transition.restore_failed","timestamp":"2026-10-15T10:42:40.285Z","error":{"name":"AggregateError","message":"","stack":"AggregateError [EACCES]: \\n    at internalConnectMultiple (node:net:1134:18)\\n    at afterConnectMultiple (node:net:1715:7)"}}
+# Subtest: hot replacement restores an enabled controller only after retirement completes
+ok 15 - hot replacement restores an enabled controller only after retirement completes
+  ---
+  duration_ms: 74.013
+  type: 'test'
+  ...
+# Subtest: controller reload applies a UI-compiled config to the existing map engine without installing a parallel engine
+ok 16 - controller reload applies a UI-compiled config to the existing map engine without installing a parallel engine
+  ---
+  duration_ms: 0.5524
+  type: 'test'
+  ...
+# Subtest: map-specific region config rejects URL/config mismatches and path traversal
+ok 17 - map-specific region config rejects URL/config mismatches and path traversal
+  ---
+  duration_ms: 3.4556
+  type: 'test'
+  ...
+# Subtest: browser SSE gateway preserves map, source-zone and PDOP fields
+ok 18 - browser SSE gateway preserves map, source-zone and PDOP fields
+  ---
+  duration_ms: 0.8663
+  type: 'test'
+  ...
+# Subtest: source motion labels never change room decisions, filters or signal-loss inference
+ok 19 - source motion labels never change room decisions, filters or signal-loss inference
+  ---
+  duration_ms: 11.8736
+  type: 'test'
+  ...
+# Subtest: disabled engine does not mutate input
+ok 20 - disabled engine does not mutate input
+  ---
+  duration_ms: 0.578
+  type: 'test'
+  ...
+# Subtest: kat1-ortopedi uses 4.5 m/s globally and for every effective region setting
+ok 21 - kat1-ortopedi uses 4.5 m/s globally and for every effective region setting
+  ---
+  duration_ms: 1.9543
+  type: 'test'
+  ...
+# Subtest: kat1-ortopedi accepts a reasonable 4.5 m/s step and rejects a jump beyond speed plus tolerance
+ok 22 - kat1-ortopedi accepts a reasonable 4.5 m/s step and rejects a jump beyond speed plus tolerance
+  ---
+  duration_ms: 1.9913
+  type: 'test'
+  ...
+# Subtest: time and independent measurements are both required, even with count=1
+ok 23 - time and independent measurements are both required, even with count=1
+  ---
+  duration_ms: 0.5847
+  type: 'test'
+  ...
+# Subtest: raw room motion always yields exact configured centre
+ok 24 - raw room motion always yields exact configured centre
+  ---
+  duration_ms: 0.8971
+  type: 'test'
+  ...
+# Subtest: parallel door blackout and approach without crossing never assign a room
+ok 25 - parallel door blackout and approach without crossing never assign a room
+  ---
+  duration_ms: 0.764
+  type: 'test'
+  ...
+# Subtest: directional door crossing and one strong inside measurement allow estimated entry, never measured entry
+ok 26 - directional door crossing and one strong inside measurement allow estimated entry, never measured entry
+  ---
+  duration_ms: 0.4192
+  type: 'test'
+  ...
+# Subtest: required door crossing can infer a silent concrete room when signal stops at the wall
+ok 27 - required door crossing can infer a silent concrete room when signal stops at the wall
+  ---
+  duration_ms: 0.7446
+  type: 'test'
+  ...
+# Subtest: synthetic publications preserve measurement time, long gaps expose uncertainty
+ok 28 - synthetic publications preserve measurement time, long gaps expose uncertainty
+  ---
+  duration_ms: 0.5959
+  type: 'test'
+  ...
+# Subtest: a single neighbor jump cannot replace a confirmed room, while a sustained direct sequence can
+ok 29 - a single neighbor jump cannot replace a confirmed room, while a sustained direct sequence can
+  ---
+  duration_ms: 0.6913
+  type: 'test'
+  ...
+# Subtest: wall measurements alone do not confirm adjacent room
+ok 30 - wall measurements alone do not confirm adjacent room
+  ---
+  duration_ms: 0.4573
+  type: 'test'
+  ...
+# Subtest: confirmed door exit releases centre, subsequent room entry succeeds
+ok 31 - confirmed door exit releases centre, subsequent room entry succeeds
+  ---
+  duration_ms: 0.6084
+  type: 'test'
+  ...
+# Subtest: long blackout allows relocation without invented transition time
+ok 32 - long blackout allows relocation without invented transition time
+  ---
+  duration_ms: 0.4745
+  type: 'test'
+  ...
+# Subtest: old, duplicate, delayed and low quality packets add no confirmation evidence
+ok 33 - old, duplicate, delayed and low quality packets add no confirmation evidence
+  ---
+  duration_ms: 0.4271
+  type: 'test'
+  ...
+# Subtest: long evidence gaps reset candidates instead of finishing old counters
+ok 34 - long evidence gaps reset candidates instead of finishing old counters
+  ---
+  duration_ms: 0.2282
+  type: 'test'
+  ...
+# Subtest: tag histories and tag count are bounded and independent
+ok 35 - tag histories and tag count are bounded and independent
+  ---
+  duration_ms: 21.7073
+  type: 'test'
+  ...
+# Subtest: coverage profiles affect dropout timing without raising entry confidence
+ok 36 - coverage profiles affect dropout timing without raising entry confidence
+  ---
+  duration_ms: 0.45
+  type: 'test'
+  ...
+# Subtest: missing doors and narrow rooms report limitations without fabricated geometry
+ok 37 - missing doors and narrow rooms report limitations without fabricated geometry
+  ---
+  duration_ms: 0.493
+  type: 'test'
+  ...
+# Subtest: live decisions project to history and expiry is not a measured room visit
+ok 38 - live decisions project to history and expiry is not a measured room visit
+  ---
+  duration_ms: 0.6538
+  type: 'test'
+  ...
+# Subtest: reference scenarios reproduce exactly; adding tags cannot change tag one
+ok 39 - reference scenarios reproduce exactly; adding tags cannot change tag one
+  ---
+  duration_ms: 11.0676
+  type: 'test'
+  ...
+# Subtest: all scenarios include useful correct coverage, room visits are not hidden by uncertainty
+ok 40 - all scenarios include useful correct coverage, room visits are not hidden by uncertainty
+  ---
+  duration_ms: 33.2149
+  type: 'test'
+  ...
+# Subtest: physical scenario routes cross room boundaries only at defined doors
+ok 41 - physical scenario routes cross room boundaries only at defined doors
+  ---
+  duration_ms: 2.1816
+  type: 'test'
+  ...
+# Subtest: candidate confidence cannot increase during a blackout, including the lost transition
+ok 42 - candidate confidence cannot increase during a blackout, including the lost transition
+  ---
+  duration_ms: 0.3563
+  type: 'test'
+  ...
+# Subtest: sustained corridor measurements after a long gap release an old room
+ok 43 - sustained corridor measurements after a long gap release an old room
+  ---
+  duration_ms: 0.6588
+  type: 'test'
+  ...
+# Subtest: confirmed corridor exit clears relocation before the next room entry
+ok 44 - confirmed corridor exit clears relocation before the next room entry
+  ---
+  duration_ms: 1.0082
+  type: 'test'
+  ...
+# Subtest: silent door proximity infers an estimated room from one corridor measurement and later becomes lost
+ok 45 - silent door proximity infers an estimated room from one corridor measurement and later becomes lost
+  ---
+  duration_ms: 1.154
+  type: 'test'
+  ...
+# Subtest: silent door proximity enforces distance and deterministically selects the nearest then first equal door
+ok 46 - silent door proximity enforces distance and deterministically selects the nearest then first equal door
+  ---
+  duration_ms: 0.8852
+  type: 'test'
+  ...
+# Subtest: silent door proximity needs neither movement history nor movement toward the door
+ok 47 - silent door proximity needs neither movement history nor movement toward the door
+  ---
+  duration_ms: 1.1566
+  type: 'test'
+  ...
+# Subtest: each accepted corridor measurement replaces or clears the silent door candidate
+ok 48 - each accepted corridor measurement replaces or clears the silent door candidate
+  ---
+  duration_ms: 0.737
+  type: 'test'
+  ...
+# Subtest: configured corridor geometry prevents nearby non-corridor positions from becoming candidates
+ok 49 - configured corridor geometry prevents nearby non-corridor positions from becoming candidates
+  ---
+  duration_ms: 0.6291
+  type: 'test'
+  ...
+# Subtest: regular and intermittent rooms and disabled proximity settings preserve existing behavior
+ok 50 - regular and intermittent rooms and disabled proximity settings preserve existing behavior
+  ---
+  duration_ms: 2.006
+  type: 'test'
+  ...
+# Subtest: ineligible doors never become silent proximity candidates
+ok 51 - ineligible doors never become silent proximity candidates
+  ---
+  duration_ms: 1.8401
+  type: 'test'
+  ...
+# Subtest: real inside evidence supersedes a prior proximity-only inferred room
+ok 52 - real inside evidence supersedes a prior proximity-only inferred room
+  ---
+  duration_ms: 0.5057
+  type: 'test'
+  ...
+# Subtest: reliable silent-room evidence supersedes the corridor proximity candidate without using crossing direction
+ok 53 - reliable silent-room evidence supersedes the corridor proximity candidate without using crossing direction
+  ---
+  duration_ms: 0.4011
+  type: 'test'
+  ...
+# Subtest: scenario A: reliable silent-room measurements confirm entry without a door crossing
+ok 54 - scenario A: reliable silent-room measurements confirm entry without a door crossing
+  ---
+  duration_ms: 0.4791
+  type: 'test'
+  ...
+# Subtest: scenario B: the real Room 3 config confirms a long reliable inside replay without a door crossing
+ok 55 - scenario B: the real Room 3 config confirms a long reliable inside replay without a door crossing
+  ---
+  duration_ms: 2.9453
+  type: 'test'
+  ...
+# Subtest: scenario C: the real Room 5 config confirms fourteen reliable inside samples without a door crossing
+ok 56 - scenario C: the real Room 5 config confirms fourteen reliable inside samples without a door crossing
+  ---
+  duration_ms: 1.8495
+  type: 'test'
+  ...
+# Subtest: scenario B: one reliable silent-room measurement survives signal loss as a nonzero inference
+ok 57 - scenario B: one reliable silent-room measurement survives signal loss as a nonzero inference
+  ---
+  duration_ms: 0.4419
+  type: 'test'
+  ...
+# Subtest: scenario C: a reliable corridor point near a silent door infers entry without motion evidence
+ok 58 - scenario C: a reliable corridor point near a silent door infers entry without motion evidence
+  ---
+  duration_ms: 0.4496
+  type: 'test'
+  ...
+# Subtest: silent-room raw evidence produces a stronger bounded inference than corridor proximity alone
+ok 59 - silent-room raw evidence produces a stronger bounded inference than corridor proximity alone
+  ---
+  duration_ms: 1.5433
+  type: 'test'
+  ...
+# Subtest: scenario D: corridor signal loss away from every silent door becomes location lost
+ok 60 - scenario D: corridor signal loss away from every silent door becomes location lost
+  ---
+  duration_ms: 0.3096
+  type: 'test'
+  ...
+# Subtest: scenario E: data returning inside a proximity-inferred room keeps and confirms that room
+ok 61 - scenario E: data returning inside a proximity-inferred room keeps and confirms that room
+  ---
+  duration_ms: 0.5134
+  type: 'test'
+  ...
+# Subtest: scenario F: seven reliable points confirm a required-door silent room without rejection
+ok 62 - scenario F: seven reliable points confirm a required-door silent room without rejection
+  ---
+  duration_ms: 0.485
+  type: 'test'
+  ...
+# Subtest: scenario G: one wall-band sample does not clear a proximity-inferred silent room
+ok 63 - scenario G: one wall-band sample does not clear a proximity-inferred silent room
+  ---
+  duration_ms: 0.3053
+  type: 'test'
+  ...
+# Subtest: scenario H: proximity inference chooses the nearest door without a movement vector
+ok 64 - scenario H: proximity inference chooses the nearest door without a movement vector
+  ---
+  duration_ms: 0.259
+  type: 'test'
+  ...
+# Subtest: scenario G: a room-specific manual threshold change takes effect only after config reload
+ok 65 - scenario G: a room-specific manual threshold change takes effect only after config reload
+  ---
+  duration_ms: 0.4902
+  type: 'test'
+  ...
+# Subtest: scenario I: one impossible-speed packet is rejected without clearing a confirmed silent room
+ok 66 - scenario I: one impossible-speed packet is rejected without clearing a confirmed silent room
+  ---
+  duration_ms: 0.4019
+  type: 'test'
+  ...
+# Subtest: a rejected low-quality packet does not postpone the accepted sample stale deadline
+ok 67 - a rejected low-quality packet does not postpone the accepted sample stale deadline
+  ---
+  duration_ms: 0.3635
+  type: 'test'
+  ...
+# Subtest: scenario J: required-door regular and intermittent rooms retain their existing entry policy
+ok 68 - scenario J: required-door regular and intermittent rooms retain their existing entry policy
+  ---
+  duration_ms: 0.7319
+  type: 'test'
+  ...
+# Subtest: silent room exit needs continuous reliable corridor count and duration, not a required door
+ok 69 - silent room exit needs continuous reliable corridor count and duration, not a required door
+  ---
+  duration_ms: 0.5114
+  type: 'test'
+  ...
+# Subtest: one corridor jump is cancelled by reliable room data and timer publications add no exit evidence
+ok 70 - one corridor jump is cancelled by reliable room data and timer publications add no exit evidence
+  ---
+  duration_ms: 0.3641
+  type: 'test'
+  ...
+# Subtest: silent exit evidence resets after maxEvidenceGapMs and rejected packets never increment it
+ok 71 - silent exit evidence resets after maxEvidenceGapMs and rejected packets never increment it
+  ---
+  duration_ms: 0.4554
+  type: 'test'
+  ...
+# Subtest: required-door regular and intermittent rooms still cannot exit through corridor evidence alone
+ok 72 - required-door regular and intermittent rooms still cannot exit through corridor evidence alone
+  ---
+  duration_ms: 1.0244
+  type: 'test'
+  ...
+# Subtest: after a doorless silent exit, dropout near another silent door infers that room by Euclidean distance
+ok 73 - after a doorless silent exit, dropout near another silent door infers that room by Euclidean distance
+  ---
+  duration_ms: 0.7097
+  type: 'test'
+  ...
+# Subtest: 21 September 2026 real route exits Rooms 3 and 5 without doors and infers Room 6 at the recorded cutoff
+ok 74 - 21 September 2026 real route exits Rooms 3 and 5 without doors and infers Room 6 at the recorded cutoff
+  ---
+  duration_ms: 5.9887
+  type: 'test'
+  ...
+# Subtest: decision trace explains silent-door inference and far-corridor loss without changing the decision
+ok 75 - decision trace explains silent-door inference and far-corridor loss without changing the decision
+  ---
+  duration_ms: 0.5896
+  type: 'test'
+  ...
+# Subtest: direct room switch requires three reliable target-room samples spread across configured time
+ok 76 - direct room switch requires three reliable target-room samples spread across configured time
+  ---
+  duration_ms: 0.5245
+  type: 'test'
+  ...
+# Subtest: anonymized fast field fixtures confirm Room 3 to Room 5 without a corridor publication
+ok 77 - anonymized fast field fixtures confirm Room 3 to Room 5 without a corridor publication
+  ---
+  duration_ms: 6.4436
+  type: 'test'
+  ...
+# Subtest: sparse field fixture cannot confirm Room 5 or retain Room 3 after a long loss
+ok 78 - sparse field fixture cannot confirm Room 5 or retain Room 3 after a long loss
+  ---
+  duration_ms: 2.493
+  type: 'test'
+  ...
+# Subtest: an active old room still yields to the nearest silent target-door cutoff without directional movement
+ok 79 - an active old room still yields to the nearest silent target-door cutoff without directional movement
+  ---
+  duration_ms: 0.4754
+  type: 'test'
+  ...
+# Subtest: one reliable sample inside another silent room followed by loss infers that room
+ok 80 - one reliable sample inside another silent room followed by loss infers that room
+  ---
+  duration_ms: 0.4747
+  type: 'test'
+  ...
+# Subtest: 24 September fast field samples infer Room 6 during the recorded cutoff
+ok 81 - 24 September fast field samples infer Room 6 during the recorded cutoff
+  ---
+  duration_ms: 2.4596
+  type: 'test'
+  ...
+# Subtest: old room support and later corridor evidence prevent a one-sample target-room cutoff
+ok 82 - old room support and later corridor evidence prevent a one-sample target-room cutoff
+  ---
+  duration_ms: 1.283
+  type: 'test'
+  ...
+# Subtest: one-sample cutoff ignores rejected room points and does not bypass regular-room policy
+ok 83 - one-sample cutoff ignores rejected room points and does not bypass regular-room policy
+  ---
+  duration_ms: 0.5593
+  type: 'test'
+  ...
+# Subtest: direct room switch is cancelled by old-room support, restarted for a different target, and ignores rejected packets
+ok 84 - direct room switch is cancelled by old-room support, restarted for a different target, and ignores rejected packets
+  ---
+  duration_ms: 0.769
+  type: 'test'
+  ...
+# Subtest: insufficient direct room evidence does not retain the old room past roomSwitchUncertainAfterMs
+ok 85 - insufficient direct room evidence does not retain the old room past roomSwitchUncertainAfterMs
+  ---
+  duration_ms: 0.3507
+  type: 'test'
+  ...
+# Subtest: decision trace snapshots entry evidence, required-door rejection, door crossing and exit
+ok 86 - decision trace snapshots entry evidence, required-door rejection, door crossing and exit
+  ---
+  duration_ms: 1.1133
+  type: 'test'
+  ...
+# Subtest: decision trace classifies rejected measurements, long loss and config reload
+ok 87 - decision trace classifies rejected measurements, long loss and config reload
+  ---
+  duration_ms: 1.574
+  type: 'test'
+  ...
+# Subtest: decision trace is an additive output and the established processed-position contract stays intact
+ok 88 - decision trace is an additive output and the established processed-position contract stays intact
+  ---
+  duration_ms: 0.3163
+  type: 'test'
+  ...
+# Subtest: fresh measurements label moving as Hareketli and every other motion as Sabit
+ok 89 - fresh measurements label moving as Hareketli and every other motion as Sabit
+  ---
+  duration_ms: 0.9871
+  type: 'test'
+  ...
+# Subtest: raw data timeout makes a tag Pasif even if its last motion was moving
+ok 90 - raw data timeout makes a tag Pasif even if its last motion was moving
+  ---
+  duration_ms: 1.55
+  type: 'test'
+  ...
+# Subtest: confirmed room decisions keep the live color independently of motion and raw data freshness
+ok 91 - confirmed room decisions keep the live color independently of motion and raw data freshness
+  ---
+  duration_ms: 0.2611
+  type: 'test'
+  ...
+# Subtest: motion survives presence conversion, snapshot hydration and browser SSE delivery
+ok 92 - motion survives presence conversion, snapshot hydration and browser SSE delivery
+  ---
+  duration_ms: 1.3331
+  type: 'test'
+  ...
+# Subtest: latest raw motion takes precedence over an older processed decision
+ok 93 - latest raw motion takes precedence over an older processed decision
+  ---
+  duration_ms: 0.289
+  type: 'test'
+  ...
+# Subtest: quick list includes all registered and discovered tags without adding fake map positions
+ok 94 - quick list includes all registered and discovered tags without adding fake map positions
+  ---
+  duration_ms: 24.6553
+  type: 'test'
+  ...
+# Subtest: quick rows and selected details display the same motion labels and room color
+ok 95 - quick rows and selected details display the same motion labels and room color
+  ---
+  duration_ms: 11.4622
+  type: 'test'
+  ...
+# Subtest: selected tracking-label panel presents a defined region instead of X/Y coordinates
+ok 96 - selected tracking-label panel presents a defined region instead of X/Y coordinates
+  ---
+  duration_ms: 14.8281
+  type: 'test'
+  ...
+# Subtest: selected tracking-label panel identifies a location outside configured areas
+ok 97 - selected tracking-label panel identifies a location outside configured areas
+  ---
+  duration_ms: 3.1548
+  type: 'test'
+  ...
+# Subtest: mobile tracking-label panel includes the map reveal action without technical coordinates
+ok 98 - mobile tracking-label panel includes the map reveal action without technical coordinates
+  ---
+  duration_ms: 2.9237
+  type: 'test'
+  ...
+# Subtest: tag management panel owns the live-map trail controls
+ok 99 - tag management panel owns the live-map trail controls
+  ---
+  duration_ms: 1.7744
+  type: 'test'
+  ...
+# Subtest: recent tags remain unique, newest first, and limited to five
+ok 100 - recent tags remain unique, newest first, and limited to five
+  ---
+  duration_ms: 1.341
+  type: 'test'
+  ...
+# Subtest: recent tags serialize and restore through browser storage
+ok 101 - recent tags serialize and restore through browser storage
+  ---
+  duration_ms: 0.2969
+  type: 'test'
+  ...
+# Subtest: location entry time is retained in the same area and reset after an area change
+ok 102 - location entry time is retained in the same area and reset after an area change
+  ---
+  duration_ms: 0.3803
+  type: 'test'
+  ...
+# Subtest: tag selection records the visit and creates one map focus request
+ok 103 - tag selection records the visit and creates one map focus request
+  ---
+  duration_ms: 0.3516
+  type: 'test'
+  ...
+# Subtest: quick tag selection updates details without requesting a map focus on the live map
+ok 104 - quick tag selection updates details without requesting a map focus on the live map
+  ---
+  duration_ms: 0.4062
+  type: 'test'
+  ...
+# Subtest: strict one-minute boundary hides an unassigned tag and retains the observation
+ok 105 - strict one-minute boundary hides an unassigned tag and retains the observation
+  ---
+  duration_ms: 2.5382
+  type: 'test'
+  ...
+# Subtest: only an unexpired current room assignment exempts a silent tag
+ok 106 - only an unexpired current room assignment exempts a silent tag
+  ---
+  duration_ms: 0.8841
+  type: 'test'
+  ...
+# Subtest: timer decisions, duplicates, out-of-order and synthetic raw messages do not refresh the raw clock
+ok 107 - timer decisions, duplicates, out-of-order and synthetic raw messages do not refresh the raw clock
+  ---
+  duration_ms: 0.2929
+  type: 'test'
+  ...
+# Subtest: fresh data recovers a tag, but a delayed historical backlog and future timestamps do not
+ok 108 - fresh data recovers a tag, but a delayed historical backlog and future timestamps do not
+  ---
+  duration_ms: 0.1481
+  type: 'test'
+  ...
+# Subtest: disabling the engine, losing a room, reconfiguring or moving floors removes the exemption immediately
+ok 109 - disabling the engine, losing a room, reconfiguring or moving floors removes the exemption immediately
+  ---
+  duration_ms: 0.4758
+  type: 'test'
+  ...
+# Subtest: changing the global timeout re-evaluates existing tags without restarting room inference
+ok 110 - changing the global timeout re-evaluates existing tags without restarting room inference
+  ---
+  duration_ms: 0.1777
+  type: 'test'
+  ...
+# Subtest: restored observations keep their location but never restore a current room assignment
+ok 111 - restored observations keep their location but never restore a current room assignment
+  ---
+  duration_ms: 0.5967
+  type: 'test'
+  ...
+# Subtest: last observed place uses raw geometry, handles corridors, ambiguous rooms and unresolved floors
+ok 112 - last observed place uses raw geometry, handles corridors, ambiguous rooms and unresolved floors
+  ---
+  duration_ms: 0.59
+  type: 'test'
+  ...
+# Subtest: presence SSE starts with an atomic snapshot, publishes versioned changes and cleans up on abort
+ok 113 - presence SSE starts with an atomic snapshot, publishes versioned changes and cleans up on abort
+  ---
+  duration_ms: 21.6416
+  type: 'test'
+  ...
+# Subtest: presence persistence keeps only registered tags, orders upserts by measurement and restores valid raw observations
+ok 114 - presence persistence keeps only registered tags, orders upserts by measurement and restores valid raw observations
+  ---
+  duration_ms: 2.8131
+  type: 'test'
+  ...
+# Subtest: a schema/persistence failure is reported and a later save can retry
+ok 115 - a schema/persistence failure is reported and a later save can retry
+  ---
+  duration_ms: 0.4828
+  type: 'test'
+  ...
+# Subtest: presence versions reject delayed events; a new server epoch restores its own state
+ok 116 - presence versions reject delayed events; a new server epoch restores its own state
+  ---
+  duration_ms: 1.7845
+  type: 'test'
+  ...
+# Subtest: both raw and processed display bindings hide tags, clear animation/trails and recover without an old path
+ok 117 - both raw and processed display bindings hide tags, clear animation/trails and recover without an old path
+  ---
+  duration_ms: 2.4369
+  type: 'test'
+  ...
+# Subtest: stale tag stays selectable with historical place, unreliable badge and disabled map action on mobile
+ok 118 - stale tag stays selectable with historical place, unreliable badge and disabled map action on mobile
+  ---
+  duration_ms: 11.8563
+  type: 'test'
+  ...
+# Subtest: settings navigation exposes the admin panel and stays absent from demo navigation
+ok 119 - settings navigation exposes the admin panel and stays absent from demo navigation
+  ---
+  duration_ms: 5.8559
+  type: 'test'
+  ...
+# Subtest: same measurement accepts only a strictly newer valid engine publication
+ok 120 - same measurement accepts only a strictly newer valid engine publication
+  ---
+  duration_ms: 2.0367
+  type: 'test'
+  ...
+# Subtest: same measurement accepts newer ROOM_TRANSITIONED publication and rejects the older decision
+ok 121 - same measurement accepts newer ROOM_TRANSITIONED publication and rejects the older decision
+  ---
+  duration_ms: 0.1734
+  type: 'test'
+  ...
+# Subtest: store shows inferred Room 6 and later LOCATION_LOST without changing measurement age
+ok 122 - store shows inferred Room 6 and later LOCATION_LOST without changing measurement age
+  ---
+  duration_ms: 0.6826
+  type: 'test'
+  ...
+# {"level":"warn","event":"tracking.zone_unresolved","timestamp":"2026-10-15T10:42:55.529Z","zoneId":"not-configured"}
+# Subtest: kaynak heartbeat'i ayrı token ve bilinen zone gerektirir
+ok 123 - kaynak heartbeat'i ayrı token ve bilinen zone gerektirir
+  ---
+  duration_ms: 15.2883
+  type: 'test'
+  ...
+# {"level":"warn","event":"tracking.zone_unresolved","timestamp":"2026-10-15T10:42:55.533Z","zoneId":"zone-a"}
+# {"level":"warn","event":"tracking.zone_unresolved","timestamp":"2026-10-15T10:42:55.542Z","zoneId":"zone-b"}
+# Subtest: örnek position payload'ı boş 204 ile kabul edilir; konum, PDOP ve zaman korunur
+ok 124 - örnek position payload'ı boş 204 ile kabul edilir; konum, PDOP ve zaman korunur
+  ---
+  duration_ms: 2.5223
+  type: 'test'
+  ...
+# Subtest: yeni tek-tag sözleşmesi PDOP olmadan kabul edilir; koordinat, kimlik, etiket ve zaman korunur
+ok 125 - yeni tek-tag sözleşmesi PDOP olmadan kabul edilir; koordinat, kimlik, etiket ve zaman korunur
+  ---
+  duration_ms: 4.6303
+  type: 'test'
+  ...
+# Subtest: geçersiz motion_label konum akışına girmeden 400 döndürür
+ok 126 - geçersiz motion_label konum akışına girmeden 400 döndürür
+  ---
+  duration_ms: 4.4125
+  type: 'test'
+  ...
+# Subtest: null ve bilinmeyen zone kabul edilir fakat haritaya çözülmez
+ok 127 - null ve bilinmeyen zone kabul edilir fakat haritaya çözülmez
+  ---
+  duration_ms: 1.06
+  type: 'test'
+  ...
+# Subtest: zone alanlarında tip ve uzunluk doğrulaması uygulanır
+ok 128 - zone alanlarında tip ve uzunluk doğrulaması uygulanır
+  ---
+  duration_ms: 0.5174
+  type: 'test'
+  ...
+# Subtest: negatif koordinatlar geçerlidir
+ok 129 - negatif koordinatlar geçerlidir
+  ---
+  duration_ms: 0.3549
+  type: 'test'
+  ...
+# Subtest: ingest POST aynı route üzerindeki SSE akışına position eventi yayınlar
+ok 130 - ingest POST aynı route üzerindeki SSE akışına position eventi yayınlar
+  ---
+  duration_ms: 1.5571
+  type: 'test'
+  ...
+# Subtest: PDOP 20 dahil, sıfır, null ve eski eksik alan konumla birlikte kabul edilir
+ok 131 - PDOP 20 dahil, sıfır, null ve eski eksik alan konumla birlikte kabul edilir
+  ---
+  duration_ms: 1.4643
+  type: 'test'
+  ...
+# Subtest: PDOP harita çözümünden sonra tüm konum işlemlerinden önce elenir
+ok 132 - PDOP harita çözümünden sonra tüm konum işlemlerinden önce elenir
+  ---
+  duration_ms: 1.2977
+  type: 'test'
+  ...
+# Subtest: yoğun bakım isteği 70 dahil kabul edilir; daha büyük PDOP işlem görmez
+not ok 133 - yoğun bakım isteği 70 dahil kabul edilir; daha büyük PDOP işlem görmez
+  ---
+  duration_ms: 9.1284
+  type: 'test'
+  location: 'C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\trackingIngest.test.ts:1:7706'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    ... Skipped lines
+    
+      [
+        [
+          'necmettin-yogun-bakim',
+          21
+        ],
+    ...
+        ],
+    +   [
+    +     'necmettin-yogun-bakim',
+    +     70.000001
+    +   ]
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0:
+      0: 'necmettin-yogun-bakim'
+      1: 21
+    1:
+      0: 'necmettin-yogun-bakim'
+      1: 70
+  actual:
+    0:
+      0: 'necmettin-yogun-bakim'
+      1: 21
+    1:
+      0: 'necmettin-yogun-bakim'
+      1: 70
+    2:
+      0: 'necmettin-yogun-bakim'
+      1: 70.000001
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\1548u\Desktop\UWB\ui\base\tests\trackingIngest.test.ts:220:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: harita PDOP filtresi kapalıyken büyük sonlu değerler normal veri akışına devam eder
+ok 134 - harita PDOP filtresi kapalıyken büyük sonlu değerler normal veri akışına devam eder
+  ---
+  duration_ms: 1.1685
+  type: 'test'
+  ...
+# Subtest: PDOP string, boolean, nesne ve sonlu olmayan sayı olamaz
+ok 135 - PDOP string, boolean, nesne ve sonlu olmayan sayı olamaz
+  ---
+  duration_ms: 1.8904
+  type: 'test'
+  ...
+# Subtest: geçersiz sözleşme payload'ları açıklayıcı 400 döndürür
+    # Subtest: yanlış type
+    ok 1 - yanlış type
+      ---
+      duration_ms: 0.5795
+      type: 'test'
+      ...
+    # Subtest: eksik tag_id
+    ok 2 - eksik tag_id
+      ---
+      duration_ms: 0.3023
+      type: 'test'
+      ...
+    # Subtest: sayısal tag_id
+    ok 3 - sayısal tag_id
+      ---
+      duration_ms: 0.2575
+      type: 'test'
+      ...
+    # Subtest: konum dizisi
+    ok 4 - konum dizisi
+      ---
+      duration_ms: 0.2321
+      type: 'test'
+      ...
+    # Subtest: string x
+    ok 5 - string x
+      ---
+      duration_ms: 0.2429
+      type: 'test'
+      ...
+    # Subtest: string y
+    ok 6 - string y
+      ---
+      duration_ms: 0.1936
+      type: 'test'
+      ...
+    # Subtest: geçersiz timestamp
+    ok 7 - geçersiz timestamp
+      ---
+      duration_ms: 0.2367
+      type: 'test'
+      ...
+    # Subtest: fazladan alan
+    ok 8 - fazladan alan
+      ---
+      duration_ms: 0.2191
+      type: 'test'
+      ...
+    1..8
+ok 136 - geçersiz sözleşme payload'ları açıklayıcı 400 döndürür
+  ---
+  duration_ms: 2.9999
+  type: 'test'
+  ...
+# Subtest: bozuk JSON 400 döndürür
+ok 137 - bozuk JSON 400 döndürür
+  ---
+  duration_ms: 0.5095
+  type: 'test'
+  ...
+1..137
+# tests 145
+# suites 0
+# pass 144
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 17666.8202

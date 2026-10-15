@@ -199,21 +199,33 @@ button { color: inherit; font: inherit; }
 .tag-switcher-name strong { overflow: hidden; color: #24384f; font-size: 9px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
 .tag-switcher-name code { color: #72869c; font: 7px ui-monospace, monospace; }
 .tag-switcher-meta { grid-column: 2; display: flex; min-width: 0; align-items: center; gap: 6px; }
-.tag-switcher-meta em { color: #087f73; font: normal 7px ui-monospace, monospace; }
+.tag-switcher-meta em { color: #8495a9; font: normal 7px ui-monospace, monospace; }
+.tag-switcher-meta.is-active em { color: #087f73; }
+.tag-switcher-meta em.tag-reliability-status { color: #9a651c; white-space: nowrap; }
 .tag-switcher-meta small { overflow: hidden; color: #7a8da2; font-size: 7px; text-overflow: ellipsis; white-space: nowrap; }
 .tag-switcher-empty { margin: 16px 0; color: #7a8da2; font-size: 9px; text-align: center; }
+.tag-switcher-row.is-stale-location .tag-switcher-meta { flex-wrap: wrap; align-items: center; gap: 5px 7px; }
+.tag-switcher-row.is-stale-location .tag-last-location { flex-basis: 100%; white-space: normal; line-height: 1.6; font-size: 9px; color: #526a80; }
+.tag-reliability-warning { display: inline-block; width: fit-content; margin: 3px 0; padding: 3px 6px; font-size: 9px; line-height: 1.4; font-style: normal; font-weight: 500; color: #9a651c; background: #fff3dd; border: 1px solid #eed7af; border-radius: 4px; }
+.tag-last-seen { display: flex; align-items: flex-start; flex-direction: column; gap: 4px; padding: 8px 12px 8px 0; max-width: 280px; font-size: 11px; line-height: 1.5; }
+.tag-last-seen > strong { font-weight: 500; }.tag-last-seen > small, .tag-last-seen-empty { color: #7a8da2; font-size: 9px; }.tag-last-seen .tag-reliability-warning { margin: 0; }
+.tag-hidden-explanation, .tag-presence-notice { font-size: 10px; line-height: 1.7; color: #9a651c; }.tag-presence-notice { padding: 9px 10px; margin: 0 0 12px; border: 1px solid #ead9b8; background: #fff8eb; border-radius: 5px; }
+.show-map-button:disabled, .mini-toolbar button:disabled { opacity: .45; cursor: default; }
 .tag-details { flex: 0 0 auto; border-top: 1px solid #cfdde6; padding-top: 13px; }
 .tag-details-empty { display: grid; gap: 4px; color: #526980; font-size: 9px; }
 .tag-details-empty span { color: #8495a9; line-height: 1.45; }
 .tag-panel-header { display: grid; grid-template-columns: 35px 1fr auto; align-items: center; gap: 10px; }
-.tag-icon { width: 35px; height: 35px; display: grid; place-items: center; border: 1px solid currentColor; background: #eef9f6; border-radius: 5px; }
+.tag-icon { width: 35px; height: 35px; display: grid; place-items: center; border: 1px solid currentColor; background: #eef2f6; border-radius: 5px; }
+.tag-icon.is-active { background: #eef9f6; }
 .tag-panel-header small { display: block; color: #7b8da1; font: 7px ui-monospace, monospace; letter-spacing: .15em; }
 .tag-panel-header h2 { margin: 4px 0 0; font-size: 12px; font-weight: 650; color: #152136; }
-.live-pill { color: #087f73; border: 1px solid rgba(0, 168, 150, .32); background: #e1f8f4; padding: 5px 6px; font: 7px ui-monospace, monospace; border-radius: 3px; }
-.live-pill i { display: inline-block; width: 4px; height: 4px; margin-right: 3px; border-radius: 50%; background: var(--accent); }
+.live-pill { color: #8495a9; border: 1px solid #cfd9e3; background: #eef2f6; padding: 5px 6px; font: 7px ui-monospace, monospace; border-radius: 3px; }
+.live-pill.is-active { color: #087f73; border-color: rgba(0, 168, 150, .32); background: #e1f8f4; }
+.live-pill i { display: inline-block; width: 4px; height: 4px; margin-right: 3px; border-radius: 50%; background: currentColor; }
 .tag-identity { margin: 17px 0 13px; padding: 9px 0; display: flex; justify-content: space-between; border-top: 1px solid #d0dee8; border-bottom: 1px solid #d0dee8; }
 .tag-identity code { color: #40546d; font: 9px ui-monospace, monospace; }
-.tag-identity span { color: #087f73; text-transform: uppercase; font: 7px ui-monospace, monospace; }
+.tag-identity span { color: #8495a9; text-transform: uppercase; font: 7px ui-monospace, monospace; }
+.tag-identity.is-active span { color: #087f73; }
 .tag-location-address { margin-bottom: 12px; padding: 10px 11px; border: 1px solid #d0dee8; border-radius: 5px; background: #f7fbff; }
 .tag-location-address > div { display: flex; align-items: center; gap: 6px; }
 .tag-location-address svg { color: var(--accent); }

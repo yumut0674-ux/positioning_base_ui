@@ -3,6 +3,7 @@ import { queryPostgres } from "./postgresClient";
 import { logger } from "./logger";
 import { isPositionPdopAccepted, type PdopFilterSettings } from "../shared/tracking/pdop";
 import { mapTrackingFilterSettings } from "./trackingFilterSettings";
+import { tagPresenceRuntime } from "./tracking/tagPresenceRuntime";
 
 export type TrackingPosition = {
   readonly tagCode: string;
@@ -16,7 +17,7 @@ export type TrackingPosition = {
   /** Optional only for internal rollout compatibility; ingest always supplies an explicit value. */
   readonly sourceZoneId?: string | null;
   readonly sourceZoneName?: string | null;
-  /** Source metadata only; never evidence for motion, quality, health or region decisions. */
+  /** Stationary measurements bypass room inference; this label does not establish quality or source health. */
   readonly motionLabel?: "moving" | "stationary" | "unknown";
   readonly mapId?: string | null;
 };
@@ -73,6 +74,7 @@ export class TrackingBuffer extends EventEmitter {
     if (position.pdop != null && (!Number.isFinite(position.pdop) || !isPositionPdopAccepted(position.pdop,
       await (this.readPdopSettings ? this.readPdopSettings(position.mapId ?? null) : mapTrackingFilterSettings.read(position.mapId ?? null))))) return false;
     position = { ...position, pdop: position.pdop ?? null, receivedAt: new Date(this.now()).toISOString() };
+    await tagPresenceRuntime.observeRaw(position);
     if (position.sourceZoneId == null) this.nullZoneCount++;
     else if (position.mapId == null) this.unresolvedZoneCount++;
     else { this.knownZoneCount++; this.mappedPositionCount++; }

@@ -146,6 +146,8 @@ export interface DataGap {
 }
 
 export interface RoutePointsHistoryData {
+  readonly aggregation?: { readonly method: "median"; readonly intervalSeconds: 60; readonly pointCountBeforeLimit: number };
+  readonly observedRange?: { readonly from: string; readonly to: string };
   readonly zoneTimeline?: readonly ZoneTimelineEntry[];
   readonly entityId: number;
   readonly entityName: string;

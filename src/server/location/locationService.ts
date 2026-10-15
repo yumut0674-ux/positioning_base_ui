@@ -4,7 +4,7 @@ import { EntityService } from "./entityService";
 import { LocationError } from "./locationErrors";
 import type { PositionRepository } from "./positionRepository";
 import type { RoomDecisionRepository } from "./roomDecisionRepository";
-import { ageDecision, decisionZone, projectHistory, projectDecisionTimeline } from "./roomDecisionProjection";
+import { ageDecision, decisionZone, projectDecisionTimeline } from "./roomDecisionProjection";
 import {
   successEnvelope,
   type CurrentLocationData, type DataGap, type HistoryQuery, type LocationAtTimeData,
@@ -162,25 +162,33 @@ export class LocationService {
     const assignments = await this.entities.getAssignmentsInRange(query.entityId, query.from, query.to);
     if (assignments.length === 0) throw new LocationError("TAG_ASSIGNMENT_NOT_FOUND", { details: { entityId: query.entityId } });
     const warnings = [...this.entityService.warningsFor(entity)];
-    const decisionHistory = (await this.decisions?.history(assignments.map(a => a.tagCode), query.from, query.to, 100000) ?? []).filter(d => assignments.some(a =>
+    const configuredMax = envInteger("UWB_HISTORY_MAX_POINTS", 2_000, 1, 2_000);
+    const [decisions, routeResult] = await Promise.all([
+      this.decisions?.history(assignments.map(a => a.tagCode), query.from, query.to, 100000, { compact: query.format === "route_points", assignments }) ?? [],
+      query.format === "route_points" ? this.positions.history(assignments, query.from, query.to, Math.min(query.limit, configuredMax), query.mapId) : null,
+    ]);
+    const decisionHistory = decisions.filter(d => (!query.mapId || d.mapId === query.mapId) && assignments.some(a =>
       a.tagCode === d.tagCode && Date.parse(d.lastRawDataTimestamp) >= Date.parse(a.assignedAt) && (!a.unassignedAt || Date.parse(d.publishedAt!) < Date.parse(a.unassignedAt))));
     if (decisionHistory.length >= 100000) warnings.push("Oda karar geçmişi işlem sınırına ulaştı; sonuç kısmi.");
     if (query.format === "route_points") {
-      const configuredMax = envInteger("UWB_HISTORY_MAX_POINTS", 2_000, 1, 2_000);
-      const result = await this.positions.history(assignments, query.from, query.to, Math.min(query.limit, configuredMax), query.mapId);
+      const result = routeResult!;
       const sampled = result.sourcePointCount > result.positions.length;
-      if (sampled) warnings.push(`Sonuç ${result.sourcePointCount} kayıttan güvenli biçimde ${result.positions.length} noktaya örneklendi.`);
+      const limited = result.aggregation ? result.aggregation.pointCountBeforeLimit > result.positions.length : sampled;
+      if (limited) warnings.push(`Rota gösterim sınırı nedeniyle ${result.positions.length} noktaya örneklendi.`);
       const data: RoutePointsHistoryData = {
         entityId: query.entityId,
         entityName: entity.name,
         from: query.from,
         to: query.to,
         format: "route_points",
-        points: projectHistory(result.positions, decisionHistory, false).map((position) => toRoutePoint(position, this.zoneResolver)),
+        // Room decisions have their own timeline; never replace median coordinates with a room centre.
+        points: result.positions.map((position) => toRoutePoint(position, this.zoneResolver)),
         gaps: buildGaps(result.positions),
         returnedCount: result.positions.length,
         sampled,
         sourcePointCount: result.sourcePointCount,
+        ...(result.aggregation ? { aggregation: result.aggregation } : {}),
+        ...(result.observedRange ? { observedRange: result.observedRange } : {}),
         ...(decisionHistory.length ? { zoneTimeline: toTimeline(projectDecisionTimeline(result.positions, decisionHistory, query.from, query.to), this.zoneResolver).slice(0, 2000).map(entry=>({...entry,timeMeaning:"decision_effective_at" as const})) } : {}),
       };
       const dataStatus = result.positions.length === 0 ? "no_data" : warnings.length ? "partial" : "complete";
