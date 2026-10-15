@@ -25,6 +25,7 @@ import { useTagTrailSettingsStorage } from "@/src/features/tracking/hooks/useTag
 import { DecisionLogsPanel } from "@/src/features/decisionLogs/components/DecisionLogsPanel";
 import type { UiMode } from "./uiMode";
 import { SettingsPanel } from "@/src/features/settings/components/SettingsPanel";
+import { mapTrackingTags } from "@/src/features/tracking/services/mapTrackingTags";
 
 const ADMIN_VIEWS = new Set<WorkspaceView>(["tags", "anchors", "regions", "analyses", "room-tests", "gekon-ai", "settings"]);
 
@@ -82,7 +83,7 @@ function LiveMapWorkspace({
   onViewChange,
 }: LiveMapWorkspaceProps) {
   const { collapsed: sidebarCollapsed, toggleCollapsed: toggleSidebar } = useSidebarCollapse();
-  const positionAnimation = useRealtimeTracking();
+  const { positionAnimation, engineEnabled } = useRealtimeTracking();
   useTagTrailSettingsStorage();
   const showLayersPanel = useIpsStore((state) => state.showLayersPanel);
   const toggleLayersPanel = useIpsStore((state) => state.toggleLayersPanel);
@@ -91,6 +92,8 @@ function LiveMapWorkspace({
   const requestMapFocus = useIpsStore((state) => state.requestMapFocus);
   const requestMapFit = useIpsStore((state) => state.requestMapFit);
   const tags = useIpsStore((state) => state.tags);
+  const observedTags = useIpsStore((state) => state.observedTags);
+  const mapTags = useMemo(() => mapTrackingTags(tags, observedTags, engineEnabled), [tags, observedTags, engineEnabled]);
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const activeMapId = useIpsStore((state) => state.activeMapId);
   const setActiveMapId = useIpsStore((state) => state.setActiveMapId);
@@ -106,14 +109,14 @@ function LiveMapWorkspace({
   });
   const activeMapDetails = mapQuery.data;
   const liveTrackingVisible = Boolean(catalog && shouldShowLiveTracking(catalog, activeMapDetails));
-  const visibleTags = useMemo(() => liveTrackingVisible ? Object.values(tags).filter((tag) => tag.mapId === activeMapId) : [], [activeMapId, liveTrackingVisible, tags]);
+  const visibleTags = useMemo(() => liveTrackingVisible ? Object.values(mapTags).filter((tag) => tag.mapId === activeMapId) : [], [activeMapId, liveTrackingVisible, mapTags]);
   const mapFrameRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [focusFeedback, setFocusFeedback] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [roomTestRecording, setRoomTestRecording] = useState(false);
   const fullscreenSupported = typeof document === "undefined" || document.fullscreenEnabled;
-  const selectedTag = selectedTagId ? tags[selectedTagId] : undefined;
+  const selectedTag = selectedTagId ? mapTags[selectedTagId] ?? tags[selectedTagId] : undefined;
   const selectedTagHidden = useIpsStore(state => selectedTagId ? state.tagPresenceById[selectedTagId]?.hiddenForNoData ?? false : false);
   const assistantContext = useMemo<GekonAiContext>(() => ({
     mode: "live",

@@ -6,6 +6,7 @@ import { TagPresenceService } from "../src/server/tracking/TagPresenceService";
 import { useIpsStore } from "../src/app/store/useIpsStore";
 import { MapDisplayFilter, type MapTagDisplay } from "../src/features/tracking/services/MapDisplayFilter";
 import { bindMapDisplayTracking } from "../src/features/tracking/services/bindMapDisplayTracking";
+import { mapTrackingTags } from "../src/features/tracking/services/mapTrackingTags";
 import { PositionAnimationController } from "../src/features/tracking/services/PositionAnimationController";
 import { DEFAULT_POSITION_ANIMATION_CONFIG } from "../src/features/tracking/config/positionAnimationConfig";
 import { DEFAULT_REGIONS_CONFIG } from "../src/features/regions/config/defaultRegionsConfig";
@@ -13,12 +14,13 @@ import { TagInformationPanelContent } from "../src/features/tracking/components/
 import { TagLastSeen } from "../src/features/tracking/components/TagLastSeen";
 import { AppSidebar } from "../src/app/components/AppSidebar";
 import type { RegionsConfig } from "../src/features/regions/types/region.types";
+import type { MotionLabel } from "../src/features/tracking/types/tracking.types";
 
-function fixture() {
+function fixture(motionLabel?: MotionLabel) {
   const mapId = DEFAULT_REGIONS_CONFIG.map.mapId;
   let now = Date.now();
   const service = new TagPresenceService(() => now);
-  const raw = { id: "T", x: 2, y: 2, timestamp: now, mapId };
+  const raw = { id: "T", x: 2, y: 2, timestamp: now, mapId, motionLabel };
   service.observeRaw(raw, { mapId, mapName: "1. Kat", floorLabel: "1. Kat", regionId: "A", regionName: "Oda 103", kind: "room" });
   const region = { id: "corridor", name: "Koridor", kind: "corridor" as const, color: "#ffffff", roomCenter: null, entrances: [],
     polygon: [[0, 0], [5, 0], [5, 5], [0, 5]].map(([x, y]) => ({ world: { x, y }, pixel: { x, y } })) };
@@ -78,6 +80,39 @@ test("both raw and processed display bindings hide tags, clear animation/trails 
   } finally { useIpsStore.setState(original, true); }
 });
 
+test("stationary snapshot without a room decision renders a marker, respects no-data hiding and recovers", () => {
+  const original = useIpsStore.getState();
+  const f = fixture("stationary");
+  let displays: Record<string, MapTagDisplay> = {};
+  const animation = new PositionAnimationController(DEFAULT_POSITION_ANIMATION_CONFIG);
+  const filter = new MapDisplayFilter(animation, value => { displays = value; useIpsStore.setState({ mapTagDisplays: value }); });
+  let unbind: (() => void) | undefined;
+  try {
+    useIpsStore.setState({ tags: {}, observedTags: {}, tagPresenceById: {}, tagLocationEntries: {}, selectedTagId: null,
+      activeMapId: f.config.map.mapId, regionsConfig: f.config, regionsConfigByMapId: { [f.config.map.mapId]: f.config } });
+    unbind = bindMapDisplayTracking(filter, true);
+    useIpsStore.getState().applyTagPresenceSnapshot(f.service.snapshot());
+    const mapTags = () => {
+      const state = useIpsStore.getState();
+      return mapTrackingTags(state.tags, state.observedTags, true);
+    };
+    assert.equal(mapTags().T.motionLabel, "stationary");
+    assert.equal(mapTags().T.regionInference, undefined);
+    assert.equal(displays.T.visible, true);
+    assert.ok(animation.getState("T"));
+    f.advance();
+    useIpsStore.getState().applyTagPresenceUpdate({ epoch: f.service.epoch, serverNow: f.now(), state: f.service.get("T")! });
+    assert.equal(displays.T.visible, false);
+    assert.equal(animation.getState("T"), undefined);
+    f.service.observeRaw({ ...f.raw, timestamp: f.now(), x: 3 }, f.service.get("T")!.lastObservedLocation);
+    useIpsStore.getState().applyTagPresenceUpdate({ epoch: f.service.epoch, serverNow: f.now(), state: f.service.get("T")! });
+    assert.equal(displays.T.visible, true);
+    assert.equal(animation.getState("T")!.samples.length, 1);
+    assert.equal(mapTags().T.x, 3);
+    assert.equal(mapTags().T.regionInference, undefined);
+  } finally { unbind?.(); filter.dispose(); useIpsStore.setState(original, true); }
+});
+
 test("stale tag stays selectable with historical place, unreliable badge and disabled map action on mobile", () => {
   const f = fixture(); f.advance();
   const presence = f.service.get("T")!;
@@ -90,7 +125,7 @@ test("stale tag stays selectable with historical place, unreliable badge and dis
   assert.match(html, /1. Kat · Oda 103/);
   assert.match(html, /Güvenilir değil/);
   assert.match(html, /SON GÖRÜLDÜĞÜ YER/);
-  assert.match(html, /Haritada gizli/);
+  assert.match(html, /haritada gizli/);
   assert.match(html, /disabled=""[^>]*>[\s\S]*?Haritada göster/);
   assert.doesNotMatch(html, /BU ALANDA|Bu alanda/);
   const management = renderToStaticMarkup(createElement(TagLastSeen, { presence, now: f.now() }));

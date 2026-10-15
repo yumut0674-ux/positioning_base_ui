@@ -20,7 +20,7 @@ import { useMapDisplayTracking } from "./useMapDisplayTracking";
 import { useTagPresenceTracking } from "./useTagPresenceTracking";
 import { colorForTag } from "../services/tagColor";
 
-export function useRealtimeTracking(): PositionAnimationController {
+export function useRealtimeTracking(): { readonly positionAnimation: PositionAnimationController; readonly engineEnabled: boolean } {
   useTagPresenceTracking();
   const upsertTag = useIpsStore((state) => state.upsertTag);
   const observeTag = useIpsStore((state) => state.observeTag);
@@ -210,5 +210,5 @@ export function useRealtimeTracking(): PositionAnimationController {
     return () => window.clearInterval(timer);
   }, [refreshTagActivity]);
 
-  return positionAnimation;
+  return { positionAnimation, engineEnabled };
 }
