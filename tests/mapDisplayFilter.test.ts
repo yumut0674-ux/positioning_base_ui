@@ -244,6 +244,31 @@ test("engine display includes stationary raw tags before any room decision and f
   } finally { unbind?.(); f.filter.dispose(); useIpsStore.setState(original, true); }
 });
 
+test("corridor markers do not require motion metadata or a room-engine publication", () => {
+  const original = useIpsStore.getState();
+  const f = fixture((mapTagDisplays) => useIpsStore.setState({ mapTagDisplays }));
+  const pair = (world: { x: number; y: number }) => ({ world, pixel: world });
+  const config = { ...DEFAULT_REGIONS_CONFIG, regions: [{ id: "corridor-main", name: "Koridor", kind: "corridor" as const,
+    color: "#fff", polygon: square.map(pair), roomCenter: null, entrances: [] }] };
+  let unbind: (() => void) | undefined;
+  try {
+    useIpsStore.setState({ tags: {}, observedTags: {}, tagPresenceById: {}, tagLocationEntries: {}, selectedTagId: null,
+      activeMapId: config.map.mapId, regionsConfig: config, regionsConfigByMapId: { [config.map.mapId]: config } });
+    unbind = bindMapDisplayTracking(f.filter, true);
+    for (const [index, motionLabel] of [undefined, "unknown", "stationary", "moving"].entries()) {
+      const id = `RAW-${index}`;
+      useIpsStore.getState().observeTag({ ...tag(2 + index, 2, 1000, id), motionLabel: motionLabel as TrackedTag["motionLabel"] });
+      assert.equal(f.displays()[id]?.visible, true, `raw motion: ${motionLabel}`);
+      let rendered: { x: number; y: number } | undefined;
+      const detach = f.animation.attach(id, { render: (x, y) => { rendered = p(x, y); } });
+      assert.deepEqual(rendered, p(2 + index, 2));
+      detach();
+    }
+    assert.deepEqual(useIpsStore.getState().tags, {});
+    assert.deepEqual(useIpsStore.getState().tagLocationEntries, {});
+  } finally { unbind?.(); f.filter.dispose(); useIpsStore.setState(original, true); }
+});
+
 test("stationary display keeps assigned rooms and accepts a delayed room decision after a raw fallback", () => {
   const original = useIpsStore.getState();
   const f = fixture((mapTagDisplays) => useIpsStore.setState({ mapTagDisplays }));
@@ -276,6 +301,32 @@ test("stationary display keeps assigned rooms and accepts a delayed room decisio
     assert.ok(inDisplayArea(f.displays().A.position!, [corridor]));
     assert.equal(useIpsStore.getState().tags.A, lost);
     assert.equal(f.animation.getState("A")?.samples.at(-1)?.regionId, null);
+  } finally { unbind?.(); f.filter.dispose(); useIpsStore.setState(original, true); }
+});
+
+test("new stationary packets refresh map animation freshness while retaining the assigned room centre", () => {
+  const original = useIpsStore.getState();
+  const f = fixture((mapTagDisplays) => useIpsStore.setState({ mapTagDisplays }));
+  const pair = (world: { x: number; y: number }) => ({ world, pixel: world });
+  const config = { ...DEFAULT_REGIONS_CONFIG, regions: [{ id: "room", name: "Oda", kind: "room" as const,
+    color: "#fff", polygon: square.map(pair), roomCenter: pair(p(5, 5)), entrances: [] }] };
+  let unbind: (() => void) | undefined;
+  try {
+    const processed = { ...tag(5, 5, 1000), positionSource: "REGION_CENTER" as const,
+      regionInference: { enabled: true, state: "IN_REGION", regionId: "room" } };
+    useIpsStore.setState({ tags: { A: processed }, observedTags: {}, tagPresenceById: {}, tagLocationEntries: {}, selectedTagId: null,
+      activeMapId: config.map.mapId, regionsConfig: config, regionsConfigByMapId: { [config.map.mapId]: config } });
+    unbind = bindMapDisplayTracking(f.filter, true);
+    for (const at of [11000, 21000, 31000]) {
+      f.advance(at);
+      useIpsStore.getState().observeTag({ ...tag(9, 9, at), motionLabel: "stationary" });
+      f.animation.update(at);
+      const state = f.animation.getState("A")!;
+      assert.equal(state.samples.at(-1)!.timestamp, at);
+      assert.equal(state.stale, false);
+      assert.deepEqual(f.displays().A.position, p(5, 5));
+      assert.equal(useIpsStore.getState().tags.A, processed);
+    }
   } finally { unbind?.(); f.filter.dispose(); useIpsStore.setState(original, true); }
 });
 

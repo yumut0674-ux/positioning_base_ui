@@ -1,22 +1,19 @@
 import type { TrackedTag } from "../types/tracking.types";
 import { assignedDisplayRoomId } from "./roomDisplayPolicy";
+import { withLatestTagObservation } from "./tagQuickList";
 
-/** Display candidates only: a stationary fallback never creates a room decision. */
+/** Display candidates only: raw visibility does not require motion metadata or create a room decision. */
 export function mapTrackingTags(
   tracked: Readonly<Record<string, TrackedTag>>,
   observed: Readonly<Record<string, TrackedTag>>,
   engineEnabled: boolean,
 ): Readonly<Record<string, TrackedTag>> {
   if (!engineEnabled) return observed;
-  const candidates: Record<string, TrackedTag> = {};
-  for (const [id, tag] of Object.entries(tracked)) {
-    if (tag.regionInference || tag.motionLabel === "stationary") candidates[id] = tag;
-  }
+  const candidates: Record<string, TrackedTag> = { ...tracked };
   for (const [id, raw] of Object.entries(observed)) {
-    if (raw.motionLabel !== "stationary") continue;
     const current = tracked[id];
-    if (current && (current.timestamp > raw.timestamp || assignedDisplayRoomId(current))) continue;
-    candidates[id] = raw;
+    if (current && current.timestamp > raw.timestamp) continue;
+    candidates[id] = current && assignedDisplayRoomId(current) ? withLatestTagObservation(current, raw) : raw;
   }
   return candidates;
 }

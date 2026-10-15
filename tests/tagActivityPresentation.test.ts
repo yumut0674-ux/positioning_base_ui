@@ -3,19 +3,49 @@ import test from "node:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { tagActivityPresentation, PASSIVE_TAG_COLOR } from "../src/features/tracking/services/tagActivityPresentation";
-import { buildTagQuickList } from "../src/features/tracking/services/tagQuickList";
+import { buildTagQuickList, withLatestTagObservation } from "../src/features/tracking/services/tagQuickList";
+import { mapTrackingTags } from "../src/features/tracking/services/mapTrackingTags";
 import { TagInformationPanelContent } from "../src/features/tracking/components/TagInformationPanel";
 import { SseTrackingGateway } from "../src/features/tracking/services/TrackingGateway";
-import { presencePosition } from "../src/server/tracking/tagPresenceRuntime";
+import { installGlobalTagPresenceRuntime, presencePosition, TagPresenceRuntime } from "../src/server/tracking/tagPresenceRuntime";
 import { TagPresenceService } from "../src/server/tracking/TagPresenceService";
 import { useIpsStore } from "../src/app/store/useIpsStore";
 import { TAG_LIVE_TIMEOUT_MS, type PositionMessage, type TrackedTag } from "../src/features/tracking/types/tracking.types";
+import type { TrackingPosition } from "../src/server/trackingBuffer";
 
 const now = Date.parse("2026-10-15T12:00:00.000Z");
 const tag = (overrides: Partial<TrackedTag> = {}): TrackedTag => ({
   id: "T", name: "Sedye", color: "#00a896", status: "active", x: 2, y: 3, timestamp: now, mapId: "map-a", ...overrides,
 });
 const room = { enabled: true, state: "IN_REGION", regionId: "room-a", measurementKind: "measured" as const };
+
+test("presence hot reload updates motion conversion without losing observations or subscribers", async () => {
+  const host = process as NodeJS.Process & { __uwbTagPresenceRuntime?: TagPresenceRuntime };
+  const original = host.__uwbTagPresenceRuntime;
+  const runtime = new TagPresenceRuntime();
+  const service = runtime.service, epoch = service.epoch;
+  const at = Date.now() - 2000;
+  const position: TrackingPosition = { tagCode: "PRESENCE-MOTION-HMR", x: 2, y: 3, mapId: null,
+    timestamp: new Date(at).toISOString(), motionLabel: "stationary" };
+  let events = 0;
+  const unsubscribe = service.subscribe(() => events++);
+  try {
+    const legacy = Object.create(TagPresenceRuntime.prototype) as TagPresenceRuntime;
+    legacy.observeRaw = async value => {
+      service.observeRaw({ id: value.tagCode, x: value.x, y: value.y, timestamp: Date.parse(value.timestamp), mapId: value.mapId },
+        { mapId: null, mapName: null, floorLabel: null, regionId: null, regionName: null, kind: "unknown" });
+    };
+    Object.setPrototypeOf(runtime, legacy);
+    await runtime.observeRaw(position);
+    assert.equal(service.get(position.tagCode)!.raw.motionLabel, undefined);
+    host.__uwbTagPresenceRuntime = runtime;
+    assert.equal(installGlobalTagPresenceRuntime(), runtime);
+    await runtime.observeRaw({ ...position, timestamp: new Date(at + 1000).toISOString() });
+    assert.equal(runtime.service, service); assert.equal(service.epoch, epoch);
+    assert.equal(service.get(position.tagCode)!.raw.motionLabel, "stationary");
+    assert.equal(events, 2);
+  } finally { unsubscribe(); host.__uwbTagPresenceRuntime = original; }
+});
 
 test("fresh measurements label moving as Hareketli and every other motion as Sabit", () => {
   for (const motionLabel of ["moving", "stationary", "unknown", undefined] as const) {
@@ -91,6 +121,39 @@ test("latest raw motion takes precedence over an older processed decision", () =
   const service = new TagPresenceService(() => now);
   service.observeRaw(raw, { mapId: null, mapName: null, floorLabel: null, regionId: null, regionName: null, kind: "unknown" });
   assert.equal(tagActivityPresentation(processed, service.get("T"), now).label, "Sabit");
+});
+
+test("successive stationary packets refresh room-tag data without changing its decision or centre", () => {
+  const decision = { ...room, validUntil: new Date(now + 3000).toISOString(), uncertainAfter: new Date(now + 60_000).toISOString() };
+  const processed = tag({ timestamp: now - 1000, motionLabel: "moving", status: "offline", pdop: 10,
+    positionSource: "REGION_CENTER", publishedAt: new Date(now - 500).toISOString(), regionInference: decision });
+  const tracked = { T: processed };
+  for (const offset of [0, 10000, 20000]) {
+    const raw = tag({ timestamp: now + offset, receivedAt: new Date(now + offset).toISOString(),
+      x: 4 + offset / 10000, y: 8, pdop: 2 + offset / 10000, motionLabel: "stationary" });
+    for (const view of [mapTrackingTags(tracked, { T: raw }, true).T, buildTagQuickList({}, tracked, { T: raw })[0]]) {
+      assert.equal(view.timestamp, raw.timestamp);
+      assert.equal(view.lastRawDataTimestamp, new Date(raw.timestamp).toISOString());
+      assert.equal(view.receivedAt, raw.receivedAt);
+      assert.equal(view.motionLabel, "stationary"); assert.equal(view.status, "active");
+      assert.equal(view.pdop, raw.pdop);
+      assert.deepEqual([view.rawPosition?.x, view.rawPosition?.y], [raw.x, raw.y]);
+      assert.deepEqual([view.x, view.y], [processed.x, processed.y]);
+      assert.equal(view.regionInference, decision);
+      assert.equal(tagActivityPresentation(view, undefined, raw.timestamp).label, "Sabit");
+    }
+  }
+  assert.equal(tracked.T, processed); assert.equal(processed.timestamp, now - 1000);
+});
+
+test("stationary corridor data uses the newest coordinates and ignores delayed raw observations", () => {
+  const processed = tag({ timestamp: now - 1000, x: 1, y: 1, status: "offline", pdop: 9,
+    regionInference: { enabled: true, state: "TRACKING_OUTSIDE", regionId: null } });
+  const raw = tag({ timestamp: now, x: 4, y: 5, pdop: 2, motionLabel: "stationary" });
+  const view = withLatestTagObservation(processed, raw);
+  assert.deepEqual([view.x, view.y], [4, 5]);
+  assert.equal(view.timestamp, now); assert.equal(view.pdop, 2); assert.equal(view.status, "active");
+  assert.equal(withLatestTagObservation(view, { ...raw, timestamp: now - 1, x: 99 }), view);
 });
 
 test("quick list includes all registered and discovered tags without adding fake map positions", () => {

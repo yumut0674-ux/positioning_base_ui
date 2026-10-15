@@ -1,12 +1,21 @@
 import type { TrackedTag } from "../types/tracking.types";
 import type { TagDefinition } from "./tagApi";
 import { colorForTag } from "./tagColor";
+import { assignedDisplayRoomId } from "./roomDisplayPolicy";
 
+/** Refresh the view from raw data without changing the stored engine decision or its evidence clocks. */
 export function withLatestTagObservation(tag: TrackedTag, raw?: TrackedTag): TrackedTag {
-  return raw && raw.timestamp >= tag.timestamp ? {
-    ...tag, motionLabel: raw.motionLabel, timestamp: raw.timestamp, receivedAt: raw.receivedAt,
-    lastRawDataTimestamp: new Date(raw.timestamp).toISOString(),
-  } : tag;
+  if (!raw || raw.timestamp < tag.timestamp) return tag;
+  const measuredAt = new Date(raw.timestamp).toISOString();
+  return {
+    ...tag,
+    ...(!assignedDisplayRoomId(tag) ? { x: raw.x, y: raw.y, mapId: raw.mapId } : {}),
+    motionLabel: raw.motionLabel, timestamp: raw.timestamp, receivedAt: raw.receivedAt,
+    status: raw.status, pdop: raw.pdop ?? null, sourceZoneId: raw.sourceZoneId, sourceZoneName: raw.sourceZoneName,
+    lastRawDataTimestamp: measuredAt,
+    rawPosition: { x: raw.x, y: raw.y, timestamp: measuredAt, pdop: raw.pdop ?? null,
+      mapId: raw.mapId, sourceZoneId: raw.sourceZoneId, sourceZoneName: raw.sourceZoneName },
+  };
 }
 
 /** Include registered tags with no observations without inventing map positions in the store. */

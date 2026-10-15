@@ -134,4 +134,16 @@ export class TagPresenceRuntime {
 }
 
 type PresenceHost = NodeJS.Process & { __uwbTagPresenceRuntime?: TagPresenceRuntime };
-export const tagPresenceRuntime = (process as PresenceHost).__uwbTagPresenceRuntime ??= new TagPresenceRuntime();
+
+/** Preserve observations and SSE subscribers while installing current methods after HMR. */
+export function installGlobalTagPresenceRuntime(): TagPresenceRuntime {
+  const host = process as PresenceHost;
+  const existing = host.__uwbTagPresenceRuntime;
+  if (existing) {
+    if (Object.getPrototypeOf(existing) !== TagPresenceRuntime.prototype) Object.setPrototypeOf(existing, TagPresenceRuntime.prototype);
+    if (Object.getPrototypeOf(existing.service) !== TagPresenceService.prototype) Object.setPrototypeOf(existing.service, TagPresenceService.prototype);
+  }
+  return host.__uwbTagPresenceRuntime = existing ?? new TagPresenceRuntime();
+}
+
+export const tagPresenceRuntime = installGlobalTagPresenceRuntime();

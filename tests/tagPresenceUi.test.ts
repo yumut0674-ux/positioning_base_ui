@@ -113,6 +113,25 @@ test("stationary snapshot without a room decision renders a marker, respects no-
   } finally { unbind?.(); filter.dispose(); useIpsStore.setState(original, true); }
 });
 
+test("legacy presence snapshot with no motion field still renders a corridor marker", () => {
+  const original = useIpsStore.getState();
+  const f = fixture();
+  let displays: Record<string, MapTagDisplay> = {};
+  const animation = new PositionAnimationController(DEFAULT_POSITION_ANIMATION_CONFIG);
+  const filter = new MapDisplayFilter(animation, value => { displays = value; useIpsStore.setState({ mapTagDisplays: value }); });
+  let unbind: (() => void) | undefined;
+  try {
+    useIpsStore.setState({ tags: {}, observedTags: {}, tagPresenceById: {}, tagLocationEntries: {}, selectedTagId: null,
+      activeMapId: f.config.map.mapId, regionsConfig: f.config, regionsConfigByMapId: { [f.config.map.mapId]: f.config } });
+    unbind = bindMapDisplayTracking(filter, true);
+    useIpsStore.getState().applyTagPresenceSnapshot(f.service.snapshot());
+    const state = useIpsStore.getState();
+    assert.equal(mapTrackingTags(state.tags, state.observedTags, true).T?.regionInference, undefined);
+    assert.equal(displays.T?.visible, true);
+    assert.equal(animation.getState("T")?.renderedX, 2);
+  } finally { unbind?.(); filter.dispose(); useIpsStore.setState(original, true); }
+});
+
 test("stale tag stays selectable with historical place, unreliable badge and disabled map action on mobile", () => {
   const f = fixture(); f.advance();
   const presence = f.service.get("T")!;
