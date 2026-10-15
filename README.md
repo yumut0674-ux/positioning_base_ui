@@ -265,13 +265,13 @@ Her istekte tek bir konum kaydı gönderilir:
 ```json
 {
   "type": "position",
-  "tag_id": "TAG-001",
-  "x": 8.8,
-  "y": 7.8,
-  "pdop": 1.83,
+  "tag_id": "AAAABBBBCCCCDDDD",
+  "x": 12.48,
+  "y": 7.32,
   "zone_id": "zone-a",
   "zone_name": "Bölge A",
-  "timestamp": "2026-07-26T12:00:00+03:00"
+  "timestamp": "2026-10-15T14:30:15.123+03:00",
+  "motion_label": "moving"
 }
 ```
 
@@ -284,7 +284,8 @@ Kurallar:
 - `type` yalnızca `"position"` olabilir.
 - `tag_id` boş olmayan string olmalı, en fazla 100 karakter olmalıdır.
 - `tag_id` trim edilir ve uppercase normalize edilir.
-- `x` ve `y` sonlu number olmalıdır.
+- `x` ve `y` sonlu number olmalıdır; metre cinsinden ortak UWB harita koordinatlarıdır, enlem/boylam değildir. Alıcı koordinatları değiştirmeden taşır.
+- `motion_label` yalnızca `"moving"`, `"stationary"` veya `"unknown"` olabilir. Eski göndericiler alanı göndermediğinde `"unknown"` kabul edilir. Etiket canlı konum verisinde `motionLabel` metadata alanı olarak taşınır; motorun hız, mesafe, oda/bölge kararları veya kaynak sağlık/geçerlilik kontrollerinde kullanılmaz.
 - `pdop` sonlu number veya `null` olmalıdır. Eski göndericilerde alan eksikse `null` kabul edilir; hiçbir aşamada `0` değerine dönüştürülmez.
 - Paket önce `zone_id` ile haritaya çözülür. Haritanın PDOP filtresi açıksa üst sınırdan büyük paketler SSE, oda/bölge motoru ve geçmiş kuyruğundan önce tamamen elenir. Sınıra eşit değerler ve `null`, mevcut diğer filtrelere devam eder. Elenen paket tag'ın son kabul edilmiş konumunu, PDOP değerini veya son veri zamanını güncellemez.
 - PDOP filtresi harita bazında açılıp kapatılır ve üst sınırı değiştirilir. Varsayılan `enabled:true, maximumPdop:20`; `necmettin-yogun-bakim` için başlangıç sınırı 70'tir. Haritası bilinmeyen/null zone için varsayılan 20 filtresi uygulanır.
