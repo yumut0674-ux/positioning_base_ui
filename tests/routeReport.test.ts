@@ -129,7 +129,7 @@ test("PDF is multipage with a repeated table header and Turkish text", async () 
   assert.ok((Buffer.from(pdf).toString("latin1").match(/\/Type\s*\/Page\b/g) ?? []).length >= 2);
 });
 
-test("PDF shows corridor durations and applies the configurable minimum to every displayed row", async context => {
+test("PDF shows corridor durations, omits missing decisions and applies the configurable minimum", async context => {
   const PdfPrinter = createRequire(import.meta.url)("pdfmake") as typeof import("pdfmake");
   const printer = context.mock.method(PdfPrinter.prototype, "createPdfKitDocument");
   let cursor = Date.parse(from);
@@ -139,7 +139,7 @@ test("PDF shows corridor durations and applies the configurable minimum to every
   ].map(([room, milliseconds]): ReportRow => {
     const start = cursor;
     cursor += Number(milliseconds);
-    return { from: new Date(start).toISOString(), to: new Date(cursor).toISOString(), mapId: "Kat 1", roomId: null, floor: "Kat 1", room: String(room), gap: room === "Veri yok" };
+    return { from: new Date(start).toISOString(), to: new Date(cursor).toISOString(), mapId: "Kat 1", roomId: ["Koridor", "Veri yok", "—"].includes(String(room)) ? null : String(room), floor: "Kat 1", room: String(room), gap: room === "Veri yok" };
   });
   const report: RouteReportData = { from, to, generatedAt: to, tags: [{ tagCode: "TAG-001", displayName: "Test", rows, hasRecords: true }] };
   async function render(data: RouteReportData, minimum?: number) {
@@ -151,15 +151,46 @@ test("PDF shows corridor durations and applies the configurable minimum to every
   }
 
   const standard = await render(report);
-  assert.deepEqual(standard.rows.map(cells => [cells[4], cells[5]]), [["Tam dakika", "1 dk"], ["Koridor", "2 dk"], ["Veri yok", "—"], ["—", "—"]]);
-  assert.deepEqual((await render(report, 120_000)).rows.map(cells => cells[4]), ["Koridor", "Veri yok", "—"]);
-  assert.equal((await render(report, 0)).rows.length, rows.length);
+  assert.deepEqual(standard.rows.map(cells => [cells[4], cells[5]]), [["Tam dakika", "1 dk"], ["Koridor", "2 dk"]]);
+  assert.deepEqual((await render(report, 120_000)).rows.map(cells => cells[4]), ["Koridor"]);
+  assert.deepEqual((await render(report, 0)).rows.map(cells => [cells[4], cells[5]]), [["Kısa oda", "1 dk"], ["Tam dakika", "1 dk"], ["Koridor", "3 dk"]]);
   const empty = await render(report, 86_400_000);
   assert.equal(empty.rows.length, 0);
-  assert.ok(empty.content.some(item => item.text === "Seçilen minimum süreyi karşılayan kayıt yok."));
+  assert.ok(empty.content.some(item => item.text === "Seçilen minimum süreyi karşılayan oda veya koridor kararı yok."));
+  assert.equal((await render({ ...report, tags: [{ ...report.tags[0], rows: rows.slice(4) }] }, 0)).rows.length, 0);
   assert.equal(report.tags[0].rows.length, 8);
 
   const midnight = { ...rows[3], from: "2026-09-25T20:59:30Z", to: "2026-09-25T21:01:00Z" };
   const split = await render({ ...report, tags: [{ ...report.tags[0], rows: [midnight] }] });
   assert.deepEqual(split.rows.map(cells => [cells[0], cells[1], cells[2], cells[5]]), [["26.09.2026", "00:00", "00:01", "1 dk"]]);
+  const bothDays = await render({ ...report, tags: [{ ...report.tags[0], rows: [{ ...midnight, from: "2026-09-25T20:58:00Z", to: "2026-09-25T21:02:00Z" }] }] });
+  assert.deepEqual(bothDays.rows.map(cells => [cells[0], cells[5]]), [["25.09.2026", "2 dk"], ["26.09.2026", "2 dk"]]);
+});
+
+test("PDF merges consecutive visible room records and sums only their included durations", async context => {
+  const PdfPrinter = createRequire(import.meta.url)("pdfmake") as typeof import("pdfmake");
+  const printer = context.mock.method(PdfPrinter.prototype, "createPdfKitDocument");
+  const start = Date.parse(from);
+  const row = (begin: number, end: number, room: string, roomId: string | null, mapId = "Kat 1"): ReportRow => ({
+    from: new Date(start + begin * 1_000).toISOString(), to: new Date(start + end * 1_000).toISOString(),
+    mapId, roomId, floor: mapId, room, gap: room === "Veri yok",
+  });
+  const rows = [
+    row(0, 80, "Oda 2", "2"), row(80, 180, "Veri yok", null), row(180, 260, "Oda 2", "2"),
+    row(260, 360, "—", null), row(360, 440, "Oda 2", "2"), row(440, 470, "Koridor", null),
+    row(470, 550, "Oda 2", "2"), row(550, 670, "Koridor", null), row(670, 730, "Oda 2", "2"),
+    row(730, 790, "Oda 2", "2", "Kat 2"), row(790, 850, "Oda 2", "different-room", "Kat 2"),
+  ];
+  const original = structuredClone(rows);
+  await createRouteReportPdf({ from, to, generatedAt: to, tags: [{ tagCode: "TAG-001", displayName: "Test", rows, hasRecords: true }] });
+  const content = printer.mock.calls.at(-1)!.arguments[0].content as { table?: { body: { text: string }[][] } }[];
+  const displayed = content.flatMap(item => item.table?.body.slice(1).map(cells => cells.slice(1).map(cell => cell.text)) ?? []);
+  assert.deepEqual(displayed, [
+    ["10:00", "10:09", "Kat 1", "Oda 2", "5 dk"],
+    ["10:09", "10:11", "Kat 1", "Koridor", "2 dk"],
+    ["10:11", "10:12", "Kat 1", "Oda 2", "1 dk"],
+    ["10:12", "10:13", "Kat 2", "Oda 2", "1 dk"],
+    ["10:13", "10:14", "Kat 2", "Oda 2", "1 dk"],
+  ]);
+  assert.deepEqual(rows, original);
 });

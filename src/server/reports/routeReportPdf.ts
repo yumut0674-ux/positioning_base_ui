@@ -34,6 +34,23 @@ function splitAtMidnight(row: ReportRow): ReportRow[] {
   return result;
 }
 
+interface PdfReportRow extends ReportRow { readonly durationMs: number }
+
+function visibleReportRows(rows: readonly ReportRow[], minimumDurationMs: number): PdfReportRow[] {
+  const result: PdfReportRow[] = [];
+  for (const row of rows.flatMap(splitAtMidnight)) {
+    const durationMs = Date.parse(row.to) - Date.parse(row.from);
+    if (row.gap || (!row.roomId && row.room !== "Koridor") || durationMs < minimumDurationMs) continue;
+    const previous = result.at(-1);
+    if (previous && previous.mapId === row.mapId && previous.roomId === row.roomId
+      && formatDate(previous.from) === formatDate(row.from)) {
+      // Omitted intervals must never be counted as time spent at this location.
+      result[result.length - 1] = { ...previous, to: row.to, durationMs: previous.durationMs + durationMs };
+    } else result.push({ ...row, durationMs });
+  }
+  return result;
+}
+
 export async function createRouteReportPdf(report: RouteReportData, minimumDurationMs = DEFAULT_SYSTEM_SETTINGS.reports.routeHistoryMinDurationMs): Promise<Uint8Array> {
   // pdfmake is CommonJS; let Node load it without Vite transforming fontkit's require calls.
   const nodeRequire = createRequire(path.join(process.cwd(), "package.json"));
@@ -55,25 +72,24 @@ export async function createRouteReportPdf(report: RouteReportData, minimumDurat
   for (const tag of report.tags) {
     content.push({ text: tag.displayName === tag.tagCode ? tag.tagCode : `${tag.displayName} · ${tag.tagCode}`, style: "tagHeading", margin: [0, 10, 0, 7] });
     if (!tag.hasRecords) content.push({ text: report.room ? "Bu tag için seçilen odada hesaplanabilir kalış yok." : "Bu tag için seçilen aralıkta konum kaydı yok.", color: "#555555", margin: [0, 0, 0, 7] });
-    const rows = tag.rows.flatMap(splitAtMidnight).filter(row => Date.parse(row.to) - Date.parse(row.from) >= minimumDurationMs);
+    const rows = visibleReportRows(tag.rows, minimumDurationMs);
     if (!rows.length) {
-      if (tag.hasRecords) content.push({ text: "Seçilen minimum süreyi karşılayan kayıt yok.", color: "#555555", margin: [0, 0, 0, 7] });
+      if (tag.hasRecords) content.push({ text: "Seçilen minimum süreyi karşılayan oda veya koridor kararı yok.", color: "#555555", margin: [0, 0, 0, 7] });
       continue;
     }
     const body: TableCell[][] = [["Tarih", "Giriş saati", "Çıkış saati", "Kat", "Oda", "Kalış süresi"].map(text => ({ text, bold: true, fillColor: "#E6E6E6", color: "#111111", margin: [3, 5, 3, 5] }))];
     for (const row of rows) {
-      const from = Date.parse(row.from), to = Date.parse(row.to);
       body.push([
         formatDate(row.from), formatTime(row.from), formatTime(row.to), row.floor, row.room,
-        row.gap || row.room === "—" ? "—" : duration(from, to),
-      ].map(text => ({ text, margin: [3, 4, 3, 4], color: row.gap ? "#555555" : "#111111" })));
+        duration(0, row.durationMs),
+      ].map(text => ({ text, margin: [3, 4, 3, 4], color: "#111111" })));
     }
     content.push({ table: { headerRows: 1, widths: [77, 63, 63, 82, "*", 70], body, dontBreakRows: true },
       layout: { hLineColor: () => "#BDBDBD", vLineColor: () => "#D4D4D4", hLineWidth: () => .5, vLineWidth: () => .5 }, margin: [0, 0, 0, 6] });
   }
   content.push({ text: report.room
-    ? "Yalnızca seçilen odadaki kalışlar ve veri bulunmayan süreler gösterilir. Diğer konumlar gösterilmez; veri bulunmayan süreler oda kalışına dahil edilmez."
-    : "Veri yok satırları ölçüm bulunmayan süreleri gösterir. Bu süreler oda kalışına dahil edilmemiştir.", color: "#555555", fontSize: 8, margin: [0, 12, 0, 0] });
+    ? "Yalnızca seçilen odanın karar kayıtları gösterilir. Aynı gün art arda gelen aynı oda kayıtları birleştirilir. Giriş ve çıkış ilk ve son kaydı gösterir; kalış süresi yalnızca rapora dahil edilen kayıtların toplamıdır."
+    : "Yalnızca oda veya koridor kararı bulunan kayıtlar gösterilir. Aynı gün art arda gelen aynı konum kayıtları birleştirilir. Giriş ve çıkış ilk ve son kaydı gösterir; kararsız ve rapora alınmayan süreler kalışa dahil edilmez.", color: "#555555", fontSize: 8, margin: [0, 12, 0, 0] });
   const definition: TDocumentDefinitions = {
     pageSize: "A4", pageOrientation: "portrait", pageMargins: [40, 82, 40, 48],
     defaultStyle: { font: "Roboto", fontSize: 9, color: "#111111" },
