@@ -1,0 +1,97 @@
+
+> gekon-ips-control@0.1.0 build
+> vinext build
+
+
+  vinext build  (Vite 8.0.13)
+
+[1/5] analyze client references...
+[2K
+transforming...✓ 323 modules transformed.
+rendering chunks...
+[PLUGIN_TIMINGS] Your build spent significant time in plugins. Here is a breakdown:
+  - vinext:optimize-imports (29%)
+  - rsc:virtual-client-package (11%)
+  - vinext:react-canary (10%)
+  - vinext:config (7%)
+  - vinext:og-font-patch (7%)
+See https://rolldown.rs/options/checks#plugintimings for more details.
+
+✓ built in 5.68s
+[2/5] analyze server references...
+[2K
+transforming...✓ 884 modules transformed.
+rendering chunks...
+✓ built in 2.73s
+[3/5] build rsc environment...
+[2K
+transforming...✓ 329 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 2.24s
+[4/5] build client environment...
+[2K
+transforming...✓ 2356 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 4.30s
+[5/5] build ssr environment...
+[2K
+transforming...✓ 908 modules transformed.
+rendering chunks...
+computing gzip size...
+✓ built in 1.48s
+[0m
+  Route (app)
+  ┌ ? /                                       
+  ├ ? /anchors                                
+  ├ λ /api/admin/gekon-ai/requests            
+  ├ λ /api/admin/gekon-ai/requests/:id        
+  ├ λ /api/admin/gekon-ai/session             
+  ├ λ /api/admin/gekon-ai/settings            
+  ├ λ /api/admin/gekon-ai/summary             
+  ├ λ /api/anchors                            
+  ├ λ /api/anchors/:id/logs                   
+  ├ λ /api/area-events                        
+  ├ λ /api/assistant                          
+  ├ λ /api/health                             
+  ├ λ /api/location/entities/:entityId/at     
+  ├ λ /api/location/entities/:entityId/current
+  ├ λ /api/location/entities/:entityId/history
+  ├ λ /api/location/entities/search           
+  ├ λ /api/maps                               
+  ├ λ /api/maps/:mapId                        
+  ├ λ /api/maps/:mapId/regions                
+  ├ λ /api/maps/:mapId/regions/validate       
+  ├ λ /api/maps/:mapId/tracking-filter        
+  ├ λ /api/region-engine/config               
+  ├ λ /api/region-engine/status               
+  ├ λ /api/region-engine/tick                 
+  ├ λ /api/regions                            
+  ├ λ /api/regions/validate                   
+  ├ λ /api/reports/route-history              
+  ├ λ /api/room-decisions                     
+  ├ λ /api/room-decisions/:decisionId         
+  ├ λ /api/room-tests                         
+  ├ λ /api/room-tests/:id                     
+  ├ λ /api/room-tests/:id/actions             
+  ├ λ /api/room-tests/:id/export              
+  ├ λ /api/room-tests/plans                   
+  ├ λ /api/settings                           
+  ├ λ /api/support                            
+  ├ λ /api/tags                               
+  ├ λ /api/tracking/ingest                    
+  ├ λ /api/tracking/presence                  
+  ├ λ /api/tracking/processed                 
+  ├ λ /api/tracking/stream                    
+  ├ ? /history                                
+  └ ? /tags                                   
+
+  λ API  ? Unknown
+
+  ? Some routes could not be classified. vinext currently uses static analysis
+    and cannot detect dynamic API usage (headers(), cookies(), etc.) at build time.
+    Automatic classification will be improved in a future release.
+
+  Build complete. Run `vinext start` to start the production server.
+

@@ -6,9 +6,6 @@ import {
   History, Layers3, Loader2, MessageCircle, MapPin, MapPinned, Maximize2, Route, Search,
 } from "lucide-react";
 import { memo, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
-import { Stage } from "react-konva";
-import type Konva from "konva";
-import useImage from "use-image";
 import { HistoryChatWidget } from "@/src/features/assistant/components/HistoryChatWidget";
 import { RouteReportDialog } from "@/src/features/reports/components/RouteReportDialog";
 import { fetchTags, type TagDefinition } from "@/src/features/tracking/services/tagApi";
@@ -22,10 +19,9 @@ import type {
 } from "@/src/server/location/location.types";
 import { useElementSize } from "@/src/shared/hooks/useElementSize";
 import { buildDecisionStays } from "../services/decisionTimeline";
-import { RouteHistoryMapLayers } from "./RouteHistoryMapLayers";
+import { RouteHistoryImageViewport } from "./RouteHistoryImageViewport";
 import styles from "./routeHistoryPanel.module.css";
 
-type CanvasPoint = readonly [number, number];
 type HistoryLoadState = "idle" | "loading" | "success" | "no_data" | "unregistered" | "unassigned" | "database_error" | "error";
 
 const MAX_HISTORY_RANGE_MS = 7 * 24 * 60 * 60 * 1_000;
@@ -83,11 +79,9 @@ export const RouteHistoryPanel = memo(function RouteHistoryPanel({ requestedTagC
   const hostRef = useRef<HTMLDivElement>(null);
   const sidebarRef = useRef<HTMLElement>(null);
   const summaryRef = useRef<HTMLElement>(null);
-  const stageRef = useRef<Konva.Stage>(null);
   const size = useElementSize(hostRef);
   const [historyMap, setHistoryMap] = useState<MapDetails | null>(null);
   const [mapCatalog, setMapCatalog] = useState<MapCatalog | null>(null);
-  const [floorImage] = useImage(historyMap?.image.url ?? "", "anonymous");
   const [initialRange] = useState(initialDateRange);
   const [entityQuery, setEntityQuery] = useState(() => requestedTagCode?.trim().toUpperCase() || "");
   const [registeredTags, setRegisteredTags] = useState<TagDefinition[]>([]);
@@ -107,6 +101,8 @@ export const RouteHistoryPanel = memo(function RouteHistoryPanel({ requestedTagC
   const [historyState, setHistoryState] = useState<HistoryLoadState>("idle");
   const [historyMessage, setHistoryMessage] = useState<string | null>(null);
   const [selectedStayId, setSelectedStayId] = useState<string | null>(null);
+  const [selectionRequestKey, setSelectionRequestKey] = useState(0);
+  const [selectionImage, setSelectionImage] = useState<{ data: RoutePointsHistoryData; stayId: string; mapId: string; url?: string; error?: string } | null>(null);
   const [viewport, setViewport] = useState({ x: 0, y: 0, scale: .9 });
   const [assistantDraftRequestId, setAssistantDraftRequestId] = useState(0);
   const [reportOpen, setReportOpen] = useState(false);
@@ -114,12 +110,7 @@ export const RouteHistoryPanel = memo(function RouteHistoryPanel({ requestedTagC
   const mapHeight = historyMap?.image.height ?? Math.max(1, size.height);
   const historyMapId = historyMap?.id ?? null;
   const historyMapEntry = mapCatalog?.maps.find((map) => map.id === historyMapId);
-  const mapTransform = useMemo(() => historyMap ? new CoordinateTransformService(historyMap.calibration) : null, [historyMap]);
-  const worldToCanvas = useCallback((position: Pick<HistoricalPosition, "x" | "y">): CanvasPoint => {
-    if (!mapTransform) return [0, 0];
-    const point = mapTransform.worldToCanvas(position);
-    return [point.x, point.y];
-  }, [mapTransform]);
+  const renderedMap = historyData?.renderedMaps?.find(entry => entry.map.id === historyMapId);
 
   useEffect(() => {
     void fetchMapCatalog().then(setMapCatalog).catch(() => setMapCatalog(null));
@@ -185,10 +176,10 @@ export const RouteHistoryPanel = memo(function RouteHistoryPanel({ requestedTagC
 
   const fitMap = useCallback(() => {
     const padding = 62;
-    const scale = Math.min(
+    const scale = Math.max(.02, Math.min(
       (size.width - padding * 2) / mapWidth,
       (size.height - padding * 2) / mapHeight,
-    );
+    ));
     setViewport({
       scale,
       x: (size.width - mapWidth * scale) / 2,
@@ -197,10 +188,10 @@ export const RouteHistoryPanel = memo(function RouteHistoryPanel({ requestedTagC
   }, [mapHeight, mapWidth, size.height, size.width]);
 
   useEffect(() => {
-    if (size.width <= 1 || size.height <= 1) return;
+    if (size.width <= 1 || size.height <= 1 || selectedStayId) return;
     const frame = window.requestAnimationFrame(fitMap);
     return () => window.cancelAnimationFrame(frame);
-  }, [fitMap, size.height, size.width]);
+  }, [fitMap, size.height, size.width, selectedStayId]);
 
   useEffect(() => {
     const query = entityQuery.trim();
@@ -268,16 +259,36 @@ export const RouteHistoryPanel = memo(function RouteHistoryPanel({ requestedTagC
   const timeline = useMemo(() => historyData?.zoneTimeline
     ? buildDecisionStays(positions, historyData.zoneTimeline)
     : buildLocationTimeline(positions, "", regionsConfigByMapId), [positions, regionsConfigByMapId, historyData]);
-  const plottedPositions = useMemo(() => historyMapId ? positions.filter((position) => position.mapId === historyMapId) : [], [historyMapId, positions]);
-  const pointValues = useMemo(() => plottedPositions.flatMap((position) => worldToCanvas(position)), [plottedPositions, worldToCanvas]);
   const distance = useMemo(() => routeDistanceByMap(positions), [positions]);
   const routeSegments = useMemo(() => segmentRouteByMap(positions), [positions]);
   const selectedStay = timeline.find((stay) => stay.id === selectedStayId) ?? null;
-  const selectedPointValues = useMemo(() => selectedStay?.mapId === historyMapId ? selectedStay.positions.flatMap((position) => worldToCanvas(position)) : [], [historyMapId, selectedStay, worldToCanvas]);
+  const selectionReady = selectionImage?.data === historyData && selectionImage?.stayId === selectedStay?.id && selectionImage?.mapId === historyMapId;
+  const hasSelection = Boolean(selectedStay?.positions.length && selectedStay.mapId === historyMapId);
+  const highlightSrc = hasSelection && selectionReady ? selectionImage?.url : undefined;
   const visitedLocationCount = new Set(timeline.filter((stay) => !stay.isDataGap).map((stay) => `${stay.mapId ?? "unresolved"}:${stay.locationLabel}`)).size;
   const totalDuration = historyData?.observedRange ? Date.parse(historyData.observedRange.to) - Date.parse(historyData.observedRange.from)
     : positions.length > 1 ? Date.parse(positions.at(-1)!.timestamp) - Date.parse(positions[0].timestamp) : 0;
   const longestStay = timeline.filter((stay) => !stay.isDataGap).reduce<LocationStay | null>((longest, stay) => !longest || stay.durationMs > longest.durationMs ? stay : longest, null);
+
+  useEffect(() => {
+    if (!selectedStay?.mapId || selectedStay.mapId !== historyMapId || !selectedStay.positions.length || !historyData) return;
+    const controller = new AbortController();
+    const stay = selectedStay, data = historyData, mapId = selectedStay.mapId;
+    let objectUrl: string | undefined;
+    void fetch("/api/location/history-map/selection", {
+      method: "POST", headers: { "Content-Type": "application/json", Accept: "image/png" }, signal: controller.signal,
+      body: JSON.stringify({ mapId, points: stay.positions.map(({ x, y }) => ({ x, y })), showRoute: !data.zoneTimeline }),
+    }).then(async response => {
+      if (!response.ok) throw new Error("Seçili bölge görseli hazırlanamadı. Bölgeyi yeniden seçin.");
+      const blob = await response.blob();
+      if (controller.signal.aborted) return;
+      objectUrl = URL.createObjectURL(blob);
+      setSelectionImage({ data, mapId, stayId: stay.id, url: objectUrl });
+    }).catch(error => {
+      if (!controller.signal.aborted) setSelectionImage({ data, mapId, stayId: stay.id, error: error instanceof Error ? error.message : "Seçili bölge görseli hazırlanamadı." });
+    });
+    return () => { controller.abort(); if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [selectedStay, historyMapId, historyData, selectionRequestKey]);
 
   const fetchHistory = async () => {
     if (historyState === "loading") return;
@@ -312,7 +323,7 @@ export const RouteHistoryPanel = memo(function RouteHistoryPanel({ requestedTagC
     setHistoryWarnings([]);
     setSelectedStayId(null);
     try {
-      const query = new URLSearchParams({ from, to, format: "route_points", limit: "2000" });
+      const query = new URLSearchParams({ from, to, format: "route_points", limit: "2000", render: "map" });
       const response = await fetch(`/api/location/entities/${selectedEntityId}/history?${query}`, {
         headers: { Accept: "application/json" },
         cache: "no-store",
@@ -345,8 +356,7 @@ export const RouteHistoryPanel = memo(function RouteHistoryPanel({ requestedTagC
       setHistoryWarnings(payload.meta.warnings);
       setHistoryState(nextPositions.length === 0 ? "no_data" : "success");
       const firstMapId = nextPositions.find((position) => position.mapId)?.mapId;
-      if (firstMapId) void fetchMapDetails(firstMapId).then(setHistoryMap).catch(() => setHistoryMap(null));
-      else setHistoryMap(null);
+      setHistoryMap(data.renderedMaps?.find(entry => entry.map.id === firstMapId)?.map ?? data.renderedMaps?.[0]?.map ?? null);
       for (const mapId of new Set(nextPositions.flatMap((position) => position.mapId ? [position.mapId] : []))) {
         void fetch(`/api/maps/${encodeURIComponent(mapId)}/regions`, { headers: { Accept: "application/json" }, cache: "no-store" })
           .then(async (regionResponse) => {
@@ -364,14 +374,16 @@ export const RouteHistoryPanel = memo(function RouteHistoryPanel({ requestedTagC
     }
   };
 
-  const focusStay = (stay: LocationStay) => {
-    if (stay.mapId && stay.mapId !== historyMapId) {
-      void fetchMapDetails(stay.mapId).then((map) => { setHistoryMap(map); window.requestAnimationFrame(fitMap); }).catch(() => undefined);
-    }
+  const focusStay = async (stay: LocationStay) => {
+    const map = historyData?.renderedMaps?.find(entry => entry.map.id === stay.mapId)?.map
+      ?? (stay.mapId === historyMapId ? historyMap : stay.mapId ? await fetchMapDetails(stay.mapId) : null);
+    if (!map) return;
+    setHistoryMap(map);
     if (stay.positions.length === 0 || size.width <= 1 || size.height <= 1) return;
-    const canvasPoints = stay.positions.map(worldToCanvas);
-    const xs = canvasPoints.map(([x]) => x);
-    const ys = canvasPoints.map(([, y]) => y);
+    const transform = new CoordinateTransformService(map.calibration);
+    const canvasPoints = stay.positions.map(position => transform.worldToCanvas(position));
+    const xs = canvasPoints.map(({ x }) => x);
+    const ys = canvasPoints.map(({ y }) => y);
     const minX = Math.min(...xs); const maxX = Math.max(...xs); const minY = Math.min(...ys); const maxY = Math.max(...ys);
     const padding = 110;
     const scale = Math.min(3.1, Math.max(.38, Math.min(
@@ -383,17 +395,8 @@ export const RouteHistoryPanel = memo(function RouteHistoryPanel({ requestedTagC
 
   const chooseStay = (stay: LocationStay) => {
     setSelectedStayId(stay.id);
-    focusStay(stay);
-  };
-
-  const handleWheel = (event: Konva.KonvaEventObject<WheelEvent>) => {
-    event.evt.preventDefault();
-    const pointer = stageRef.current?.getPointerPosition();
-    if (!pointer) return;
-    const nextScale = Math.min(3.1, Math.max(.38, viewport.scale * (event.evt.deltaY > 0 ? .9 : 1.1)));
-    const focusX = (pointer.x - viewport.x) / viewport.scale;
-    const focusY = (pointer.y - viewport.y) / viewport.scale;
-    setViewport({ scale: nextScale, x: pointer.x - focusX * nextScale, y: pointer.y - focusY * nextScale });
+    setSelectionRequestKey(current => current + 1);
+    void focusStay(stay).catch(() => undefined);
   };
 
   const routePointsForAssistant = useMemo(() => historyData?.zoneTimeline ? undefined : historyData?.points.map((point) => ({
@@ -414,10 +417,9 @@ export const RouteHistoryPanel = memo(function RouteHistoryPanel({ requestedTagC
       <div className={styles.historyLayout}>
       <section ref={mapFrameRef} className={styles.mapFrame} aria-label="Rota haritası">
         <div ref={hostRef} className={styles.mapCanvas}>
-          <Stage ref={stageRef} width={size.width} height={size.height} x={viewport.x} y={viewport.y} draggable onWheel={handleWheel} onDragEnd={(event) => setViewport((current) => ({ ...current, x: event.target.x(), y: event.target.y() }))}>
-            <RouteHistoryMapLayers image={floorImage} width={mapWidth} height={mapHeight} scale={viewport.scale} points={pointValues} selectedPoints={selectedPointValues} selected={Boolean(selectedStay)} showRoute={!historyData?.zoneTimeline} />
-          </Stage>
+          <RouteHistoryImageViewport src={renderedMap?.imageDataUrl} highlightSrc={highlightSrc} width={mapWidth} height={mapHeight} viewport={viewport} onViewportChange={setViewport} />
         </div>
+        {hasSelection && !highlightSrc && <div className={styles.mapRenderStatus} role="status">{selectionReady && selectionImage?.error ? selectionImage.error : "Seçili bölge hazırlanıyor…"}</div>}
         <div className={styles.vignette} />
         <div className={styles.mapMeta}><CircleDot size={13} /> {historyMap ? "PLAN KALİBRE EDİLDİ" : "KAT BELİRLENEMEDİ"} <span>{historyMap ? `${historyMap.calibration.pixelsPerMeter} PX/M` : "PLAN YOK"} · {routeSegments.length} SEGMENT</span></div>
         <div className={styles.zoomReadout}>{Math.round(viewport.scale * 100)}%</div>

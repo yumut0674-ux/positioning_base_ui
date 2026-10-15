@@ -1,0 +1,510 @@
+✔ motion labels cannot change area transitions or establish source health (8.7167ms)
+✔ normal entry and observed exit use raw gate and inside/outside evidence (0.9345ms)
+✔ exit gate dropout becomes estimated after 30 seconds, with separate measurement and decision times (0.3892ms)
+✔ return within wait cancels exit; room or inside dropout never creates an exit (0.4534ms)
+✔ late, duplicate, implausible and low quality packets cannot confirm a transition (0.4182ms)
+✔ multiple gates and floor handoff share a transition id (0.5982ms)
+✔ restart preserves pending exit, idempotent event identity and global outage guard (0.4631ms)
+✔ another map staying live does not turn a failed map's pending gates into mass exits (0.4091ms)
+✔ single tag needs independent healthy heartbeat; unknown and outage keep a visible pending reason (0.7508ms)
+✔ a stale healthy signal never authorizes mass estimated exits (4.4679ms)
+✔ outside confirmation after a long gap is estimated, while timely gate evidence is observed (0.8596ms)
+✔ source health payload validates freshness independently of positions (1.4494ms)
+✔ legacy config works and invalid area association is rejected (1.72ms)
+✔ area state and events use persisted JSON and idempotent event insertion (37.418ms)
+{"level":"error","event":"area_transition.state_spool_failed","timestamp":"2026-10-15T12:13:56.193Z","pendingWrites":1,"queuedEvents":0,"queuedStates":1,"batchSize":2,"maxPendingEvents":2,"maxPendingStates":1,"coalescedStateWrites":100,"droppedRecords":0,"rejectedWrites":1,"error":{"name":"Error","message":"Alan durum diski kuyruğu dolu; yeni durum kalıcı yazılamadı","stack":"Error: Alan durum diski kuyruğu dolu; yeni durum kalıcı yazılamadı\n    at AreaTransitionRepository.saveState (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:60:83)\n    at <anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:197:31)\n    at getActual (node:assert:530:5)\n    at Function.throws (node:assert:676:24)\n    at TestContext.<anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:197:12)\n    at async Test.run (node:internal/test_runner/test:1054:7)\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+{"level":"error","event":"area_transition.event_spool_failed","timestamp":"2026-10-15T12:13:56.202Z","pendingWrites":3,"queuedEvents":2,"queuedStates":1,"batchSize":2,"maxPendingEvents":2,"maxPendingStates":1,"coalescedStateWrites":100,"droppedRecords":0,"rejectedWrites":2,"error":{"name":"AreaTransitionPersistenceError","message":"Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı","stack":"AreaTransitionPersistenceError: Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı\n    at AreaTransitionRepository.ensureEventCapacity (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:79:19)\n    at AreaTransitionRepository.saveEvent (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:69:12)\n    at <anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:202:31)\n    at getActual (node:assert:530:5)\n    at Function.throws (node:assert:676:24)\n    at TestContext.<anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:202:12)\n    at async Test.run (node:internal/test_runner/test:1054:7)\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+{"level":"error","event":"area_transition.persistence_failed","timestamp":"2026-10-15T12:13:56.205Z","pendingWrites":3,"queuedEvents":2,"queuedStates":1,"batchSize":2,"maxPendingEvents":2,"maxPendingStates":1,"coalescedStateWrites":100,"droppedRecords":0,"rejectedWrites":2,"error":{"name":"Error","message":"database offline","stack":"Error: database offline\n    at AreaTransitionRepository.query (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:193:60)\n    at <anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:106:24)\n    at AreaTransitionRepository.flush (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:122:5)\n    at TestContext.<anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:204:17)\n    at async Test.run (node:internal/test_runner/test:1054:7)\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+✔ DB outage preserves bounded batches and durable event files for restart and retry (403.7141ms)
+{"level":"error","event":"area_transition.event_spool_failed","timestamp":"2026-10-15T12:13:56.249Z","pendingWrites":2,"queuedEvents":1,"queuedStates":1,"batchSize":50,"maxPendingEvents":1,"maxPendingStates":20000,"coalescedStateWrites":3,"droppedRecords":0,"rejectedWrites":1,"error":{"name":"AreaTransitionPersistenceError","message":"Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı","stack":"AreaTransitionPersistenceError: Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı\n    at AreaTransitionRepository.ensureEventCapacity (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:79:19)\n    at AreaTransitionEngine.reserveEvents (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:223:65)\n    at AreaTransitionEngine.tick (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\AreaTransitionEngine.ts:175:12)\n    at <anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:228:32)\n    at getActual (node:assert:530:5)\n    at Function.throws (node:assert:676:24)\n    at TestContext.<anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:228:12)\n    at async Test.run (node:internal/test_runner/test:1054:7)\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+✔ a full durable event queue rolls back the engine transition until it can be persisted (37.0016ms)
+{"level":"error","event":"area_transition.event_spool_failed","timestamp":"2026-10-15T12:13:56.285Z","pendingWrites":1,"queuedEvents":0,"queuedStates":1,"batchSize":50,"maxPendingEvents":1,"maxPendingStates":20000,"coalescedStateWrites":2,"droppedRecords":0,"rejectedWrites":1,"error":{"name":"AreaTransitionPersistenceError","message":"Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı","stack":"AreaTransitionPersistenceError: Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı\n    at AreaTransitionRepository.ensureEventCapacity (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\areaTransitionRepository.ts:79:19)\n    at AreaTransitionEngine.reserveEvents (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:244:65)\n    at AreaTransitionEngine.reserveForMeasurement (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\AreaTransitionEngine.ts:111:10)\n    at AreaTransitionEngine.advance (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\AreaTransitionEngine.ts:145:16)\n    at AreaTransitionEngine.ingest (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\server\\regionEngine\\AreaTransitionEngine.ts:99:54)\n    at send (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:245:71)\n    at <anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:249:25)\n    at getActual (node:assert:530:5)\n    at Function.throws (node:assert:676:24)\n    at TestContext.<anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\areaTransitions.test.ts:249:12)"}}
+✔ floor handoff reserves both linked event slots before changing either area (26.2417ms)
+﹣ PostgreSQL commits an event and its final state, restores them, and deduplicates replay (0.2366ms) # SKIP
+✔ area configuration survives the validated API save and file reload (8.0313ms)
+✔ editor visibility is per map, independent per item and keeps hidden items recoverable (1.1358ms)
+✔ processed browser stream URL is same-origin and contains no private service port (0.7697ms)
+✔ processed proxy streams SSE and cancels upstream when the browser stream closes (3059.7695ms)
+{"level":"error","event":"tracking.processed_proxy_unavailable","timestamp":"2026-10-15T12:13:58.824Z","error":{"name":"TypeError","message":"fetch failed","stack":"TypeError: fetch failed\n    at node:internal/deps/undici/undici:13510:13\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async GET (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\app\\api\\tracking\\processed\\route.ts:30:16)\n    at async TestContext.<anonymous> (C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\tests\\demoSharing.test.ts:80:22)\n    at async Test.run (node:internal/test_runner/test:1054:7)\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+✔ processed proxy returns a generic 503 when its loopback upstream is unavailable (9.6961ms)
+✔ an unconfigured optional assistant does not make an otherwise healthy response fail (1.8074ms)
+✔ health response strips sensitive internal failure details (1.2602ms)
+✔ live-map tag label uses the display name instead of the hardware id (1.5226ms)
+✔ HTML tag overlay uses the same translation and scale as the Konva viewport (0.2329ms)
+✔ world coordinates are written as a compositor-friendly tag transform (0.316ms)
+✔ detached HTML renderers are not updated by later positions (0.7183ms)
+✔ intensive care loads the seven existing rooms and room 9 without engine warnings (16.6517ms)
+✔ room centres remain in physical rooms while regions extend three metres behind the rear wall (1.3252ms)
+✔ each corridor door is centred in the physical front wall and opens 1.5 metres inward (1.0668ms)
+✔ neighbouring room areas have a ten centimetre gap along the full extended wall (0.8881ms)
+✔ room 9 follows the lower-right walls and its corridor door works in both directions (3.7147ms)
+✔ both corridor end gates record observed area entry and exit (7.5372ms)
+{"level":"info","event":"region_engine.region_engine_enabled","timestamp":"2026-10-15T12:13:58.432Z"}
+{"level":"info","event":"region_engine.region_config_loaded","timestamp":"2026-10-15T12:13:58.434Z","score":1}
+{"level":"info","event":"region_engine.region_entry_candidate","timestamp":"2026-10-15T12:13:58.434Z","vehicleId":"vehicle-1","regionId":"room-a","score":0.5}
+{"level":"info","event":"region_engine.vehicle_entered_region","timestamp":"2026-10-15T12:13:58.435Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.vehicle_pinned_to_region_center","timestamp":"2026-10-15T12:13:58.435Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.vehicle_exited_region","timestamp":"2026-10-15T12:13:58.436Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.region_engine_disabled","timestamp":"2026-10-15T12:13:58.436Z"}
+{"level":"info","event":"region_engine.region_engine_enabled","timestamp":"2026-10-15T12:13:58.437Z"}
+{"level":"info","event":"region_engine.region_config_loaded","timestamp":"2026-10-15T12:13:58.438Z","score":1}
+{"level":"info","event":"region_engine.region_entry_candidate","timestamp":"2026-10-15T12:13:58.438Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.vehicle_entered_region","timestamp":"2026-10-15T12:13:58.438Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.vehicle_pinned_to_region_center","timestamp":"2026-10-15T12:13:58.438Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.region_entry_candidate","timestamp":"2026-10-15T12:13:58.438Z","vehicleId":"vehicle-2","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.vehicle_entered_region","timestamp":"2026-10-15T12:13:58.439Z","vehicleId":"vehicle-2","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.vehicle_pinned_to_region_center","timestamp":"2026-10-15T12:13:58.439Z","vehicleId":"vehicle-2","regionId":"room-a","score":1}
+{"level":"info","event":"region_engine.region_engine_disabled","timestamp":"2026-10-15T12:13:58.439Z"}
+✔ disabled engine does not process or mutate raw positions (5.5231ms)
+✔ outside, entry, inferred pinning and confirmed exit preserve the expected coordinates (16.5452ms)
+✔ one scheduler handles multiple vehicles and disable clears all state (2.7488ms)
+✔ center-less regions are skipped and invalid rule config is rejected (8.2257ms)
+✔ Servis motor zone resolves to the active service floor (23.0592ms)
+✔ Servis uses the selected CAD origin and clockwise motor axes in both map and room editor (42.0627ms)
+✔ API zone Neüyoğun resolves to intensive care while its display name stays unchanged (4.0819ms)
+✔ necmettin-servis loads in the room editor with its own image and calibration (14.1968ms)
+✔ necmettin-yogun-bakim loads in the room editor with its own image and calibration (10.8311ms)
+✔ intensive care uses the selected origin with Y along the long horizontal axis (5.4136ms)
+✔ checked-in map catalog and live map config are valid (4.2702ms)
+✔ multiple live maps are valid but duplicate active zone mappings are rejected (15.1107ms)
+✔ invalid catalogs are rejected before being served (9.9962ms)
+✔ unknown, traversal and planned map requests have controlled errors (9.1482ms)
+✔ map endpoint maps unknown and traversal input to 404 and 400 (3.9787ms)
+✔ short outside spike holds last valid point, rejects the sample, and resumes inside (6.1049ms)
+✔ one outside measurement followed by silence hides at the deadline and re-entry keeps the last rendered point (1.2048ms)
+✔ continuous outside, duplicate, old and synthetic publications do not extend the deadline (2.422ms)
+✔ initial outside position is hidden; tags and their deadlines are independent (0.9028ms)
+✔ boundaries, adjacent/overlapping polygons, narrow gaps and L corridors (0.785ms)
+✔ unsafe L corridor animation holds instead of snapping; queued motion stays inside (4.6508ms)
+✔ RAW map presentation suppresses jitter and requires confirmation for a sudden jump (1.6157ms)
+✔ configuration re-evaluates immediately, preserves an outside deadline and cleans up (0.9966ms)
+✔ store binding switches RAW/engine coordinates and maps without modifying measurements or room entries (7.1707ms)
+✔ engine display includes stationary raw tags before any room decision and follows new observations (3.3865ms)
+✔ corridor markers do not require motion metadata or a room-engine publication (1.5051ms)
+✔ stationary display keeps assigned rooms and accepts a delayed room decision after a raw fallback (2.617ms)
+✔ new stationary packets refresh map animation freshness while retaining the assigned room centre (2.7966ms)
+✔ raw room coordinates and entry candidates stay in the corridor until an engine assignment (7.6573ms)
+✔ confirmed and inferred engine assignments permit only the assigned room (22.9656ms)
+✔ corridor animation cannot take a shortcut through an unassigned room at a bend (3.1876ms)
+✔ unassigned raw room coordinates do not produce a room label in the tag panel (1.1657ms)
+✔ room-only maps cannot display an unassigned tag inside a room (3.4957ms)
+✔ revoking a room clears old room frames immediately even with animation disabled (15.2774ms)
+✔ revoking an assignment cancels a pending room transition before it enters the room (4.0623ms)
+✔ a jump into a disconnected valid region updates the target without teleporting the marker (0.5177ms)
+✔ disabled animation still times out and synthetic RAW publications retain measurement age (0.439ms)
+✔ newer synthetic decisions for one measurement do not add physical route samples (0.4178ms)
+✔ hidden tag stays in the list with visibility explanation and real activity (37.3685ms)
+✔ tag panel renders the accepted inferred Room 6 decision (9.3428ms)
+✔ display wait configuration defaults to 2000 ms and validates persisted values (0.7932ms)
+✔ hiding and reopening the tag layer retains the validated position until tag cleanup (0.4958ms)
+✔ panel target and marker converge after a non-routable direct room transition (1.0515ms)
+✖ yoğun bakım haritası PDOP 70 ile başlar, diğer haritalar ve bilinmeyen kat 20 kullanır (27.7729ms)
+✔ kapatılan PDOP filtresi sonlu sayıları kabul eder; null ve sıfır korunur (1.8183ms)
+✔ hot reload PDOP davranışını güncellerken mevcut tamponu, kuyruğu ve dinleyicileri korur (16.9741ms)
+✔ PDOP ayarları harita bazında kalıcıdır; kaydetme cache'e hemen yansır ve diğer haritayı değiştirmez (120.5143ms)
+✔ harita filtre API'si ayarları kaydeder; hatalı ayar ve harita seçimi dosyayı değiştirmez (221.6495ms)
+✔ eşik güncelleme ve açma/kapatma motor durumunu sıfırlamaz; kabul edilen veriye mevcut oda algoritması uygulanır (144.3089ms)
+✔ default selection survives empty or obsolete browser storage (0.7014ms)
+✔ catalog groups floors and keeps planned units visible but disabled (0.8155ms)
+✔ live coordinates are authorized only for the catalog live map (0.1284ms)
+✔ quick tracking selection waits for the requested map before focusing (0.3329ms)
+✔ a mobile pinch can zoom in from the fitted scale below the normal zoom floor (2.576ms)
+✔ pinching preserves the map point under the moving center of both fingers (0.8218ms)
+✔ two fingers moving together pan the map without changing the scale (1.7652ms)
+✔ one finger pans a zoomed map and respects the map edges (0.8024ms)
+✔ one finger cannot move the fully fitted map (0.3204ms)
+✔ switching between pan and pinch keeps the current viewport and resumes with the remaining finger (0.4187ms)
+✔ zooming out stops at the fitted map and reverses immediately in the same gesture (0.404ms)
+✔ reversing a pinch at maximum zoom responds without lifting the fingers (0.4678ms)
+✔ finger ordering is irrelevant and replacing a finger rebases instead of jumping (0.5584ms)
+✔ cancelled gestures, extra fingers, coincident fingers and unmeasured panels do not change the viewport (0.6123ms)
+✔ fits and centers the complete floor plan in a desktop map panel (1.4897ms)
+✔ keeps the plan contained on narrow panels and ignores unmeasured panels (0.3289ms)
+✔ locks panning at the fitted scale and constrains a zoomed plan to the map panel (0.4254ms)
+✔ centers axes that remain smaller than the panel while zoomed (0.3384ms)
+✔ fit and constraints use the active map dimensions (0.3456ms)
+✔ tracking label focus uses a fifty percent map scale (0.1787ms)
+✔ uses the service plan origin with x vertical and y horizontal (1.5677ms)
+✔ zone resolver maps only catalog zone ids and leaves null/unknown unresolved (4.79ms)
+✔ route segments split on every map transition and never add cross-floor distance (2.0593ms)
+✔ store follows only the selected tag across maps and rejects delayed old-floor packets (1.5239ms)
+✔ region engine manager isolates maps, clears the old map and rejects a delayed floor switch (1.1939ms)
+✔ stationary raw data updates presence, history and areas without reaching rooms or clearing their map (43.0349ms)
+✔ runtime controller installs only RegionPositionEngine and exposes the active engine version (8.2368ms)
+✔ hot reload retires a stale global controller and retains exactly one tracking listener (41.7233ms)
+{"level":"error","event":"area_transition.restore_failed","timestamp":"2026-10-15T12:14:05.870Z","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1134:18)\n    at afterConnectMultiple (node:net:1715:7)"}}
+✔ hot replacement restores an enabled controller only after retirement completes (185.2934ms)
+✔ controller reload applies a UI-compiled config to the existing map engine without installing a parallel engine (12.9711ms)
+✔ map-specific region config rejects URL/config mismatches and path traversal (5.7409ms)
+✔ browser SSE gateway preserves map, source-zone and PDOP fields (0.9549ms)
+✔ valid REGION_CENTER changes use the existing spatial transition (9.6044ms)
+✔ field room-03 to room-05 relocation fades, snaps, and finishes exactly at the target (5.9864ms)
+✔ RAW to room-03 centre crosses a narrow map gap without sticking at the door (2.9227ms)
+✔ REGION_CENTER outside the display area cannot start a relocation (0.9637ms)
+✔ room centre to RAW corridor fades across a map gap and reaches the latest measurement without restarting (1.9842ms)
+✔ a disconnected target arriving after the hidden midpoint is reached even without another packet (1.9344ms)
+✔ RAW relocation across a concave corridor does not freeze and never draws an outside point (0.6956ms)
+✔ disabled animation relocates immediately across a map gap and still rejects an outside target (0.3935ms)
+✔ repeated publication at the same room centre does not restart relocation (1.0185ms)
+✔ retains a renderer attached before the tag's first position arrives (0.8722ms)
+✔ interpolates from message timestamps without restarting when irregular updates arrive (0.4342ms)
+✔ a 1500 ms message gap remains a regular timestamp-based segment (0.2383ms)
+✔ a three-second corridor packet gap stays buffered instead of bypassing the display delay (0.3385ms)
+✔ the corridor buffer retains a full display delay at ten updates per second (0.4962ms)
+✔ out-of-order rendered samples and exact duplicates cannot move a tag backwards (0.2074ms)
+✔ production speed limit prevents both large jumps and long-frame catch-up jumps (0.5727ms)
+✔ extrapolation is velocity based, capped, and then holds the last projected point (0.2909ms)
+✔ REGION_CENTER eases toward its exact centre, ignores repeats, and never extrapolates (0.3173ms)
+✔ RAW after REGION_CENTER changes without a wall-crossing route, then resumes buffered movement (0.2069ms)
+✔ disabled animation applies the newest value immediately and needs no update loop (0.1731ms)
+✔ teleports and overlong segments use a short controlled transition (0.2166ms)
+✔ receivedAt is the timestamp fallback (0.1481ms)
+✔ tags have independent buffers and stale state follows the configured timeout (0.2287ms)
+✔ buffer size is bounded (0.1791ms)
+✔ synthetic centre heartbeats neither reset measurement age nor move a pinned tag (0.1715ms)
+✔ stationary UWB jitter stays inside the visual dead-band (6.4029ms)
+✔ normal movement follows the recent average more gently than individual measurements (0.8267ms)
+✔ the display target averages accepted measurements in a three-second rolling window (0.9185ms)
+✔ a repeated timestamp cannot overweight a measurement or keep moving the marker (2.6407ms)
+✔ averaging reduces side-to-side wobble during a steady corridor walk (2.8534ms)
+✔ the average has a bounded sample count and reset discards the old route (0.8148ms)
+✔ a single impossible jump is held and a return to the route clears it (0.6579ms)
+✔ two nearby fast measurements confirm real relocation without snapping (1.3259ms)
+✔ long measurement gaps are accepted as unknown movement, not rejected as spikes (3.2223ms)
+{"level":"error","event":"region_engine.processed_port_start_failed","timestamp":"2026-10-15T12:14:06.740Z","port":51571,"message":"REGION_POSITION_PORT 51571 kullanımda; boş bir 300x portu seçin","error":{"name":"Error","message":"listen EADDRINUSE: address already in use 127.0.0.1:51571","stack":"Error: listen EADDRINUSE: address already in use 127.0.0.1:51571\n    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\n    at listenInCluster (node:net:1997:12)\n    at node:net:2206:7\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)"}}
+✔ processed server publishes backward-compatible position events over SSE (106.9825ms)
+✔ processed port reports a clear error when the configured port is occupied (11.9164ms)
+✔ region engine status GET exposes the expected backward-compatible shape (6.9638ms)
+✔ status PUT validates input and repeated disable requests are idempotent (4.3003ms)
+{"level":"error","event":"tag_presence.restore_failed","timestamp":"2026-10-15T12:14:08.028Z","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \n    at internalConnectMultiple (node:net:1134:18)\n    at afterConnectMultiple (node:net:1715:7)"}}
+✔ server startup enables room detection for live maps and manual disable remains effective (86.9815ms)
+✔ moving, unknown and absent motion labels preserve room decisions, filters and signal-loss inference (36.497ms)
+✔ stationary measurements cannot initialize room state; moving resumes normal inference (1.8095ms)
+✔ stationary coordinates cannot alter room evidence or distance references, including timer inference (11.5565ms)
+✔ disabled engine does not mutate input (0.819ms)
+✔ kat1-ortopedi uses 4.5 m/s globally and for every effective region setting (3.8585ms)
+✔ kat1-ortopedi accepts a reasonable 4.5 m/s step and rejects a jump beyond speed plus tolerance (4.5675ms)
+✔ time and independent measurements are both required, even with count=1 (1.5498ms)
+✔ raw room motion always yields exact configured centre (2.0634ms)
+✔ parallel door blackout and approach without crossing never assign a room (1.6826ms)
+✔ directional door crossing and one strong inside measurement allow estimated entry, never measured entry (1.3381ms)
+✔ required door crossing can infer a silent concrete room when signal stops at the wall (1.5649ms)
+✔ synthetic publications preserve measurement time, long gaps expose uncertainty (1.3949ms)
+✔ a single neighbor jump cannot replace a confirmed room, while a sustained direct sequence can (1.1711ms)
+✔ wall measurements alone do not confirm adjacent room (1.294ms)
+✔ confirmed door exit releases centre, subsequent room entry succeeds (2.0111ms)
+✔ long blackout allows relocation without invented transition time (1.6144ms)
+✔ old, duplicate, delayed and low quality packets add no confirmation evidence (1.5576ms)
+✔ long evidence gaps reset candidates instead of finishing old counters (1.4125ms)
+✔ tag histories and tag count are bounded and independent (40.5456ms)
+✔ coverage profiles affect dropout timing without raising entry confidence (0.7822ms)
+✔ missing doors and narrow rooms report limitations without fabricated geometry (0.8598ms)
+✔ live decisions project to history and expiry is not a measured room visit (1.2585ms)
+✔ reference scenarios reproduce exactly; adding tags cannot change tag one (17.4888ms)
+✔ all scenarios include useful correct coverage, room visits are not hidden by uncertainty (56.8934ms)
+✔ physical scenario routes cross room boundaries only at defined doors (3.4528ms)
+✔ candidate confidence cannot increase during a blackout, including the lost transition (0.4528ms)
+✔ sustained corridor measurements after a long gap release an old room (0.5249ms)
+✔ confirmed corridor exit clears relocation before the next room entry (0.9956ms)
+✔ silent door proximity infers an estimated room from one corridor measurement and later becomes lost (0.8369ms)
+✔ silent door proximity enforces distance and deterministically selects the nearest then first equal door (2.1193ms)
+✔ silent door proximity needs neither movement history nor movement toward the door (1.8418ms)
+✔ each accepted corridor measurement replaces or clears the silent door candidate (0.4319ms)
+✔ configured corridor geometry prevents nearby non-corridor positions from becoming candidates (0.367ms)
+✔ regular and intermittent rooms and disabled proximity settings preserve existing behavior (1.1318ms)
+✔ ineligible doors never become silent proximity candidates (1.2916ms)
+✔ real inside evidence supersedes a prior proximity-only inferred room (0.5851ms)
+✔ reliable silent-room evidence supersedes the corridor proximity candidate without using crossing direction (0.4411ms)
+✔ scenario A: reliable silent-room measurements confirm entry without a door crossing (1.114ms)
+✔ scenario B: the real Room 3 config confirms a long reliable inside replay without a door crossing (3.6144ms)
+✔ scenario C: the real Room 5 config confirms fourteen reliable inside samples without a door crossing (2.3355ms)
+✔ scenario B: one reliable silent-room measurement survives signal loss as a nonzero inference (0.8942ms)
+✔ scenario C: a reliable corridor point near a silent door infers entry without motion evidence (0.5613ms)
+✔ silent-room raw evidence produces a stronger bounded inference than corridor proximity alone (2.0985ms)
+✔ scenario D: corridor signal loss away from every silent door becomes location lost (0.338ms)
+✔ scenario E: data returning inside a proximity-inferred room keeps and confirms that room (0.5769ms)
+✔ scenario F: seven reliable points confirm a required-door silent room without rejection (0.484ms)
+✔ scenario G: one wall-band sample does not clear a proximity-inferred silent room (0.3199ms)
+✔ scenario H: proximity inference chooses the nearest door without a movement vector (0.2805ms)
+✔ scenario G: a room-specific manual threshold change takes effect only after config reload (0.563ms)
+✔ scenario I: one impossible-speed packet is rejected without clearing a confirmed silent room (0.4385ms)
+✔ a rejected low-quality packet does not postpone the accepted sample stale deadline (0.4128ms)
+✔ scenario J: required-door regular and intermittent rooms retain their existing entry policy (1.0463ms)
+✔ silent room exit needs continuous reliable corridor count and duration, not a required door (0.6401ms)
+✔ one corridor jump is cancelled by reliable room data and timer publications add no exit evidence (0.4124ms)
+✔ silent exit evidence resets after maxEvidenceGapMs and rejected packets never increment it (0.5134ms)
+✔ required-door regular and intermittent rooms still cannot exit through corridor evidence alone (0.9761ms)
+✔ after a doorless silent exit, dropout near another silent door infers that room by Euclidean distance (0.6831ms)
+✔ 21 September 2026 real route exits Rooms 3 and 5 without doors and infers Room 6 at the recorded cutoff (6.8024ms)
+✔ decision trace explains silent-door inference and far-corridor loss without changing the decision (0.8718ms)
+✔ direct room switch requires three reliable target-room samples spread across configured time (0.8165ms)
+✔ anonymized fast field fixtures confirm Room 3 to Room 5 without a corridor publication (6.6846ms)
+✔ sparse field fixture cannot confirm Room 5 or retain Room 3 after a long loss (3.1628ms)
+✔ an active old room still yields to the nearest silent target-door cutoff without directional movement (0.5387ms)
+✔ one reliable sample inside another silent room followed by loss infers that room (0.5653ms)
+✔ 24 September fast field samples infer Room 6 during the recorded cutoff (2.5746ms)
+✔ old room support and later corridor evidence prevent a one-sample target-room cutoff (1.5895ms)
+✔ one-sample cutoff ignores rejected room points and does not bypass regular-room policy (0.7141ms)
+✔ direct room switch is cancelled by old-room support, restarted for a different target, and ignores rejected packets (0.9064ms)
+✔ insufficient direct room evidence does not retain the old room past roomSwitchUncertainAfterMs (0.3749ms)
+✔ decision trace snapshots entry evidence, required-door rejection, door crossing and exit (1.5153ms)
+✔ decision trace classifies rejected measurements, long loss and config reload (1.6533ms)
+✔ decision trace is an additive output and the established processed-position contract stays intact (0.4996ms)
+✔ raw marker positions come only from observedTags and ignore processed display state (5.3467ms)
+✔ raw world position is converted with the existing inverse affine transform (3.5789ms)
+✔ engine state cannot alter a raw marker coordinate (0.2901ms)
+✔ stale raw tags remain visible and are marked stale (0.3689ms)
+✔ non-finite raw or transformed coordinates are omitted (0.4878ms)
+✔ region panel keeps the raw view opt-in and the layer non-interactive (33.949ms)
+✔ decision queue stores raw decisions and state changes, deduplicates synthetic centres (13.2481ms)
+✔ decision buffer caps memory, including an interrupted persistence flush (208.8621ms)
+✔ raw buffer is bounded and received/measurement times persist independently (630.713ms)
+✔ LocationService exposes the live decision and keeps inferred/uncertain visits separate (8.103ms)
+﹣ PostgreSQL roundtrip uses separate decision table and preserves measurement/publication timestamps (0.1272ms) # SKIP
+✔ decision log list applies combined filters, merges pending records and uses a stable cursor (3.9622ms)
+✔ decision list keyset order does not skip equal timestamps (24.4327ms)
+✔ recent decision detail is shared across route repository instances (1.7909ms)
+✔ default preferred policy releases a room after sustained reliable corridor evidence without a door crossing (32.0639ms)
+✔ named corridor connections and legacy corridor aliases both prove required door crossings (7.1717ms)
+✔ a different named corridor cannot satisfy the required door connection (1.9998ms)
+✔ required doors still block a wall exit even with sustained reliable corridor data (1.3851ms)
+✔ a corridor spike, wall-band points, rejected packets and timers do not complete a preferred exit (2.4998ms)
+✔ corridor evidence restarts after a long gap instead of releasing on one new packet (2.2628ms)
+✔ room handoff is atomic, and undo restores the entire previous visit without deleting audit events (13.2882ms)
+✔ pause closes the active visit and excludes waiting time from both recording time and benchmark truth (3.7959ms)
+✔ exported benchmark part ids can be used by the existing CLI without accepting path traversal (2.6341ms)
+✔ unknown intervals and repeated room ids across maps never merge into corridor truth (1.1599ms)
+✔ a repeated request is idempotent, different content with the same id and backwards clocks are rejected (1.5916ms)
+✔ local events do not invent server receipt times and clock measurements survive exports (2.1325ms)
+✔ active visit exports retain the four fields and completed tests require explicit tag verification to score (1.8867ms)
+✔ page recovery stops observation at the last heartbeat, keeping unobserved time outside visits (0.8557ms)
+✔ sequential routes advance and undo as one action, and reject an out-of-order step (1.6949ms)
+✔ legacy plan imports remain detached, validate duplicate ids and invalid connections (2.4869ms)
+✔ repository atomically updates document and audit log, refuses competing versions and retries a lost response (14.9315ms)
+✔ demo hosts cannot call the room test API while the existing admin/local modes can (3.0452ms)
+✖ Servis has 18 silent rooms with 1 m door proximity, configured door geometry and its own entry/exit thresholds (8.5411ms)
+✖ each Servis door retains its one-metre signal-loss threshold independently of nearby doors (6.3289ms)
+✖ one-metre proximity prevents inference in the corridor between opposing moved doors (1.2961ms)
+✔ room numbering follows the Servis CAD labels and all coordinates use Servis calibration (2.2739ms)
+✔ rooms extend three metres behind their rear walls and adjacent rooms have a ten centimetre gap (0.276ms)
+✔ completed room fronts include corridor recesses and keep bathrooms and utility shafts separate (25.6408ms)
+✔ reliable measurements in the completed recess confirm its room and exit through the moved door (14.7079ms)
+✔ every Servis room requires both five reliable measurements and two seconds before confirming entry (26.9279ms)
+✔ configured Servis gates record area entry and observed exit using their own wait settings (1.5709ms)
+✔ settings API supplies defaults, persists seconds and applies changes only after a successful save (75.8608ms)
+✔ existing maps and the new-map template enable 10 metres and 2 relocation measurements (18.2962ms)
+✔ distance rejection is independent of speed and preserves accepted timing, history and cadence (5.4493ms)
+✔ distance equality passes, an excess fails, and a sub-threshold point still obeys speed (2.6593ms)
+✔ both violated filters are logged, while a long gap never exempts the distance limit (2.1237ms)
+✔ two coherent distant samples reset only the reference, and subsequent samples must reprove the room (4.2031ms)
+✔ returning to the accepted location cancels the distant candidate (1.2096ms)
+✔ two rapid samples do not reset before minimum duration and timers never confirm candidates (2.3033ms)
+✔ duplicates and out-of-order packets after rejection neither count nor erase the valid candidate (1.2801ms)
+✔ low or non-finite quality breaks candidate continuity and cannot extend accepted validity (3.51ms)
+✔ stale measurements break the candidate and do not infer a room or refresh its support (1.5857ms)
+✔ a speed violation between candidate points restarts the candidate even if the cluster radius passes (1.1026ms)
+✔ cluster drift, excessive gaps and total window expiry restart verification (2.4589ms)
+✔ distance-rejected room and corridor samples cannot create silent-door or room-switch evidence (2.3376ms)
+✔ continuous rejects age the accepted location to lost without adding evidence (1.5035ms)
+✔ tag removal, configuration reload and separate tags establish independent references (4.1556ms)
+✔ setting zero restores the existing speed/freshness/quality pipeline (0.856ms)
+✔ configuration enforces finite map-wide parameters and keeps the filter in API round trips (5.1711ms)
+✔ presence hot reload updates motion conversion without losing observations or subscribers (11.6935ms)
+✔ fresh measurements label moving as Hareketli and every other motion as Sabit (1.0188ms)
+✔ raw data timeout makes a tag Pasif even if its last motion was moving (0.4479ms)
+✔ confirmed room decisions keep the live color independently of motion and raw data freshness (1.067ms)
+✔ motion survives presence conversion, snapshot hydration and browser SSE delivery (3.6204ms)
+✔ latest raw motion takes precedence over an older processed decision (0.8515ms)
+✔ successive stationary packets refresh room-tag data without changing its decision or centre (3.3249ms)
+✔ stationary corridor data uses the newest coordinates and ignores delayed raw observations (0.7298ms)
+✔ quick list includes all registered and discovered tags without adding fake map positions (67.6494ms)
+✔ quick rows and selected details display the same motion labels and room color (35.763ms)
+✔ tag management panel owns the live-map trail controls (6.0392ms)
+✔ strict one-minute boundary hides an unassigned tag and retains the observation (5.5208ms)
+✔ only an unexpired current room assignment exempts a silent tag (3.1973ms)
+✔ timer decisions, duplicates, out-of-order and synthetic raw messages do not refresh the raw clock (0.7318ms)
+✔ fresh data recovers a tag, but a delayed historical backlog and future timestamps do not (0.5637ms)
+✔ disabling the engine, losing a room, reconfiguring or moving floors removes the exemption immediately (0.901ms)
+✔ changing the global timeout re-evaluates existing tags without restarting room inference (0.4412ms)
+✔ restored observations keep their location but never restore a current room assignment (1.1348ms)
+✔ last observed place uses raw geometry, handles corridors, ambiguous rooms and unresolved floors (1.4676ms)
+✔ presence SSE starts with an atomic snapshot, publishes versioned changes and cleans up on abort (46.6161ms)
+✔ presence persistence keeps only registered tags, orders upserts by measurement and restores valid raw observations (4.6924ms)
+✔ a schema/persistence failure is reported and a later save can retry (1.0807ms)
+✔ presence versions reject delayed events; a new server epoch restores its own state (3.8008ms)
+✔ both raw and processed display bindings hide tags, clear animation/trails and recover without an old path (4.6615ms)
+✔ stationary snapshot without a room decision renders a marker, respects no-data hiding and recovers (0.9186ms)
+✔ legacy presence snapshot with no motion field still renders a corridor marker (0.6362ms)
+✔ stale tag stays selectable with historical place, unreliable badge and disabled map action on mobile (21.8409ms)
+✔ settings navigation exposes the admin panel and stays absent from demo navigation (12.3131ms)
+✔ live room simulation CLI options are deterministic and validated (3.0329ms)
+✔ random simulator delays stay within inclusive limits (2.044ms)
+✔ interval environment validation falls back for non-numeric values and rejects inverted bounds (1.7451ms)
+✔ default simulator cadence is fixed at one update per second (0.3965ms)
+✔ simulator sends source heartbeat separately from tag positions when configured (4.0215ms)
+✔ simulation endpoint selection distinguishes local and public destinations (0.4097ms)
+✔ tags follow the corridor, visit a room centre, then stay there for 2–20 seconds (1.1917ms)
+✔ a new position tick aborts unfinished response waits instead of skipping the send (1.6705ms)
+✔ stalled HTTP responses never suppress later one-second position ticks (2.3898ms)
+✔ old centre-only room definitions cannot create a wall shortcut (1.1695ms)
+✔ normal payload carries the zone contract and multi-floor output is deterministic (1.1538ms)
+✔ null and unknown zone scenarios emit explicit values (0.9555ms)
+✔ delayed old-floor and same-coordinate scenarios preserve explicit floor evidence (1.7479ms)
+✔ trail retains only the configured time window (2.9ms)
+✔ trail ignores jitter and breaks across jumps or region-centre positions (0.5122ms)
+✔ non-routable room relocation starts a new trail segment at the destination (0.5153ms)
+✔ trail settings validate and persist browser preferences (0.9605ms)
+✔ tag panel trail actions update only the visual preference (0.6264ms)
+✔ same measurement accepts only a strictly newer valid engine publication (3.1666ms)
+✔ same measurement accepts newer ROOM_TRANSITIONED publication and rejects the older decision (0.2805ms)
+✔ store shows inferred Room 6 and later LOCATION_LOST without changing measurement age (1.0587ms)
+{"level":"warn","event":"tracking.zone_unresolved","timestamp":"2026-10-15T12:14:22.765Z","zoneId":"not-configured"}
+✔ kaynak heartbeat'i ayrı token ve bilinen zone gerektirir (17.564ms)
+{"level":"warn","event":"tracking.zone_unresolved","timestamp":"2026-10-15T12:14:22.770Z","zoneId":"zone-a"}
+{"level":"warn","event":"tracking.zone_unresolved","timestamp":"2026-10-15T12:14:22.777Z","zoneId":"zone-b"}
+✔ örnek position payload'ı boş 204 ile kabul edilir; konum, PDOP ve zaman korunur (2.611ms)
+✔ yeni tek-tag sözleşmesi PDOP olmadan kabul edilir; koordinat, kimlik, etiket ve zaman korunur (2.9834ms)
+✔ geçersiz motion_label konum akışına girmeden 400 döndürür (4.0126ms)
+✔ null ve bilinmeyen zone kabul edilir fakat haritaya çözülmez (1.0529ms)
+✔ zone alanlarında tip ve uzunluk doğrulaması uygulanır (0.4967ms)
+✔ negatif koordinatlar geçerlidir (0.3911ms)
+✔ ingest POST aynı route üzerindeki SSE akışına position eventi yayınlar (2.6092ms)
+✔ PDOP 20 dahil, sıfır, null ve eski eksik alan konumla birlikte kabul edilir (1.69ms)
+✔ PDOP harita çözümünden sonra tüm konum işlemlerinden önce elenir (1.1851ms)
+✖ yoğun bakım isteği 70 dahil kabul edilir; daha büyük PDOP işlem görmez (9.9968ms)
+✔ harita PDOP filtresi kapalıyken büyük sonlu değerler normal veri akışına devam eder (1.8128ms)
+✔ PDOP string, boolean, nesne ve sonlu olmayan sayı olamaz (2.1921ms)
+▶ geçersiz sözleşme payload'ları açıklayıcı 400 döndürür
+  ✔ yanlış type (0.608ms)
+  ✔ eksik tag_id (0.4807ms)
+  ✔ sayısal tag_id (0.292ms)
+  ✔ konum dizisi (0.4369ms)
+  ✔ string x (2.0953ms)
+  ✔ string y (0.556ms)
+  ✔ geçersiz timestamp (0.2806ms)
+  ✔ fazladan alan (0.2568ms)
+✔ geçersiz sözleşme payload'ları açıklayıcı 400 döndürür (5.9738ms)
+✔ bozuk JSON 400 döndürür (1.1473ms)
+✔ raw buffer PDOP filtresi kayıt sorgusu, SSE, motor ve geçmiş kuyruğundan önce uygulanır (27.3936ms)
+✔ ham konum ve PDOP birlikte yayınlanır ve yazılır; null ile sıfır ayrı tutulur (2.7317ms)
+✔ konum repository'si güncel ve tarihsel sorgularda PDOP null ve sıfırı korur (2.0038ms)
+✔ oda motoru kabul edilmiş konumun PDOP değerini ham ve işlenmiş çıktıda korur (8.6898ms)
+﹣ PostgreSQL PDOP sütununa kabul edilen konumlarla birlikte null ve sıfır ayrı yazılır (0.1655ms) # SKIP
+ℹ tests 363
+ℹ suites 0
+ℹ pass 355
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 3
+ℹ todo 0
+ℹ duration_ms 28820.8646
+
+✖ failing tests:
+
+test at tests\mapPdopFilter.test.ts:1:1273
+✖ yoğun bakım haritası PDOP 70 ile başlar, diğer haritalar ve bilinmeyen kat 20 kullanır (27.7729ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   enabled: false,
+  -   enabled: true,
+      maximumPdop: 70
+    }
+  
+      at TestContext.<anonymous> (C:\Users\1548u\Desktop\UWB\ui\base\tests\mapPdopFilter.test.ts:27:10)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { enabled: false, maximumPdop: 70 },
+    expected: { enabled: true, maximumPdop: 70 },
+    operator: 'deepStrictEqual'
+  }
+
+test at tests\serviceRooms.test.ts:1:2701
+✖ Servis has 18 silent rooms with 1 m door proximity, configured door geometry and its own entry/exit thresholds (8.5411ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  1.3 !== 1
+  
+      at TestContext.<anonymous> (C:\Users\1548u\Desktop\UWB\ui\base\tests\serviceRooms.test.ts:62:12)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1047:25)
+      at Test.start (node:internal/test_runner/test:944:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1.3,
+    expected: 1,
+    operator: 'strictEqual'
+  }
+
+test at tests\serviceRooms.test.ts:1:4189
+✖ each Servis door retains its one-metre signal-loss threshold independently of nearby doors (6.3289ms)
+  AssertionError [ERR_ASSERTION]: Dr Odası
+  
+  'room-01' !== null
+  
+      at TestContext.<anonymous> (C:\Users\1548u\Desktop\UWB\ui\base\tests\serviceRooms.test.ts:100:18)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1047:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+      at Test.postRun (node:internal/test_runner/test:1173:19)
+      at Test.run (node:internal/test_runner/test:1101:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'room-01',
+    expected: null,
+    operator: 'strictEqual'
+  }
+
+test at tests\serviceRooms.test.ts:1:5489
+✖ one-metre proximity prevents inference in the corridor between opposing moved doors (1.2961ms)
+  AssertionError [ERR_ASSERTION]: Dr Odası: 1.01 m
+  
+  'room-01' !== null
+  
+      at TestContext.<anonymous> (C:\Users\1548u\Desktop\UWB\ui\base\tests\serviceRooms.test.ts:126:16)
+      at Test.runInAsyncScope (node:async_hooks:214:14)
+      at Test.run (node:internal/test_runner/test:1047:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+      at Test.postRun (node:internal/test_runner/test:1173:19)
+      at Test.run (node:internal/test_runner/test:1101:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: 'room-01',
+    expected: null,
+    operator: 'strictEqual'
+  }
+
+test at tests\trackingIngest.test.ts:1:7706
+✖ yoğun bakım isteği 70 dahil kabul edilir; daha büyük PDOP işlem görmez (9.9968ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  ... Skipped lines
+  
+    [
+      [
+        'necmettin-yogun-bakim',
+        21
+      ],
+  ...
+      ],
+  +   [
+  +     'necmettin-yogun-bakim',
+  +     70.000001
+  +   ]
+    ]
+  
+      at TestContext.<anonymous> (C:\Users\1548u\Desktop\UWB\ui\base\tests\trackingIngest.test.ts:220:12)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: [ [ 'necmettin-yogun-bakim', 21 ], [ 'necmettin-yogun-bakim', 70 ], [ 'necmettin-yogun-bakim', 70.000001 ] ],
+    expected: [ [ 'necmettin-yogun-bakim', 21 ], [ 'necmettin-yogun-bakim', 70 ] ],
+    operator: 'deepStrictEqual'
+  }

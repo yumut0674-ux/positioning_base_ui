@@ -51,8 +51,8 @@ test("fresh measurements label moving as Hareketli and every other motion as Sab
   for (const motionLabel of ["moving", "stationary", "unknown", undefined] as const) {
     const presentation = tagActivityPresentation(tag({ motionLabel }), undefined, now);
     assert.equal(presentation.label, motionLabel === "moving" ? "Hareketli" : "Sabit");
-    assert.equal(presentation.isLiveColor, motionLabel === "moving");
-    assert.equal(presentation.color, motionLabel === "moving" ? "#00a896" : PASSIVE_TAG_COLOR);
+    assert.equal(presentation.isLiveColor, true);
+    assert.equal(presentation.color, "#00a896");
   }
 });
 
@@ -62,6 +62,7 @@ test("raw data timeout makes a tag Pasif even if its last motion was moving", ()
   const stale = tagActivityPresentation(moving, undefined, now + TAG_LIVE_TIMEOUT_MS + 1);
   assert.equal(stale.label, "Pasif");
   assert.equal(stale.isLiveColor, false);
+  assert.equal(stale.color, PASSIVE_TAG_COLOR);
   assert.equal(tagActivityPresentation(tag({ timestamp: 0 }), undefined, now).label, "Pasif");
   assert.equal(tagActivityPresentation(undefined, undefined, now).label, "Pasif");
   const heartbeat = tag({ timestamp: now + 60_000, publishedAt: new Date(now + 60_000).toISOString(), lastRawDataTimestamp: new Date(now).toISOString() });
@@ -78,7 +79,7 @@ test("confirmed room decisions keep the live color independently of motion and r
     assert.equal(tagActivityPresentation(assigned, undefined, now + 60_000).isLiveColor, false);
   }
   for (const state of ["ENTRY_CANDIDATE", "LOCATION_LOST", "TRACKING_OUTSIDE"]) {
-    assert.equal(tagActivityPresentation(tag({ regionInference: { ...room, state } }), undefined, now).isLiveColor, false);
+    assert.equal(tagActivityPresentation(tag({ timestamp: now - TAG_LIVE_TIMEOUT_MS - 1, regionInference: { ...room, state } }), undefined, now).isLiveColor, false);
   }
 });
 
@@ -195,7 +196,7 @@ test("quick list includes all registered and discovered tags without adding fake
 test("quick rows and selected details display the same motion labels and room color", () => {
   for (const [current, label, active] of [
     [tag({ motionLabel: "moving" }), "HAREKETLİ", true],
-    [tag({ motionLabel: "stationary" }), "SABİT", false],
+    [tag({ motionLabel: "stationary" }), "SABİT", true],
     [tag({ motionLabel: "unknown", regionInference: room }), "SABİT", true],
     [tag({ timestamp: 1, motionLabel: "moving" }), "PASİF", false],
   ] as const) {
@@ -208,4 +209,23 @@ test("quick rows and selected details display the same motion labels and room co
     assert.ok(html.includes(`class="tag-switcher-status${active ? " is-active" : ""}"`));
     assert.doesNotMatch(html, /CANLI/);
   }
+});
+
+test("quick list orders moving and stationary tags above passive tags and updates after data times out", () => {
+  const tags = [
+    tag({ id: "P", name: "A Pasif", timestamp: 1 }),
+    tag({ id: "N", name: "B Verisiz", timestamp: 0 }),
+    tag({ id: "S", name: "C Sabit", motionLabel: "stationary" }),
+    tag({ id: "M", name: "D Hareketli", timestamp: now - 9_000, motionLabel: "moving" }),
+    tag({ id: "U", name: "E Sabit", motionLabel: "unknown" }),
+  ];
+  const orderAt = (renderedAt: number) => {
+    const html = renderToStaticMarkup(createElement(TagInformationPanelContent, {
+      tags, recentTagIds: [], now: renderedAt, locationDuration: "", onSelectTag() {}, onOpenHistory() {},
+    }));
+    return [...html.matchAll(/<code>([^<]+)<\/code>/g)].map(match => match[1]);
+  };
+  assert.deepEqual(orderAt(now), ["M", "S", "U", "P", "N"]);
+  assert.deepEqual(orderAt(now + 1_001), ["S", "U", "P", "N", "M"]);
+  assert.deepEqual(tags.map(tag => tag.id), ["P", "N", "S", "M", "U"]);
 });

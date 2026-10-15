@@ -1,0 +1,30 @@
+[
+  {
+    "name": "rejected_moving_sample_reaches_display",
+    "engineEvent": "MEASUREMENT_REJECTED",
+    "engineAcceptedX": 1,
+    "rawRejectedX": 3,
+    "displayX": 3,
+    "visible": true,
+    "reproduced": true
+  },
+  {
+    "name": "stationary_corridor_becomes_inferred_room_on_timer",
+    "initialState": "TRACKING_OUTSIDE",
+    "initialRoom": null,
+    "finalState": "INFERRED_IN_REGION",
+    "finalRoom": "room-01",
+    "lastEngineMeasurementAt": "2026-10-15T00:00:00.000Z",
+    "reproduced": true
+  },
+  {
+    "name": "fresh_raw_packet_waits_for_presence_to_unhide",
+    "rawAgeMs": 0,
+    "oldPresenceHidden": true,
+    "display": {
+      "visible": false,
+      "reason": "no-data"
+    },
+    "reproduced": true
+  }
+]

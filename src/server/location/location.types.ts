@@ -146,6 +146,7 @@ export interface DataGap {
 }
 
 export interface RoutePointsHistoryData {
+  readonly renderedMaps?: readonly RenderedHistoryMap[];
   readonly aggregation?: { readonly method: "median"; readonly intervalSeconds: 60; readonly pointCountBeforeLimit: number };
   readonly observedRange?: { readonly from: string; readonly to: string };
   readonly zoneTimeline?: readonly ZoneTimelineEntry[];
@@ -159,6 +160,11 @@ export interface RoutePointsHistoryData {
   readonly returnedCount: number;
   readonly sampled: boolean;
   readonly sourcePointCount: number;
+}
+
+export interface RenderedHistoryMap {
+  readonly map: import("../maps/map.types").MapDetails;
+  readonly imageDataUrl: string;
 }
 
 export interface ZoneTimelineHistoryData {

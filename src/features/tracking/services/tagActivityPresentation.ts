@@ -19,6 +19,6 @@ export function tagActivityPresentation(tag: TrackedTag | undefined, presence?: 
   const uncertainAfter = Date.parse(tag?.regionInference?.uncertainAfter ?? "");
   const hasRoomDecision = Boolean(tag && assignedDisplayRoomId(tag) && !presence?.hiddenForNoData
     && (!Number.isFinite(uncertainAfter) || now < uncertainAfter));
-  const isLiveColor = activity === "moving" || hasRoomDecision;
+  const isLiveColor = activity !== "offline" || hasRoomDecision;
   return { activity, label: TAG_ACTIVITY_LABELS[activity], isLiveColor, color: isLiveColor ? tag?.color : PASSIVE_TAG_COLOR };
 }

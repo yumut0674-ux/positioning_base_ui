@@ -12,8 +12,10 @@ import type { MapCatalog } from "@/src/server/maps/map.types";
 import type { TagPresenceState } from "../types/tagPresence.types";
 import { hiddenOnMapLabel, lastDataAgeLabel, lastObservedLocationLabel } from "../services/tagPresencePresentation";
 import { useTagPresenceClock } from "../hooks/useTagPresenceClock";
-import { tagActivityPresentation } from "../services/tagActivityPresentation";
+import { tagActivityPresentation, type TagActivity } from "../services/tagActivityPresentation";
 import { buildTagQuickList } from "../services/tagQuickList";
+
+const TAG_ACTIVITY_ORDER: Record<TagActivity, number> = { moving: 0, stationary: 1, offline: 2 };
 
 interface TagInformationPanelProps {
   readonly onOpenHistory: (tagCode: string) => void;
@@ -60,7 +62,11 @@ function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag, regionsC
   const normalizedQuery = query.trim().toLocaleLowerCase("tr-TR");
   const tagsById = useMemo(() => new Map(tags.map((tag) => [tag.id, tag])), [tags]);
   const recentTags = useMemo(() => recentTagIds.map((tagId) => tagsById.get(tagId)).filter((tag): tag is TrackedTag => Boolean(tag)), [recentTagIds, tagsById]);
-  const visibleTags = useMemo(() => tags.filter((tag) => !normalizedQuery || matchesQuery(tag, normalizedQuery)), [normalizedQuery, tags]);
+  const visibleTags = useMemo(() => tags
+    .filter((tag) => !normalizedQuery || matchesQuery(tag, normalizedQuery))
+    .map((tag) => ({ tag, activity: tagActivityPresentation(tag, presenceById?.[tag.id], now) }))
+    .sort((left, right) => TAG_ACTIVITY_ORDER[left.activity.activity] - TAG_ACTIVITY_ORDER[right.activity.activity]
+      || left.tag.name.localeCompare(right.tag.name, "tr")), [normalizedQuery, tags, presenceById, now]);
   const emptyStateMessage = normalizedQuery ? `“${query.trim()}” için sonuç bulunamadı.` : "Henüz takip etiketi bulunmuyor.";
 
   return (
@@ -69,10 +75,9 @@ function TagQuickList({ tags, recentTagIds, selectedTagId, onSelectTag, regionsC
       <label className="tag-switcher-search"><Search size={14} aria-hidden="true" /><span className="sr-only">Takip etiketi ara</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Takip etiketi adı veya kodu ara" /></label>
       {!normalizedQuery && recentTags.length > 0 && <section className="recent-tags" aria-labelledby={recentTitleId}><small id={recentTitleId}>SON GÖRÜNTÜLENENLER</small><div>{recentTags.map((tag) => <button key={tag.id} type="button" onClick={() => onSelectTag(tag.id)} aria-pressed={tag.id === selectedTagId} aria-label={`${tag.name} (${tag.id}) ${tag.id === selectedTagId ? "etiketinin seçimini kaldır" : "etiketini seç"}`}>{tag.name}</button>)}</div></section>}
       <div className="tag-switcher-list" role="listbox" aria-label="Takip etiketi listesi">
-        {visibleTags.map((tag) => {
+        {visibleTags.map(({ tag, activity }) => {
           const isSelected = tag.id === selectedTagId;
           const presence = presenceById?.[tag.id];
-          const activity = tagActivityPresentation(tag, presence, now);
           const hidden = presence?.hiddenForNoData;
           return <button key={tag.id} type="button" role="option" aria-selected={isSelected} className={`tag-switcher-row${isSelected ? " is-selected" : ""}${hidden ? " is-stale-location" : ""}`} onClick={() => onSelectTag(tag.id)}>
             <span className={`tag-switcher-status${activity.isLiveColor ? " is-active" : ""}`} aria-hidden="true" />
