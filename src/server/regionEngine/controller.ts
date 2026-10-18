@@ -2,7 +2,8 @@ import type { RegionsConfig } from "@/src/features/regions/types/region.types";
 import { trackingBuffer, type TrackingPosition } from "../trackingBuffer";
 import { compileRegionsConfig, loadRegionsConfigForMap } from "./configLoader";
 import { ProcessedPositionServer } from "./ProcessedPositionServer";
-import { RegionPositionEngine, ROOM_ENGINE_VERSION } from "./RegionPositionEngine";
+import { ROOM_ENGINE_VERSION } from "./RegionPositionEngine";
+import { createRoomEngine, readRoomEngineSelection, type RoomEngine, type RoomEngineSelection } from "./roomEngineSelection";
 import { getRegionEngineRuntimeConfig } from "./runtimeConfig";
 import type { CompiledRegionsConfig, RegionEngineStatus } from "./types";
 import { logger } from "../logger";
@@ -10,9 +11,8 @@ import { roomDecisions } from "../location/roomDecisionRepository";
 import { mapRepository } from "../maps/mapRepository";
 import { AreaTransitionEngine } from "./AreaTransitionEngine";
 import { areaTransitions } from "./areaTransitionRepository";
-import { tagPresenceRuntime } from "../tracking/tagPresenceRuntime";
 
-interface ManagedEngine { readonly engine: RegionPositionEngine; warnings: readonly string[] }
+interface ManagedEngine { readonly engine: RoomEngine; readonly algorithm: RoomEngineSelection["algorithm"]; warnings: readonly string[] }
 interface RegionEngineGlobalRegistration {
   readonly version: string;
   readonly revision?: string;
@@ -21,7 +21,7 @@ interface RegionEngineGlobalRegistration {
 }
 
 const POSITION_LISTENER_MARK = Symbol.for("uwb.regionEngine.positionListener");
-export const REGION_ENGINE_CONTROLLER_REVISION = "region-controller-7";
+export const REGION_ENGINE_CONTROLLER_REVISION = "region-controller-6";
 type MarkedPositionListener = ((position: TrackingPosition) => void) & { [POSITION_LISTENER_MARK]?: boolean };
 
 /** Isolates inference and vehicle state by application map. */
@@ -30,6 +30,7 @@ export class RegionEngineController {
   private readonly output: ProcessedPositionServer;
   private readonly engines = new Map<string, ManagedEngine>();
   private readonly unavailableMaps = new Set<string>();
+  private readonly selections = new Map<string, RoomEngineSelection>();
   private readonly latestByTag = new Map<string, { readonly at: number; readonly mapId: string }>();
   private readonly areaConfigs = new Map<string, CompiledRegionsConfig>();
   private readonly areaSourceZones = new Map<string, readonly string[]>();
@@ -54,10 +55,9 @@ export class RegionEngineController {
     }
     if (enabled === this.enabled) return this.status();
     if (!enabled) {
-      tagPresenceRuntime.service.setEngineEnabled(false);
       if (this.areaTimer) clearInterval(this.areaTimer); this.areaTimer = null;
       for (const managed of this.engines.values()) managed.engine.disable();
-      this.engines.clear(); this.unavailableMaps.clear(); this.latestByTag.clear(); this.areaConfigs.clear(); this.areaSourceZones.clear(); this.areaSourceSignals.clear(); this.areaEngine = null; this.areaError = null; this.enabled = false;
+      this.engines.clear(); this.selections.clear(); this.unavailableMaps.clear(); this.latestByTag.clear(); this.areaConfigs.clear(); this.areaSourceZones.clear(); this.areaSourceSignals.clear(); this.areaEngine = null; this.areaError = null; this.enabled = false;
       await this.output.stop();
       await areaTransitions.flush();
       return this.status();
@@ -72,6 +72,11 @@ export class RegionEngineController {
       try { return { mapId: map.id, compiled: await loadRegionsConfigForMap(map.id) }; }
       catch (error) { logger.error("region_engine.config_load_failed", error, { mapId: map.id }); return null; }
     }))).filter((item): item is { readonly mapId: string; readonly compiled: CompiledRegionsConfig } => item !== null);
+    this.selections.clear();
+    for (const item of loaded) {
+      try { this.selections.set(item.mapId, await readRoomEngineSelection(item.mapId)); }
+      catch (error) { logger.error("region_engine.selection_failed", error, { mapId: item.mapId }); }
+    }
     const loadedIds = new Set(loaded.map((item) => item.mapId));
     this.unavailableMaps.clear();
     for (const map of liveMaps) if (!loadedIds.has(map.id)) this.unavailableMaps.add(map.id);
@@ -89,7 +94,6 @@ export class RegionEngineController {
       this.areaError = null;
     } catch (error) { logger.error("area_transition.restore_failed", error); this.areaEngine = null; this.areaError = error instanceof Error ? error.message : String(error); }
     this.enabled = true;
-    tagPresenceRuntime.service.setEngineEnabled(true);
     if (this.areaEngine) { this.areaTimer = setInterval(() => this.tickAreas(), 1000); this.areaTimer.unref?.(); }
     return this.status();
   }
@@ -103,8 +107,6 @@ export class RegionEngineController {
     const managed = this.engines.get(position.mapId);
     if (!managed) { logger.warn("region_engine.map_config_unavailable", { mapId: position.mapId }); return; }
     this.areaEngine?.ingest(position);
-    // Keep raw/large-area tracking independent; stationary data cannot change room-map ownership.
-    if (position.motionLabel === "stationary") return;
     if (previous && previous.mapId !== position.mapId) this.engines.get(previous.mapId)?.engine.removeVehicle(position.tagCode);
     this.latestByTag.set(position.tagCode, { at: measuredAt, mapId: position.mapId });
     managed.engine.ingest(position);
@@ -142,7 +144,6 @@ export class RegionEngineController {
   public dispose(): Promise<void> {
     if (this.disposePromise) return this.disposePromise;
     this.disposed = true;
-    tagPresenceRuntime.service.setEngineEnabled(false);
     if (this.areaTimer) clearInterval(this.areaTimer); this.areaTimer = null;
     for (const managed of this.engines.values()) managed.engine.disable();
     this.engines.clear(); this.unavailableMaps.clear(); this.latestByTag.clear(); this.areaConfigs.clear(); this.areaSourceZones.clear(); this.areaSourceSignals.clear(); this.areaEngine = null; this.areaError = null; this.enabled = false;
@@ -178,19 +179,17 @@ export class RegionEngineController {
   }
 
   private install(mapId: string, compiled: CompiledRegionsConfig): void {
-    tagPresenceRuntime.invalidateMap(mapId);
-    tagPresenceRuntime.service.configureMap(mapId, new Set(compiled.regions.map(region => region.id)));
     this.areaConfigs.set(mapId, compiled);
     const current = this.engines.get(mapId);
-    if (current) { current.engine.reload(compiled); current.warnings = compiled.warnings ?? []; return; }
-    const engine = new RegionPositionEngine((position) => {
-      if (this.disposed) return;
-      tagPresenceRuntime.observeDecision(position);
-      this.output.publish(position);
-      roomDecisions.record(position);
-    }, this.runtime.broadcastIntervalMs);
+    const selection = this.selections.get(mapId);
+    const algorithm = selection?.algorithm ?? "evidence";
+    const selectionWarnings = selection ? [] : ["Oda motoru seçimi okunamadı; eski kural motoru kullanılıyor"];
+    if (current && current.algorithm === algorithm) { current.engine.reload(compiled); current.warnings = [...(compiled.warnings ?? []), ...selectionWarnings]; return; }
+    current?.engine.disable();
+    const engine = createRoomEngine(selection ?? { algorithm }, (position) => { this.output.publish(position); roomDecisions.record(position); }, this.runtime.broadcastIntervalMs);
     engine.enable(compiled);
-    this.engines.set(mapId, { engine, warnings: compiled.warnings ?? [] });
+    logger.info("region_engine.installed", { mapId, algorithm, source: selection?.source ?? "varsayılan" });
+    this.engines.set(mapId, { engine, algorithm, warnings: [...(compiled.warnings ?? []), ...selectionWarnings] });
   }
 }
 

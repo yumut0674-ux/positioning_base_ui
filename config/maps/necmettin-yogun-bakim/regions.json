@@ -110,7 +110,7 @@
   "positionAnimation": {
     "enabled": true,
     "mode": "buffered_interpolation",
-    "interpolationDelayMs": 5500,
+    "interpolationDelayMs": 2000,
     "maximumBufferSize": 64,
     "maximumSegmentDurationMs": 4000,
     "maximumExtrapolationMs": 0,
@@ -118,7 +118,7 @@
     "teleportDistanceMeters": 6,
     "teleportAnimationDurationMs": 1500,
     "regionTransitionDurationMs": 2000,
-    "maximumVisualSpeedMetersPerSecond": 1,
+    "maximumVisualSpeedMetersPerSecond": 2,
     "maximumTransitionDurationMs": 8000,
     "easing": "ease_in_out"
   },
@@ -898,17 +898,17 @@
       "entrances": [
         {
           "pixel": {
-            "x": 2826,
-            "y": 1744
+            "x": 3069,
+            "y": 1322
           },
           "world": {
-            "x": 6.511589599999755,
-            "y": 16.593475000000076
+            "x": 3.9002535999999957,
+            "y": 18.097159
           },
-          "widthMeters": 1.5,
+          "widthMeters": 1.9,
           "inwardNormal": {
-            "x": 0,
-            "y": 1
+            "x": 1,
+            "y": 0
           },
           "connectsTo": "corridor-main",
           "approachDepthMeters": 1,

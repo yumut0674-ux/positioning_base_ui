@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oda Test Kaydı</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1b1f24; --muted:#5d6670; --line:#d9dde3; --acc:#1f6feb; --in:#1a7f37; --warn:#b42318; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#111418; --card:#1a1f25; --ink:#e8ebef; --muted:#9aa4ae; --line:#2c333b; --acc:#4c8dff; --in:#3fb950; --warn:#ff6b5e; } }
+  * { box-sizing:border-box; }
+  body { margin:0; font:16px/1.4 system-ui,-apple-system,"Segoe UI",sans-serif; background:var(--bg); color:var(--ink); }
+  main { max-width:720px; margin:0 auto; padding:16px; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  .muted { color:var(--muted); font-size:14px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px; margin:12px 0; }
+  label { display:block; font-size:14px; color:var(--muted); margin:8px 0 4px; }
+  input, select, textarea { width:100%; font:inherit; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--bg); color:var(--ink); }
+  button { font:inherit; border:1px solid var(--line); background:var(--card); color:var(--ink); border-radius:10px; padding:12px; cursor:pointer; }
+  button.primary { background:var(--acc); border-color:var(--acc); color:#fff; font-weight:600; }
+  button.danger { color:var(--warn); }
+  button:disabled { opacity:.45; cursor:default; }
+  .rooms { display:grid; grid-template-columns:repeat(auto-fill,minmax(92px,1fr)); gap:8px; }
+  .rooms button { padding:16px 6px; font-size:18px; font-weight:600; }
+  .rooms button.active { background:var(--in); border-color:var(--in); color:#fff; }
+  .status { font-size:22px; font-weight:700; margin:4px 0; }
+  .status.in { color:var(--in); }
+  .row { display:flex; gap:8px; flex-wrap:wrap; }
+  .row > * { flex:1 1 140px; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  td, th { text-align:left; padding:6px 4px; border-bottom:1px solid var(--line); }
+  .clock { font-variant-numeric:tabular-nums; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Oda Test Kaydı</h1>
+  <div class="muted">Tag hangi odadaysa o odaya, odadan çıkınca <b>Koridora çıktı</b>'ya basın. İnternet ve veritabanı gerekmez.
+    Telefon saati otomatik ayarlı olmalı. Saat: <span id="clock" class="clock"></span></div>
+
+  <section id="setup" class="card">
+    <label for="map">Harita</label>
+    <select id="map"></select>
+    <label for="tags">Taşınan tag kodu (Jetson'daki uid; birden fazlaysa virgülle)</label>
+    <input id="tags" placeholder="ör. EC27D9C145F838EB">
+    <label for="who">Test eden / not</label>
+    <input id="who" placeholder="ör. Hasan, tag yaka kartında">
+    <p><button class="primary" id="start">Testi başlat</button></p>
+  </section>
+
+  <section id="run" class="card hidden">
+    <div class="muted" id="runInfo"></div>
+    <div class="status" id="status">Koridorda</div>
+    <div class="muted" id="since"></div>
+    <p class="rooms" id="rooms"></p>
+    <div class="row">
+      <button class="primary" id="exit" disabled>Koridora çıktı</button>
+      <button id="undo" disabled>Son işlemi geri al</button>
+    </div>
+    <label for="note">Not (ör. "kapıda 10 sn bekledim", "yatağın yanında durdum")</label>
+    <textarea id="note" rows="2"></textarea>
+    <p class="row"><button class="danger" id="finish">Testi bitir ve dosyayı indir</button></p>
+  </section>
+
+  <section class="card">
+    <b>Ziyaretler</b>
+    <table><thead><tr><th>Oda</th><th>Giriş</th><th>Çıkış</th><th>Süre</th></tr></thead><tbody id="list"></tbody></table>
+  </section>
+
+  <section id="done" class="card hidden">
+    <b>Dosya indirildi.</b> İnmediyse aşağıdaki metni kopyalayıp <code>.json</code> uzantılı kaydedin.
+    <p class="row"><button id="again">Dosyayı tekrar indir</button><button id="copy">Metni kopyala</button><button id="reset">Yeni test</button></p>
+    <textarea id="out" rows="8" readonly></textarea>
+  </section>
+</main>
+<script>
+const MAPS = {
+  "necmettin-servis": { name: "Servis", rooms: [["room-01","Dr Odası"],["room-02","201"],["room-03","202"],["room-04","203"],["room-05","204"],["room-06","205"],["room-07","206"],["room-08","207"],["room-09","208"],["room-10","209"],["room-18","210"],["room-17","211"],["room-16","212"],["room-15","213"],["room-14","214"],["room-13","215"],["room-12","216"],["room-11","217"]] },
+  "necmettin-yogun-bakim": { name: "Yoğun bakım", rooms: [["room-01","Oda 1"],["room-02","Oda 2"],["room-03","Oda 3"],["room-04","Oda 4"],["room-05","Oda 5"],["room-06","Oda 6"],["room-07","Oda 7"],["room-09","Oda 9"]] },
+};
+const $ = id => document.getElementById(id);
+const KEY = "oda-test-kaydi-v1";
+let s = null; // { mapId, tags, who, from, to, visits:[{roomId,from,to}], current:{roomId,from}|null, history:[] , note }
+
+const load = () => { try { return JSON.parse(localStorage.getItem(KEY) || "null"); } catch { return null; } };
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch { /* storage unavailable */ } };
+const roomName = id => (MAPS[s.mapId].rooms.find(r => r[0] === id) || [id, id])[1];
+const hms = iso => new Date(iso).toLocaleTimeString("tr-TR", { hour12: false });
+const dur = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / 1000) + " sn";
+const snapshot = () => JSON.parse(JSON.stringify({ visits: s.visits, current: s.current }));
+
+for (const [id, m] of Object.entries(MAPS)) $("map").add(new Option(m.name, id));
+setInterval(() => {
+  $("clock").textContent = new Date().toLocaleTimeString("tr-TR", { hour12: false });
+  if (s && s.current) $("since").textContent = `${hms(s.current.from)}'den beri içeride (${dur(s.current.from, new Date().toISOString())})`;
+}, 500);
+
+function render() {
+  const running = s && !s.to;
+  $("setup").classList.toggle("hidden", !!s);
+  $("run").classList.toggle("hidden", !running);
+  $("done").classList.toggle("hidden", !(s && s.to));
+  const rows = s ? [...s.visits, ...(s.current ? [{ ...s.current, to: null }] : [])] : [];
+  $("list").innerHTML = rows.map(v => `<tr><td>${roomName(v.roomId)}</td><td>${hms(v.from)}</td><td>${v.to ? hms(v.to) : "içeride"}</td><td>${v.to ? dur(v.from, v.to) : ""}</td></tr>`).join("") || `<tr><td colspan="4" class="muted">Henüz yok</td></tr>`;
+  if (!running) return;
+  $("runInfo").textContent = `${MAPS[s.mapId].name} · tag ${s.tags.join(", ")} · başlangıç ${hms(s.from)}`;
+  $("rooms").innerHTML = "";
+  for (const [id, name] of MAPS[s.mapId].rooms) {
+    const b = document.createElement("button");
+    b.textContent = name; b.className = s.current && s.current.roomId === id ? "active" : "";
+    b.onclick = () => enter(id);
+    $("rooms").append(b);
+  }
+  $("status").textContent = s.current ? `İçeride: ${roomName(s.current.roomId)}` : "Koridorda";
+  $("status").className = "status" + (s.current ? " in" : "");
+  if (!s.current) $("since").textContent = "";
+  $("exit").disabled = !s.current;
+  $("undo").disabled = !s.history.length;
+  $("note").value = s.note || "";
+}
+
+function enter(roomId) {
+  const now = new Date().toISOString();
+  if (s.current && s.current.roomId === roomId) return;
+  s.history.push(snapshot());
+  // Going straight from one room to another closes the first one at the same moment.
+  if (s.current) s.visits.push({ ...s.current, to: now });
+  s.current = { roomId, from: now };
+  save(); render();
+}
+$("exit").onclick = () => { if (!s.current) return; s.history.push(snapshot()); s.visits.push({ ...s.current, to: new Date().toISOString() }); s.current = null; save(); render(); };
+$("undo").onclick = () => { const last = s.history.pop(); if (!last) return; s.visits = last.visits; s.current = last.current; save(); render(); };
+$("note").oninput = () => { s.note = $("note").value; save(); };
+
+$("start").onclick = () => {
+  const tags = $("tags").value.split(/[\s,;]+/).map(t => t.trim().toUpperCase()).filter(Boolean);
+  if (!tags.length) { alert("Tag kodunu yazın."); return; }
+  s = { mapId: $("map").value, tags, who: $("who").value.trim(), from: new Date().toISOString(), to: null, visits: [], current: null, history: [], note: "" };
+  save(); render();
+};
+
+function truth() {
+  const stamp = s.from.slice(0, 19).replace(/[-:T]/g, "");
+  return {
+    testId: `saha-${s.mapId}-${stamp}`, timezone: "Europe/Istanbul", revision: 1,
+    revisionReason: "Oda Test Kaydı sayfası (saha)", test: { from: s.from, to: s.to }, visits: s.visits,
+    groups: [{ id: "saha", tagCodes: s.tags, note: s.who || undefined }],
+    note: [`map=${s.mapId}`, s.note].filter(Boolean).join(" · "),
+  };
+}
+function download() {
+  const text = JSON.stringify(truth(), null, 2);
+  $("out").value = text;
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], { type: "application/json" }));
+  a.download = `${truth().testId}.json`;
+  document.body.append(a); a.click(); a.remove();
+}
+$("finish").onclick = () => {
+  if (!confirm("Test bitirilsin mi?")) return;
+  const now = new Date().toISOString();
+  if (s.current) { s.visits.push({ ...s.current, to: now }); s.current = null; }
+  s.to = now; save(); render(); download();
+};
+$("again").onclick = download;
+$("copy").onclick = () => { $("out").select(); navigator.clipboard?.writeText($("out").value); };
+$("reset").onclick = () => { if (confirm("Yeni test başlatılsın mı? (Bu testin dosyasını indirdiğinizden emin olun.)")) { s = null; try { localStorage.removeItem(KEY); } catch {} render(); } };
+
+s = load();
+if (s && s.to) $("out").value = JSON.stringify(truth(), null, 2);
+render();
+</script>
+</body>
+</html>

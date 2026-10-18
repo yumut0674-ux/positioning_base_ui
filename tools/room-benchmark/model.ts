@@ -3,6 +3,8 @@ export interface RawRow {
   created_at: string | null; received_at: string | null; quality: number | null;
   map_id: string | null; zone_id: string | null; zone_name: string | null;
   pdop?: number | null;
+  /** Tag IMU state reported by the Jetson (`motion` 0/1). Missing in older exports. */
+  motion?: "moving" | "stationary" | null;
 }
 export interface Visit { roomId: string; from: string; to: string }
 export interface Truth {

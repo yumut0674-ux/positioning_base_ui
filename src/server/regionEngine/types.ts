@@ -144,6 +144,15 @@ export interface ProcessedPosition extends TrackingPosition {
     readonly regionName?: string | null;
     readonly reasons?: readonly string[];
     readonly measurementKind?: "measured" | "estimated" | "uncertain";
+    /** Olasılıksal motor: tag büyük alanın çıkış kapısından dışarı çıktı. */
+    readonly outsideArea?: boolean;
+    /** Son oda çıkışı (oda → koridor/alan dışı) ve zamanı. */
+    readonly exitedRegionId?: string | null;
+    readonly exitedAt?: string | null;
+    /** Alanın çıkış kapısından çıkış zamanı (outsideArea iken). */
+    readonly leftAreaAt?: string | null;
+    /** Veri kesildi; gösterilen yer son karardır. */
+    readonly signalLost?: boolean;
     readonly validUntil?: string;
     readonly uncertainAfter?: string;
   };

@@ -110,7 +110,7 @@
   "positionAnimation": {
     "enabled": true,
     "mode": "buffered_interpolation",
-    "interpolationDelayMs": 5500,
+    "interpolationDelayMs": 2000,
     "maximumBufferSize": 64,
     "maximumSegmentDurationMs": 4000,
     "maximumExtrapolationMs": 0,
@@ -118,7 +118,7 @@
     "teleportDistanceMeters": 6,
     "teleportAnimationDurationMs": 1500,
     "regionTransitionDurationMs": 2000,
-    "maximumVisualSpeedMetersPerSecond": 1,
+    "maximumVisualSpeedMetersPerSecond": 2,
     "maximumTransitionDurationMs": 8000,
     "easing": "ease_in_out"
   },

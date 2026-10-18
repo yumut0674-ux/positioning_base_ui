@@ -3,11 +3,8 @@ import type { Point2D } from "@/src/shared/types/geometry";
 export const TAG_LIVE_TIMEOUT_MS = 10_000;
 
 export type TagStatus = "active" | "idle" | "warning" | "offline";
-export type MotionLabel = "moving" | "stationary" | "unknown";
 
 export interface TrackedTag extends Point2D {
-  readonly motionLabel?: MotionLabel;
-  readonly receivedAt?: string;
   readonly pdop?: number | null;
   readonly mapId?: string | null;
   readonly sourceZoneId?: string | null;
@@ -26,7 +23,6 @@ export interface TrackedTag extends Point2D {
 }
 
 export interface PositionMessage extends Point2D {
-  readonly motionLabel?: MotionLabel;
   readonly pdop?: number | null;
   readonly mapId?: string | null;
   readonly sourceZoneId?: string | null;
@@ -47,6 +43,15 @@ export interface PositionMessage extends Point2D {
     readonly regionName?: string | null;
     readonly reasons?: readonly string[];
     readonly measurementKind?: "measured" | "estimated" | "uncertain";
+    /** Olasılıksal oda motoru: tag alanın çıkış kapısından dışarı çıktı; haritada gösterilmez. */
+    readonly outsideArea?: boolean;
+    /** Son oda çıkışı (oda → koridor/alan dışı) ve zamanı. */
+    readonly exitedRegionId?: string | null;
+    readonly exitedAt?: string | null;
+    /** Alanın çıkış kapısından çıkış zamanı (outsideArea iken). */
+    readonly leftAreaAt?: string | null;
+    /** Veri kesildi; gösterilen yer son karardır. */
+    readonly signalLost?: boolean;
     readonly validUntil?: string;
     readonly uncertainAfter?: string;
   };

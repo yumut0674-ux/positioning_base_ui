@@ -94,8 +94,9 @@ test("room 9 follows the lower-right walls and its corridor door works in both d
   for (const pixel of [{ x: 2786, y: 1744 }, { x: 3306, y: 1900 }, { x: 3050, y: 2080 }, { x: 3050, y: 1260 }]) {
     assert.ok(!pointInPolygon(transform(pixel), room));
   }
-  const outside = transform({ x: 2786, y: 1744 });
-  const inside = transform({ x: 2866, y: 1744 });
+  // Kapı kat planındaki (DWG) yerinde: koridora bakan batı duvarında sürgülü kapı (y ≈ 17,1–19,1 m).
+  const outside = transform({ x: 3069, y: 1241 });
+  const inside = transform({ x: 3069, y: 1402 });
   assert.ok(pointInPolygon(outside, corridor));
   assert.ok(pointInPolygon(inside, room));
   assert.equal(crossesDoor(outside, inside, room, true, corridor.id)?.doorId, "room-09-corridor-door");

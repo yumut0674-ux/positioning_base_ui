@@ -1,0 +1,12 @@
+{
+  "algorithm": "hmm",
+  "note": "Olasılıksal oda motoru (room-hmm-2). Eski kural motoruna dönmek için \"evidence\" yazın veya sunucuyu ROOM_ENGINE_ALGORITHM=evidence ile başlatın. Ayar değişikliği motor yeniden etkinleştirilince/sunucu yeniden başlatılınca uygulanır. Yoğun bakım (camlı odalar): oda girişi 2 sn doğrulanır; odadaki tagın Jetson konumu çoğu zaman cam cephenin önünde koridorda göründüğü için cephenin 0,8 m önü o odanın kanıtı sayılır (glassWall*); oda çıkışı, son nokta odaya 1,6 m'den yakınken 3 sn sürmeden yayımlanmaz. Servis ayarları ayrı dosyadadır. Hareketsiz (10 sn'de bir ölçüm gönderen) tagın koridordaki işareti ölçümlerin ortancasında sabit tutulur; Jetson'un 1–3 m'lik sıçramaları işareti oynatmaz (stationaryDisplayHoldMeters).",
+  "hmm": {
+    "stableEntryConfirmMs": 2000,
+    "roomExitConfirmMs": 3000,
+    "roomExitNearMeters": 1.6,
+    "glassWallStripMeters": 0.8,
+    "glassWallCorridorFloor": 0.15,
+    "stationaryDisplayHoldMeters": 3
+  }
+}

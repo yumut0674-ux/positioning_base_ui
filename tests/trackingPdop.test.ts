@@ -58,13 +58,13 @@ test("ham konum ve PDOP birlikte yayınlanır ve yazılır; null ile sıfır ayr
     await buffer.flush();
     const insert = calls.at(-1)!;
     assert.match(insert, /ADD COLUMN IF NOT EXISTS pdop DOUBLE PRECISION/);
-    assert.match(insert, /INSERT INTO tag_location_history \([^)]*map_id, pdop\)/);
+    assert.match(insert, /INSERT INTO tag_location_history \([^)]*map_id, pdop, motion\)/);
     const rows = insert.split("VALUES ")[1].split(",\n");
-    assert.match(rows[0], /'map-a', 1\.83\)$/);
-    assert.match(rows[1], /'map-a', 20\)$/);
-    assert.match(rows[2], /'map-a', 0\)$/);
-    assert.match(rows[3], /'map-a', NULL\)$/);
-    assert.match(rows[4], /'map-a', NULL\);$/);
+    assert.match(rows[0], /'map-a', 1\.83, NULL\)$/);
+    assert.match(rows[1], /'map-a', 20, NULL\)$/);
+    assert.match(rows[2], /'map-a', 0, NULL\)$/);
+    assert.match(rows[3], /'map-a', NULL, NULL\)$/);
+    assert.match(rows[4], /'map-a', NULL, NULL\);$/);
     assert.equal(buffer.status().queueSize, 0);
   } finally { buffer.stop(); }
 });

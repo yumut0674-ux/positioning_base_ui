@@ -3,7 +3,6 @@ import { queryPostgres } from "./postgresClient";
 import { logger } from "./logger";
 import { isPositionPdopAccepted, type PdopFilterSettings } from "../shared/tracking/pdop";
 import { mapTrackingFilterSettings } from "./trackingFilterSettings";
-import { tagPresenceRuntime } from "./tracking/tagPresenceRuntime";
 
 export type TrackingPosition = {
   readonly tagCode: string;
@@ -14,11 +13,21 @@ export type TrackingPosition = {
   readonly quality?: number;
   /** Missing legacy measurements have unknown geometry quality, represented as null. */
   readonly pdop?: number | null;
+  /** Tag IMU state from the Jetson: moving ≈ 2 blink/s, stationary ≈ 1 blink/10 s. Missing = unknown. */
+  readonly motion?: "moving" | "stationary" | null;
+  /**
+   * The solver's own position when the Jetson clamped it into its zone polygon (raw_inside=false).
+   * x/y stay the clamped value; the room engine may use this one when it lies inside a room.
+   */
+  readonly solverRaw?: { readonly x: number; readonly y: number } | null;
+  /**
+   * Number of anchors the Jetson solver kept (inlier_anchor_count). A 3-anchor TDoA solution has a
+   * mirror twin across the anchor line; in the field these produce most wrong-room points.
+   */
+  readonly anchorCount?: number | null;
   /** Optional only for internal rollout compatibility; ingest always supplies an explicit value. */
   readonly sourceZoneId?: string | null;
   readonly sourceZoneName?: string | null;
-  /** Stationary measurements bypass room inference; this label does not establish quality or source health. */
-  readonly motionLabel?: "moving" | "stationary" | "unknown";
   readonly mapId?: string | null;
 };
 
@@ -38,6 +47,7 @@ ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS pdop DOUBLE PRECISION;
 ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS zone_id VARCHAR(100);
 ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS zone_name VARCHAR(160);
 ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS map_id VARCHAR(100);
+ALTER TABLE tag_location_history ADD COLUMN IF NOT EXISTS motion VARCHAR(16);
 CREATE INDEX IF NOT EXISTS idx_tag_location_history_tag_map_time ON tag_location_history(tag_code, map_id, created_at DESC, id DESC);
 CREATE INDEX IF NOT EXISTS idx_tag_location_history_map_time ON tag_location_history(map_id, created_at DESC, id DESC);
 `;
@@ -74,7 +84,6 @@ export class TrackingBuffer extends EventEmitter {
     if (position.pdop != null && (!Number.isFinite(position.pdop) || !isPositionPdopAccepted(position.pdop,
       await (this.readPdopSettings ? this.readPdopSettings(position.mapId ?? null) : mapTrackingFilterSettings.read(position.mapId ?? null))))) return false;
     position = { ...position, pdop: position.pdop ?? null, receivedAt: new Date(this.now()).toISOString() };
-    await tagPresenceRuntime.observeRaw(position);
     if (position.sourceZoneId == null) this.nullZoneCount++;
     else if (position.mapId == null) this.unresolvedZoneCount++;
     else { this.knownZoneCount++; this.mappedPositionCount++; }
@@ -120,9 +129,9 @@ export class TrackingBuffer extends EventEmitter {
     const batch = this.queue.splice(0, this.queue.length);
     try {
       const nullable = (value: string | null) => value === null ? "NULL" : sqlString(value);
-      const values = batch.map((position) => `(${sqlString(position.tagCode)}, ${position.x}, ${position.y}, ${sqlString(position.timestamp)}::timestamptz, ${position.receivedAt ? `${sqlString(position.receivedAt)}::timestamptz` : "NULL"}, ${position.quality ?? "NULL"}, ${nullable(position.sourceZoneId ?? null)}, ${nullable(position.sourceZoneName ?? null)}, ${nullable(position.mapId ?? null)}, ${position.pdop ?? "NULL"})`).join(",\n");
+      const values = batch.map((position) => `(${sqlString(position.tagCode)}, ${position.x}, ${position.y}, ${sqlString(position.timestamp)}::timestamptz, ${position.receivedAt ? `${sqlString(position.receivedAt)}::timestamptz` : "NULL"}, ${position.quality ?? "NULL"}, ${nullable(position.sourceZoneId ?? null)}, ${nullable(position.sourceZoneName ?? null)}, ${nullable(position.mapId ?? null)}, ${position.pdop ?? "NULL"}, ${nullable(position.motion ?? null)})`).join(",\n");
       await this.query(`${schemaSql}
-INSERT INTO tag_location_history (tag_code, x, y, created_at, received_at, quality, zone_id, zone_name, map_id, pdop)
+INSERT INTO tag_location_history (tag_code, x, y, created_at, received_at, quality, zone_id, zone_name, map_id, pdop, motion)
 VALUES ${values};`);
       this.lastPersistenceError = null;
       this.lastSuccessfulFlushAt = new Date(this.now()).toISOString();

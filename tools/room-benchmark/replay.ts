@@ -2,6 +2,8 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { RegionPositionEngine, ROOM_ENGINE_VERSION } from '../../src/server/regionEngine/RegionPositionEngine';
+import { HMM_ROOM_ENGINE_VERSION } from '../../src/server/regionEngine/RoomHmmEngine';
+import { createRoomEngine, readRoomEngineSelectionBeside } from '../../src/server/regionEngine/roomEngineSelection';
 import { compileRegionsConfig } from '../../src/server/regionEngine/configLoader';
 import type { ProcessedPosition, DecisionTrace } from '../../src/server/regionEngine/types';
 import type { RegionsConfig } from '../../src/features/regions/types/region.types';
@@ -23,7 +25,7 @@ export interface Run { schemaVersion:1; testId:string; engineVersion:string; git
   rawSpatialEvidence?:SpatialVisitEvidence[];preprocessing?:ReplayPreprocessing }
 export type ReplayResult={decisions:Decision[];metrics:ReturnType<typeof score>;unscoredTags:string[];preprocessing:ReplayPreprocessing};
 /** Historical comparisons use a verified Git snapshot with this same delivery/clock harness. */
-export type ReplayEngineFactory=(publish:(position:ProcessedPosition)=>void,intervalMs:number,now:()=>number)=>Pick<RegionPositionEngine,'enable'|'ingest'|'tick'|'disable'>;
+export type ReplayEngineFactory=(publish:(position:ProcessedPosition)=>void,intervalMs:number,now:()=>number)=>{enable(config:ReturnType<typeof compileRegionsConfig>):void;ingest(position:Parameters<RegionPositionEngine['ingest']>[0]):unknown;tick():void;disable():void};
 const git = (args:string[]):string => { try { return execFileSync('git',args,{encoding:'utf8'}).trim(); } catch { return 'unavailable'; } };
 /** Read only the map's input filter file. Never load the live settings service or its writer. */
 export async function readReplayPdopSettings(configPath:string):Promise<{settings:PdopFilterSettings;path:string;sha256:string|null;source:string}> {
@@ -76,6 +78,7 @@ export function replayRows(rows: RawRow[], truth: Truth, config: ReturnType<type
         engine.ingest({tagCode:row.tag_code,x:row.x,y:row.y,timestamp:row.created_at,
           ...(row.received_at?{receivedAt:row.received_at}:{}),...(row.quality===null?{}:{quality:row.quality}),
           ...('pdop' in row?{pdop:row.pdop}:{}),
+          ...(row.motion==='moving'||row.motion==='stationary'?{motion:row.motion}:{}),
           mapId:row.map_id,sourceZoneId:row.zone_id,sourceZoneName:row.zone_name});
       } finally { deliveringRow=undefined; }
     }
@@ -83,11 +86,15 @@ export function replayRows(rows: RawRow[], truth: Truth, config: ReturnType<type
   } finally { engine.disable(); }
   return {decisions,unscoredTags,preprocessing,metrics:score(truth,decisions,rows,settings.sampleMs,settings.boundaryToleranceMs)};
 }
-export async function runTest(id:string, options:{configPath:string;tickMs:number;sampleMs:number;boundaryToleranceMs:number;pdopEnabled?:boolean;pdopMax?:number}):Promise<Run> {
+export async function runTest(id:string, options:{configPath:string;tickMs:number;sampleMs:number;boundaryToleranceMs:number;pdopEnabled?:boolean;pdopMax?:number;engine?:'evidence'|'hmm'|'auto'}):Promise<Run> {
   const {truth,manifest,rows,truthSha256}=await readDataset(id);
   const configBytes=await readFile(options.configPath), config=compileRegionsConfig(JSON.parse(configBytes.toString()) as RegionsConfig);
   const pdop=await readReplayPdopSettings(options.configPath);
-  const result=replayRows(rows,truth,config,{...options,pdopEnabled:options.pdopEnabled??pdop.settings.enabled,pdopMax:options.pdopMax??pdop.settings.maximumPdop,warmupMs:manifest.warmupMs,observationMs:manifest.observationMs});
+  // --engine auto uses config/maps/<map>/room-engine.json beside the regions file (as the live controller does).
+  const selection=options.engine==='auto'?readRoomEngineSelectionBeside(options.configPath):{algorithm:(options.engine??'evidence') as 'evidence'|'hmm',hmm:undefined};
+  const engineVersion=selection.algorithm==='hmm'?HMM_ROOM_ENGINE_VERSION:ROOM_ENGINE_VERSION;
+  const result=replayRows(rows,truth,config,{...options,pdopEnabled:options.pdopEnabled??pdop.settings.enabled,pdopMax:options.pdopMax??pdop.settings.maximumPdop,warmupMs:manifest.warmupMs,observationMs:manifest.observationMs},
+    (publish,interval,now)=>createRoomEngine(selection,publish,interval,now,false));
   result.preprocessing.pdop.sourcePath=path.resolve('src/shared/tracking/pdop.ts');
   result.preprocessing.pdop.sourceSha256=await sha256(await readFile(result.preprocessing.pdop.sourcePath));
   result.preprocessing.pdop.settingsPath=pdop.path;
@@ -97,7 +104,7 @@ export async function runTest(id:string, options:{configPath:string;tickMs:numbe
   const unmatched=Object.keys(manifest.candidateTags).filter(tag=>!truth.groups.some(group=>group.tagCodes.includes(tag)));
   result.unscoredTags=[...new Set([...result.unscoredTags,...unmatched])].sort();
   const status=git(['status','--short']);
-  return {schemaVersion:1,testId:id,engineVersion:ROOM_ENGINE_VERSION,git:{commit:git(['rev-parse','HEAD']),dirty:!!status,status},
+  return {schemaVersion:1,testId:id,engineVersion,git:{commit:git(['rev-parse','HEAD']),dirty:!!status,status},
     config:{path:path.resolve(options.configPath),sha256:await sha256(configBytes),version:config.version??'unversioned',
       context:manifest.source.includes('SENTETİK')?'anonim sentetik fixture + güncel harita':'geçmiş veri + güncel harita (geçmiş harita snapshotı sağlanmadı)'},
     dataset:{source:manifest.source,caveat:manifest.caveat,sha256:manifest.sha256,rowCount:manifest.rowCount,candidateTags:manifest.candidateTags,timing:manifest.timing,quality:manifest.quality,...(manifest.pdop?{pdop:manifest.pdop}:{}),truthRevision:truth.revision,truthSha256,warmupMs:manifest.warmupMs,observationMs:manifest.observationMs},

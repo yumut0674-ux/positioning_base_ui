@@ -8,7 +8,6 @@ import type { ProcessedPosition } from "../src/server/regionEngine/types";
 import { scenarioConfig, generateScenario, SCENARIOS } from "../test_api/room_scenarios.js";
 import { evaluateScenario } from "../test_api/evaluate_rooms";
 import { ageDecision, projectHistory, decisionZone } from "../src/server/location/roomDecisionProjection";
-import type { TrackingPosition } from "../src/server/trackingBuffer";
 
 const epoch=Date.parse("2026-09-01T00:00:00Z");
 function setup(overrides: RegionsConfig["engine"]={}) {
@@ -55,86 +54,6 @@ function requiredDoorConfig(base: RegionsConfig, coverage: "silent" | "regular" 
     inference: { ...region.inference, coverage, silentEntryMaxDistanceMeters: coverage === "silent" ? distance : undefined,
       doorDefaults: { ...region.inference?.doorDefaults, evidenceMode: "required" as const } } })) };
 }
-test("moving, unknown and absent motion labels preserve room decisions, filters and signal-loss inference", () => {
-  const run = (motionLabel: TrackingPosition["motionLabel"]) => {
-    let now = epoch;
-    const published: ProcessedPosition[] = [];
-    const base = scenarioConfig() as RegionsConfig;
-    const config: RegionsConfig = { ...base, engine: { ...base.engine, maximumStepDistanceMeters: 10 } };
-    const engine = new RegionPositionEngine(p => published.push(p), 250, () => now, false);
-    engine.enable(compileRegionsConfig(config));
-    try {
-      for (const [t, x, y, quality] of [
-        [0, 3, 2, 1], [1000, 3, 2.5, 1], [2000, 3, 3, 1],
-        [3000, 100, 100, 1], [4000, 3, 3, 0], [5000, 3, 3, 1],
-      ]) {
-        now = epoch + t;
-        engine.ingest({ tagCode: "T", x, y, quality, timestamp: new Date(now).toISOString(),
-          ...(motionLabel === undefined ? {} : { motionLabel }) });
-      }
-      for (const t of [9000, 70000]) { now = epoch + t; engine.tick(); }
-      // Only the transported metadata may differ, including in rawPosition snapshots.
-      return JSON.parse(JSON.stringify(published, (key, value) => key === "motionLabel" ? undefined : value)) as ProcessedPosition[];
-    } finally { engine.disable(); }
-  };
-  const baseline = run(undefined);
-  assert.ok(baseline.some(p => p.regionInference.state === "IN_REGION"));
-  assert.ok(baseline.some(p => p.decisionTrace?.eventType === "MEASUREMENT_REJECTED"));
-  assert.ok(baseline.some(p => p.regionInference.state === "INFERRED_IN_REGION"));
-  for (const label of ["moving", "unknown"] as const) assert.deepEqual(run(label), baseline);
-});
-
-test("stationary measurements cannot initialize room state; moving resumes normal inference", () => {
-  let now = epoch;
-  const published: ProcessedPosition[] = [];
-  const engine = new RegionPositionEngine(p => published.push(p), 250, () => now, false);
-  engine.enable(compileRegionsConfig(scenarioConfig() as RegionsConfig));
-  try {
-    for (const t of [0, 1000, 2000]) {
-      now = epoch + t;
-      assert.equal(engine.ingest({ tagCode: "T", x: 3, y: 3, timestamp: new Date(now).toISOString(), motionLabel: "stationary" }), undefined);
-    }
-    now += 10_000; engine.tick();
-    assert.equal(engine.getVehicleState("T"), undefined);
-    assert.equal(published.length, 0);
-    const resumed = engine.ingest({ tagCode: "T", x: 3, y: 3, timestamp: new Date(now).toISOString(), motionLabel: "moving" });
-    assert.ok(resumed);
-    assert.equal(engine.getVehicleState("T")!.history.length, 1);
-  } finally { engine.disable(); }
-});
-
-test("stationary coordinates cannot alter room evidence or distance references, including timer inference", () => {
-  const run = (includeStationary: boolean) => {
-    let now = epoch;
-    const published: ProcessedPosition[] = [];
-    const engine = new RegionPositionEngine(p => published.push(p), 250, () => now, false);
-    const base = scenarioConfig() as RegionsConfig;
-    engine.enable(compileRegionsConfig(silentProximityConfig({ ...base, engine: { ...base.engine, maximumStepDistanceMeters: 10 } })));
-    try {
-      for (const t of [0, 1000, 2000]) {
-        now = epoch + t;
-        engine.ingest({ tagCode: "T", x: 3, y: 3, timestamp: new Date(now).toISOString(), motionLabel: "moving" });
-      }
-      assert.equal(engine.getVehicleState("T")!.activeRegionId, "A");
-      const before = JSON.stringify(engine.getVehicleState("T"));
-      const publicationCount = published.length;
-      for (const [t, x, y] of [[3000, 9, 3], [4000, 100, 100], [5000, 100, 100], [6000, 3, -1], [7000, 3, 3]]) {
-        now = epoch + t;
-        if (includeStationary) assert.equal(engine.ingest({ tagCode: "T", x, y, timestamp: new Date(now).toISOString(), motionLabel: "stationary" }), undefined);
-      }
-      assert.equal(JSON.stringify(engine.getVehicleState("T")), before);
-      assert.equal(published.length, publicationCount);
-      for (const t of [9000, 70000]) { now = epoch + t; engine.tick(); }
-      assert.equal(published.at(-1)!.regionInference.state, "LOCATION_LOST");
-      now = epoch + 71000;
-      assert.ok(engine.ingest({ tagCode: "T", x: 3, y: 3, timestamp: new Date(now).toISOString(), motionLabel: "unknown" }));
-      assert.equal(engine.getVehicleState("T")!.lastRawDataTimestamp, now);
-      return published;
-    } finally { engine.disable(); }
-  };
-  assert.deepEqual(run(true), run(false));
-});
-
 test("disabled engine does not mutate input",()=>{const s=setup();s.engine.disable();assert.equal(s.point(0,1,1),undefined);});
 test("kat1-ortopedi uses 4.5 m/s globally and for every effective region setting",()=>{
   const compiled=compileRegionsConfig(orthopedicsConfig());

@@ -10,7 +10,7 @@ import { assignedDisplayRoomId, isCorridorRegion } from "./roomDisplayPolicy";
 export interface MapTagDisplay {
   readonly visible: boolean;
   readonly position?: Point2D;
-  readonly reason?: "outside" | "no-regions" | "no-data";
+  readonly reason?: "outside" | "no-regions";
 }
 interface State {
   candidate: TrackedTag;
@@ -36,26 +36,12 @@ export class MapDisplayFilter {
   private holdMs = 2_000;
   private mapId: string | null = null;
   private timer?: ReturnType<typeof setTimeout>;
-  private hiddenTagIds: ReadonlySet<string> = new Set();
 
   public constructor(
     private readonly animation: PositionAnimationController,
     private readonly changed: (displays: Record<string, MapTagDisplay>) => void,
     private readonly clock: Clock = { now: Date.now, setTimeout, clearTimeout },
   ) {}
-
-  public setHiddenTagIds(ids: ReadonlySet<string>): void {
-    if (ids.size === this.hiddenTagIds.size && [...ids].every(id => this.hiddenTagIds.has(id))) return;
-    const previous = this.hiddenTagIds;
-    this.hiddenTagIds = ids;
-    for (const [id, state] of this.states) {
-      if (previous.has(id) && !ids.has(id)) {
-        this.states.delete(id);
-        this.animation.remove(id);
-      } else this.evaluate(state, true);
-    }
-    this.publish();
-  }
 
   public configure(polygons: readonly DisplayPolygon[], holdMs: number, mapId: string | null = null,
     regions?: readonly RegionDefinition[]): void {
@@ -111,14 +97,6 @@ export class MapDisplayFilter {
 
   private evaluate(state: State, snap = false): void {
     const tag = state.candidate, now = this.clock.now();
-    if (this.hiddenTagIds.has(tag.id)) {
-      this.animation.remove(tag.id);
-      state.lastValid = undefined;
-      state.outsideSince = undefined;
-      state.stabilizer = new AdaptivePositionFilter();
-      state.display = { visible: false, reason: "no-data" };
-      return;
-    }
     const decision = tag.regionInference;
     const assignedRoomId = assignedDisplayRoomId(tag);
     const assignedRoom = assignedRoomId ? this.rooms?.get(assignedRoomId) : undefined;
@@ -126,8 +104,11 @@ export class MapDisplayFilter {
     // A lost location may still carry the last known centre in x/y. Only a
     // current engine assignment permits that room; candidates never do.
     const incoming = this.rooms && !assignedRoom ? (tag.rawPosition ?? tag) : tag;
-    let target: Point2D | undefined = inDisplayArea(incoming, allowedArea) ? { x: incoming.x, y: incoming.y } : undefined;
-    if (!target && this.rooms && !assignedRoom && inDisplayArea(incoming, this.polygons)) {
+    // The engine decided the tag left the mapped area through an exit gate: never pin it to
+    // the corridor/room edge; the normal outside hold then hides it.
+    const leftArea = decision?.enabled === true && decision.outsideArea === true;
+    let target: Point2D | undefined = !leftArea && inDisplayArea(incoming, allowedArea) ? { x: incoming.x, y: incoming.y } : undefined;
+    if (!target && !leftArea && this.rooms && !assignedRoom && inDisplayArea(incoming, this.polygons)) {
       target = projectIntoDisplayArea(incoming, this.corridors);
     }
     if (state.lastValid && !inDisplayArea(state.lastValid, allowedArea)) {

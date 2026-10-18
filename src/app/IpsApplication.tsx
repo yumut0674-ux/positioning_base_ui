@@ -24,10 +24,8 @@ import { isSelectableMap, persistActiveMapId, readStoredMapId, resolveInitialMap
 import { useTagTrailSettingsStorage } from "@/src/features/tracking/hooks/useTagTrailSettingsStorage";
 import { DecisionLogsPanel } from "@/src/features/decisionLogs/components/DecisionLogsPanel";
 import type { UiMode } from "./uiMode";
-import { SettingsPanel } from "@/src/features/settings/components/SettingsPanel";
-import { mapTrackingTags } from "@/src/features/tracking/services/mapTrackingTags";
 
-const ADMIN_VIEWS = new Set<WorkspaceView>(["tags", "anchors", "regions", "analyses", "room-tests", "gekon-ai", "settings"]);
+const ADMIN_VIEWS = new Set<WorkspaceView>(["tags", "anchors", "regions", "analyses", "room-tests", "gekon-ai"]);
 
 const GekonAiAdminPanel = dynamic(
   () => import("@/src/features/assistantAdmin/components/GekonAiAdminPanel").then((module) => module.GekonAiAdminPanel),
@@ -83,7 +81,7 @@ function LiveMapWorkspace({
   onViewChange,
 }: LiveMapWorkspaceProps) {
   const { collapsed: sidebarCollapsed, toggleCollapsed: toggleSidebar } = useSidebarCollapse();
-  const { positionAnimation, engineEnabled } = useRealtimeTracking();
+  const positionAnimation = useRealtimeTracking();
   useTagTrailSettingsStorage();
   const showLayersPanel = useIpsStore((state) => state.showLayersPanel);
   const toggleLayersPanel = useIpsStore((state) => state.toggleLayersPanel);
@@ -92,8 +90,6 @@ function LiveMapWorkspace({
   const requestMapFocus = useIpsStore((state) => state.requestMapFocus);
   const requestMapFit = useIpsStore((state) => state.requestMapFit);
   const tags = useIpsStore((state) => state.tags);
-  const observedTags = useIpsStore((state) => state.observedTags);
-  const mapTags = useMemo(() => mapTrackingTags(tags, observedTags, engineEnabled), [tags, observedTags, engineEnabled]);
   const selectedTagId = useIpsStore((state) => state.selectedTagId);
   const activeMapId = useIpsStore((state) => state.activeMapId);
   const setActiveMapId = useIpsStore((state) => state.setActiveMapId);
@@ -109,15 +105,14 @@ function LiveMapWorkspace({
   });
   const activeMapDetails = mapQuery.data;
   const liveTrackingVisible = Boolean(catalog && shouldShowLiveTracking(catalog, activeMapDetails));
-  const visibleTags = useMemo(() => liveTrackingVisible ? Object.values(mapTags).filter((tag) => tag.mapId === activeMapId) : [], [activeMapId, liveTrackingVisible, mapTags]);
+  const visibleTags = useMemo(() => liveTrackingVisible ? Object.values(tags).filter((tag) => tag.mapId === activeMapId) : [], [activeMapId, liveTrackingVisible, tags]);
   const mapFrameRef = useRef<HTMLDivElement>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [focusFeedback, setFocusFeedback] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [roomTestRecording, setRoomTestRecording] = useState(false);
   const fullscreenSupported = typeof document === "undefined" || document.fullscreenEnabled;
-  const selectedTag = selectedTagId ? mapTags[selectedTagId] ?? tags[selectedTagId] : undefined;
-  const selectedTagHidden = useIpsStore(state => selectedTagId ? state.tagPresenceById[selectedTagId]?.hiddenForNoData ?? false : false);
+  const selectedTag = selectedTagId ? tags[selectedTagId] : undefined;
   const assistantContext = useMemo<GekonAiContext>(() => ({
     mode: "live",
     selectedTagId: selectedTag?.id,
@@ -195,22 +190,20 @@ function LiveMapWorkspace({
   }, [onViewChange]);
 
   const handleFocus = useCallback(() => {
-    if (selectedTagHidden) return;
     requestMapFocus();
     setFocusFeedback(true);
     window.setTimeout(() => setFocusFeedback(false), 450);
-  }, [requestMapFocus, selectedTagHidden]);
+  }, [requestMapFocus]);
 
   const handleFitMap = useCallback(() => {
     requestMapFit();
   }, [requestMapFit]);
 
   const handleShowMap = useCallback(() => {
-    if (selectedTagHidden) return;
     if (selectedTag?.mapId && selectedTagId) selectTagOnMap(selectedTagId, selectedTag.mapId);
     else requestMapFocus();
     mapFrameRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [requestMapFocus, selectTagOnMap, selectedTag, selectedTagId, selectedTagHidden]);
+  }, [requestMapFocus, selectTagOnMap, selectedTag, selectedTagId]);
 
   const handleMapSelect = useCallback((mapId: string) => {
     const entry = catalog?.maps.find((candidate) => candidate.id === mapId);
@@ -238,7 +231,7 @@ function LiveMapWorkspace({
       {mobileMenuOpen && <button type="button" className="mobile-sidebar-backdrop" aria-label="Menüyü kapat" onClick={() => setMobileMenuOpen(false)} />}
       <AppSidebar mode={mode} activeView={activeView} collapsed={sidebarCollapsed} mobileOpen={mobileMenuOpen} onMobileClose={() => setMobileMenuOpen(false)} onViewChange={handleSidebarViewChange} roomTestRecording={roomTestRecording} />
       <main className="workspace">
-        {mode === "admin" && activeView === "settings" ? <SettingsPanel /> : mode === "admin" && activeView === "gekon-ai" ? <GekonAiAdminPanel /> : mode === "admin" && activeView === "anchors" ? <AnchorManagementPanel embedded /> : mode === "admin" && activeView === "tags" ? <TagManagementPanel embedded /> : mode === "admin" && activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : mode === "admin" && activeView === "analyses" ? <DecisionLogsPanel /> : activeView === "history" || activeView === "room-tests" ? null : <>
+        {mode === "admin" && activeView === "gekon-ai" ? <GekonAiAdminPanel /> : mode === "admin" && activeView === "anchors" ? <AnchorManagementPanel embedded /> : mode === "admin" && activeView === "tags" ? <TagManagementPanel embedded /> : mode === "admin" && activeView === "regions" ? <RegionManagementPanel /> : activeView === "support" ? <SupportContactPanel embedded /> : mode === "admin" && activeView === "analyses" ? <DecisionLogsPanel /> : activeView === "history" || activeView === "room-tests" ? null : <>
           <div className="workspace-heading live-map-heading">
             <div className="workspace-heading-content">
               <span>{liveTrackingVisible ? "CANLI OPERASYONLAR" : "HARİTA GÖRÜNÜMÜ"} / {(activeMap?.floorLabel ?? "HARİTA").toUpperCase()}</span>
@@ -258,7 +251,7 @@ function LiveMapWorkspace({
               <div className="mini-toolbar" aria-label="Harita araçları">
                 <button className={showLayersPanel ? "active" : ""} title="Katmanları aç/kapat" onClick={toggleLayersPanel}><Layers3 size={16} /></button>
                 <button className={measurementEnabled ? "active" : ""} title="Ölçüm" aria-label="Ölçüm modunu aç veya kapat" aria-pressed={measurementEnabled} onClick={toggleMeasurement}><Ruler size={16} /></button>
-                <button className={focusFeedback ? "focus-feedback" : ""} title={selectedTagHidden ? "Güncel konum verisi bekleniyor" : "Odakla"} aria-label="Seçili etikete odaklan" disabled={selectedTagHidden} onClick={handleFocus}><Scan size={16} /></button>
+                <button className={focusFeedback ? "focus-feedback" : ""} title="Odakla" aria-label="Seçili etikete odaklan" onClick={handleFocus}><Scan size={16} /></button>
                 <button title="Haritayı sığdır" aria-label="Haritayı sığdır" onClick={handleFitMap}><LocateFixed size={16} /></button>
                 <span />
                 <button className={isFullscreen ? "active" : ""} title={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-label={isFullscreen ? "Tam ekrandan çık" : "Tam ekran"} aria-pressed={isFullscreen} disabled={!fullscreenSupported} onClick={toggleFullscreen}><Maximize2 size={16} /></button>

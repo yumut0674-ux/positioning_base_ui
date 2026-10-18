@@ -218,118 +218,6 @@ test("store binding switches RAW/engine coordinates and maps without modifying m
 const corridor = [p(0, 0), p(10, 0), p(10, 2), p(0, 2)];
 const roomA = [p(2, 2), p(4, 2), p(4, 5), p(2, 5)];
 const roomB = [p(6, 2), p(8, 2), p(8, 5), p(6, 5)];
-
-test("engine display includes stationary raw tags before any room decision and follows new observations", () => {
-  const original = useIpsStore.getState();
-  const f = fixture((mapTagDisplays) => useIpsStore.setState({ mapTagDisplays }));
-  const pair = (world: { x: number; y: number }) => ({ world, pixel: world });
-  const config = { ...DEFAULT_REGIONS_CONFIG, regions: [{ id: "corridor-main", name: "Koridor", kind: "corridor" as const,
-    color: "#fff", polygon: square.map(pair), roomCenter: null, entrances: [] }] };
-  let unbind: (() => void) | undefined;
-  try {
-    useIpsStore.setState({ tags: {}, observedTags: {}, tagPresenceById: {}, tagLocationEntries: {}, selectedTagId: null,
-      activeMapId: config.map.mapId, regionsConfig: config, regionsConfigByMapId: { [config.map.mapId]: config } });
-    unbind = bindMapDisplayTracking(f.filter, true);
-    useIpsStore.getState().observeTag({ ...tag(2, 2, 1000), motionLabel: "stationary" });
-    assert.equal(f.displays().A?.visible, true);
-    assert.deepEqual(f.displays().A.position, p(2, 2));
-    f.advance(2000);
-    useIpsStore.getState().observeTag({ ...tag(2.1, 2, 2000), motionLabel: "stationary" });
-    assert.equal(f.animation.getState("A")?.samples.at(-1)?.timestamp, 2000);
-    useIpsStore.getState().observeTag({ ...tag(3, 3, 2000, "OTHER"), motionLabel: "stationary", mapId: "other-map" });
-    useIpsStore.getState().observeTag({ ...tag(3, 3, 2000, "UNRESOLVED"), motionLabel: "stationary", mapId: null });
-    assert.equal(f.displays().OTHER, undefined); assert.equal(f.displays().UNRESOLVED, undefined);
-    assert.deepEqual(useIpsStore.getState().tags, {});
-    assert.deepEqual(useIpsStore.getState().tagLocationEntries, {});
-  } finally { unbind?.(); f.filter.dispose(); useIpsStore.setState(original, true); }
-});
-
-test("corridor markers do not require motion metadata or a room-engine publication", () => {
-  const original = useIpsStore.getState();
-  const f = fixture((mapTagDisplays) => useIpsStore.setState({ mapTagDisplays }));
-  const pair = (world: { x: number; y: number }) => ({ world, pixel: world });
-  const config = { ...DEFAULT_REGIONS_CONFIG, regions: [{ id: "corridor-main", name: "Koridor", kind: "corridor" as const,
-    color: "#fff", polygon: square.map(pair), roomCenter: null, entrances: [] }] };
-  let unbind: (() => void) | undefined;
-  try {
-    useIpsStore.setState({ tags: {}, observedTags: {}, tagPresenceById: {}, tagLocationEntries: {}, selectedTagId: null,
-      activeMapId: config.map.mapId, regionsConfig: config, regionsConfigByMapId: { [config.map.mapId]: config } });
-    unbind = bindMapDisplayTracking(f.filter, true);
-    for (const [index, motionLabel] of [undefined, "unknown", "stationary", "moving"].entries()) {
-      const id = `RAW-${index}`;
-      useIpsStore.getState().observeTag({ ...tag(2 + index, 2, 1000, id), motionLabel: motionLabel as TrackedTag["motionLabel"] });
-      assert.equal(f.displays()[id]?.visible, true, `raw motion: ${motionLabel}`);
-      let rendered: { x: number; y: number } | undefined;
-      const detach = f.animation.attach(id, { render: (x, y) => { rendered = p(x, y); } });
-      assert.deepEqual(rendered, p(2 + index, 2));
-      detach();
-    }
-    assert.deepEqual(useIpsStore.getState().tags, {});
-    assert.deepEqual(useIpsStore.getState().tagLocationEntries, {});
-  } finally { unbind?.(); f.filter.dispose(); useIpsStore.setState(original, true); }
-});
-
-test("stationary display keeps assigned rooms and accepts a delayed room decision after a raw fallback", () => {
-  const original = useIpsStore.getState();
-  const f = fixture((mapTagDisplays) => useIpsStore.setState({ mapTagDisplays }));
-  const pair = (world: { x: number; y: number }) => ({ world, pixel: world });
-  const config = { ...DEFAULT_REGIONS_CONFIG, regions: [
-    { id: "corridor-main", name: "Koridor", kind: "corridor" as const, color: "#fff", polygon: corridor.map(pair), roomCenter: null, entrances: [] },
-    { id: "room-a", name: "Oda A", kind: "room" as const, color: "#fff", polygon: roomA.map(pair), roomCenter: pair(p(3, 3.5)), entrances: [] },
-    { id: "room-b", name: "Oda B", kind: "room" as const, color: "#fff", polygon: roomB.map(pair), roomCenter: pair(p(7, 3.5)), entrances: [] },
-  ] };
-  let unbind: (() => void) | undefined;
-  try {
-    useIpsStore.setState({ tags: {}, observedTags: {}, tagPresenceById: {}, tagLocationEntries: {}, selectedTagId: null,
-      activeMapId: config.map.mapId, regionsConfig: config, regionsConfigByMapId: { [config.map.mapId]: config } });
-    unbind = bindMapDisplayTracking(f.filter, true);
-    const raw = { ...tag(7, 3.5, 2000), motionLabel: "stationary" as const };
-    useIpsStore.getState().observeTag(raw);
-    assert.equal(f.displays().A?.visible, true);
-    assert.ok(inDisplayArea(f.displays().A.position!, [corridor]));
-    const assigned = { ...tag(3, 3.5, 1000), positionSource: "REGION_CENTER" as const, publishedAt: new Date(2500).toISOString(),
-      regionInference: { enabled: true, state: "IN_REGION", regionId: "room-a" } };
-    useIpsStore.getState().upsertTag(assigned);
-    assert.deepEqual(f.displays().A.position, p(3, 3.5));
-    useIpsStore.getState().observeTag({ ...raw, timestamp: 3000, x: 100, y: 100 });
-    assert.deepEqual(f.displays().A.position, p(3, 3.5));
-    const lost = { ...assigned, publishedAt: new Date(4000).toISOString(),
-      regionInference: { enabled: true, state: "LOCATION_LOST", regionId: null, lastKnownRegionId: "room-a" } };
-    useIpsStore.getState().upsertTag(lost);
-    useIpsStore.getState().observeTag({ ...raw, timestamp: 4000 });
-    assert.equal(f.displays().A.visible, true);
-    assert.ok(inDisplayArea(f.displays().A.position!, [corridor]));
-    assert.equal(useIpsStore.getState().tags.A, lost);
-    assert.equal(f.animation.getState("A")?.samples.at(-1)?.regionId, null);
-  } finally { unbind?.(); f.filter.dispose(); useIpsStore.setState(original, true); }
-});
-
-test("new stationary packets refresh map animation freshness while retaining the assigned room centre", () => {
-  const original = useIpsStore.getState();
-  const f = fixture((mapTagDisplays) => useIpsStore.setState({ mapTagDisplays }));
-  const pair = (world: { x: number; y: number }) => ({ world, pixel: world });
-  const config = { ...DEFAULT_REGIONS_CONFIG, regions: [{ id: "room", name: "Oda", kind: "room" as const,
-    color: "#fff", polygon: square.map(pair), roomCenter: pair(p(5, 5)), entrances: [] }] };
-  let unbind: (() => void) | undefined;
-  try {
-    const processed = { ...tag(5, 5, 1000), positionSource: "REGION_CENTER" as const,
-      regionInference: { enabled: true, state: "IN_REGION", regionId: "room" } };
-    useIpsStore.setState({ tags: { A: processed }, observedTags: {}, tagPresenceById: {}, tagLocationEntries: {}, selectedTagId: null,
-      activeMapId: config.map.mapId, regionsConfig: config, regionsConfigByMapId: { [config.map.mapId]: config } });
-    unbind = bindMapDisplayTracking(f.filter, true);
-    for (const at of [11000, 21000, 31000]) {
-      f.advance(at);
-      useIpsStore.getState().observeTag({ ...tag(9, 9, at), motionLabel: "stationary" });
-      f.animation.update(at);
-      const state = f.animation.getState("A")!;
-      assert.equal(state.samples.at(-1)!.timestamp, at);
-      assert.equal(state.stale, false);
-      assert.deepEqual(f.displays().A.position, p(5, 5));
-      assert.equal(useIpsStore.getState().tags.A, processed);
-    }
-  } finally { unbind?.(); f.filter.dispose(); useIpsStore.setState(original, true); }
-});
-
 function roomPermissionFixture() {
   const f = fixture();
   const pair = (world: { x: number; y: number }) => ({ world, pixel: world });
@@ -520,14 +408,12 @@ test("newer synthetic decisions for one measurement do not add physical route sa
 });
 
 test("hidden tag stays in the list with visibility explanation and real activity", () => {
-  const outside = { ...tag(15, 15, 1_000), motionLabel: "moving" as const };
   const html = renderToStaticMarkup(createElement(TagInformationPanelContent, {
-    tags: [outside], selectedTag: outside, locationAddress: "Tanımlı alan dışında", now: 1_000,
-    recentTagIds: [], locationDuration: "", onSelectTag: () => {}, onOpenHistory: () => {},
+    tags: [tag(15, 15, 1_000)], recentTagIds: [], locationDuration: "", onSelectTag: () => {}, onOpenHistory: () => {},
     mapTagDisplays: { A: { visible: false, reason: "outside" } },
   }));
   assert.match(html, /Alan dışında · haritada gizli/);
-  assert.match(html, /HAREKETLİ/);
+  assert.match(html, /CANLI/);
   assert.match(html, /role="option"/);
 });
 

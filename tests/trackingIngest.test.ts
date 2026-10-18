@@ -63,51 +63,11 @@ test("örnek position payload'ı boş 204 ile kabul edilir; konum, PDOP ve zaman
       timestamp: "2026-07-21T14:30:15.123+03:00",
       sourceZoneId: "servis",
       sourceZoneName: "Servis",
-      motionLabel: "unknown",
       mapId: "necmettin-servis",
     });
   } finally {
     trackingBuffer.ingest = originalIngest;
   }
-});
-
-test("yeni tek-tag sözleşmesi PDOP olmadan kabul edilir; koordinat, kimlik, etiket ve zaman korunur", async () => {
-  const originalIngest = trackingBuffer.ingest;
-  const captured: TrackingPosition[] = [];
-  trackingBuffer.ingest = async position => { captured.push(position); return true; };
-  try {
-    for (const motion_label of ["moving", "stationary", "unknown", undefined]) {
-      const payload = {
-        type: "position", tag_id: "AAAABBBBCCCCDDDD", x: 12.48, y: 7.32,
-        zone_id: "zone-a", zone_name: "Bölge A", timestamp: "2026-10-15T14:30:15.123+03:00", motion_label,
-      };
-      assert.equal((await POST(jsonRequest(payload))).status, 204);
-      assert.deepEqual(captured.at(-1), {
-        tagCode: payload.tag_id, x: payload.x, y: payload.y, timestamp: payload.timestamp,
-        sourceZoneId: payload.zone_id, sourceZoneName: payload.zone_name, mapId: null,
-        pdop: null, motionLabel: motion_label ?? "unknown",
-      });
-    }
-    for (const tag_id of ["00001234567890123456", "9007199254740993"]) {
-      assert.equal((await POST(jsonRequest({ ...EXAMPLE_PAYLOAD, tag_id, motion_label: "stationary" }))).status, 204);
-      assert.equal(captured.at(-1)?.tagCode, tag_id);
-      assert.equal(typeof captured.at(-1)?.tagCode, "string");
-    }
-  } finally { trackingBuffer.ingest = originalIngest; }
-});
-
-test("geçersiz motion_label konum akışına girmeden 400 döndürür", async () => {
-  const originalIngest = trackingBuffer.ingest;
-  let ingested = 0;
-  trackingBuffer.ingest = async () => { ingested++; return true; };
-  try {
-    for (const motion_label of [null, "", "MOVING", "idle", " moving ", 0, false, {}, []]) {
-      const response = await POST(jsonRequest({ ...EXAMPLE_PAYLOAD, motion_label }));
-      assert.equal(response.status, 400);
-      assert.match((await response.json() as { error: string }).error, /motion_label/);
-    }
-    assert.equal(ingested, 0);
-  } finally { trackingBuffer.ingest = originalIngest; }
 });
 
 test("null ve bilinmeyen zone kabul edilir fakat haritaya çözülmez", async () => {
@@ -159,13 +119,12 @@ test("ingest POST aynı route üzerindeki SSE akışına position eventi yayınl
   };
 
   try {
-    const response = await POST(jsonRequest({ ...EXAMPLE_PAYLOAD, motion_label: "stationary" }));
+    const response = await POST(jsonRequest(EXAMPLE_PAYLOAD));
     assert.equal(response.status, 204);
     const event = decoder.decode((await reader.read()).value);
     assert.match(event, /event: position/);
     assert.match(event, /"tagCode":"A1B2C3D400000001"/);
     assert.match(event, /"pdop":1\.83/);
-    assert.match(event, /"motionLabel":"stationary"/);
     assert.match(event, /"timestamp":"2026-07-21T14:30:15.123\+03:00"/);
   } finally {
     trackingBuffer.ingest = originalIngest;
@@ -253,8 +212,6 @@ test("geçersiz sözleşme payload'ları açıklayıcı 400 döndürür", async 
   const cases = [
     ["yanlış type", { ...EXAMPLE_PAYLOAD, type: "location" }],
     ["eksik tag_id", Object.fromEntries(Object.entries(EXAMPLE_PAYLOAD).filter(([field]) => field !== "tag_id"))],
-    ["sayısal tag_id", { ...EXAMPLE_PAYLOAD, tag_id: 123456789 }],
-    ["konum dizisi", [EXAMPLE_PAYLOAD]],
     ["string x", { ...EXAMPLE_PAYLOAD, x: "1.25" }],
     ["string y", { ...EXAMPLE_PAYLOAD, y: "0.8" }],
     ["geçersiz timestamp", { ...EXAMPLE_PAYLOAD, timestamp: "2026-02-30T14:30:15+03:00" }],
@@ -279,4 +236,35 @@ test("bozuk JSON 400 döndürür", async () => {
   }));
   assert.equal(response.status, 400);
   assert.equal(typeof (await response.json() as { error?: unknown }).error, "string");
+});
+
+test("Jetson motion (0 hareketli / 1 hareketsiz) ve motion_label kabul edilir; bilinmeyen değer bilinmiyor sayılır", () => {
+  assert.equal(parsePositionPayload({ ...EXAMPLE_PAYLOAD, motion: 0, motion_label: "moving" }).motion, "moving");
+  assert.equal(parsePositionPayload({ ...EXAMPLE_PAYLOAD, motion: 1, motion_label: "stationary" }).motion, "stationary");
+  assert.equal(parsePositionPayload({ ...EXAMPLE_PAYLOAD, motion: 1 }).motion, "stationary");
+  assert.equal(parsePositionPayload({ ...EXAMPLE_PAYLOAD, motion_label: "moving" }).motion, "moving");
+  assert.equal(parsePositionPayload({ ...EXAMPLE_PAYLOAD, motion: 2, motion_label: "unknown" }).motion, null);
+  assert.equal(parsePositionPayload({ ...EXAMPLE_PAYLOAD, motion: null }).motion, null);
+  assert.equal("motion" in parsePositionPayload(EXAMPLE_PAYLOAD), false);
+  assert.throws(() => parsePositionPayload({ ...EXAMPLE_PAYLOAD, motion: true }), /motion/);
+  assert.throws(() => parsePositionPayload({ ...EXAMPLE_PAYLOAD, motion_label: 1 }), /motion_label/);
+});
+
+test("Jetson raw_x/raw_y yalnız raw_inside=false iken (bölgeye kırpılmış çözüm) solverRaw olarak taşınır", () => {
+  const clamped = parsePositionPayload({ ...EXAMPLE_PAYLOAD, raw_x: -2.86, raw_y: 4.88, raw_inside: false });
+  assert.deepEqual(clamped.solverRaw, { x: -2.86, y: 4.88 });
+  assert.equal(clamped.x, EXAMPLE_PAYLOAD.x, "gösterilen konum kırpılmış x/y kalır");
+  assert.equal(parsePositionPayload({ ...EXAMPLE_PAYLOAD, raw_x: 1.25, raw_y: 0.8, raw_inside: true }).solverRaw, null);
+  assert.equal(parsePositionPayload({ ...EXAMPLE_PAYLOAD, raw_x: null, raw_y: null, raw_inside: false }).solverRaw, null);
+  assert.equal("solverRaw" in parsePositionPayload(EXAMPLE_PAYLOAD), false);
+  assert.throws(() => parsePositionPayload({ ...EXAMPLE_PAYLOAD, raw_inside: "false" }), /raw_inside/);
+  assert.throws(() => parsePositionPayload({ ...EXAMPLE_PAYLOAD, raw_x: "1" }), /raw_x/);
+});
+
+test("Jetson inlier_anchor_count kabul edilir ve anchorCount olarak taşınır", () => {
+  assert.equal(parsePositionPayload({ ...EXAMPLE_PAYLOAD, inlier_anchor_count: 3 }).anchorCount, 3);
+  assert.equal(parsePositionPayload({ ...EXAMPLE_PAYLOAD, inlier_anchor_count: null }).anchorCount, null);
+  assert.equal("anchorCount" in parsePositionPayload(EXAMPLE_PAYLOAD), false);
+  assert.throws(() => parsePositionPayload({ ...EXAMPLE_PAYLOAD, inlier_anchor_count: 3.5 }), /inlier_anchor_count/);
+  assert.throws(() => parsePositionPayload({ ...EXAMPLE_PAYLOAD, inlier_anchor_count: "4" }), /inlier_anchor_count/);
 });

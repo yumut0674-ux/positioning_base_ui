@@ -1,0 +1,5 @@
+{
+  "algorithm": "hmm",
+  "note": "Olasılıksal oda motoru (room-hmm-2). Eski kural motoruna dönmek için \"evidence\" yazın veya sunucuyu ROOM_ENGINE_ALGORITHM=evidence ile başlatın. Ayar değişikliği motor yeniden etkinleştirilince/sunucu yeniden başlatılınca uygulanır.",
+  "hmm": {}
+}

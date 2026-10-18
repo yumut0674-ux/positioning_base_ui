@@ -10,7 +10,7 @@ import { mapTrackingFilterSettings, TrackingFilterConfigurationError } from "@/s
 export const runtime = "nodejs";
 
 const EXPECTED_FIELDS = ["type", "tag_id", "x", "y", "timestamp"] as const;
-const OPTIONAL_FIELDS = ["quality", "pdop", "zone_id", "zone_name", "motion_label"] as const;
+const OPTIONAL_FIELDS = ["quality", "pdop", "zone_id", "zone_name", "motion", "motion_label", "raw_x", "raw_y", "raw_inside", "inlier_anchor_count"] as const;
 const ISO_DATE_TIME = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?(Z|[+-]\d{2}:\d{2})$/;
 const encoder = new TextEncoder();
 
@@ -24,7 +24,15 @@ type IngestBody = {
   readonly pdop?: unknown;
   readonly zone_id?: unknown;
   readonly zone_name?: unknown;
+  /** Tag IMU state from the Jetson: 0 moving, 1 stationary (other values = unknown). */
+  readonly motion?: unknown;
   readonly motion_label?: unknown;
+  /** Unclamped solver position and whether it was inside the Jetson zone polygon. */
+  readonly raw_x?: unknown;
+  readonly raw_y?: unknown;
+  readonly raw_inside?: unknown;
+  /** Anchors the Jetson solver kept; 3-anchor TDoA solutions can be mirrored across the corridor. */
+  readonly inlier_anchor_count?: unknown;
 };
 
 function isIsoDateTime(value: string): boolean {
@@ -84,10 +92,12 @@ export function parsePositionPayload(value: unknown): TrackingPosition {
     x: input.x,
     y: input.y,
     pdop: validatePdop(input.pdop),
+    ...motionField(input.motion, input.motion_label),
+    ...solverRawField(input.raw_x, input.raw_y, input.raw_inside),
+    ...anchorCountField(input.inlier_anchor_count),
     timestamp: input.timestamp,
     sourceZoneId,
     sourceZoneName,
-    motionLabel: validateMotionLabel(input.motion_label),
     mapId: null,
   };
 }
@@ -125,12 +135,36 @@ function validateQuality(value: unknown): number {
   return value;
 }
 
-function validateMotionLabel(value: unknown): NonNullable<TrackingPosition["motionLabel"]> {
-  if (value === undefined) return "unknown";
-  if (value !== "moving" && value !== "stationary" && value !== "unknown") {
-    throw new Error('motion_label "moving", "stationary" veya "unknown" olmalıdır');
-  }
-  return value;
+/**
+ * Jetson sends `motion` as 0 (moving) / 1 (stationary) and optionally `motion_label`.
+ * Unknown firmware states (e.g. 2 or "unknown") are accepted as unknown so that a new
+ * firmware value never makes the whole position packet fail.
+ */
+function motionField(motion: unknown, label: unknown): { motion?: "moving" | "stationary" | null } {
+  if (motion === undefined && label === undefined) return {};
+  if (motion !== undefined && motion !== null && typeof motion !== "number" && typeof motion !== "string") throw new Error("motion number, string veya null olmalıdır");
+  if (label !== undefined && label !== null && typeof label !== "string") throw new Error("motion_label string veya null olmalıdır");
+  const fromValue = motion === 0 || motion === "0" || motion === "moving" ? "moving" : motion === 1 || motion === "1" || motion === "stationary" ? "stationary" : null;
+  const fromLabel = label === "moving" || label === "stationary" ? label : null;
+  // The numeric flag is the firmware's own value; the label is only a fallback.
+  return { motion: fromValue ?? fromLabel };
+}
+
+function anchorCountField(value: unknown): { anchorCount?: number | null } {
+  if (value === undefined) return {};
+  if (value === null) return { anchorCount: null };
+  if (typeof value !== "number" || !Number.isInteger(value) || value < 0 || value > 64) throw new Error("inlier_anchor_count 0-64 arası tam sayı veya null olmalıdır");
+  return { anchorCount: value };
+}
+
+/** Only a clamped solution (raw_inside=false) carries extra information; otherwise raw equals x/y. */
+function solverRawField(rawX: unknown, rawY: unknown, rawInside: unknown): { solverRaw?: { x: number; y: number } | null } {
+  if (rawX === undefined && rawY === undefined && rawInside === undefined) return {};
+  if (rawInside !== undefined && rawInside !== null && typeof rawInside !== "boolean") throw new Error("raw_inside boolean veya null olmalıdır");
+  for (const [name, value] of [["raw_x", rawX], ["raw_y", rawY]] as const)
+    if (value !== undefined && value !== null && typeof value !== "number") throw new Error(`${name} number veya null olmalıdır`);
+  const finite = typeof rawX === "number" && Number.isFinite(rawX) && typeof rawY === "number" && Number.isFinite(rawY);
+  return { solverRaw: rawInside === false && finite ? { x: rawX, y: rawY } : null };
 }
 
 function validatePdop(value: unknown): number | null {
