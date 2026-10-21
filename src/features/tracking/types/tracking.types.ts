@@ -3,8 +3,11 @@ import type { Point2D } from "@/src/shared/types/geometry";
 export const TAG_LIVE_TIMEOUT_MS = 10_000;
 
 export type TagStatus = "active" | "idle" | "warning" | "offline";
+export type MotionLabel = "moving" | "stationary" | "unknown";
 
 export interface TrackedTag extends Point2D {
+  readonly motionLabel?: MotionLabel;
+  readonly receivedAt?: string;
   readonly pdop?: number | null;
   readonly mapId?: string | null;
   readonly sourceZoneId?: string | null;
@@ -23,6 +26,7 @@ export interface TrackedTag extends Point2D {
 }
 
 export interface PositionMessage extends Point2D {
+  readonly motionLabel?: MotionLabel;
   readonly pdop?: number | null;
   readonly mapId?: string | null;
   readonly sourceZoneId?: string | null;

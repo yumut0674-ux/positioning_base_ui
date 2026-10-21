@@ -21,6 +21,7 @@ if (!file) {
 }
 const url = opt("url", "http://127.0.0.1:3000/api/tracking/ingest");
 const speed = Number(opt("speed", "1"));
+const full = args.includes("--full");
 const onlyTag = opt("tag", null)?.toUpperCase() ?? null;
 const istanbulClock = (seconds) => new Date(seconds * 1000 + 3 * 3_600_000).toISOString().slice(11, 19);
 const from = opt("from", null), to = opt("to", null);
@@ -49,14 +50,16 @@ for (const r of rows) {
   const due = start + ((r.updated_at - first) * 1000) / speed;
   const wait = due - Date.now();
   if (wait > 0) await new Promise(resolve => setTimeout(resolve, wait));
+  const label = typeof r.motion_label === "string" ? r.motion_label : r.motion === 0 ? "moving" : r.motion === 1 ? "stationary" : "unknown";
+  // Default: exactly what the Jetson v9.1 first forwarding address sends (with the motion_label patch).
+  // --full adds the extra solver fields (raw_x/raw_y/raw_inside, numeric motion).
   const body = {
     type: "position", tag_id: String(r.uid), x: Number(r.x), y: Number(r.y),
-    zone_id: r.zone_id ?? null, zone_name: r.zone_name ?? null,
     pdop: finite(r.geometry_pdop ?? r.pdop),
-    motion: r.motion === 0 || r.motion === 1 ? r.motion : null,
-    motion_label: typeof r.motion_label === "string" ? r.motion_label : null,
-    raw_x: finite(r.raw_x), raw_y: finite(r.raw_y),
-    raw_inside: typeof r.raw_inside === "boolean" ? r.raw_inside : null,
+    zone_id: r.zone_id ?? null, zone_name: r.zone_name ?? null,
+    motion_label: label,
+    ...(full ? { motion: r.motion === 0 || r.motion === 1 ? r.motion : null, raw_x: finite(r.raw_x), raw_y: finite(r.raw_y),
+      raw_inside: typeof r.raw_inside === "boolean" ? r.raw_inside : null } : {}),
     timestamp: zoned(Date.now()),
   };
   try {

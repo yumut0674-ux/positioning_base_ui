@@ -151,6 +151,8 @@ export interface ProcessedPosition extends TrackingPosition {
     readonly exitedAt?: string | null;
     /** Alanın çıkış kapısından çıkış zamanı (outsideArea iken). */
     readonly leftAreaAt?: string | null;
+    /** Çıkılan kapının adı (ör. "Ameliyathane giriş / çıkış"). */
+    readonly leftAreaGate?: string | null;
     /** Veri kesildi; gösterilen yer son karardır. */
     readonly signalLost?: boolean;
     readonly validUntil?: string;

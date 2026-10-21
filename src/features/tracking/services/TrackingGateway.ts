@@ -24,6 +24,7 @@ export class SocketTrackingGateway implements TrackingGateway {
 }
 
 export type SsePositionPayload = {
+  readonly motionLabel?: PositionMessage["motionLabel"];
   readonly pdop?: number | null;
   readonly mapId?: string | null;
   readonly sourceZoneId?: string | null;
@@ -55,6 +56,7 @@ export class SseTrackingGateway implements TrackingGateway {
         const parsedTimestamp = typeof payload.timestamp === "string" ? Date.parse(payload.timestamp) : Number.NaN;
         const timestamp = Number.isFinite(parsedTimestamp) ? parsedTimestamp : receivedAt;
         onPosition({
+          motionLabel: payload.motionLabel,
           mapId: payload.mapId ?? null,
           sourceZoneId: payload.sourceZoneId ?? null,
           sourceZoneName: payload.sourceZoneName ?? null,

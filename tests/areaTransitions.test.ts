@@ -13,6 +13,7 @@ import { queryPostgres } from "../src/server/postgresClient";
 import { cleanRegionsConfig, persistRegionsConfig } from "../app/api/regions/route";
 import { parseSourceHealthPayload } from "../app/api/tracking/ingest/route";
 import { AREA_EVENT_LABELS, AREA_EVENT_TYPES } from "../src/features/decisionLogs/services/areaEventLabels";
+import type { TrackingPosition } from "../src/server/trackingBuffer";
 import { EMPTY_AREA_VISIBILITY, areaVisibilityKey, isAreaVisible, isGateVisible, readAreaVisibility, toggleAreaVisibility, visibleSelection } from "../src/features/regions/services/areaEditorVisibility";
 
 const point = (x: number, y: number) => ({ pixel: { x, y }, world: { x, y } });
@@ -37,6 +38,26 @@ function harness(secondGate = false) {
   const enter = () => { send(0, 0.5, 5); send(1, 2, 5); send(2, 3, 5); };
   return { configs, engine, events, send, enter };
 }
+
+test("motion labels cannot change area transitions or establish source health", () => {
+  const run = (motionLabel: TrackingPosition["motionLabel"]) => {
+    const h = harness();
+    for (const [seconds, x] of [[0, 0.5], [1, 2], [2, 3], [3, 9.5]]) {
+      const now = base + seconds * 1000;
+      h.engine.ingest({ tagCode: "T", mapId: "map-a", x, y: 5, timestamp: new Date(now).toISOString(),
+        ...(motionLabel === undefined ? {} : { motionLabel }) }, now);
+    }
+    h.engine.tick(base + 40_000);
+    assert.equal(h.events.length, 1);
+    assert.equal(h.engine.health("map-a", base + 40_000), "unknown");
+    h.engine.noteSourceHealth("map-a", true, base + 41_000);
+    h.engine.tick(base + 41_000);
+    assert.deepEqual(h.events.map(event => event.type), ["AREA_ENTERED", "AREA_EXITED_ESTIMATED"]);
+    return { events: h.events, states: h.engine.snapshot(), diagnostics: h.engine.diagnostics(base + 41_000) };
+  };
+  const baseline = run(undefined);
+  for (const label of ["moving", "stationary", "unknown"] as const) assert.deepEqual(run(label), baseline);
+});
 
 test("normal entry and observed exit use raw gate and inside/outside evidence", () => {
   const h = harness(); h.enter();

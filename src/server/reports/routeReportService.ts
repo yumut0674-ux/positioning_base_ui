@@ -82,8 +82,11 @@ export async function loadRouteReport(input: RouteReportRequest, now = new Date(
     && Date.parse(position.lastRawDataTimestamp) <= Date.parse(input.to));
   if (inRange.length + pending.length > MAX_RECORDS) throw new RouteReportError("Rapor veri sınırına ulaştı. Tarih aralığını veya tag sayısını azaltın.", 422);
   const all = [...seeds.map(fromRow), ...inRange.map(fromRow), ...pending.map(fromPending)];
+  // The "Kat" column shows the map's display name (e.g. "Yoğun Bakım"), not its internal id.
+  const mapNames = new Map((await getRooms().catch(() => [] as readonly RouteReportRoom[])).map(room => [room.mapId, room.mapName]));
   const tags = input.tags.map(tag => {
-    const report = buildTagReport(tag, names.get(tag) ?? tag, input.from, input.to, all);
+    const built = buildTagReport(tag, names.get(tag) ?? tag, input.from, input.to, all);
+    const report = { ...built, rows: built.rows.map(row => row.mapId && mapNames.has(row.mapId) ? { ...row, floor: mapNames.get(row.mapId)! } : row) };
     return selectedRoom ? filterTagReportToRoom(report, selectedRoom) : report;
   });
   if (tags.every(tag => !tag.hasRecords)) throw new RouteReportError(selectedRoom

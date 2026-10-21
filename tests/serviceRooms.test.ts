@@ -46,6 +46,8 @@ function assertServiceThresholds(settings: Pick<GlobalRegionEngineSettings, keyo
   }
 }
 
+const SILENT_ENTRY_M = 1.3;
+
 test("Servis has 18 silent rooms with 1 m door proximity, configured door geometry and its own entry/exit thresholds", () => {
   assert.equal(compiled.regions.length, 18);
   assert.equal(compiled.corridors.length, 1);
@@ -59,7 +61,8 @@ test("Servis has 18 silent rooms with 1 m door proximity, configured door geomet
   for (const room of compiled.regions) {
     assertServiceThresholds(room.settings, room.name ?? room.id);
     assert.equal(room.settings.coverage, "silent");
-    assert.equal(room.settings.silentEntryMaxDistanceMeters, 1);
+    // 13 Ekim: kapı sinyal kaybı mesafesi sahada 1 m'den 1,3 m'ye çıkarıldı (config).
+    assert.equal(room.settings.silentEntryMaxDistanceMeters, SILENT_ENTRY_M);
     assert.equal(room.entrances.length, 1);
     const configuredDoor = config.regions.find(candidate => candidate.id === room.id)?.entrances.find(door => door.id === room.entrances[0].id);
     assert.ok(configuredDoor, room.name);
@@ -72,9 +75,9 @@ test("Servis has 18 silent rooms with 1 m door proximity, configured door geomet
   }
 });
 
-test("each Servis door retains its one-metre signal-loss threshold independently of nearby doors", () => {
+test("each Servis door retains its signal-loss threshold (1.3 m) independently of nearby doors", () => {
   for (const room of compiled.regions) {
-    for (const distance of [1, 1.01]) {
+    for (const distance of [SILENT_ENTRY_M - 0.01, SILENT_ENTRY_M + 0.01]) {
       let now = epoch;
       const published: ReturnType<RegionPositionEngine["ingest"]>[] = [];
       const engine = new RegionPositionEngine(position => published.push(position), 250, () => now, false);
@@ -92,7 +95,7 @@ test("each Servis door retains its one-metre signal-loss threshold independently
         now = epoch + 8001;
         engine.tick();
         const decision = published.at(-1)!;
-        if (distance === 1) {
+        if (distance < SILENT_ENTRY_M) {
           assert.equal(decision.regionInference.regionId, room.id, room.name);
           assert.equal(decision.regionInference.state, "INFERRED_IN_REGION", room.name);
           assert.equal(decision.regionInference.measurementKind, "estimated", room.name);
@@ -105,9 +108,9 @@ test("each Servis door retains its one-metre signal-loss threshold independently
   }
 });
 
-test("one-metre proximity prevents inference in the corridor between opposing moved doors", () => {
+test("door proximity (1.3 m) prevents inference in the corridor between opposing moved doors", () => {
   for (const room of compiled.regions) {
-    for (const distance of [1, 1.01, 1.5, 2, 2.01]) {
+    for (const distance of [1, SILENT_ENTRY_M - 0.01, SILENT_ENTRY_M + 0.01, 2, 2.01]) {
       let now = epoch;
       const published: ReturnType<RegionPositionEngine["ingest"]>[] = [];
       const engine = new RegionPositionEngine(position => published.push(position), 250, () => now, false);
@@ -116,7 +119,7 @@ test("one-metre proximity prevents inference in the corridor between opposing mo
       const point = { x: door.x - door.inwardNormal!.x * distance, y: door.y - door.inwardNormal!.y * distance };
       // The completed main corridor is 3.6 m wide; points beyond this
       // room's one-metre limit remain beyond the opposite door's limit.
-      const expectedRegionId = distance === 1 ? room.id : null;
+      const expectedRegionId = distance < SILENT_ENTRY_M ? room.id : null;
       try {
         assert.ok(pointInPolygon(point, compiled.corridors[0]), room.name);
         engine.ingest({ tagCode: room.id, ...point, quality: 1, timestamp: new Date(now).toISOString() });

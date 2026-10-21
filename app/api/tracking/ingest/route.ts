@@ -98,6 +98,8 @@ export function parsePositionPayload(value: unknown): TrackingPosition {
     timestamp: input.timestamp,
     sourceZoneId,
     sourceZoneName,
+    // Numeric firmware flag wins; otherwise the label (validated strictly, as before).
+    motionLabel: motionField(input.motion, undefined).motion ?? validateMotionLabel(input.motion_label),
     mapId: null,
   };
 }
@@ -141,7 +143,8 @@ function validateQuality(value: unknown): number {
  * firmware value never makes the whole position packet fail.
  */
 function motionField(motion: unknown, label: unknown): { motion?: "moving" | "stationary" | null } {
-  if (motion === undefined && label === undefined) return {};
+  // Without the numeric flag the label alone travels as motionLabel (see parsePositionPayload).
+  if (motion === undefined) return {};
   if (motion !== undefined && motion !== null && typeof motion !== "number" && typeof motion !== "string") throw new Error("motion number, string veya null olmalıdır");
   if (label !== undefined && label !== null && typeof label !== "string") throw new Error("motion_label string veya null olmalıdır");
   const fromValue = motion === 0 || motion === "0" || motion === "moving" ? "moving" : motion === 1 || motion === "1" || motion === "stationary" ? "stationary" : null;
@@ -165,6 +168,14 @@ function solverRawField(rawX: unknown, rawY: unknown, rawInside: unknown): { sol
     if (value !== undefined && value !== null && typeof value !== "number") throw new Error(`${name} number veya null olmalıdır`);
   const finite = typeof rawX === "number" && Number.isFinite(rawX) && typeof rawY === "number" && Number.isFinite(rawY);
   return { solverRaw: rawInside === false && finite ? { x: rawX, y: rawY } : null };
+}
+
+function validateMotionLabel(value: unknown): NonNullable<TrackingPosition["motionLabel"]> {
+  if (value === undefined) return "unknown";
+  if (value !== "moving" && value !== "stationary" && value !== "unknown") {
+    throw new Error('motion_label "moving", "stationary" veya "unknown" olmalıdır');
+  }
+  return value;
 }
 
 function validatePdop(value: unknown): number | null {

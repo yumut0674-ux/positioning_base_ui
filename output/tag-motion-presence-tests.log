@@ -1,0 +1,152 @@
+
+> gekon-ips-control@0.1.0 test:presence
+> node --import tsx --test tests/tagPresence.test.ts tests/settingsApi.test.ts tests/tagPresenceApi.test.ts tests/tagPresencePersistence.test.ts tests/tagPresenceUi.test.ts tests/tagActivityPresentation.test.ts
+
+TAP version 13
+# Subtest: settings API supplies defaults, persists seconds and applies changes only after a successful save
+ok 1 - settings API supplies defaults, persists seconds and applies changes only after a successful save
+  ---
+  duration_ms: 99.4867
+  type: 'test'
+  ...
+# Subtest: fresh measurements label moving as Hareketli and every other motion as Sabit
+ok 2 - fresh measurements label moving as Hareketli and every other motion as Sabit
+  ---
+  duration_ms: 0.9682
+  type: 'test'
+  ...
+# Subtest: raw data timeout makes a tag Pasif even if its last motion was moving
+ok 3 - raw data timeout makes a tag Pasif even if its last motion was moving
+  ---
+  duration_ms: 1.3779
+  type: 'test'
+  ...
+# Subtest: confirmed room decisions keep the live color independently of motion and raw data freshness
+ok 4 - confirmed room decisions keep the live color independently of motion and raw data freshness
+  ---
+  duration_ms: 0.2825
+  type: 'test'
+  ...
+# Subtest: motion survives presence conversion, snapshot hydration and browser SSE delivery
+ok 5 - motion survives presence conversion, snapshot hydration and browser SSE delivery
+  ---
+  duration_ms: 1.2601
+  type: 'test'
+  ...
+# Subtest: latest raw motion takes precedence over an older processed decision
+ok 6 - latest raw motion takes precedence over an older processed decision
+  ---
+  duration_ms: 0.2701
+  type: 'test'
+  ...
+# Subtest: quick list includes all registered and discovered tags without adding fake map positions
+ok 7 - quick list includes all registered and discovered tags without adding fake map positions
+  ---
+  duration_ms: 21.3679
+  type: 'test'
+  ...
+# Subtest: quick rows and selected details display the same motion labels and room color
+ok 8 - quick rows and selected details display the same motion labels and room color
+  ---
+  duration_ms: 8.661
+  type: 'test'
+  ...
+# Subtest: strict one-minute boundary hides an unassigned tag and retains the observation
+ok 9 - strict one-minute boundary hides an unassigned tag and retains the observation
+  ---
+  duration_ms: 5.9601
+  type: 'test'
+  ...
+# Subtest: only an unexpired current room assignment exempts a silent tag
+ok 10 - only an unexpired current room assignment exempts a silent tag
+  ---
+  duration_ms: 2.0669
+  type: 'test'
+  ...
+# Subtest: timer decisions, duplicates, out-of-order and synthetic raw messages do not refresh the raw clock
+ok 11 - timer decisions, duplicates, out-of-order and synthetic raw messages do not refresh the raw clock
+  ---
+  duration_ms: 0.5453
+  type: 'test'
+  ...
+# Subtest: fresh data recovers a tag, but a delayed historical backlog and future timestamps do not
+ok 12 - fresh data recovers a tag, but a delayed historical backlog and future timestamps do not
+  ---
+  duration_ms: 0.3609
+  type: 'test'
+  ...
+# Subtest: disabling the engine, losing a room, reconfiguring or moving floors removes the exemption immediately
+ok 13 - disabling the engine, losing a room, reconfiguring or moving floors removes the exemption immediately
+  ---
+  duration_ms: 0.6994
+  type: 'test'
+  ...
+# Subtest: changing the global timeout re-evaluates existing tags without restarting room inference
+ok 14 - changing the global timeout re-evaluates existing tags without restarting room inference
+  ---
+  duration_ms: 0.351
+  type: 'test'
+  ...
+# Subtest: restored observations keep their location but never restore a current room assignment
+ok 15 - restored observations keep their location but never restore a current room assignment
+  ---
+  duration_ms: 1.0964
+  type: 'test'
+  ...
+# Subtest: last observed place uses raw geometry, handles corridors, ambiguous rooms and unresolved floors
+ok 16 - last observed place uses raw geometry, handles corridors, ambiguous rooms and unresolved floors
+  ---
+  duration_ms: 1.2508
+  type: 'test'
+  ...
+# Subtest: presence SSE starts with an atomic snapshot, publishes versioned changes and cleans up on abort
+ok 17 - presence SSE starts with an atomic snapshot, publishes versioned changes and cleans up on abort
+  ---
+  duration_ms: 52.5054
+  type: 'test'
+  ...
+# Subtest: presence persistence keeps only registered tags, orders upserts by measurement and restores valid raw observations
+ok 18 - presence persistence keeps only registered tags, orders upserts by measurement and restores valid raw observations
+  ---
+  duration_ms: 6.5556
+  type: 'test'
+  ...
+# Subtest: a schema/persistence failure is reported and a later save can retry
+ok 19 - a schema/persistence failure is reported and a later save can retry
+  ---
+  duration_ms: 1.3677
+  type: 'test'
+  ...
+# Subtest: presence versions reject delayed events; a new server epoch restores its own state
+ok 20 - presence versions reject delayed events; a new server epoch restores its own state
+  ---
+  duration_ms: 1.9363
+  type: 'test'
+  ...
+# Subtest: both raw and processed display bindings hide tags, clear animation/trails and recover without an old path
+ok 21 - both raw and processed display bindings hide tags, clear animation/trails and recover without an old path
+  ---
+  duration_ms: 2.5611
+  type: 'test'
+  ...
+# Subtest: stale tag stays selectable with historical place, unreliable badge and disabled map action on mobile
+ok 22 - stale tag stays selectable with historical place, unreliable badge and disabled map action on mobile
+  ---
+  duration_ms: 12.201
+  type: 'test'
+  ...
+# Subtest: settings navigation exposes the admin panel and stays absent from demo navigation
+ok 23 - settings navigation exposes the admin panel and stays absent from demo navigation
+  ---
+  duration_ms: 6.0519
+  type: 'test'
+  ...
+1..23
+# tests 23
+# suites 0
+# pass 23
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6263.2399

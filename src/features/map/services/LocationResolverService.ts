@@ -15,7 +15,7 @@ function isPointOnSegment(point: LocationZonePoint, start: LocationZonePoint, en
   return dot >= 0 && dot <= squaredLength;
 }
 
-function isInsidePolygon(x: number, y: number, polygon: readonly LocationZonePoint[]): boolean {
+export function isInsidePolygon(x: number, y: number, polygon: readonly LocationZonePoint[]): boolean {
   if (polygon.length < 3) return false;
   const point = { x, y };
   let inside = false;

@@ -8,6 +8,8 @@ import { addRecentTagId, nextTagLocationEntry, type TagLocationEntry } from "@/s
 import { MAP_TAG_FOCUS_SCALE } from "@/src/features/map/config/mapConfig";
 import type { MapTagDisplay } from "@/src/features/tracking/services/MapDisplayFilter";
 import { shouldAcceptTagUpdate } from "@/src/features/tracking/services/tagUpdateOrdering";
+import type { TagPresenceSnapshot, TagPresenceState, TagPresenceUpdate } from "@/src/features/tracking/types/tagPresence.types";
+import { colorForTag } from "@/src/features/tracking/services/tagColor";
 import {
   DEFAULT_TAG_TRAIL_SETTINGS,
   normalizeTagTrailDuration,
@@ -28,6 +30,13 @@ interface MeasurementState {
 }
 
 interface IpsState {
+  readonly tagPresenceById: Record<string, TagPresenceState>;
+  readonly presenceEpoch: string | null;
+  readonly presenceConnection: "connecting" | "live" | "reconnecting";
+  readonly presenceWarning: string | null;
+  readonly presenceClockOffset: number;
+  applyTagPresenceSnapshot: (snapshot: TagPresenceSnapshot) => void;
+  applyTagPresenceUpdate: (event: TagPresenceUpdate) => void;
   readonly mapTagDisplays: Record<string, MapTagDisplay>;
   readonly activeMapId: string | null;
   readonly readyMapId: string | null;
@@ -76,7 +85,56 @@ interface IpsState {
   setTagTrailDuration: (durationMs: number) => void;
 }
 
+function mergePresenceRows(state: IpsState, rows: readonly TagPresenceState[], replace: boolean): Partial<IpsState> {
+  const tagPresenceById: Record<string, TagPresenceState> = replace ? {} : { ...state.tagPresenceById };
+  const tags = { ...state.tags }, observedTags = { ...state.observedTags };
+  const tagLocationEntries = { ...state.tagLocationEntries };
+  if (replace) {
+    const retained = new Set(rows.map(row => row.tagCode));
+    for (const id of Object.keys(state.tagPresenceById)) if (!retained.has(id)) {
+      delete tags[id]; delete observedTags[id]; delete tagLocationEntries[id];
+    }
+  }
+  for (const presence of rows) {
+    if (!replace && (tagPresenceById[presence.tagCode]?.revision ?? -1) >= presence.revision) continue;
+    tagPresenceById[presence.tagCode] = presence;
+    const id = presence.tagCode;
+    // A position from another stream may arrive just before its matching presence event.
+    if (observedTags[id] && observedTags[id].timestamp > presence.lastRawMeasuredAt) continue;
+    const identity = { id, name: state.tagDefinitions[id]?.displayName || tags[id]?.name || id,
+      color: tags[id]?.color ?? colorForTag(id),
+      motionLabel: presence.raw.motionLabel,
+      status: Date.now() - presence.lastRawMeasuredAt <= TAG_LIVE_TIMEOUT_MS ? "active" as const : "offline" as const };
+    observedTags[id] = { ...presence.raw, ...identity };
+    tags[id] = { ...(presence.processed ?? presence.raw), ...identity };
+    tagLocationEntries[id] = nextTagLocationEntry(tagLocationEntries[id], tags[id],
+      tags[id].mapId ? state.regionsConfigByMapId[tags[id].mapId!] : null);
+  }
+  const followed = state.selectedTagId ? tags[state.selectedTagId] : undefined;
+  return {
+    tagPresenceById: boundedRecord(tagPresenceById), tags: boundedRecord(tags), observedTags: boundedRecord(observedTags),
+    tagLocationEntries: boundedRecord(tagLocationEntries),
+    ...(!replace && followed?.mapId && followed.mapId !== state.activeMapId ? {
+      activeMapId: followed.mapId, regionsConfig: state.regionsConfigByMapId[followed.mapId] ?? null,
+      readyMapId: null, pendingTagFocusId: followed.id, mapFocusScale: MAP_TAG_FOCUS_SCALE,
+      mapTagDisplays: {}, mapTransitionNotice: `${followed.name} ${followed.mapId} haritasına geçti.`,
+    } : {}),
+  };
+}
+
 export const useIpsStore = create<IpsState>((set) => ({
+  tagPresenceById: {},
+  presenceEpoch: null,
+  presenceConnection: "connecting",
+  presenceWarning: null,
+  presenceClockOffset: 0,
+  applyTagPresenceSnapshot: (snapshot) => set(state => ({
+    ...mergePresenceRows(state, snapshot.states, true), presenceEpoch: snapshot.epoch,
+    presenceClockOffset: snapshot.serverNow - Date.now(), presenceWarning: snapshot.warning, presenceConnection: "live",
+  })),
+  applyTagPresenceUpdate: (event) => set(state => state.presenceEpoch !== event.epoch ? state : {
+    ...mergePresenceRows(state, [event.state], false), presenceClockOffset: event.serverNow - Date.now(),
+  }),
   mapTagDisplays: {},
   activeMapId: null,
   readyMapId: null,
@@ -163,7 +221,12 @@ export const useIpsStore = create<IpsState>((set) => ({
     return changed ? { tags, observedTags } : state;
   }),
   setAnchors: (anchors) => set({ anchors }),
-  setTagDefinitions: (tags) => set({ tagDefinitions: Object.fromEntries(tags.map((tag) => [tag.id.toUpperCase(), tag])) }),
+  setTagDefinitions: (tags) => set(state => {
+    const tagDefinitions = Object.fromEntries(tags.map(tag => [tag.id.toUpperCase(), tag]));
+    const rename = (source: Record<string, TrackedTag>) => Object.fromEntries(Object.entries(source).map(([id, tag]) =>
+      [id, tagDefinitions[id]?.displayName ? { ...tag, name: tagDefinitions[id].displayName } : tag]));
+    return { tagDefinitions, tags: rename(state.tags), observedTags: rename(state.observedTags) };
+  }),
   setRegionsConfig: (regionsConfig) => set((state) => {
     const regionsConfigByMapId = { ...state.regionsConfigByMapId, [regionsConfig.map.mapId]: regionsConfig };
     return {
@@ -174,7 +237,9 @@ export const useIpsStore = create<IpsState>((set) => ({
       nextTagLocationEntry(state.tagLocationEntries[tagId], tag, tag.mapId ? regionsConfigByMapId[tag.mapId] ?? null : null),
     ])),
   }; }),
-  selectTag: (selectedTagId) => set((state) => ({
+  selectTag: (selectedTagId) => set((state) => selectedTagId === null || state.selectedTagId === selectedTagId
+    ? { selectedTagId: null, pendingTagFocusId: null }
+    : ({
     selectedTagId,
     recentTagIds: selectedTagId ? addRecentTagId(state.recentTagIds, selectedTagId) : state.recentTagIds,
     ...(selectedTagId && state.tags[selectedTagId]?.mapId && state.tags[selectedTagId].mapId !== state.activeMapId ? {
@@ -182,7 +247,9 @@ export const useIpsStore = create<IpsState>((set) => ({
       regionsConfig: state.regionsConfigByMapId[state.tags[selectedTagId].mapId!] ?? null, mapTagDisplays: {}, mapFocusScale: MAP_TAG_FOCUS_SCALE,
     } : {}),
   })),
-  selectTagAndFocus: (selectedTagId) => set((state) => ({
+  selectTagAndFocus: (selectedTagId) => set((state) => state.selectedTagId === selectedTagId
+    ? { selectedTagId: null, pendingTagFocusId: null }
+    : ({
     selectedTagId,
     recentTagIds: addRecentTagId(state.recentTagIds, selectedTagId),
     mapFocusRequest: state.mapFocusRequest + 1,

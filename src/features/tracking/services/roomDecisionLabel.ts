@@ -17,7 +17,8 @@ export function roomDecisionLabel(tag: TrackedTag, config?: RegionsConfig | null
   const lost = d.signalLost ? " · sinyal yok, son karar" : "";
   if (d.outsideArea) {
     const area = config?.largeAreas?.[0]?.name ?? "Alan";
-    return `${area} alanından çıktı${d.leftAreaAt ? ` · ${clock(d.leftAreaAt)}` : ""}`;
+    const gate = (d as { leftAreaGate?: string | null }).leftAreaGate;
+    return `${area} alanından çıktı${gate ? ` (${gate})` : ""}${d.leftAreaAt ? ` · ${clock(d.leftAreaAt)}` : ""}`;
   }
   if (d.state === "LOCATION_LOST") return "Belirsiz · son bilinen konum";
   if (d.state === "ENTRY_CANDIDATE") return "Belirsiz · oda adayı";

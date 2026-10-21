@@ -11,6 +11,7 @@ import { roomDecisions } from "../location/roomDecisionRepository";
 import { mapRepository } from "../maps/mapRepository";
 import { AreaTransitionEngine } from "./AreaTransitionEngine";
 import { areaTransitions } from "./areaTransitionRepository";
+import { tagPresenceRuntime } from "../tracking/tagPresenceRuntime";
 
 interface ManagedEngine { readonly engine: RoomEngine; readonly algorithm: RoomEngineSelection["algorithm"]; warnings: readonly string[] }
 interface RegionEngineGlobalRegistration {
@@ -21,7 +22,7 @@ interface RegionEngineGlobalRegistration {
 }
 
 const POSITION_LISTENER_MARK = Symbol.for("uwb.regionEngine.positionListener");
-export const REGION_ENGINE_CONTROLLER_REVISION = "region-controller-6";
+export const REGION_ENGINE_CONTROLLER_REVISION = "region-controller-7";
 type MarkedPositionListener = ((position: TrackingPosition) => void) & { [POSITION_LISTENER_MARK]?: boolean };
 
 /** Isolates inference and vehicle state by application map. */
@@ -55,6 +56,7 @@ export class RegionEngineController {
     }
     if (enabled === this.enabled) return this.status();
     if (!enabled) {
+      tagPresenceRuntime.service.setEngineEnabled(false);
       if (this.areaTimer) clearInterval(this.areaTimer); this.areaTimer = null;
       for (const managed of this.engines.values()) managed.engine.disable();
       this.engines.clear(); this.selections.clear(); this.unavailableMaps.clear(); this.latestByTag.clear(); this.areaConfigs.clear(); this.areaSourceZones.clear(); this.areaSourceSignals.clear(); this.areaEngine = null; this.areaError = null; this.enabled = false;
@@ -94,6 +96,7 @@ export class RegionEngineController {
       this.areaError = null;
     } catch (error) { logger.error("area_transition.restore_failed", error); this.areaEngine = null; this.areaError = error instanceof Error ? error.message : String(error); }
     this.enabled = true;
+    tagPresenceRuntime.service.setEngineEnabled(true);
     if (this.areaEngine) { this.areaTimer = setInterval(() => this.tickAreas(), 1000); this.areaTimer.unref?.(); }
     return this.status();
   }
@@ -107,6 +110,10 @@ export class RegionEngineController {
     const managed = this.engines.get(position.mapId);
     if (!managed) { logger.warn("region_engine.map_config_unavailable", { mapId: position.mapId }); return; }
     this.areaEngine?.ingest(position);
+    // Keep raw/large-area tracking independent; stationary data cannot change room-map ownership.
+    // The probabilistic engine receives it anyway: it freezes its own room decision while the tag
+    // reports stationary and only uses the samples for a slowly refreshed display position.
+    if (position.motionLabel === "stationary" && managed.algorithm !== "hmm") return;
     if (previous && previous.mapId !== position.mapId) this.engines.get(previous.mapId)?.engine.removeVehicle(position.tagCode);
     this.latestByTag.set(position.tagCode, { at: measuredAt, mapId: position.mapId });
     managed.engine.ingest(position);
@@ -144,6 +151,7 @@ export class RegionEngineController {
   public dispose(): Promise<void> {
     if (this.disposePromise) return this.disposePromise;
     this.disposed = true;
+    tagPresenceRuntime.service.setEngineEnabled(false);
     if (this.areaTimer) clearInterval(this.areaTimer); this.areaTimer = null;
     for (const managed of this.engines.values()) managed.engine.disable();
     this.engines.clear(); this.unavailableMaps.clear(); this.latestByTag.clear(); this.areaConfigs.clear(); this.areaSourceZones.clear(); this.areaSourceSignals.clear(); this.areaEngine = null; this.areaError = null; this.enabled = false;
@@ -179,14 +187,21 @@ export class RegionEngineController {
   }
 
   private install(mapId: string, compiled: CompiledRegionsConfig): void {
+    tagPresenceRuntime.invalidateMap(mapId);
+    tagPresenceRuntime.service.configureMap(mapId, new Set(compiled.regions.map(region => region.id)));
     this.areaConfigs.set(mapId, compiled);
     const current = this.engines.get(mapId);
     const selection = this.selections.get(mapId);
     const algorithm = selection?.algorithm ?? "evidence";
     const selectionWarnings = selection ? [] : ["Oda motoru seçimi okunamadı; eski kural motoru kullanılıyor"];
-    if (current && current.algorithm === algorithm) { current.engine.reload(compiled); current.warnings = [...(compiled.warnings ?? []), ...selectionWarnings]; return; }
+    if (current && (current.algorithm ?? algorithm) === algorithm) { current.engine.reload(compiled); current.warnings = [...(compiled.warnings ?? []), ...selectionWarnings]; return; }
     current?.engine.disable();
-    const engine = createRoomEngine(selection ?? { algorithm }, (position) => { this.output.publish(position); roomDecisions.record(position); }, this.runtime.broadcastIntervalMs);
+    const engine = createRoomEngine(selection ?? { algorithm }, (position) => {
+      if (this.disposed) return;
+      tagPresenceRuntime.observeDecision(position);
+      this.output.publish(position);
+      roomDecisions.record(position);
+    }, this.runtime.broadcastIntervalMs);
     engine.enable(compiled);
     logger.info("region_engine.installed", { mapId, algorithm, source: selection?.source ?? "varsayılan" });
     this.engines.set(mapId, { engine, algorithm, warnings: [...(compiled.warnings ?? []), ...selectionWarnings] });

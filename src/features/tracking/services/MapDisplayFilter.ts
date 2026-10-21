@@ -10,7 +10,7 @@ import { assignedDisplayRoomId, isCorridorRegion } from "./roomDisplayPolicy";
 export interface MapTagDisplay {
   readonly visible: boolean;
   readonly position?: Point2D;
-  readonly reason?: "outside" | "no-regions";
+  readonly reason?: "outside" | "no-regions" | "no-data";
 }
 interface State {
   candidate: TrackedTag;
@@ -36,12 +36,26 @@ export class MapDisplayFilter {
   private holdMs = 2_000;
   private mapId: string | null = null;
   private timer?: ReturnType<typeof setTimeout>;
+  private hiddenTagIds: ReadonlySet<string> = new Set();
 
   public constructor(
     private readonly animation: PositionAnimationController,
     private readonly changed: (displays: Record<string, MapTagDisplay>) => void,
     private readonly clock: Clock = { now: Date.now, setTimeout, clearTimeout },
   ) {}
+
+  public setHiddenTagIds(ids: ReadonlySet<string>): void {
+    if (ids.size === this.hiddenTagIds.size && [...ids].every(id => this.hiddenTagIds.has(id))) return;
+    const previous = this.hiddenTagIds;
+    this.hiddenTagIds = ids;
+    for (const [id, state] of this.states) {
+      if (previous.has(id) && !ids.has(id)) {
+        this.states.delete(id);
+        this.animation.remove(id);
+      } else this.evaluate(state, true);
+    }
+    this.publish();
+  }
 
   public configure(polygons: readonly DisplayPolygon[], holdMs: number, mapId: string | null = null,
     regions?: readonly RegionDefinition[]): void {
@@ -97,6 +111,14 @@ export class MapDisplayFilter {
 
   private evaluate(state: State, snap = false): void {
     const tag = state.candidate, now = this.clock.now();
+    if (this.hiddenTagIds.has(tag.id)) {
+      this.animation.remove(tag.id);
+      state.lastValid = undefined;
+      state.outsideSince = undefined;
+      state.stabilizer = new AdaptivePositionFilter();
+      state.display = { visible: false, reason: "no-data" };
+      return;
+    }
     const decision = tag.regionInference;
     const assignedRoomId = assignedDisplayRoomId(tag);
     const assignedRoom = assignedRoomId ? this.rooms?.get(assignedRoomId) : undefined;

@@ -23,8 +23,8 @@ function request(value: unknown) {
   });
 }
 
-test("yoğun bakım haritası PDOP 70 ile başlar, diğer haritalar ve bilinmeyen kat 20 kullanır", async () => {
-  assert.deepEqual(await mapTrackingFilterSettings.read(intensiveCare, true), { enabled: true, maximumPdop: 70 });
+test("yoğun bakım haritası PDOP sınırı 70 (filtre kapalı: olasılıksal motor zayıf PDOP'u kendisi tartar), diğer haritalar ve bilinmeyen kat 20 kullanır", async () => {
+  assert.deepEqual(await mapTrackingFilterSettings.read(intensiveCare, true), { enabled: false, maximumPdop: 70 });
   assert.deepEqual(await mapTrackingFilterSettings.read(service, true), DEFAULT_PDOP_FILTER_SETTINGS);
   assert.deepEqual(await mapTrackingFilterSettings.read(null), DEFAULT_PDOP_FILTER_SETTINGS);
   assert.ok(isPositionPdopAccepted(70, { enabled: true, maximumPdop: 70 }));

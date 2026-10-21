@@ -5,6 +5,8 @@ export interface PositionHistoryResult {
   readonly positions: readonly PositionRecord[];
   readonly sourcePointCount: number;
   readonly processingTruncated: boolean;
+  readonly aggregation?: { readonly method: "median"; readonly intervalSeconds: 60; readonly pointCountBeforeLimit: number };
+  readonly observedRange?: { readonly from: string; readonly to: string };
 }
 
 export interface PositionRepository {
@@ -76,23 +78,46 @@ LIMIT 1;`);
 WITH ordered AS (
   SELECT tag_code, x, y, pdop, map_id, zone_id, zone_name, created_at, id,
     extract(epoch FROM (created_at - lag(created_at) OVER (ORDER BY created_at, id))) AS gap_before_seconds,
-    row_number() OVER (ORDER BY created_at, id) AS row_number,
-    count(*) OVER () AS total_count
+    CASE WHEN row(tag_code, map_id, zone_id, zone_name) IS DISTINCT FROM
+      lag(row(tag_code, map_id, zone_id, zone_name)) OVER (ORDER BY created_at, id) THEN 1 ELSE 0 END AS segment_start
   FROM tag_location_history WHERE (${filters})${mapId ? ` AND map_id = ${sqlString(mapId)}` : ""}
+), segmented AS (
+  SELECT *, sum(segment_start) OVER (ORDER BY created_at, id) AS segment_id FROM ordered
+), minute_medians AS (
+  SELECT tag_code, map_id, zone_id, zone_name, segment_id,
+    percentile_cont(0.5) WITHIN GROUP (ORDER BY x) AS x,
+    percentile_cont(0.5) WITHIN GROUP (ORDER BY y) AS y,
+    percentile_cont(0.5) WITHIN GROUP (ORDER BY pdop) AS pdop,
+    min(created_at) AS created_at, max(created_at) AS last_observed_at,
+    max(gap_before_seconds) AS gap_before_seconds, count(*) AS source_count
+  FROM segmented
+  GROUP BY tag_code, map_id, zone_id, zone_name, segment_id, date_trunc('minute', created_at)
+), ranked AS (
+  SELECT *, row_number() OVER (ORDER BY created_at, segment_id) AS row_number,
+    count(*) OVER () AS total_count, sum(source_count) OVER () AS source_point_count,
+    min(created_at) OVER () AS first_observed_at, max(last_observed_at) OVER () AS final_observed_at
+  FROM minute_medians
 ), sampled AS (
-  SELECT * FROM ordered
+  SELECT * FROM ranked
   WHERE total_count <= ${limit}
-     OR mod(row_number - 1, CEIL(total_count::numeric / ${limit})::bigint) = 0
-  ORDER BY created_at, id LIMIT ${limit}
+     OR row_number = 1
+     OR floor((row_number - 1) * ${limit - 1}::numeric / NULLIF(total_count - 1, 0))
+       > floor((row_number - 2) * ${limit - 1}::numeric / NULLIF(total_count - 1, 0))
+  ORDER BY created_at, segment_id LIMIT ${limit}
 )
 SELECT tag_code AS "tagCode", x::text, y::text, pdop::text, map_id AS "mapId", zone_id AS "sourceZoneId", zone_name AS "sourceZoneName",
   created_at AS "observedAt", gap_before_seconds::text AS "gapBeforeSeconds",
-  total_count::text AS "sourcePointCount"
-FROM sampled ORDER BY created_at, id;`);
+  source_point_count::text AS "sourcePointCount", total_count::text AS "aggregatedPointCount",
+  first_observed_at AS "firstObservedAt", final_observed_at AS "lastObservedAt"
+FROM sampled ORDER BY created_at, segment_id;`);
     return {
       positions: rows.map(fromRow),
       sourcePointCount: Number(rows[0]?.sourcePointCount ?? 0),
       processingTruncated: false,
+      aggregation: { method: "median", intervalSeconds: 60, pointCountBeforeLimit: Number(rows[0]?.aggregatedPointCount ?? rows.length) },
+      ...(rows[0]?.firstObservedAt && rows[0]?.lastObservedAt ? {
+        observedRange: { from: toIstanbulIso(rows[0].firstObservedAt), to: toIstanbulIso(rows[0].lastObservedAt) },
+      } : {}),
     };
   }
 

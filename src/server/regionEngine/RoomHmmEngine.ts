@@ -219,6 +219,17 @@ export interface RoomHmmSettings {
    * yeni yer sayılır. 0: kapalı (ham konum).
    */
   readonly stationaryDisplayHoldMeters: number;
+  /**
+   * Tag hareketsiz (IMU ya da 10 sn ölçüm aralığı) iken oda kararı dondurulur: ölçümler karara girmez,
+   * oda/koridor kararı hareket başlayana kadar aynı kalır. Koridordaki işaret, son hareketli konumda başlar
+   * ve stationaryDisplayRefreshMs'de bir o süredeki ölçümlerin en yoğun olduğu yere taşınır. 0: kapalı.
+   */
+  readonly stationaryFreeze: number;
+  readonly stationaryDisplayRefreshMs: number;
+  /** Yoğunluk ızgarasının hücre boyu (m). */
+  readonly stationaryDensityCellMeters: number;
+  /** İlk kez görülen tag bu süre dolmadan dondurulmaz (ilk karar ölçümlerle verilir). */
+  readonly stationaryFreezeWarmupMs: number;
   readonly roomExitNearMeters: number;
 }
 
@@ -291,6 +302,10 @@ export const DEFAULT_ROOM_HMM_SETTINGS: RoomHmmSettings = Object.freeze({
   glassWallRoomWeight: 1,
   glassWallCorridorFloor: 0.3,
   stationaryDisplayHoldMeters: 0,
+  stationaryFreeze: 0,
+  stationaryDisplayRefreshMs: 600_000,
+  stationaryDensityCellMeters: 0.5,
+  stationaryFreezeWarmupMs: 60_000,
   roomExitNearMeters: 1.5,
 });
 
@@ -320,7 +335,7 @@ interface DoorModel {
   /** The room's extent along its door wall (tangent coordinate relative to the door centre). */
   readonly spanMin: number; readonly spanMax: number;
 }
-interface GateModel { readonly id: string; readonly polygon: readonly Point[]; readonly bounds: Bounds; readonly centroid: Point }
+interface GateModel { readonly id: string; readonly name: string | null; readonly polygon: readonly Point[]; readonly bounds: Bounds; readonly centroid: Point }
 interface Bounds { readonly minX: number; readonly minY: number; readonly maxX: number; readonly maxY: number }
 interface Model {
   readonly states: readonly HiddenState[];
@@ -348,6 +363,7 @@ interface HmmVehicle extends VehicleRegionStatus {
   lastExit: { readonly regionId: string; readonly at: number } | null; leftAreaAt: number | null;
   pendingPlace: string | null; pendingSince: number;
   dwellAnchor: Point | null; hasAnchorInfo: boolean; pendingLastSeen: number; motionInferred: boolean; exitPendingSince: number; holdSamples: Point[]; holdPos: Point | null; holdFar: number;
+  frozen: boolean; firstSeenAt: number; leftAreaGate: string | null; lastMovingPos: Point | null; freezeSamples: Sample[]; freezeDisplay: Point | null; freezeRefreshAt: number;
   committed: string | null; committedSince: number;
   lastKnown: string | null;
   rateEma: number; latencyEma: number;
@@ -382,7 +398,7 @@ function buildModel(config: CompiledRegionsConfig): Model {
   const add = (place: string, sub: Sub, roomIndex = -1) => { states.push({ place, sub, roomIndex }); return states.length - 1; };
   const corridorMove = add(CORRIDOR, "move"), corridorStill = add(CORRIDOR, "still"), unknown = add(UNKNOWN, "unknown");
   const gates: GateModel[] = config.largeAreas.flatMap(area => area.gates.filter(gate => gate.role !== "entry").map(gate => ({
-    id: gate.id, polygon: gate.polygon, bounds: boundsOf(gate.polygon),
+    id: gate.id, name: (gate as { name?: string }).name ?? null, polygon: gate.polygon, bounds: boundsOf(gate.polygon),
     centroid: { x: gate.polygon.reduce((s, p) => s + p.x, 0) / gate.polygon.length, y: gate.polygon.reduce((s, p) => s + p.y, 0) / gate.polygon.length },
   })));
   const outsideNear = gates.length ? add(OUTSIDE, "near") : -1;
@@ -472,6 +488,8 @@ export class RoomHmmEngine {
   // ---------------------------------------------------------------- ingest
   public ingest(raw: TrackingPosition): ProcessedPosition | undefined {
     if (!this.enabled || !this.config || !this.model) return;
+    // The Jetson's first forwarding address carries the tag IMU state only as motion_label.
+    if (raw.motion == null && (raw.motionLabel === "moving" || raw.motionLabel === "stationary")) raw = { ...raw, motion: raw.motionLabel };
     const at = Date.parse(raw.timestamp), now = this.now();
     if (!Number.isFinite(at) || !Number.isFinite(raw.x) || !Number.isFinite(raw.y) || at > now + 2000) return;
     // The Jetson clamps solutions into its zone polygon; when its zone has no room notches an
@@ -531,6 +549,20 @@ export class RoomHmmEngine {
     else if (this.settings.inferStationaryFromCadence >= 0.5 && (v.reportedMotion === null || v.motionInferred)) this.inferMotionFromCadence(v, raw, at, dtMs);
     if (raw.motion !== "stationary" && this.placeProbability(v, CORRIDOR) > 0.6 && dtMs > 0 && dtMs < 3000) v.rateEma = v.rateEma * 0.9 + (1000 / Math.max(50, dtMs)) * 0.1;
 
+    if (this.freezeActive(v, at)) {
+      // Stationary tag: its samples neither move the belief nor the decision; they only feed the
+      // slowly refreshed display position. Moving again (IMU) resumes normal inference at once.
+      this.updateFreezeDisplay(v, raw, at);
+      v.beliefAt = Math.max(v.beliefAt, at);
+      v.lastMeasurementAt = at; v.lastRawPosition = raw; v.lastRawDataTimestamp = at; v.lastFlagged = false;
+      v.reasons = ["Tag hareketsiz: oda kararı sabit, konum en yoğun ölçüm bölgesinde gösteriliyor"];
+      return this.send(v);
+    }
+    if (v.frozen) {
+      v.frozen = false; v.freezeSamples = []; v.freezeDisplay = null; v.track = null;
+      // The frozen period must not be replayed as one long silence.
+      v.beliefAt = Math.max(v.beliefAt, at - 1000);
+    }
     // A lone sample far from where a stationary tag lies is a solver jump: limited influence.
     const holdOutlier = this.updateDisplayHold(v, raw, at);
     this.propagate(v, Math.max(v.beliefAt, at));
@@ -551,8 +583,43 @@ export class RoomHmmEngine {
       this.updateDwell(v, at);
     }
     while (v.recent.length && at - v.recent[0].at > 40_000) v.recent.shift();
+    if (!flagged && this.reportedMotion(v, at) !== "stationary") v.lastMovingPos = { x: raw.x, y: raw.y };
     this.decide(v, at, flagged ? ["Fiziksel olarak tutarsız/zayıf ölçüm; etkisi sınırlandı"] : []);
     return this.send(v);
+  }
+
+  /** Freeze while the tag reports (or blinks as) stationary, once a first decision exists. */
+  private freezeActive(v: HmmVehicle, at: number): boolean {
+    const s = this.settings;
+    if (s.stationaryFreeze < 0.5 || v.committed === null || this.reportedMotion(v, at) !== "stationary") return false;
+    if (!v.frozen && at - v.firstSeenAt < s.stationaryFreezeWarmupMs) return false;
+    if (!v.frozen) {
+      v.frozen = true; v.freezeSamples = [];
+      v.freezeDisplay = v.lastMovingPos ?? { x: v.lastRawPosition.x, y: v.lastRawPosition.y };
+      // Without a moving position to start from, show the densest spot after a shorter first window.
+      v.freezeRefreshAt = at + (v.lastMovingPos ? s.stationaryDisplayRefreshMs : Math.min(s.stationaryDisplayRefreshMs, 120_000));
+    }
+    return true;
+  }
+
+  /** Densest cell (3×3 neighbourhood centroid) of the samples within the refresh window. */
+  private updateFreezeDisplay(v: HmmVehicle, raw: Point, at: number): void {
+    const s = this.settings, cell = Math.max(0.1, s.stationaryDensityCellMeters);
+    v.freezeSamples.push({ x: raw.x, y: raw.y, at });
+    while (v.freezeSamples.length && at - v.freezeSamples[0].at > s.stationaryDisplayRefreshMs) v.freezeSamples.shift();
+    if (at < v.freezeRefreshAt || v.freezeSamples.length < 3) return;
+    v.freezeRefreshAt = at + s.stationaryDisplayRefreshMs;
+    const counts = new Map<string, number>(), key = (x: number, y: number) => `${x},${y}`;
+    for (const p of v.freezeSamples) { const k = key(Math.floor(p.x / cell), Math.floor(p.y / cell)); counts.set(k, (counts.get(k) ?? 0) + 1); }
+    let best = { ix: 0, iy: 0, n: -1 };
+    for (const [k] of counts) {
+      const [ix, iy] = k.split(",").map(Number); let n = 0;
+      for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) n += counts.get(key(ix + dx, iy + dy)) ?? 0;
+      if (n > best.n) best = { ix, iy, n };
+    }
+    const near = v.freezeSamples.filter(p => Math.abs(Math.floor(p.x / cell) - best.ix) <= 1 && Math.abs(Math.floor(p.y / cell) - best.iy) <= 1);
+    const center = { x: near.reduce((a, p) => a + p.x, 0) / near.length, y: near.reduce((a, p) => a + p.y, 0) / near.length };
+    if (!v.freezeDisplay || Math.hypot(center.x - v.freezeDisplay.x, center.y - v.freezeDisplay.y) > 1.0) v.freezeDisplay = center;
   }
 
   public tick(): void {
@@ -561,6 +628,12 @@ export class RoomHmmEngine {
     for (const [id, v] of this.vehicles) {
       if (now - v.lastRawDataTimestamp > Math.max(this.settings.inferredRoomMaxAgeMs, 3_600_000) + 3_600_000) { this.vehicles.delete(id); continue; }
       const clock = now - clamp(v.latencyEma, 0, 4000);
+      if (v.frozen) {
+        // Frozen (stationary) tags keep their decision even through data gaps; only heartbeats go out.
+        v.beliefAt = Math.max(v.beliefAt, clock);
+        if (now - v.lastPublishedTimestamp >= this.broadcastIntervalMs) this.send(v, true);
+        continue;
+      }
       if (clock > v.beliefAt) this.propagate(v, clock);
       const before = `${v.state}|${v.activeRegionId}|${v.candidateRegionId}`;
       v.tracePreviousState = v.state; v.traceTrigger = "timer"; v.traceInput = undefined;
@@ -576,7 +649,7 @@ export class RoomHmmEngine {
       vehicleId: raw.tagCode, state: "TRACKING_OUTSIDE", lastRawPosition: raw, resolvedPosition: undefined as unknown as ProcessedPosition,
       activeRegionId: null, candidateRegionId: null, entryConfidence: 0, lastRawDataTimestamp: at, lastPublishedTimestamp: 0,
       insideConfirmationCount: 0, exitConfirmationCount: 0,
-      belief: this.initialBelief(raw), beliefAt: at, track: null, recent: [], recentAccepted: [], stillAnchor: null, fastBlinkCount: 0, reportedMotion: null, reportedMotionAt: 0, lastExit: null, leftAreaAt: null, pendingPlace: null, pendingSince: 0, pendingLastSeen: 0, motionInferred: false, exitPendingSince: 0, holdSamples: [], holdPos: null, holdFar: 0, dwellAnchor: null, hasAnchorInfo: false, committed: null, committedSince: at, lastKnown: null,
+      belief: this.initialBelief(raw), beliefAt: at, track: null, recent: [], recentAccepted: [], stillAnchor: null, fastBlinkCount: 0, reportedMotion: null, reportedMotionAt: 0, lastExit: null, leftAreaAt: null, pendingPlace: null, pendingSince: 0, pendingLastSeen: 0, motionInferred: false, exitPendingSince: 0, holdSamples: [], holdPos: null, holdFar: 0, frozen: false, firstSeenAt: at, leftAreaGate: null, lastMovingPos: null, freezeSamples: [], freezeDisplay: null, freezeRefreshAt: 0, dwellAnchor: null, hasAnchorInfo: false, committed: null, committedSince: at, lastKnown: null,
       rateEma: 2, latencyEma: 0, lastMeasurementAt: 0, lastMeasurementRoom: null, lastFlagged: false, lastRoomSupport: null, lastMeasurementOutsideArea: false, reasons: [], probabilities: {},
     };
     return vehicle;
@@ -1139,7 +1212,14 @@ export class RoomHmmEngine {
       v.committedSince = at;
       v.transitionFrom = previous && isRoomPlace(previous) && isRoomPlace(v.committed!) ? previous : undefined;
       if (previous && isRoomPlace(previous) && v.committed !== previous) v.lastExit = { regionId: previous, at };
-      if (v.committed === OUTSIDE) v.leftAreaAt = at;
+      if (v.committed === OUTSIDE) {
+        v.leftAreaAt = at;
+        // Which exit: the gate nearest to the last corridor-side sample (e.g. ICU end vs operating theatre).
+        const last = v.recentAccepted.at(-1) ?? v.lastRawPosition, gates = this.model!.gates;
+        let nearest: GateModel | null = null, best = Number.POSITIVE_INFINITY;
+        for (const gate of gates) { const d = polygonDistance(last, gate); if (d < best) { best = d; nearest = gate; } }
+        v.leftAreaGate = nearest?.name ?? nearest?.id ?? null;
+      }
     }
 
     const committed = v.committed!;
@@ -1244,17 +1324,18 @@ export class RoomHmmEngine {
         ...(v.candidateRegionId ? { candidateRegionId: v.candidateRegionId } : {}), confidence: v.entryConfidence, measurementKind: kind },
       reasons: [...v.reasons, `Olasılıklar: ${this.describeProbabilities(v.probabilities)}`].map(message => ({ code: this.reasonCode(message), message })),
     };
+    const display = (v.frozen ? v.freezeDisplay : null) ?? v.holdPos ?? raw;
     const position: ProcessedPosition = {
-      ...raw, x: region?.roomCenter.x ?? v.holdPos?.x ?? raw.x, y: region?.roomCenter.y ?? v.holdPos?.y ?? raw.y,
+      ...raw, x: region?.roomCenter.x ?? display.x, y: region?.roomCenter.y ?? display.y,
       decisionId: createHash("sha256").update(JSON.stringify([v.vehicleId, raw.timestamp, this.now(), v.state, v.activeRegionId, v.candidateRegionId, config.version])).digest("hex"),
       timestamp: raw.timestamp, publishedAt: new Date(this.now()).toISOString(), synthetic, engineVersion: HMM_ROOM_ENGINE_VERSION,
       configVersion: config.version ?? "unversioned", positionSource: region ? "REGION_CENTER" : "RAW",
       // Held display position for a stationary tag (the true sample stays in decisionTrace.input).
-      rawPosition: v.holdPos && !region ? { ...raw, x: v.holdPos.x, y: v.holdPos.y } : raw,
+      rawPosition: !region && (display.x !== raw.x || display.y !== raw.y) ? { ...raw, x: display.x, y: display.y } : raw,
       lastRawDataTimestamp: raw.timestamp, decisionTrace: trace,
       regionInference: { enabled: true, state: v.state, regionId: region?.id ?? null, regionName: region?.name ?? null,
         candidateRegionId: v.candidateRegionId, lastKnownRegionId: v.lastKnown, confidence: v.entryConfidence, reasons: v.reasons,
-        measurementKind: kind, ...(v.committed === OUTSIDE ? { outsideArea: true, leftAreaAt: v.leftAreaAt ? new Date(v.leftAreaAt).toISOString() : null } : {}),
+        measurementKind: kind, ...(v.committed === OUTSIDE ? { outsideArea: true, leftAreaAt: v.leftAreaAt ? new Date(v.leftAreaAt).toISOString() : null, ...(v.leftAreaGate ? { leftAreaGate: v.leftAreaGate } : {}) } : {}),
         ...(v.lastExit ? { exitedRegionId: v.lastExit.regionId, exitedAt: new Date(v.lastExit.at).toISOString() } : {}),
         ...(this.now() - v.lastRawDataTimestamp > this.settings.signalLostAfterMs ? { signalLost: true } : {}),
         validUntil: new Date(v.lastRawDataTimestamp + this.measuredFreshMs(v, v.lastRawDataTimestamp)).toISOString(),

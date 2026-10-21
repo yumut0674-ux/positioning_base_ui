@@ -110,7 +110,7 @@ export function RouteReportDialog({ onClose, initialTagCode, initialFrom, initia
         {roomState === "loading" && <p className={styles.roomStatus} role="status">Odalar yükleniyor… Tüm odalar için rapor oluşturabilirsiniz.</p>}
         {roomState === "error" && <p className={styles.roomStatus} role="alert">Oda listesi yüklenemedi. Tüm odalar için rapor oluşturabilirsiniz.</p>}
         <div className={styles.dates}><label>Başlangıç<input type="datetime-local" value={from} onChange={event => { setFrom(event.target.value); setMessage(null); }} disabled={creating} /></label><label>Bitiş<input type="datetime-local" value={to} onChange={event => { setTo(event.target.value); setMessage(null); }} disabled={creating} /></label></div>
-        <p className={styles.hint}>Rapor aralığı en fazla 7 gün olabilir. Veri bulunmayan süreler PDF içinde açıkça gösterilir.</p>
+        <p className={styles.hint}>Rapor aralığı en fazla 7 gün olabilir. PDF içinde yalnızca oda veya koridor kararı bulunan kayıtlar gösterilir.</p>
         {message && <p className={styles.message} role="alert">{message}</p>}
       </div>
       <footer className={styles.footer}><button type="button" onClick={onClose} disabled={creating}>İptal</button><button type="button" className={styles.primary} onClick={() => void create()} disabled={creating || tagState !== "ready" || tags.length === 0}>{creating ? <Loader2 size={16} className={styles.spin} /> : <Download size={16} />}{creating ? "PDF oluşturuluyor…" : "PDF Oluştur"}</button></footer>

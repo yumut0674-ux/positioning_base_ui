@@ -29,7 +29,9 @@ const GAP_MS = 5 * 60_000;
 
 function location(decision: ReportDecision): Pick<ReportRow, "mapId" | "roomId" | "floor" | "room" | "gap"> {
   if (decision.state === "TRACKING_OUTSIDE" && decision.corridorEvidence) return { mapId: decision.mapId, roomId: null, floor: decision.mapId ?? "—", room: "Koridor", gap: false };
-  if (decision.state !== "IN_REGION" || !decision.roomId) return { mapId: decision.mapId, roomId: null, floor: decision.mapId ?? "—", room: "—", gap: false };
+  // EXIT_CANDIDATE still carries the committed room (the live map shows it); only a confirmed
+  // exit ends the stay. Otherwise one room visit splits into sub-minute rows the PDF drops.
+  if (!decision.roomId || (decision.state !== "IN_REGION" && decision.state !== "EXIT_CANDIDATE")) return { mapId: decision.mapId, roomId: null, floor: decision.mapId ?? "—", room: "—", gap: false };
   return { mapId: decision.mapId, roomId: decision.roomId, floor: decision.mapId ?? "—", room: decision.roomName ?? decision.roomId, gap: false };
 }
 

@@ -319,8 +319,35 @@ test("yoğun bakım: hareketsiz tagın koridordaki işareti Jetson sıçramalar�
     for (let i = 0; i < 4; i++) { clock += 10_000; engine.ingest({ tagCode: "S", x: 2.2, y: 13.6, timestamp: new Date(clock).toISOString(), mapId: "m" }); }
     return { path, last: shown.at(-1)! };
   };
-  const held = run(selection.hmm), free = run(resolveRoomHmmSettings({ ...selection.hmm, stationaryDisplayHoldMeters: 0 }));
+  // Dondurma kapalıyken (hareket bilgisi gelmeyen kurulum) ortanca sabitleme davranışı.
+  const held = run(resolveRoomHmmSettings({ ...selection.hmm, stationaryFreeze: 0 })), free = run(resolveRoomHmmSettings({ ...selection.hmm, stationaryFreeze: 0, stationaryDisplayHoldMeters: 0 }));
   assert.ok(held.path < 0.6, `sabit tag oynamamalı: ${held.path.toFixed(2)} m`);
   assert.ok(free.path > 10, `negatif kontrol: ${free.path.toFixed(2)} m`);
   assert.ok(Math.hypot(held.last.x - 2.2, held.last.y - 13.6) < 0.5, "yer değişimi gösterilmeli");
+});
+
+test("hareketsiz tag (IMU): oda kararı donar, karşı odaya sıçrayan noktalar ve veri boşlukları kararı değiştirmez; hareket edince normale döner", async () => {
+  const selection = await readRoomEngineSelection("necmettin-yogun-bakim", undefined, {});
+  let clock = T0; const out: ProcessedPosition[] = [];
+  const engine = new RoomHmmEngine(p => out.push(p), 1000, () => clock, false, selection.hmm);
+  engine.enable(icu);
+  const send = (p: P, motion: "moving" | "stationary") => engine.ingest({ tagCode: "S", x: p.x, y: p.y, timestamp: new Date(clock).toISOString(), mapId: "m", motion });
+  const spot = { x: 2.4, y: 11.0 };
+  for (let i = 0; i < 160; i++) { clock += 500; send({ x: spot.x + (i % 2 ? 0.1 : -0.1), y: spot.y }, "moving"); if (i % 2) engine.tick(); }  // 80 sn koridorda
+  assert.equal(out.at(-1)!.regionInference.regionId, null);
+  const shownBefore = out.at(-1)!.rawPosition!;
+  // Hareketsiz: 10 sn'de bir; her üç ölçümden biri Oda 4'ün içine (3 anchorlu ayna), arada 40 sn veri yok.
+  const before = out.length;
+  for (let i = 0; i < 30; i++) {
+    for (let k = 0; k < 10; k++) { clock += 1000; engine.tick(); }
+    if (i === 12) { for (let k = 0; k < 40; k++) { clock += 1000; engine.tick(); } }
+    send(i % 3 === 0 ? { x: -1.0, y: 11.1 } : { x: spot.x + 0.3, y: spot.y - 0.2 }, "stationary");
+  }
+  assert.ok(out.slice(before).every(p => p.regionInference.regionId === null), "hareketsizken oda kararı değişmemeli");
+  const shown = out.slice(before).map(p => p.rawPosition!);
+  assert.ok(shown.every(p => Math.hypot(p.x - shownBefore.x, p.y - shownBefore.y) < 0.6), "işaret son hareketli konumda kalmalı");
+  // Hareket: Oda 4'e girer.
+  for (let i = 1; i <= 8; i++) { clock += 500; send({ x: 2.4 - i * 0.3, y: 11.1 }, "moving"); }
+  for (let i = 0; i < 30; i++) { clock += 500; send({ x: -1.5, y: 11.1 }, "moving"); if (i % 2) engine.tick(); }
+  assert.equal(out.at(-1)!.regionInference.regionId, "room-04");
 });

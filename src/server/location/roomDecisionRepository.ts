@@ -2,12 +2,18 @@ import { queryPostgres } from "../postgresClient";
 import { logger } from "../logger";
 import type { ProcessedPosition } from "../regionEngine/types";
 import type { TagAssignment } from "./location.types";
+import { compactDecisionHistory } from "./roomDecisionProjection";
 import type { DecisionLogFilters, DecisionLogListResponse, DecisionLogSummary } from "../../features/decisionLogs/types/decisionLog.types";
+
+export interface RoomDecisionHistoryOptions {
+  readonly compact: boolean;
+  readonly assignments?: readonly TagAssignment[];
+}
 
 export interface RoomDecisionRepository {
   latest(tag: string, at: string): Promise<ProcessedPosition | null>;
   latestMeasuredRoom(assignments: readonly TagAssignment[], at: string): Promise<ProcessedPosition | null>;
-  history(tags: readonly string[], from: string, to: string, limit: number): Promise<readonly ProcessedPosition[]>;
+  history(tags: readonly string[], from: string, to: string, limit: number, options?: RoomDecisionHistoryOptions): Promise<readonly ProcessedPosition[]>;
   list(filters: DecisionLogFilters): Promise<DecisionLogListResponse>;
   detail(decisionId: string): Promise<ProcessedPosition | null>;
 }
@@ -168,20 +174,58 @@ export class PostgresRoomDecisionRepository implements RoomDecisionRepository {
     if (!stored || !valid(stored)) return pending;
     return pending && Date.parse(pending.lastRawDataTimestamp) > Date.parse(stored.lastRawDataTimestamp) ? pending : stored;
   }
-  public async history(tags: readonly string[], from: string, to: string, limit: number): Promise<readonly ProcessedPosition[]> {
+  public async history(tags: readonly string[], from: string, to: string, limit: number, options?: RoomDecisionHistoryOptions): Promise<readonly ProcessedPosition[]> {
     if (!tags.length) return [];
+    const assignmentWhere = options?.assignments ? options.assignments.map(a => `(tag_code = ${quote(a.tagCode)}
+      AND (payload->>'lastRawDataTimestamp')::timestamptz >= ${quote(a.assignedAt)}::timestamptz
+      ${a.unassignedAt ? `AND published_at < ${quote(a.unassignedAt)}::timestamptz` : ""})`).join(" OR ") || "FALSE" : "TRUE";
+    const historyFields = options?.compact ? "id,tag_code,published_at,payload - 'decisionTrace' - 'rawPosition' AS payload" : "*";
     const rows = await this.query(`WITH decisions AS (
-      SELECT * FROM tag_room_decisions WHERE tag_code IN (${tags.map(quote).join(",")}) AND published_at BETWEEN ${quote(from)}::timestamptz AND ${quote(to)}::timestamptz
-      UNION ALL (SELECT DISTINCT ON (tag_code) * FROM tag_room_decisions WHERE tag_code IN (${tags.map(quote).join(",")}) AND published_at < ${quote(from)}::timestamptz ORDER BY tag_code,published_at DESC,id DESC)
-    ) SELECT payload::text FROM decisions ORDER BY published_at,id LIMIT ${Math.max(1, Math.min(250000, Math.floor(limit)))};`);
+      SELECT ${historyFields} FROM tag_room_decisions WHERE tag_code IN (${tags.map(quote).join(",")}) AND published_at BETWEEN ${quote(from)}::timestamptz AND ${quote(to)}::timestamptz
+      UNION ALL (SELECT DISTINCT ON (tag_code) ${historyFields} FROM tag_room_decisions WHERE tag_code IN (${tags.map(quote).join(",")}) AND published_at < ${quote(from)}::timestamptz ORDER BY tag_code,published_at DESC,id DESC)
+    ) ${options?.compact ? `, labelled AS (
+      SELECT id,tag_code,published_at,jsonb_build_array(payload->>'mapId', payload->>'sourceZoneId', payload->>'sourceZoneName',
+        payload#>>'{regionInference,state}', payload#>>'{regionInference,regionId}',
+        payload#>>'{regionInference,regionName}', payload#>>'{regionInference,measurementKind}') AS location_key,
+        (payload#>>'{regionInference,validUntil}')::timestamptz AS valid_until,
+        (payload#>>'{regionInference,uncertainAfter}')::timestamptz AS uncertain_after
+      FROM decisions WHERE (${assignmentWhere})
+    ), neighbours AS (
+      SELECT *, lag(location_key) OVER w AS previous_key,
+        lag(valid_until) OVER w AS previous_valid_until, lag(uncertain_after) OVER w AS previous_uncertain_after
+      FROM labelled WINDOW w AS (PARTITION BY tag_code ORDER BY published_at,id)
+    ), grouped AS (
+      SELECT *, sum(CASE WHEN location_key IS DISTINCT FROM previous_key
+        OR published_at >= previous_valid_until OR published_at >= previous_uncertain_after THEN 1 ELSE 0 END)
+        OVER (PARTITION BY tag_code ORDER BY published_at,id) AS visit_id FROM neighbours
+    ), endpoints AS (
+      SELECT *, row_number() OVER w AS visit_row,
+        count(*) OVER w AS visit_count,
+        last_value(valid_until) OVER w AS final_valid_until,
+        last_value(uncertain_after) OVER w AS final_uncertain_after
+      FROM grouped WINDOW w AS (PARTITION BY tag_code,visit_id ORDER BY published_at,id ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING)
+    ) SELECT jsonb_set(payload - 'decisionTrace' - 'rawPosition', '{regionInference}',
+        ((payload->'regionInference') - 'validUntil' - 'uncertainAfter')
+          || CASE WHEN final_valid_until IS NOT NULL THEN jsonb_build_object('validUntil',final_valid_until) ELSE '{}'::jsonb END
+          || CASE WHEN final_uncertain_after IS NOT NULL THEN jsonb_build_object('uncertainAfter',final_uncertain_after) ELSE '{}'::jsonb END)::text AS payload
+      FROM endpoints JOIN decisions USING (id,tag_code,published_at) WHERE visit_row = 1 OR visit_row = visit_count`
+      : "SELECT payload::text FROM decisions"}
+      ORDER BY published_at,id LIMIT ${Math.max(1, Math.min(250000, Math.floor(limit)))};`);
     const pending = [...this.inFlight,...this.queue].filter(p => tags.includes(p.tagCode) && Date.parse(p.publishedAt!) >= Date.parse(from) && Date.parse(p.publishedAt!) <= Date.parse(to));
     for (const tag of tags) {
       const seed=[...this.inFlight,...this.queue].filter(p=>p.tagCode===tag&&Date.parse(p.publishedAt!)<Date.parse(from)).at(-1);
       if (seed) pending.push(seed);
     }
     const unique = new Map<string,ProcessedPosition>();
-    for (const p of [...rows.map(row => JSON.parse(row.payload!) as ProcessedPosition), ...pending]) unique.set(p.decisionId ?? JSON.stringify(p),p);
-    return [...unique.values()].sort((a,b) => Date.parse(a.publishedAt!) - Date.parse(b.publishedAt!)).slice(0, limit);
+    for (const p of [...rows.map(row => JSON.parse(row.payload!) as ProcessedPosition), ...pending]) {
+      if (options?.compact && options.assignments && !options.assignments.some(a => a.tagCode === p.tagCode
+        && Date.parse(p.lastRawDataTimestamp) >= Date.parse(a.assignedAt) && (!a.unassignedAt || Date.parse(p.publishedAt!) < Date.parse(a.unassignedAt)))) continue;
+      const key = p.decisionId ?? JSON.stringify(p);
+      // Stored compact endpoints include the freshness of the whole visit.
+      if (!options?.compact || !unique.has(key)) unique.set(key, p);
+    }
+    const merged = [...unique.values()];
+    return (options?.compact ? compactDecisionHistory(merged) : merged.sort((a,b) => Date.parse(a.publishedAt!) - Date.parse(b.publishedAt!))).slice(0, limit);
   }
   public pendingSnapshot(): readonly ProcessedPosition[] { return [...this.inFlight, ...this.queue]; }
   public async detail(decisionId: string): Promise<ProcessedPosition | null> {

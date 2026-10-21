@@ -2,6 +2,20 @@
 
 14 Ekim 2026 (16 Ekim güncellemesi: eski motor dönemine ait Jetson oturum kayıtları, tag hareket bilgisi ve Jetson kırpması). Saha geri bildirimi, Jetson kayıtları ve bu repodaki motor incelenerek hazırlandı.
 
+## 20 Ekim: hareketsiz taglar, Umut'un 15 Ekim değişiklikleri, yoğun bakım koridoru
+
+- Umut'un 7 commit'i birleştirildi (motion_label, tag görünürlüğü/no-data, rota geçmişi, raporlar). Umut'un
+  denetleyicisi hareketsiz konumları oda motoruna hiç vermiyordu; olasılıksal motor bunları alır ve kendisi dondurur
+  (eski kural motoru için Umut'un davranışı aynen duruyor).
+- `stationaryFreeze` (iki haritada açık): tag hareketsizken (Jetson motion_label ya da 10 sn ölçüm aralığı) inanç ve
+  karar dondurulur; veri boşlukları ve karşı odaya sıçrayan noktalar kararı değiştirmez. Koridordaki işaret son
+  hareketli konumda kalır, `stationaryDisplayRefreshMs` (10 dk) bir, o süredeki ölçümlerin en yoğun 0,5 m hücresine
+  (3×3 komşuluk ağırlık merkezi) 1 m'den fazla uzaksa taşınır. Hareket (IMU moving) gelince hemen normale döner.
+  İlk görülen tag 60 sn dolmadan dondurulmaz. Test tagının sonuçları (servis 9, yoğun bakım 3 kayıt) değişmedi.
+- Jetson v9.1 `transport.py`: ilk adrese `motion_label` eklendi (`jetson-v9.1-guncelleme/`).
+- Yoğun bakım: koridorun y < 9 m bölümü x 3,9 → 4,5 m (defibrilatör). Çıkış kapısının adı karar etiketinde
+  ("Yoğun Bakım alanından çıktı (… kapısı)").
+
 ## 18 Ekim (6): yoğun bakımda duran tagların "hareket ediyor gibi" görünmesi
 
 Video (15:07–15:10) ve V2 kayıtları: hareketsiz taglar 10 sn'de bir ölçüm gönderiyor; ölçümlerin %12–19'u

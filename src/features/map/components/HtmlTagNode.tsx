@@ -4,20 +4,20 @@ import type { PositionAnimationController } from "@/src/features/tracking/servic
 import type { CoordinateTransformService } from "../services/CoordinateTransformService";
 import { renderHtmlTagPosition } from "../services/htmlTagOverlay";
 import styles from "./htmlTagOverlay.module.css";
+import { PASSIVE_TAG_COLOR } from "@/src/features/tracking/services/tagActivityPresentation";
 
 interface HtmlTagNodeProps {
   readonly tag: TrackedTag;
   readonly transform: CoordinateTransformService;
   readonly positionAnimation: PositionAnimationController;
   readonly selected: boolean;
+  readonly liveColor: boolean;
   readonly onSelect: (id: string) => void;
 }
 
-function HtmlTagNodeComponent({ tag, transform, positionAnimation, selected, onSelect }: HtmlTagNodeProps) {
+function HtmlTagNodeComponent({ tag, transform, positionAnimation, selected, liveColor, onSelect }: HtmlTagNodeProps) {
   const positionRef = useRef<HTMLDivElement>(null);
-  const uncertain = tag.regionInference?.measurementKind === "uncertain";
-  const estimated = tag.regionInference?.measurementKind === "estimated";
-  const colorStyle = { color: tag.color, opacity: uncertain ? 0.5 : estimated ? 0.75 : 1 } satisfies CSSProperties;
+  const colorStyle = { color: liveColor ? tag.color : PASSIVE_TAG_COLOR } satisfies CSSProperties;
 
   useLayoutEffect(() => positionAnimation.attach(tag.id, {
     render: (x, y, _stale, opacity) => {
@@ -36,7 +36,7 @@ function HtmlTagNodeComponent({ tag, transform, positionAnimation, selected, onS
         type="button"
         className={`${styles.button} ${selected ? styles.selected : ""}`}
         style={colorStyle}
-        aria-label={`${tag.name} (${tag.id}) etiketini seç`}
+        aria-label={`${tag.name} (${tag.id}) ${selected ? "etiketinin seçimini kaldır" : "etiketini seç"}`}
         aria-pressed={selected}
         title={tag.name}
         onClick={() => onSelect(tag.id)}
@@ -63,7 +63,7 @@ function sameVisualTag(previous: HtmlTagNodeProps, next: HtmlTagNodeProps): bool
     && previous.tag.name === next.tag.name
     && previous.tag.color === next.tag.color
     && previous.tag.direction === next.tag.direction
-    && previous.tag.regionInference?.measurementKind === next.tag.regionInference?.measurementKind
+    && previous.liveColor === next.liveColor
     && previous.transform === next.transform
     && previous.positionAnimation === next.positionAnimation
     && previous.selected === next.selected
