@@ -1,0 +1,29 @@
+{
+  "testId": "test-1681d486-28ef-46f2-b835-10fc1fbc69be",
+  "timezone": "Europe/Istanbul",
+  "revision": 2,
+  "revisionReason": "2026-09-25 kullanıcı doğrulaması: üç tag aynı rota grubunda birlikte taşındı",
+  "test": {
+    "from": "2026-09-21T16:25:05.529Z",
+    "to": "2026-09-21T16:27:29.409Z"
+  },
+  "visits": [
+    {
+      "roomId": "room-03",
+      "from": "2026-09-21T16:25:12.048Z",
+      "to": "2026-09-21T16:25:49.246Z"
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-09-21T16:25:51.127Z",
+      "to": "2026-09-21T16:26:32.748Z"
+    },
+    {
+      "roomId": "room-06",
+      "from": "2026-09-21T16:26:41.683Z",
+      "to": "2026-09-21T16:27:17.693Z"
+    }
+  ],
+  "groups": [{"id":"birlikte-tasinan-rota","tagCodes":["D95660981D60BDA1","9A8FA14BB93426F1","06F0623201E95CE8"]}],
+  "note": "Hızlı yürüyüş"
+}

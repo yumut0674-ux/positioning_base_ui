@@ -1,0 +1,7 @@
+tunnel: <TUNNEL_UUID>
+credentials-file: C:\Users\<WINDOWS_USER>\.cloudflared\<TUNNEL_UUID>.json
+
+ingress:
+  - hostname: <DEMO_DOMAIN>
+    service: http://127.0.0.1:3000
+  - service: http_status:404

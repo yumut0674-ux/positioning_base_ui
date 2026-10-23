@@ -1,0 +1,22 @@
+{
+  "testId": "test-ce530aaa-a117-4075-8191-7169508dec93",
+  "testName": "Servis — Oda testi — AD5D457F2924852A",
+  "site": "Necmettin Hastanesi — Servis",
+  "timezone": "Europe/Istanbul",
+  "revision": 1,
+  "revisionReason": "Kullanıcının oda testi kaydı UTC saatleri ve açık tag kodu korunarak aktarıldı. Bu rota diğer eşzamanlı testten bağımsızdır.",
+  "test": {"from":"2026-10-12T15:53:29.680Z","to":"2026-10-12T15:58:19.255Z"},
+  "visits": [
+    {"roomId":"room-16","from":"2026-10-12T15:53:47.535Z","to":"2026-10-12T15:54:01.252Z"},
+    {"roomId":"room-07","from":"2026-10-12T15:54:11.920Z","to":"2026-10-12T15:54:27.344Z"},
+    {"roomId":"room-14","from":"2026-10-12T15:54:37.220Z","to":"2026-10-12T15:54:56.959Z"},
+    {"roomId":"room-13","from":"2026-10-12T15:55:23.012Z","to":"2026-10-12T15:55:40.626Z"},
+    {"roomId":"room-12","from":"2026-10-12T15:56:04.677Z","to":"2026-10-12T15:56:15.790Z"},
+    {"roomId":"room-14","from":"2026-10-12T15:56:43.435Z","to":"2026-10-12T15:56:50.605Z"},
+    {"roomId":"room-07","from":"2026-10-12T15:57:01.630Z","to":"2026-10-12T15:57:13.229Z"},
+    {"roomId":"room-10","from":"2026-10-12T15:57:28.408Z","to":"2026-10-12T15:57:47.267Z"},
+    {"roomId":"room-16","from":"2026-10-12T15:57:56.464Z","to":"2026-10-12T15:58:08.556Z"}
+  ],
+  "groups": [{"id":"servis-ce530aaa","tagCodes":["AD5D457F2924852A"],"note":"Tag kodu kullanıcı test kaydında açıkça belirtilmiştir."}],
+  "note": "Kaynak source.json içinde korunur. Z saatleri UTC'dir; yerel gösterim Europe/Istanbul. Oda ziyaretleri arasındaki süre koridordur. Saat kaydırılmaz; katı ve ±2 saniye sınır toleranslı değerlendirme birlikte üretilir."
+}

@@ -1,0 +1,6 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": { "incremental": false },
+  "include": ["../replay.ts", "run-integrated-filter-study.ts", "sweep-integrated-filter.ts", "replay-sweep-selection.ts", "integrated-filter-probes.test.ts", "study-metrics.ts"],
+  "exclude": ["../../../node_modules", "../reports"]
+}

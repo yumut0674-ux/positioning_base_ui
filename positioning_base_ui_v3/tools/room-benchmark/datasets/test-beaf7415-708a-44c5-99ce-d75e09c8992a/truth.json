@@ -1,0 +1,24 @@
+{
+  "testId": "test-beaf7415-708a-44c5-99ce-d75e09c8992a",
+  "timezone": "Europe/Istanbul",
+  "revision": 2,
+  "revisionReason": "2026-09-25 kullanıcı doğrulaması: bu testte D95660981D60BDA1 taşındı",
+  "test": {
+    "from": "2026-09-24T08:07:18.268Z",
+    "to": "2026-09-24T08:08:59.798Z"
+  },
+  "visits": [
+    {
+      "roomId": "room-03",
+      "from": "2026-09-24T08:07:31.208Z",
+      "to": "2026-09-24T08:08:12.721Z"
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-09-24T08:08:15.553Z",
+      "to": "2026-09-24T08:08:56.647Z"
+    }
+  ],
+  "groups": [{"id":"saha-rotasi","tagCodes":["D95660981D60BDA1"]}],
+  "note": "Koridorda daha hızlı yürüyüş"
+}

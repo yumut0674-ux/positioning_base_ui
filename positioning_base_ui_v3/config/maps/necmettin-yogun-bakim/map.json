@@ -1,0 +1,28 @@
+{
+  "id": "necmettin-yogun-bakim",
+  "image": {
+    "url": "/maps/necmettin-yogun-bakim/floor-plan-9b40600eb2b7.png",
+    "width": 3840,
+    "height": 2160
+  },
+  "world": {
+    "widthMeters": 13.36608,
+    "heightMeters": 23.76192
+  },
+  "calibration": {
+    "worldOrigin": {
+      "x": 0,
+      "y": 0
+    },
+    "canvasOrigin": {
+      "x": 144.44295410471886,
+      "y": 691.7069166127994
+    },
+    "pixelsPerMeter": 161.60310277957336,
+    "invertYAxis": true,
+    "rotationDegrees": 90
+  },
+  "updatedAt": "2026-10-14T12:32:08.687Z",
+  "status": "active",
+  "liveTrackingEnabled": true
+}

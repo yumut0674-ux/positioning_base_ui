@@ -1,0 +1,32 @@
+{
+  "testId": "test-00000000-0000-0000-0000-000000000001",
+  "source": "ANONİM SENTETİK FİXTURE; gerçek saha testi değildir",
+  "timezone": "Europe/Istanbul",
+  "importedAt": "2026-09-24T00:00:00.000Z",
+  "warmupMs": 5000,
+  "observationMs": 70000,
+  "selectedTags": [
+    "ANON-A",
+    "ANON-B"
+  ],
+  "candidateTags": {
+    "ANON-A": 10,
+    "ANON-B": 10
+  },
+  "rowCount": 20,
+  "sha256": "48d4298ac664f0d5adea82ee5defe497c68029f79f8a0fa0af12ae8df0cd5b1f",
+  "timing": "exact",
+  "mapIds": {
+    "spor-koridor": 20
+  },
+  "quality": {
+    "missingReceivedAt": 0,
+    "missingMeasurementAt": 0,
+    "missingCoordinates": 0,
+    "missingQuality": 0,
+    "timingAnomalies": 0,
+    "anomalyRows": [],
+    "largeGaps": []
+  },
+  "caveat": "Sadece benchmarkın çalıştığını göstermek için deterministik anonim fixture."
+}

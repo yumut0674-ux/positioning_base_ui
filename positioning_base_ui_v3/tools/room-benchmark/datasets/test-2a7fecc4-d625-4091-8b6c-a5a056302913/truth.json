@@ -1,0 +1,18 @@
+{
+  "testId": "test-2a7fecc4-d625-4091-8b6c-a5a056302913",
+  "timezone": "Europe/Istanbul",
+  "revision": 1,
+  "revisionReason": "Kullanıcının 2026-10-08 Necmettin Yoğun Bakım saha kronometresi kaydından ilk aktarım; taşınan tag henüz doğrulanmadı",
+  "site": "Necmettin Hastanesi — Yoğun Bakım",
+  "test": {
+    "from": "2026-10-08T15:02:11.119Z",
+    "to": "2026-10-08T15:05:16.485Z"
+  },
+  "visits": [
+    { "roomId": "room-02", "from": "2026-10-08T15:02:35.373Z", "to": "2026-10-08T15:03:00.840Z" },
+    { "roomId": "room-05", "from": "2026-10-08T15:03:10.759Z", "to": "2026-10-08T15:03:36.873Z" },
+    { "roomId": "room-02", "from": "2026-10-08T15:03:46.353Z", "to": "2026-10-08T15:04:12.352Z" }
+  ],
+  "groups": [],
+  "note": "Necmettin Yoğun Bakım testi. Oda aralıkları arasındaki süre koridordur. Taşınan tag doğrulanmadan oda başarısı puanlanmaz."
+}

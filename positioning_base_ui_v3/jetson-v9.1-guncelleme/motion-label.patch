@@ -1,0 +1,58 @@
+--- transport.py	2026-10-13 10:54:25.000000000 +0300
++++ transport.py	2026-10-20 00:11:00.345308951 +0300
+@@ -35,6 +35,17 @@
+             return "127.0.0.1"
+ 
+ 
++def _motion_label(position: dict[str, Any]) -> str:
++    label = position.get("motion_label")
++    if label in ("moving", "stationary", "unknown"):
++        return str(label)
++    try:
++        motion = int(position.get("motion", -1))
++    except (TypeError, ValueError):
++        return "unknown"
++    return "moving" if motion == 0 else "stationary" if motion == 1 else "unknown"
++
++
+ class PositionForwarder:
+     """Non-blocking publisher for the HTTP position contract."""
+ 
+@@ -85,6 +96,9 @@
+             "pdop": pdop if pdop is not None and math.isfinite(pdop) else None,
+             "zone_id": position.get("zone_id"),
+             "zone_name": position.get("zone_name"),
++            # Tag IMU state (AM_TAG_META motion: 0 moving, 1 stationary) for the room UI.
++            # Only the label is sent: every UI version accepts motion_label.
++            "motion_label": _motion_label(position),
+             "timestamp": datetime.now()
+             .astimezone()
+             .isoformat(timespec="milliseconds"),
+--- tests/test_transport.py	2026-10-13 10:55:16.000000000 +0300
++++ tests/test_transport.py	2026-10-20 00:11:32.358880660 +0300
+@@ -206,9 +206,11 @@
+                             "pdop",
+                             "zone_id",
+                             "zone_name",
++                            "motion_label",
+                             "timestamp",
+                         },
+                     )
++                    self.assertEqual(record["motion_label"], "unknown")
+                     self.assertEqual(record["type"], "position")
+                     self.assertEqual(record["tag_id"], "AAAABBBBCCCCDDDD")
+                     self.assertEqual(record["x"], 1.25 + index)
+@@ -440,3 +442,13 @@
+ 
+ if __name__ == "__main__":
+     unittest.main()
++
++
++class MotionLabelTests(unittest.TestCase):
++    def test_motion_label_from_tag_telemetry(self) -> None:
++        from transport import _motion_label
++        self.assertEqual(_motion_label({"motion": 0}), "moving")
++        self.assertEqual(_motion_label({"motion": 1}), "stationary")
++        self.assertEqual(_motion_label({"motion_label": "stationary", "motion": 0}), "stationary")
++        self.assertEqual(_motion_label({"motion": 2}), "unknown")
++        self.assertEqual(_motion_label({}), "unknown")

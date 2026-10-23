@@ -1,0 +1,15 @@
+{
+  "test_id": "test-4192b569-b345-4a41-a028-32b342ab4710",
+  "test_name": "servis2",
+  "tag_id": null,
+  "tag_codes": [],
+  "timezone": "Europe/Istanbul",
+  "started_at": "2026-10-12T15:14:10.978Z",
+  "ended_at": "2026-10-12T15:17:25.149Z",
+  "rooms": [
+    {"room":"room-11","entered_at":"2026-10-12T15:14:23.568Z","exited_at":"2026-10-12T15:14:52.113Z","duration_seconds":28.545},
+    {"room":"room-12","entered_at":"2026-10-12T15:15:30.905Z","exited_at":"2026-10-12T15:15:49.833Z","duration_seconds":18.928},
+    {"room":"room-14","entered_at":"2026-10-12T15:16:04.039Z","exited_at":"2026-10-12T15:16:23.473Z","duration_seconds":19.434},
+    {"room":"room-08","entered_at":"2026-10-12T15:16:46.761Z","exited_at":"2026-10-12T15:17:14.043Z","duration_seconds":27.282}
+  ]
+}

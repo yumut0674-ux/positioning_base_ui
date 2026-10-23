@@ -1,0 +1,56 @@
+// This interpretation belongs to the 13 October sweep; future data needs a fresh interpretation.
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict');
+const dir=process.argv[2],s=JSON.parse(fs.readFileSync(path.join(dir,'summary.json'),'utf8'));
+assert.deepEqual(s.protectedBefore,s.protectedAfter);
+const service=s.totals.filter(x=>x.map==='necmettin-servis'),current=service.find(x=>x.profile==='current'),d10=service.find(x=>x.profile==='D10');
+assert.equal(current.caught,25);assert.equal(d10.caught,27);assert.equal(d10.wrongRoomSeconds,39.75);
+const n=x=>x==null?'—':Number(x).toLocaleString('tr-TR',{maximumFractionDigits:3});
+const md=[],p=x=>md.push(x,''),h=x=>p('## '+x),table=(headers,rows)=>p('| '+headers.join(' | ')+' |\n| '+headers.map(()=>'---').join(' | ')+' |\n'+rows.map(r=>'| '+r.join(' | ')+' |').join('\n'));
+const trial=(t,profile)=>t.trials.find(x=>x.profile===profile);
+const names={'4192b569':'Servis2 / cihaz','5c71fd2a':'Mustafa / uzun','bd53fa7f':'cihaz / akşam','ca88f73a':'Tansiyon','ce530aaa':'Mustafa / kısa','f6d295ed':'Yoğun bakım / hasan'};
+const name=t=>names[t.testId.split('-')[1]];
+p('# Entegre mesafe filtresi: parametre duyarlılığı');
+p('13 Ekim 2026. Güncel room-evidence-10 ile 19 profil × 6 puanlı veri kümesi, her biri iki kez çalıştırıldı. Servis 5 test / 43 ziyaret; yoğun bakım 1 doğrulanmış test / 5 ziyaret. Eşleşmesi belirsiz 8 Ekim testi puanlanmadı. Çalışan motor ve config değiştirilmedi.');
+p('Bu veri üzerinde ilk denenecek tek değişiklik Servis maximumStepDistanceMeters=10. Diğer filtre ayarlarını korumak, mevcut 5 m ayarının yol açtığı kayıpları azaltıyor. Bu, filtresiz motora kıyasla genel ve kesin bir başarı artışı kanıtı değildir: yakalama ve toplam doğru oda süresi filtresiz koşuyla aynı, kesin doğru süre 1 sn daha düşük; yanlış oda 1,75 sn azalıyor.');
+h('Önerilen ilk deney');
+table(['Parametre','Mevcut','İlk deney','Gerekçe'],[
+ ['maximumStepDistanceMeters','5 m','10 m','Uzun aralıklı gerçek hareketi ve kapı ölçümlerini daha az eliyor'],
+ ['relocationClusterRadiusMeters','1 m','1 m','Yalnız mesafeyi değiştiren deney en iyi tek değişiklik oldu'],
+ ['relocationConfirmationCount','2','2','3 noktaya yükseltmek mevcut profilde sonucu değiştirmedi'],
+ ['relocationConfirmationDurationMs','1500 ms','1500 ms','Tek başına 1000/750 ms yapmak yanlış oda süresini artırdı'],
+ ['relocationMaximumGapMs','2000 ms','2000 ms','Tek başına 4000 ms daha çok doğru oda süresi sağlamadı'],
+ ['relocationCandidateWindowMs','6000 ms','6000 ms','10000 ms, denenen birleşik profilde ek kazanç sağlamadı']
+]);
+p('Mesafe, son kabul edilen filtre referansından yeni ham noktaya uzaklıktır; oda/kapı yakınlığı değildir. 10 m ayarı 5–10 m aralığındaki adımlarda mutlak mesafe engelini kaldırır; mevcut hız, tazelik ve kalite politikası sürer. Uzun sinyal boşluğunda motorun hız kontrolünü gevşeten mevcut politikası da sürer. Dolayısıyla daha geniş eşik, bazı sıçramaları da geçirebilir; yeni saha rotasıyla doğrulama gerekir.');
+h('Servis toplamları — bütün profiller');
+table(['Profil','Yakalama','Doğru oda %','Kesin doğru sn','Tahmini doğru sn','Yanlış oda sn','Koridorda oda sn','Referans reset'],service.map(t=>[t.profile,t.caught+'/'+t.totalVisits,n(t.roomPercent),n(t.confirmedSeconds),n(t.inferredSeconds),n(t.wrongRoomSeconds),n(t.corridorFalseSeconds),t.resets]));
+p('Yakalama en az bir doğru IN_REGION/INFERRED_IN_REGION kararıdır. Doğru oda yüzdesi, gerçek odada geçirilen zamana göre ağırlıklıdır. Aday/LOCATION_LOST başarı değildir. Yanlış oda ve koridorda oda ayrı sürelerdir. Uzun Mustafa testi toplam oda süresinin büyük bölümünü oluşturur; her test ve kesin/tahmini ayrımı birlikte değerlendirilmelidir.');
+h('Tek parametreyi değiştirmek ne yaptı?');
+p('D=6 m yakalamayı 25 → 23’e indirdi; D=8 m 26’ya, D=10 m 27’ye çıkardı. Sonuçlar eşikle doğrusal değişmiyor: farklı kabul/red sıraları motorun daha sonraki durumunu etkiliyor. D=10 m koşusunda mesafe reddi 262 → 60, referans reseti 5 → 0 oldu. İyileşmenin önemli bölümü gerçek veriyi daha az bloke etmek ve reset sonrası ek giriş beklemesine daha az düşmekten geliyor.');
+p('R=1,5 veya 2 m tek başına 26/43 yakalıyor; yanlış oda 80,75 sn kalıyor. T=1000 ms yakalamayı 26’ya çıkarırken yanlış oda 88,25 sn’ye yükseltiyor; T=750 ms aynı yanlış oda süresiyle doğru oda oranını da düşürüyor. N=3 mevcut 2 nokta koşusuyla aynı metrikleri verdi: bu veri üzerinde süre şartı zaten daha fazla nokta gerektirebiliyor.');
+p('G=4000 ms koridorda oda süresini 136,75 → 119,75 sn azaltıyor, fakat doğru oda oranı %23,192 → %22,591 ve LOCATION_LOST 728,222 → 765,822 sn oluyor. W=10000 ms, D5/R2/T1000/G4000 profili üzerinde W=6000 ile metrikleri değiştirmedi. Bu nedenle bütün parametreleri birlikte gevşetmek gerekçeli görünmüyor.');
+h('5 m mesafe sınırını koruyan alternatif');
+p('D=5 m, R=2 m, N=2, T=1000 ms, G=4000 ms, W=6000 ms birleşimi: 27/43 yakalama, %23,648 doğru oda, 46,25 sn yanlış oda, 122,5 sn koridorda oda. Mevcut ayardan daha iyi; 10 m seçeneğine göre daha az koridor yanlış gösterimi fakat daha çok yanlış oda ve daha az doğru oda süresi var. Bu ikinci bir deney seçeneğidir, tek başına en iyi genel ayar değildir.');
+p('D=8 m, R=2 m, N=2, T=1000 ms, G=4000 ms, W=6000 ms: 27/43 yakalama, %23,772 doğru oda, 43,5 sn yanlış oda, 128,25 sn koridorda oda. Tüm amaçlarda aynı anda en iyi profil çıkmadı; tercih hata türüne göre değişiyor.');
+h('Her testte önerilen ayar ve alternatifler');
+table(['Test','Mevcut yakalama / oda %','D10 yakalama / oda %','D5/R2/T1000/G4000 yakalama / oda %','D8/R2/T1000/G4000 yakalama / oda %'],s.tests.map(t=>[name(t),...['current','D10','D5-R2-T1000-G4000','D8-R2-T1000-G4000'].map(profile=>{const a=trial(t,profile).summary;return a.caught+'/'+a.totalVisits+' / '+n(a.roomPercent)+'%';})]));
+p('D10 ile cihaz akşam testinde room-08 ve room-12 geri yakalanıyor; Mustafa kısa testinde room-13 geri yakalanıyor. Tansiyon testinde mevcut 5 m filtreyle kazanılan tahmini room-13 ziyareti kayboluyor (5/6 → 4/6). Toplam 27/43 sonucu bu farklılıkları gizlememelidir. D5/R2/T1000/G4000 Tansiyon kazanımını koruyor fakat Mustafa kısa room-13 kaybı devam ediyor.');
+h('Yoğun bakım ve genellenebilirlik');
+p('Puanlı yoğun bakım / hasan testinde bütün 19 profil aynı sonucu verdi: 4/5 yakalama, %27,061 doğru oda, 25 sn kesin ve 12,75 sn tahmini doğru oda; 1,75 sn yanlış oda ve 15,5 sn koridorda oda. Test aralığında mesafe reddi sıfır. Bu testle yoğun bakım filtresini kalibre edecek yeterli zorlayıcı olay yok; Servis önerisi yoğun bakıma otomatik genellenmemeli.');
+p('Tarama ayar seçimi için aynı eski veriyi tekrar kullanır; bunlar ayrılmış doğrulama verileri değildir. Yeni farklı süreli rotalarda oda girişleri, çıkışları, koridor sıçramaları ve sinyal boşluklarıyla ayrıca doğrulanmalı. İncelenen sınırlı profil kümesinin dışında daha iyi bir ayar bulunamayacağı iddia edilmez.');
+h('Parametrelerin çözmediği davranışlar');
+p('Reddedilen ölçümün süresi dolmuş eski odayı yeniden INFERRED_IN_REGION yapması, aday expiry hesabına teslim gecikmesinin katılması ve filtre reseti sonrası relocationEvidenceDurationMultiplier=2 ile oda girişinin 2 → 4 sn olması önceki entegre motor incelemesinde doğrulandı. Parametre taraması bu kod yollarını değiştirmedi. D10 bunlara daha az düşerek iyi sonuç verebilir; davranışların kendisini düzeltmez. Önceki ayrıntı: ../integrated-filter-hospital-20261013/analysis.md.');
+h('Sürümler, veri bütünlüğü ve tekrar çalıştırma');
+p('Motor '+s.engine+'; Git '+s.git.commit+'; çalışma ağacı kirli ve kullanıcı değişiklikleri korunmuş. Her deneyde aynı raw SHA, truth SHA/revizyon, geometri ve oda ayarları var; yalnız tabloda belirtilen filtre parametreleri değişir. Her config ayrı version/SHA ile kaydedildi. Tam kaynak hash, git durumu, veri manifesti ve simülasyon ayarları summary.json içinde. Motor/controller/geometri/varsayılan ayarlar/iki harita hash’leri başı-sonu eşit.');
+table(['Harita','Kaynak configVersion','Kaynak config SHA-256'],[...new Map(s.tests.map(t=>[t.map,[t.map,t.sourceConfig.version,t.sourceConfig.sha256]])).values()]);
+p('received_at teslim zamanı, created_at ölçüm/kanıt zamanı olarak korundu. Tick 1000 ms, skor 250 ms, sınır toleransı ±2 sn, manifestteki 30 sn ısınma/60 sn gözlem kullanıldı. Sadece test aralığı puanlandı. Geçmiş saha verisi + güncel harita bağlamı korunuyor. DB bağlantısı kurulmadı, raw/truth veya canlı config değiştirilmedi. received_at bütün bu veri kümelerinde dolu; quality alanı eksik ve büyük sinyal boşlukları manifestte görünür.');
+p('19 profilin her biri iki kez replay edildi ve tüm karar/metrik eşitliği doğrulandı. D10, D5/R2/T1000/G4000 ve D8/R2/T1000/G4000 seçilen profilleri tekrar oynatıldı; ilk karar/metrik SHA-256 ile eşitlik kontrolünden sonra tam karar JSON’ları kaydedildi. Diğer profiller için config snapshotları, metrikler, oda/ziyaret sonuçları ve çıktı fingerprint’i saklandı.');
+p('Yeni komut: node --import tsx tools/room-benchmark/experiments/sweep-integrated-filter.ts YENI-RUN-ID. Ayrıntılı seçilen koşuları kaydetmek için: node --import tsx tools/room-benchmark/experiments/replay-sweep-selection.ts tools/room-benchmark/reports/YENI-RUN-ID D10 D5-R2-T1000-G4000.');
+p('Benchmark ve iki karakterizasyon testi 10/10 geçti. Çalışma kapsamı typecheck’i (tsconfig.integrated-study.json) başarılı. Önceki genel doğrulamada iki mevcut spor rota regresyonu başarısızdı; motor değiştirilmediği için bunlar bu çalışma tarafından çözülmedi. Genel typecheck, mevcut ui-experience-5c71fd2a-20261013/analyze.ts:133 rapor dosyasındaki yinelenen roomId hatasına takılıyor; ilgili dosyaya dokunulmadı.');
+p('Hatırlatma: yanlış ham koordinat, kapı/oda içi sinyal boşluğu, harita hizası ve DB kapsamı sistem düzeyinde incelenmelidir. Daha iyi parametre skoru konum üretiminin düzeldiği anlamına gelmez. Doğrulanmış ve tahmini başarıyı ayrı izleyin.');
+const text=md.join('\n');fs.writeFileSync(path.join(dir,'analysis.md'),text,{flag:'wx'});
+const esc=x=>x.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;');const blocks=[];let tab=false;
+for(const line of text.split('\n')){if(line.startsWith('|')){if(/^\|[- |]+\|$/.test(line))continue;if(!tab){blocks.push('<div class="scroll"><table>');tab=true;}blocks.push('<tr>'+line.slice(1,-1).split('|').map(c=>'<td>'+esc(c.trim())+'</td>').join('')+'</tr>');continue;}if(tab){blocks.push('</table></div>');tab=false;}const h=line.match(/^(#{1,3}) /);if(h)blocks.push(`<h${h[1].length}>${esc(line.slice(h[0].length))}</h${h[1].length}>`);else if(line.trim())blocks.push('<p>'+esc(line)+'</p>');}
+if(tab)blocks.push('</table></div>');
+fs.writeFileSync(path.join(dir,'analysis.html'),'<!doctype html><html lang="tr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Filtre parametreleri</title><style>body{font:16px/1.6 system-ui;max-width:1280px;margin:auto;padding:28px;color:#193044}p{max-width:1040px;overflow-wrap:anywhere}.scroll{overflow:auto}table{border-collapse:collapse;font-size:14px}td{border:1px solid #cbd5df;padding:9px;vertical-align:top}tr:first-child{background:#e8eff5;font-weight:600}h2{margin-top:36px}</style>'+blocks.join('\n')+'</html>',{flag:'wx'});
+console.log(path.join(dir,'analysis.md'));

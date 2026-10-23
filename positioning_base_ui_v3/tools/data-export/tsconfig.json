@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "incremental": false,
+    "noEmit": true
+  },
+  "include": ["./**/*.ts", "../room-benchmark/importArchive.ts"],
+  "exclude": ["../../node_modules"]
+}

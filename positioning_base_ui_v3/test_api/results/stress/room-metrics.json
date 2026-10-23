@@ -1,0 +1,472 @@
+[
+  {
+    "scenario": "corridor",
+    "seed": 20260907,
+    "durationSeconds": 39,
+    "tagCount": 4,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 1,
+        "correctSeconds": 155,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 0,
+        "correctSeconds": 156,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      }
+    }
+  },
+  {
+    "scenario": "parallel-gap",
+    "seed": 20260907,
+    "durationSeconds": 39,
+    "tagCount": 4,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 5,
+        "correctSeconds": 151,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 0,
+        "correctSeconds": 156,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      }
+    }
+  },
+  {
+    "scenario": "door-turnback",
+    "seed": 20260907,
+    "durationSeconds": 13.5,
+    "tagCount": 4,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 8,
+        "correctSeconds": 46,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 0,
+        "correctSeconds": 54,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      }
+    }
+  },
+  {
+    "scenario": "entry-gap",
+    "seed": 20260907,
+    "durationSeconds": 50.75,
+    "tagCount": 4,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 137,
+        "correctSeconds": 66,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 195,
+        "delayMs": [
+          33000,
+          33000,
+          33000,
+          34000
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 4,
+        "correctSeconds": 79,
+        "unassignedRoomSeconds": 120,
+        "roomTruthSeconds": 195,
+        "delayMs": [
+          31000,
+          31000,
+          31000,
+          31000
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "inside-long-gap",
+    "seed": 20260907,
+    "durationSeconds": 59,
+    "tagCount": 4,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 18,
+        "correctSeconds": 218,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 228,
+        "delayMs": [
+          3000,
+          3000,
+          3000,
+          4000
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 4,
+        "correctSeconds": 232,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 228,
+        "delayMs": [
+          1000,
+          1000,
+          1000,
+          1000
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "room-motion",
+    "seed": 20260907,
+    "durationSeconds": 59,
+    "tagCount": 4,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 14,
+        "correctSeconds": 222,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 228,
+        "delayMs": [
+          3000,
+          3000,
+          3000,
+          4000
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 4,
+        "correctSeconds": 232,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 228,
+        "delayMs": [
+          1000,
+          1000,
+          1000,
+          1000
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "shared-wall-noise",
+    "seed": 20260907,
+    "durationSeconds": 33.5,
+    "tagCount": 4,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 14,
+        "correctSeconds": 120,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 126,
+        "delayMs": [
+          3000,
+          3000,
+          3000,
+          4000
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 4,
+        "correctSeconds": 130,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 126,
+        "delayMs": [
+          1000,
+          1000,
+          1000,
+          1000
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "neighbor-jumps",
+    "seed": 20260907,
+    "durationSeconds": 59,
+    "tagCount": 4,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 14,
+        "correctSeconds": 222,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 228,
+        "delayMs": [
+          3000,
+          3000,
+          3000,
+          4000
+        ]
+      },
+      "legacy": {
+        "falseEntries": 3,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 9,
+        "uncertainSeconds": 15,
+        "correctSeconds": 205,
+        "unassignedRoomSeconds": 7,
+        "roomTruthSeconds": 228,
+        "delayMs": [
+          1000,
+          1000,
+          1000,
+          1000
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "door-transfer",
+    "seed": 20260907,
+    "durationSeconds": 66.25,
+    "tagCount": 4,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 38,
+        "uncertainSeconds": 30,
+        "correctSeconds": 196.75,
+        "unassignedRoomSeconds": 0.25,
+        "roomTruthSeconds": 214,
+        "delayMs": [
+          3000,
+          3000,
+          3000,
+          4000,
+          2250,
+          2250,
+          2250,
+          21250
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 10,
+        "uncertainSeconds": 9,
+        "correctSeconds": 245,
+        "unassignedRoomSeconds": 1,
+        "roomTruthSeconds": 214,
+        "delayMs": [
+          1000,
+          1000,
+          1000,
+          1000,
+          1250,
+          1250,
+          1250,
+          2250
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "relocation",
+    "seed": 20260907,
+    "durationSeconds": 66.25,
+    "tagCount": 4,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 102,
+        "uncertainSeconds": 32,
+        "correctSeconds": 131,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 214,
+        "delayMs": [
+          3000,
+          3000,
+          3000,
+          4000,
+          19250,
+          19250,
+          19250,
+          19250
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 113,
+        "uncertainSeconds": 8,
+        "correctSeconds": 139,
+        "unassignedRoomSeconds": 5,
+        "roomTruthSeconds": 214,
+        "delayMs": [
+          1000,
+          1000,
+          1000,
+          1000,
+          19250,
+          19250,
+          20250,
+          20250
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "first-inside",
+    "seed": 20260907,
+    "durationSeconds": 16.5,
+    "tagCount": 4,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 8,
+        "correctSeconds": 58,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 66,
+        "delayMs": [
+          2000,
+          2000,
+          2000,
+          2000
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 4,
+        "correctSeconds": 62,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 66,
+        "delayMs": [
+          1000,
+          1000,
+          1000,
+          1000
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "packet-order",
+    "seed": 20260907,
+    "durationSeconds": 59,
+    "tagCount": 4,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 14,
+        "correctSeconds": 222,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 228,
+        "delayMs": [
+          3000,
+          3000,
+          3000,
+          4000
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 1,
+        "correctSeconds": 235,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 228,
+        "delayMs": [
+          250,
+          250,
+          250,
+          250
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "variable-stream-gap",
+    "seed": 20260907,
+    "durationSeconds": 39,
+    "tagCount": 4,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 40.5,
+        "correctSeconds": 115.5,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 0,
+        "correctSeconds": 156,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      }
+    }
+  }
+]

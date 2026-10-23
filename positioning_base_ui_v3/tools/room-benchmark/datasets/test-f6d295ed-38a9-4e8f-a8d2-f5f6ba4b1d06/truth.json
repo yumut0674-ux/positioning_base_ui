@@ -1,0 +1,17 @@
+{
+  "testId": "test-f6d295ed-38a9-4e8f-a8d2-f5f6ba4b1d06",
+  "timezone": "Europe/Istanbul",
+  "revision": 2,
+  "revisionReason": "Kullanıcı taşınan tag adını hasan olarak doğruladı; SELECT ile hasan adı 06F0623201E95CE8 koduyla eşleştirildi. Oda aralıkları değişmedi.",
+  "site": "Necmettin Hastanesi — Yoğun Bakım",
+  "test": { "from": "2026-10-09T07:57:47.199Z", "to": "2026-10-09T08:00:51.852Z" },
+  "visits": [
+    { "roomId": "room-05", "from": "2026-10-09T07:57:55.241Z", "to": "2026-10-09T07:58:22.267Z" },
+    { "roomId": "room-02", "from": "2026-10-09T07:58:32.428Z", "to": "2026-10-09T07:58:59.793Z" },
+    { "roomId": "room-01", "from": "2026-10-09T07:59:03.158Z", "to": "2026-10-09T07:59:30.294Z" },
+    { "roomId": "room-02", "from": "2026-10-09T07:59:34.102Z", "to": "2026-10-09T08:00:04.444Z" },
+    { "roomId": "room-05", "from": "2026-10-09T08:00:15.424Z", "to": "2026-10-09T08:00:43.405Z" }
+  ],
+  "groups": [{ "id": "hospital-hasan-route", "tagCodes": ["06F0623201E95CE8"], "note": "Kullanıcı hasan tagını taşıdığını doğruladı; ad-kod eşleşmesi veritabanından SELECT ile kontrol edildi." }],
+  "note": "Yoğun bakım testi. Oda aralıkları arasındaki süre koridordur. Kullanıcı taşınan tag adını hasan olarak doğruladı."
+}

@@ -1,0 +1,1 @@
+{"code":"const TAG_LIVE_TIMEOUT_MS=1e4;export{TAG_LIVE_TIMEOUT_MS};\n","warnings":[],"map":{"version":3,"mappings":"AAEO,MAAM,oBAAsB","names":[],"ignoreList":[],"sources":["C:\\Users\\1548u\\Desktop\\UWB\\ui\\base\\src\\features\\tracking\\types\\tracking.types.ts"],"sourcesContent":[null]}}
