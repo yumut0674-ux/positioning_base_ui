@@ -1,0 +1,781 @@
+TAP version 13
+# Subtest: motion labels cannot change area transitions or establish source health
+ok 1 - motion labels cannot change area transitions or establish source health
+  ---
+  duration_ms: 26.0728
+  type: 'test'
+  ...
+# Subtest: normal entry and observed exit use raw gate and inside/outside evidence
+ok 2 - normal entry and observed exit use raw gate and inside/outside evidence
+  ---
+  duration_ms: 2.9267
+  type: 'test'
+  ...
+# Subtest: exit gate dropout becomes estimated after 30 seconds, with separate measurement and decision times
+ok 3 - exit gate dropout becomes estimated after 30 seconds, with separate measurement and decision times
+  ---
+  duration_ms: 1.4785
+  type: 'test'
+  ...
+# Subtest: return within wait cancels exit; room or inside dropout never creates an exit
+ok 4 - return within wait cancels exit; room or inside dropout never creates an exit
+  ---
+  duration_ms: 1.1897
+  type: 'test'
+  ...
+# Subtest: late, duplicate, implausible and low quality packets cannot confirm a transition
+ok 5 - late, duplicate, implausible and low quality packets cannot confirm a transition
+  ---
+  duration_ms: 0.9333
+  type: 'test'
+  ...
+# Subtest: multiple gates and floor handoff share a transition id
+ok 6 - multiple gates and floor handoff share a transition id
+  ---
+  duration_ms: 1.2869
+  type: 'test'
+  ...
+# Subtest: restart preserves pending exit, idempotent event identity and global outage guard
+ok 7 - restart preserves pending exit, idempotent event identity and global outage guard
+  ---
+  duration_ms: 0.9802
+  type: 'test'
+  ...
+# Subtest: another map staying live does not turn a failed map's pending gates into mass exits
+ok 8 - another map staying live does not turn a failed map's pending gates into mass exits
+  ---
+  duration_ms: 0.7071
+  type: 'test'
+  ...
+# Subtest: single tag needs independent healthy heartbeat; unknown and outage keep a visible pending reason
+ok 9 - single tag needs independent healthy heartbeat; unknown and outage keep a visible pending reason
+  ---
+  duration_ms: 1.2138
+  type: 'test'
+  ...
+# Subtest: a stale healthy signal never authorizes mass estimated exits
+ok 10 - a stale healthy signal never authorizes mass estimated exits
+  ---
+  duration_ms: 3.7496
+  type: 'test'
+  ...
+# Subtest: outside confirmation after a long gap is estimated, while timely gate evidence is observed
+ok 11 - outside confirmation after a long gap is estimated, while timely gate evidence is observed
+  ---
+  duration_ms: 1.0659
+  type: 'test'
+  ...
+# Subtest: source health payload validates freshness independently of positions
+ok 12 - source health payload validates freshness independently of positions
+  ---
+  duration_ms: 1.5948
+  type: 'test'
+  ...
+# Subtest: legacy config works and invalid area association is rejected
+ok 13 - legacy config works and invalid area association is rejected
+  ---
+  duration_ms: 3.1748
+  type: 'test'
+  ...
+# Subtest: area state and events use persisted JSON and idempotent event insertion
+ok 14 - area state and events use persisted JSON and idempotent event insertion
+  ---
+  duration_ms: 135.1158
+  type: 'test'
+  ...
+# {"level":"error","event":"area_transition.state_spool_failed","timestamp":"2026-10-26T13:25:53.653Z","pendingWrites":1,"queuedEvents":0,"queuedStates":1,"batchSize":2,"maxPendingEvents":2,"maxPendingStates":1,"coalescedStateWrites":100,"droppedRecords":0,"rejectedWrites":1,"error":{"name":"Error","message":"Alan durum diski kuyruğu dolu; yeni durum kalıcı yazılamadı","stack":"Error: Alan durum diski kuyruğu dolu; yeni durum kalıcı yazılamadı\\n    at AreaTransitionRepository.saveState (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:60:83)\\n    at <anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\tests\\\\areaTransitions.test.ts:197:31)\\n    at getActual (node:assert:530:5)\\n    at Function.throws (node:assert:676:24)\\n    at TestContext.<anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\tests\\\\areaTransitions.test.ts:197:12)\\n    at async Test.run (node:internal/test_runner/test:1054:7)\\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+# {"level":"error","event":"area_transition.event_spool_failed","timestamp":"2026-10-26T13:25:53.663Z","pendingWrites":3,"queuedEvents":2,"queuedStates":1,"batchSize":2,"maxPendingEvents":2,"maxPendingStates":1,"coalescedStateWrites":100,"droppedRecords":0,"rejectedWrites":2,"error":{"name":"AreaTransitionPersistenceError","message":"Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı","stack":"AreaTransitionPersistenceError: Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı\\n    at AreaTransitionRepository.ensureEventCapacity (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:79:19)\\n    at AreaTransitionRepository.saveEvent (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:69:12)\\n    at <anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\tests\\\\areaTransitions.test.ts:202:31)\\n    at getActual (node:assert:530:5)\\n    at Function.throws (node:assert:676:24)\\n    at TestContext.<anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\tests\\\\areaTransitions.test.ts:202:12)\\n    at async Test.run (node:internal/test_runner/test:1054:7)\\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+# {"level":"error","event":"area_transition.persistence_failed","timestamp":"2026-10-26T13:25:53.668Z","pendingWrites":3,"queuedEvents":2,"queuedStates":1,"batchSize":2,"maxPendingEvents":2,"maxPendingStates":1,"coalescedStateWrites":100,"droppedRecords":0,"rejectedWrites":2,"error":{"name":"Error","message":"database offline","stack":"Error: database offline\\n    at AreaTransitionRepository.query (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\tests\\\\areaTransitions.test.ts:193:60)\\n    at <anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:106:24)\\n    at AreaTransitionRepository.flush (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:122:5)\\n    at TestContext.<anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\tests\\\\areaTransitions.test.ts:204:17)\\n    at async Test.run (node:internal/test_runner/test:1054:7)\\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+# Subtest: DB outage preserves bounded batches and durable event files for restart and retry
+ok 15 - DB outage preserves bounded batches and durable event files for restart and retry
+  ---
+  duration_ms: 810.9812
+  type: 'test'
+  ...
+# {"level":"error","event":"area_transition.event_spool_failed","timestamp":"2026-10-26T13:25:53.725Z","pendingWrites":2,"queuedEvents":1,"queuedStates":1,"batchSize":50,"maxPendingEvents":1,"maxPendingStates":20000,"coalescedStateWrites":3,"droppedRecords":0,"rejectedWrites":1,"error":{"name":"AreaTransitionPersistenceError","message":"Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı","stack":"AreaTransitionPersistenceError: Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı\\n    at AreaTransitionRepository.ensureEventCapacity (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:79:19)\\n    at AreaTransitionEngine.reserveEvents (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\tests\\\\areaTransitions.test.ts:223:65)\\n    at AreaTransitionEngine.tick (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\src\\\\server\\\\regionEngine\\\\AreaTransitionEngine.ts:175:12)\\n    at <anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\tests\\\\areaTransitions.test.ts:228:32)\\n    at getActual (node:assert:530:5)\\n    at Function.throws (node:assert:676:24)\\n    at TestContext.<anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\tests\\\\areaTransitions.test.ts:228:12)\\n    at async Test.run (node:internal/test_runner/test:1054:7)\\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+# Subtest: a full durable event queue rolls back the engine transition until it can be persisted
+ok 16 - a full durable event queue rolls back the engine transition until it can be persisted
+  ---
+  duration_ms: 55.4499
+  type: 'test'
+  ...
+# {"level":"error","event":"area_transition.event_spool_failed","timestamp":"2026-10-26T13:25:53.781Z","pendingWrites":1,"queuedEvents":0,"queuedStates":1,"batchSize":50,"maxPendingEvents":1,"maxPendingStates":20000,"coalescedStateWrites":2,"droppedRecords":0,"rejectedWrites":1,"error":{"name":"AreaTransitionPersistenceError","message":"Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı","stack":"AreaTransitionPersistenceError: Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı\\n    at AreaTransitionRepository.ensureEventCapacity (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:79:19)\\n    at AreaTransitionEngine.reserveEvents (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\tests\\\\areaTransitions.test.ts:244:65)\\n    at AreaTransitionEngine.reserveForMeasurement (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\src\\\\server\\\\regionEngine\\\\AreaTransitionEngine.ts:111:10)\\n    at AreaTransitionEngine.advance (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\src\\\\server\\\\regionEngine\\\\AreaTransitionEngine.ts:145:16)\\n    at AreaTransitionEngine.ingest (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\src\\\\server\\\\regionEngine\\\\AreaTransitionEngine.ts:99:54)\\n    at send (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\tests\\\\areaTransitions.test.ts:245:71)\\n    at <anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\tests\\\\areaTransitions.test.ts:249:25)\\n    at getActual (node:assert:530:5)\\n    at Function.throws (node:assert:676:24)\\n    at TestContext.<anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\tests\\\\areaTransitions.test.ts:249:12)"}}
+# Subtest: floor handoff reserves both linked event slots before changing either area
+ok 17 - floor handoff reserves both linked event slots before changing either area
+  ---
+  duration_ms: 36.9607
+  type: 'test'
+  ...
+# Subtest: PostgreSQL commits an event and its final state, restores them, and deduplicates replay
+ok 18 - PostgreSQL commits an event and its final state, restores them, and deduplicates replay # SKIP
+  ---
+  duration_ms: 0.309
+  type: 'test'
+  ...
+# Subtest: area configuration survives the validated API save and file reload
+ok 19 - area configuration survives the validated API save and file reload
+  ---
+  duration_ms: 8.808
+  type: 'test'
+  ...
+# Subtest: editor visibility is per map, independent per item and keeps hidden items recoverable
+ok 20 - editor visibility is per map, independent per item and keeps hidden items recoverable
+  ---
+  duration_ms: 0.8735
+  type: 'test'
+  ...
+# Subtest: live-map tag label uses the display name instead of the hardware id
+ok 21 - live-map tag label uses the display name instead of the hardware id
+  ---
+  duration_ms: 2.1563
+  type: 'test'
+  ...
+# Subtest: HTML tag overlay uses the same translation and scale as the Konva viewport
+ok 22 - HTML tag overlay uses the same translation and scale as the Konva viewport
+  ---
+  duration_ms: 0.3322
+  type: 'test'
+  ...
+# Subtest: world coordinates are written as a compositor-friendly tag transform
+ok 23 - world coordinates are written as a compositor-friendly tag transform
+  ---
+  duration_ms: 0.4106
+  type: 'test'
+  ...
+# Subtest: detached HTML renderers are not updated by later positions
+ok 24 - detached HTML renderers are not updated by later positions
+  ---
+  duration_ms: 0.8706
+  type: 'test'
+  ...
+# Subtest: intensive care loads the seven existing rooms and room 9 without engine warnings
+ok 25 - intensive care loads the seven existing rooms and room 9 without engine warnings
+  ---
+  duration_ms: 10.5632
+  type: 'test'
+  ...
+# Subtest: room centres remain in physical rooms while regions extend three metres behind the rear wall
+ok 26 - room centres remain in physical rooms while regions extend three metres behind the rear wall
+  ---
+  duration_ms: 0.876
+  type: 'test'
+  ...
+# Subtest: each corridor door is centred in the physical front wall and opens 1.5 metres inward
+ok 27 - each corridor door is centred in the physical front wall and opens 1.5 metres inward
+  ---
+  duration_ms: 0.4742
+  type: 'test'
+  ...
+# Subtest: neighbouring room areas have a ten centimetre gap along the full extended wall
+ok 28 - neighbouring room areas have a ten centimetre gap along the full extended wall
+  ---
+  duration_ms: 0.431
+  type: 'test'
+  ...
+# Subtest: room 9 follows the lower-right walls and its corridor door works in both directions
+ok 29 - room 9 follows the lower-right walls and its corridor door works in both directions
+  ---
+  duration_ms: 12.7663
+  type: 'test'
+  ...
+# Subtest: both corridor end gates record observed area entry and exit
+ok 30 - both corridor end gates record observed area entry and exit
+  ---
+  duration_ms: 10.3318
+  type: 'test'
+  ...
+# Subtest: Servis motor zone resolves to the active service floor
+ok 31 - Servis motor zone resolves to the active service floor
+  ---
+  duration_ms: 71.847
+  type: 'test'
+  ...
+# Subtest: Servis uses the selected CAD origin and clockwise motor axes in both map and room editor
+ok 32 - Servis uses the selected CAD origin and clockwise motor axes in both map and room editor
+  ---
+  duration_ms: 216.0799
+  type: 'test'
+  ...
+# Subtest: API zone Neüyoğun resolves to intensive care while its display name stays unchanged
+ok 33 - API zone Neüyoğun resolves to intensive care while its display name stays unchanged
+  ---
+  duration_ms: 41.1198
+  type: 'test'
+  ...
+# Subtest: necmettin-servis loads in the room editor with its own image and calibration
+ok 34 - necmettin-servis loads in the room editor with its own image and calibration
+  ---
+  duration_ms: 89.4149
+  type: 'test'
+  ...
+# Subtest: necmettin-yogun-bakim loads in the room editor with its own image and calibration
+ok 35 - necmettin-yogun-bakim loads in the room editor with its own image and calibration
+  ---
+  duration_ms: 66.1689
+  type: 'test'
+  ...
+# Subtest: intensive care uses the selected origin with Y along the long horizontal axis
+ok 36 - intensive care uses the selected origin with Y along the long horizontal axis
+  ---
+  duration_ms: 14.5303
+  type: 'test'
+  ...
+# Subtest: checked-in map catalog and live map config are valid
+ok 37 - checked-in map catalog and live map config are valid
+  ---
+  duration_ms: 26.1357
+  type: 'test'
+  ...
+# Subtest: multiple live maps are valid but duplicate active zone mappings are rejected
+ok 38 - multiple live maps are valid but duplicate active zone mappings are rejected
+  ---
+  duration_ms: 58.6493
+  type: 'test'
+  ...
+# Subtest: invalid catalogs are rejected before being served
+ok 39 - invalid catalogs are rejected before being served
+  ---
+  duration_ms: 30.1315
+  type: 'test'
+  ...
+# Subtest: unknown, traversal and planned map requests have controlled errors
+ok 40 - unknown, traversal and planned map requests have controlled errors
+  ---
+  duration_ms: 27.2617
+  type: 'test'
+  ...
+# Subtest: map endpoint maps unknown and traversal input to 404 and 400
+ok 41 - map endpoint maps unknown and traversal input to 404 and 400
+  ---
+  duration_ms: 8.8463
+  type: 'test'
+  ...
+# Subtest: short outside spike holds last valid point, rejects the sample, and resumes inside
+ok 42 - short outside spike holds last valid point, rejects the sample, and resumes inside
+  ---
+  duration_ms: 8.1932
+  type: 'test'
+  ...
+# Subtest: one outside measurement followed by silence hides at the deadline and re-entry keeps the last rendered point
+ok 43 - one outside measurement followed by silence hides at the deadline and re-entry keeps the last rendered point
+  ---
+  duration_ms: 2.3771
+  type: 'test'
+  ...
+# Subtest: continuous outside, duplicate, old and synthetic publications do not extend the deadline
+ok 44 - continuous outside, duplicate, old and synthetic publications do not extend the deadline
+  ---
+  duration_ms: 21.008
+  type: 'test'
+  ...
+# Subtest: initial outside position is hidden; tags and their deadlines are independent
+ok 45 - initial outside position is hidden; tags and their deadlines are independent
+  ---
+  duration_ms: 0.7088
+  type: 'test'
+  ...
+# Subtest: boundaries, adjacent/overlapping polygons, narrow gaps and L corridors
+ok 46 - boundaries, adjacent/overlapping polygons, narrow gaps and L corridors
+  ---
+  duration_ms: 0.4629
+  type: 'test'
+  ...
+# Subtest: unsafe L corridor animation holds instead of snapping; queued motion stays inside
+ok 47 - unsafe L corridor animation holds instead of snapping; queued motion stays inside
+  ---
+  duration_ms: 3.7153
+  type: 'test'
+  ...
+# Subtest: RAW map presentation suppresses jitter and requires confirmation for a sudden jump
+ok 48 - RAW map presentation suppresses jitter and requires confirmation for a sudden jump
+  ---
+  duration_ms: 1.375
+  type: 'test'
+  ...
+# Subtest: configuration re-evaluates immediately, preserves an outside deadline and cleans up
+ok 49 - configuration re-evaluates immediately, preserves an outside deadline and cleans up
+  ---
+  duration_ms: 0.7777
+  type: 'test'
+  ...
+# Subtest: store binding switches RAW/engine coordinates and maps without modifying measurements or room entries
+ok 50 - store binding switches RAW/engine coordinates and maps without modifying measurements or room entries
+  ---
+  duration_ms: 7.7553
+  type: 'test'
+  ...
+# Subtest: engine display includes stationary raw tags before any room decision and follows new observations
+ok 51 - engine display includes stationary raw tags before any room decision and follows new observations
+  ---
+  duration_ms: 1.7644
+  type: 'test'
+  ...
+# Subtest: corridor markers do not require motion metadata or a room-engine publication
+ok 52 - corridor markers do not require motion metadata or a room-engine publication
+  ---
+  duration_ms: 1.4131
+  type: 'test'
+  ...
+# Subtest: stationary display keeps assigned rooms and accepts a delayed room decision after a raw fallback
+ok 53 - stationary display keeps assigned rooms and accepts a delayed room decision after a raw fallback
+  ---
+  duration_ms: 2.1528
+  type: 'test'
+  ...
+# Subtest: new stationary packets refresh map animation freshness while retaining the assigned room centre
+ok 54 - new stationary packets refresh map animation freshness while retaining the assigned room centre
+  ---
+  duration_ms: 1.1924
+  type: 'test'
+  ...
+# Subtest: raw room coordinates and entry candidates stay in the corridor until an engine assignment
+ok 55 - raw room coordinates and entry candidates stay in the corridor until an engine assignment
+  ---
+  duration_ms: 3.517
+  type: 'test'
+  ...
+# Subtest: confirmed and inferred engine assignments permit only the assigned room
+ok 56 - confirmed and inferred engine assignments permit only the assigned room
+  ---
+  duration_ms: 21.6366
+  type: 'test'
+  ...
+# Subtest: corridor animation cannot take a shortcut through an unassigned room at a bend
+ok 57 - corridor animation cannot take a shortcut through an unassigned room at a bend
+  ---
+  duration_ms: 1.5945
+  type: 'test'
+  ...
+# Subtest: unassigned raw room coordinates do not produce a room label in the tag panel
+ok 58 - unassigned raw room coordinates do not produce a room label in the tag panel
+  ---
+  duration_ms: 0.4362
+  type: 'test'
+  ...
+# Subtest: room-only maps cannot display an unassigned tag inside a room
+ok 59 - room-only maps cannot display an unassigned tag inside a room
+  ---
+  duration_ms: 0.41
+  type: 'test'
+  ...
+# Subtest: revoking a room clears old room frames immediately even with animation disabled
+ok 60 - revoking a room clears old room frames immediately even with animation disabled
+  ---
+  duration_ms: 12.0352
+  type: 'test'
+  ...
+# Subtest: revoking an assignment cancels a pending room transition before it enters the room
+ok 61 - revoking an assignment cancels a pending room transition before it enters the room
+  ---
+  duration_ms: 4.5287
+  type: 'test'
+  ...
+# Subtest: a jump into a disconnected valid region updates the target without teleporting the marker
+ok 62 - a jump into a disconnected valid region updates the target without teleporting the marker
+  ---
+  duration_ms: 0.4579
+  type: 'test'
+  ...
+# Subtest: disabled animation still times out and synthetic RAW publications retain measurement age
+ok 63 - disabled animation still times out and synthetic RAW publications retain measurement age
+  ---
+  duration_ms: 0.4366
+  type: 'test'
+  ...
+# Subtest: newer synthetic decisions for one measurement do not add physical route samples
+ok 64 - newer synthetic decisions for one measurement do not add physical route samples
+  ---
+  duration_ms: 0.4516
+  type: 'test'
+  ...
+# Subtest: hidden tag stays in the list with visibility explanation and real activity
+ok 65 - hidden tag stays in the list with visibility explanation and real activity
+  ---
+  duration_ms: 35.7105
+  type: 'test'
+  ...
+# Subtest: tag panel renders the accepted inferred Room 6 decision
+ok 66 - tag panel renders the accepted inferred Room 6 decision
+  ---
+  duration_ms: 5.0066
+  type: 'test'
+  ...
+# Subtest: display wait configuration defaults to 2000 ms and validates persisted values
+ok 67 - display wait configuration defaults to 2000 ms and validates persisted values
+  ---
+  duration_ms: 0.6074
+  type: 'test'
+  ...
+# Subtest: hiding and reopening the tag layer retains the validated position until tag cleanup
+ok 68 - hiding and reopening the tag layer retains the validated position until tag cleanup
+  ---
+  duration_ms: 0.3986
+  type: 'test'
+  ...
+# Subtest: panel target and marker converge after a non-routable direct room transition
+ok 69 - panel target and marker converge after a non-routable direct room transition
+  ---
+  duration_ms: 0.734
+  type: 'test'
+  ...
+# Subtest: default selection survives empty or obsolete browser storage
+ok 70 - default selection survives empty or obsolete browser storage
+  ---
+  duration_ms: 1.5769
+  type: 'test'
+  ...
+# Subtest: catalog groups floors and keeps planned units visible but disabled
+ok 71 - catalog groups floors and keeps planned units visible but disabled
+  ---
+  duration_ms: 1.4049
+  type: 'test'
+  ...
+# Subtest: live coordinates are authorized only for the catalog live map
+ok 72 - live coordinates are authorized only for the catalog live map
+  ---
+  duration_ms: 0.2709
+  type: 'test'
+  ...
+# Subtest: quick tracking selection waits for the requested map before focusing
+ok 73 - quick tracking selection waits for the requested map before focusing
+  ---
+  duration_ms: 0.7213
+  type: 'test'
+  ...
+# Subtest: manual map selection clears the selected tag while raw and processed data stay live
+ok 74 - manual map selection clears the selected tag while raw and processed data stay live
+  ---
+  duration_ms: 4.5343
+  type: 'test'
+  ...
+# Subtest: presence updates and reconnect snapshots cannot override a manually chosen map
+ok 75 - presence updates and reconnect snapshots cannot override a manually chosen map
+  ---
+  duration_ms: 3.2126
+  type: 'test'
+  ...
+# Subtest: tag floor changes respect manual browsing until an explicit show-on-map action resumes following
+ok 76 - tag floor changes respect manual browsing until an explicit show-on-map action resumes following
+  ---
+  duration_ms: 15.455
+  type: 'test'
+  ...
+# Subtest: explicit tag selection can resume map following after browsing another map
+ok 77 - explicit tag selection can resume map following after browsing another map
+  ---
+  duration_ms: 1.3973
+  type: 'test'
+  ...
+# Subtest: selecting the current map keeps selection, while changing maps clears pending tag focus
+ok 78 - selecting the current map keeps selection, while changing maps clears pending tag focus
+  ---
+  duration_ms: 0.6839
+  type: 'test'
+  ...
+# Subtest: a mobile pinch can zoom in from the fitted scale below the normal zoom floor
+ok 79 - a mobile pinch can zoom in from the fitted scale below the normal zoom floor
+  ---
+  duration_ms: 2.516
+  type: 'test'
+  ...
+# Subtest: pinching preserves the map point under the moving center of both fingers
+ok 80 - pinching preserves the map point under the moving center of both fingers
+  ---
+  duration_ms: 0.5345
+  type: 'test'
+  ...
+# Subtest: two fingers moving together pan the map without changing the scale
+ok 81 - two fingers moving together pan the map without changing the scale
+  ---
+  duration_ms: 1.3118
+  type: 'test'
+  ...
+# Subtest: one finger pans a zoomed map and respects the map edges
+ok 82 - one finger pans a zoomed map and respects the map edges
+  ---
+  duration_ms: 0.468
+  type: 'test'
+  ...
+# Subtest: one finger cannot move the fully fitted map
+ok 83 - one finger cannot move the fully fitted map
+  ---
+  duration_ms: 0.2898
+  type: 'test'
+  ...
+# Subtest: switching between pan and pinch keeps the current viewport and resumes with the remaining finger
+ok 84 - switching between pan and pinch keeps the current viewport and resumes with the remaining finger
+  ---
+  duration_ms: 0.3913
+  type: 'test'
+  ...
+# Subtest: zooming out stops at the fitted map and reverses immediately in the same gesture
+ok 85 - zooming out stops at the fitted map and reverses immediately in the same gesture
+  ---
+  duration_ms: 0.4286
+  type: 'test'
+  ...
+# Subtest: reversing a pinch at maximum zoom responds without lifting the fingers
+ok 86 - reversing a pinch at maximum zoom responds without lifting the fingers
+  ---
+  duration_ms: 0.5125
+  type: 'test'
+  ...
+# Subtest: finger ordering is irrelevant and replacing a finger rebases instead of jumping
+ok 87 - finger ordering is irrelevant and replacing a finger rebases instead of jumping
+  ---
+  duration_ms: 0.6765
+  type: 'test'
+  ...
+# Subtest: cancelled gestures, extra fingers, coincident fingers and unmeasured panels do not change the viewport
+ok 88 - cancelled gestures, extra fingers, coincident fingers and unmeasured panels do not change the viewport
+  ---
+  duration_ms: 0.9274
+  type: 'test'
+  ...
+# Subtest: fits and centers the complete floor plan in a desktop map panel
+ok 89 - fits and centers the complete floor plan in a desktop map panel
+  ---
+  duration_ms: 2.7192
+  type: 'test'
+  ...
+# Subtest: keeps the plan contained on narrow panels and ignores unmeasured panels
+ok 90 - keeps the plan contained on narrow panels and ignores unmeasured panels
+  ---
+  duration_ms: 0.3104
+  type: 'test'
+  ...
+# Subtest: locks panning at the fitted scale and constrains a zoomed plan to the map panel
+ok 91 - locks panning at the fitted scale and constrains a zoomed plan to the map panel
+  ---
+  duration_ms: 0.4158
+  type: 'test'
+  ...
+# Subtest: centers axes that remain smaller than the panel while zoomed
+ok 92 - centers axes that remain smaller than the panel while zoomed
+  ---
+  duration_ms: 0.3577
+  type: 'test'
+  ...
+# Subtest: fit and constraints use the active map dimensions
+ok 93 - fit and constraints use the active map dimensions
+  ---
+  duration_ms: 0.3534
+  type: 'test'
+  ...
+# Subtest: tracking label focus uses a fifty percent map scale
+ok 94 - tracking label focus uses a fifty percent map scale
+  ---
+  duration_ms: 0.1859
+  type: 'test'
+  ...
+# Subtest: uses the service plan origin with x vertical and y horizontal
+ok 95 - uses the service plan origin with x vertical and y horizontal
+  ---
+  duration_ms: 1.3906
+  type: 'test'
+  ...
+# Subtest: zone resolver maps only catalog zone ids and leaves null/unknown unresolved
+ok 96 - zone resolver maps only catalog zone ids and leaves null/unknown unresolved
+  ---
+  duration_ms: 2.8471
+  type: 'test'
+  ...
+# Subtest: route segments split on every map transition and never add cross-floor distance
+ok 97 - route segments split on every map transition and never add cross-floor distance
+  ---
+  duration_ms: 1.4602
+  type: 'test'
+  ...
+# Subtest: store follows only the selected tag across maps and rejects delayed old-floor packets
+ok 98 - store follows only the selected tag across maps and rejects delayed old-floor packets
+  ---
+  duration_ms: 0.9512
+  type: 'test'
+  ...
+# Subtest: region engine manager isolates maps, clears the old map and rejects a delayed floor switch
+ok 99 - region engine manager isolates maps, clears the old map and rejects a delayed floor switch
+  ---
+  duration_ms: 0.6346
+  type: 'test'
+  ...
+# {"level":"info","event":"region_engine.installed","timestamp":"2026-10-26T13:25:53.133Z","mapId":"simulation-reference","algorithm":"evidence","source":"varsayılan"}
+# Subtest: stationary raw data updates presence, history and areas without reaching rooms or clearing their map
+ok 100 - stationary raw data updates presence, history and areas without reaching rooms or clearing their map
+  ---
+  duration_ms: 79.8295
+  type: 'test'
+  ...
+# Subtest: runtime controller installs only RegionPositionEngine and exposes the active engine version
+ok 101 - runtime controller installs only RegionPositionEngine and exposes the active engine version
+  ---
+  duration_ms: 12.3329
+  type: 'test'
+  ...
+# Subtest: hot reload retires a stale global controller and retains exactly one tracking listener
+ok 102 - hot reload retires a stale global controller and retains exactly one tracking listener
+  ---
+  duration_ms: 68.1709
+  type: 'test'
+  ...
+# {"level":"info","event":"region_engine.installed","timestamp":"2026-10-26T13:25:53.356Z","mapId":"necmettin-servis","algorithm":"hmm","source":"C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\config\\\\maps\\\\necmettin-servis\\\\room-engine.json"}
+# {"level":"info","event":"region_engine.installed","timestamp":"2026-10-26T13:25:53.357Z","mapId":"necmettin-yogun-bakim","algorithm":"hmm","source":"C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v5\\\\config\\\\maps\\\\necmettin-yogun-bakim\\\\room-engine.json"}
+# {"level":"error","event":"area_transition.restore_failed","timestamp":"2026-10-26T13:25:53.373Z","error":{"name":"AggregateError","message":"","stack":"AggregateError [EACCES]: \\n    at internalConnectMultiple (node:net:1134:18)\\n    at afterConnectMultiple (node:net:1715:7)"}}
+# Subtest: hot replacement restores an enabled controller only after retirement completes
+ok 103 - hot replacement restores an enabled controller only after retirement completes
+  ---
+  duration_ms: 186.6142
+  type: 'test'
+  ...
+# Subtest: controller reload applies a UI-compiled config to the existing map engine without installing a parallel engine
+ok 104 - controller reload applies a UI-compiled config to the existing map engine without installing a parallel engine
+  ---
+  duration_ms: 1.3224
+  type: 'test'
+  ...
+# Subtest: map-specific region config rejects URL/config mismatches and path traversal
+ok 105 - map-specific region config rejects URL/config mismatches and path traversal
+  ---
+  duration_ms: 11.4751
+  type: 'test'
+  ...
+# Subtest: browser SSE gateway preserves map, source-zone and PDOP fields
+ok 106 - browser SSE gateway preserves map, source-zone and PDOP fields
+  ---
+  duration_ms: 1.7894
+  type: 'test'
+  ...
+# Subtest: raw marker positions come only from observedTags and ignore processed display state
+ok 107 - raw marker positions come only from observedTags and ignore processed display state
+  ---
+  duration_ms: 2.9698
+  type: 'test'
+  ...
+# Subtest: raw world position is converted with the existing inverse affine transform
+ok 108 - raw world position is converted with the existing inverse affine transform
+  ---
+  duration_ms: 1.2856
+  type: 'test'
+  ...
+# Subtest: engine state cannot alter a raw marker coordinate
+ok 109 - engine state cannot alter a raw marker coordinate
+  ---
+  duration_ms: 0.3604
+  type: 'test'
+  ...
+# Subtest: stale raw tags remain visible and are marked stale
+ok 110 - stale raw tags remain visible and are marked stale
+  ---
+  duration_ms: 1.1783
+  type: 'test'
+  ...
+# Subtest: non-finite raw or transformed coordinates are omitted
+ok 111 - non-finite raw or transformed coordinates are omitted
+  ---
+  duration_ms: 1.0421
+  type: 'test'
+  ...
+# Subtest: region panel keeps the raw view opt-in and the layer non-interactive
+ok 112 - region panel keeps the raw view opt-in and the layer non-interactive
+  ---
+  duration_ms: 2.3618
+  type: 'test'
+  ...
+# Subtest: Servis has 21 silent rooms with 1.3 m door proximity, configured door geometry and its own entry/exit thresholds
+ok 113 - Servis has 21 silent rooms with 1.3 m door proximity, configured door geometry and its own entry/exit thresholds
+  ---
+  duration_ms: 3.2331
+  type: 'test'
+  ...
+# Subtest: each Servis door retains its signal-loss threshold (1.3 m) independently of nearby doors
+ok 114 - each Servis door retains its signal-loss threshold (1.3 m) independently of nearby doors
+  ---
+  duration_ms: 22.8443
+  type: 'test'
+  ...
+# Subtest: door proximity (1.3 m) prevents inference in the corridor between opposing moved doors
+ok 115 - door proximity (1.3 m) prevents inference in the corridor between opposing moved doors
+  ---
+  duration_ms: 14.556
+  type: 'test'
+  ...
+# Subtest: existing Servis CAD labels and all 21 room centres retain their calibration
+ok 116 - existing Servis CAD labels and all 21 room centres retain their calibration
+  ---
+  duration_ms: 3.6167
+  type: 'test'
+  ...
+# Subtest: updated rooms retain their rear extensions and adjacent rows remain separate
+ok 117 - updated rooms retain their rear extensions and adjacent rows remain separate
+  ---
+  duration_ms: 0.5403
+  type: 'test'
+  ...
+# Subtest: updated door normals point into their rooms and all room and corridor interiors remain separate
+ok 118 - updated door normals point into their rooms and all room and corridor interiors remain separate
+  ---
+  duration_ms: 29.463
+  type: 'test'
+  ...
+# Subtest: reliable measurements in the completed recess confirm its room and exit through the moved door
+ok 119 - reliable measurements in the completed recess confirm its room and exit through the moved door
+  ---
+  duration_ms: 36.1807
+  type: 'test'
+  ...
+# Subtest: every Servis room requires both five reliable measurements and two seconds before confirming entry
+ok 120 - every Servis room requires both five reliable measurements and two seconds before confirming entry
+  ---
+  duration_ms: 75.6904
+  type: 'test'
+  ...
+# Subtest: configured Servis gates record area entry and observed exit using their own wait settings
+ok 121 - configured Servis gates record area entry and observed exit using their own wait settings
+  ---
+  duration_ms: 2.5782
+  type: 'test'
+  ...
+# Subtest: tag management panel owns the live-map trail controls
+ok 122 - tag management panel owns the live-map trail controls
+  ---
+  duration_ms: 16.7867
+  type: 'test'
+  ...
+# Subtest: trail retains only the configured time window
+ok 123 - trail retains only the configured time window
+  ---
+  duration_ms: 3.2626
+  type: 'test'
+  ...
+# Subtest: trail ignores jitter and breaks across jumps or region-centre positions
+ok 124 - trail ignores jitter and breaks across jumps or region-centre positions
+  ---
+  duration_ms: 0.4953
+  type: 'test'
+  ...
+# Subtest: non-routable room relocation starts a new trail segment at the destination
+ok 125 - non-routable room relocation starts a new trail segment at the destination
+  ---
+  duration_ms: 0.5273
+  type: 'test'
+  ...
+# Subtest: trail settings validate and persist browser preferences
+ok 126 - trail settings validate and persist browser preferences
+  ---
+  duration_ms: 0.579
+  type: 'test'
+  ...
+# Subtest: tag panel trail actions update only the visual preference
+ok 127 - tag panel trail actions update only the visual preference
+  ---
+  duration_ms: 0.6951
+  type: 'test'
+  ...
+1..127
+# tests 127
+# suites 0
+# pass 126
+# fail 0
+# cancelled 0
+# skipped 1
+# todo 0
+# duration_ms 3910.7569

@@ -1,0 +1,218 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { resolveLocation } from "../../src/features/map/services/LocationResolverService";
+import { DEFAULT_REGIONS_CONFIG } from "../../src/features/regions/config/defaultRegionsConfig";
+import type { RegionsConfig } from "../../src/features/regions/types/region.types";
+import type { EntityRepository } from "../../src/server/location/entityRepository";
+import { LocationError } from "../../src/server/location/locationErrors";
+import { LocationService } from "../../src/server/location/locationService";
+import type { PositionHistoryResult, PositionRepository } from "../../src/server/location/positionRepository";
+import { toIstanbulIso, type EntityMatch, type PositionRecord, type TagAssignment, type TrackedEntity } from "../../src/server/location/location.types";
+import { now } from "./fixtures/testData";
+
+const entity: TrackedEntity = {
+  entityId: 28, entityCode: "PALLET-028", name: "Palet 28", entityType: "product",
+  status: "active", aliases: [], usesLegacyTagModel: false,
+};
+const oldAssignment: TagAssignment = {
+  entityId: 28, tagCode: "TAG-OLD", assignedAt: "2026-07-17T00:00:00.000Z",
+  unassignedAt: "2026-07-18T12:00:00.000Z", usesLegacyTagModel: false,
+};
+const newAssignment: TagAssignment = {
+  entityId: 28, tagCode: "TAG-NEW", assignedAt: "2026-07-18T12:00:00.000Z",
+  unassignedAt: null, usesLegacyTagModel: false,
+};
+
+test("exit history enriches only the active assignment and a reader outage leaves current tracking intact", async () => {
+  const baseline = await new LocationService(new FakeEntities(), new FakePositions()).current(28, now);
+  for (const mode of ["current", "old-assignment", "unavailable"] as const) {
+    const exitedAt = mode === "old-assignment" ? "2026-07-17T12:00:00Z" : "2026-07-18T13:00:00Z";
+    const reader = { read: async (tags: readonly string[]) => {
+      assert.deepEqual(tags, ["TAG-NEW"]);
+      if (mode === "unavailable") throw new Error("Exit history unavailable");
+      return { serverNow: now().getTime(), byTag: { "TAG-NEW": { tagCode: "TAG-NEW", publishedAt: exitedAt,
+        exit: { tagCode: "TAG-NEW", mapId: "icu", areaName: "Yoğun Bakım", gateName: "Kapı", exitedAt, publishedAt: exitedAt, decisionId: "exit" } } } };
+    } };
+    const result = await new LocationService(new FakeEntities(), new FakePositions(), resolveLocation, undefined, reader).current(28, now);
+    assert.deepEqual(result.data.position, baseline.data.position);
+    assert.equal(result.data.trackingStatus, baseline.data.trackingStatus);
+    assert.equal(result.data.observedAt, baseline.data.observedAt);
+    assert.equal(result.data.lastAreaExit?.decisionId ?? null, mode === "current" ? "exit" : null);
+  }
+});
+
+class FakeEntities implements EntityRepository {
+  public active: TagAssignment | null = newAssignment;
+  public range: readonly TagAssignment[] = [oldAssignment, newAssignment];
+  public search(): Promise<readonly EntityMatch[]> { return Promise.resolve([]); }
+  public getById(): Promise<TrackedEntity | null> { return Promise.resolve(entity); }
+  public getAssignmentAt(): Promise<TagAssignment | null> { return Promise.resolve(this.active); }
+  public getAssignmentsInRange(): Promise<readonly TagAssignment[]> { return Promise.resolve(this.range); }
+}
+
+class FakePositions implements PositionRepository {
+  public latestPosition: PositionRecord | null = {
+    tagCode: "TAG-NEW", x: 100, y: 100,
+    observedAt: "2026-07-19T11:29:50.000Z", gapBeforeSeconds: null,
+  };
+  public seenAssignments: readonly TagAssignment[] = [];
+  public historyCallCount = 0;
+  public timelineCallCount = 0;
+  public timelinePositions: readonly PositionRecord[] = [
+    { tagCode: "TAG-OLD", x: 7, y: 7, observedAt: "2026-07-18T13:00:00+03:00", gapBeforeSeconds: null },
+    { tagCode: "TAG-NEW", x: 8, y: 8, observedAt: "2026-07-18T16:00:00+03:00", gapBeforeSeconds: 10 },
+  ];
+  public latest(): Promise<PositionRecord | null> { return Promise.resolve(this.latestPosition); }
+  public nearest(): Promise<PositionRecord | null> { return Promise.resolve(null); }
+  public history(assignments: readonly TagAssignment[]): Promise<PositionHistoryResult> {
+    this.historyCallCount += 1;
+    this.seenAssignments = assignments;
+    return Promise.resolve({ positions: [
+      { tagCode: "TAG-OLD", x: 7, y: 7, observedAt: "2026-07-18T10:00:00.000Z", gapBeforeSeconds: null },
+      { tagCode: "TAG-NEW", x: 8, y: 8, observedAt: "2026-07-18T13:00:00.000Z", gapBeforeSeconds: 10 },
+    ], sourcePointCount: 2, processingTruncated: false });
+  }
+  public timelineHistory(assignments: readonly TagAssignment[]): Promise<PositionHistoryResult> {
+    this.timelineCallCount += 1;
+    this.seenAssignments = assignments;
+    return Promise.resolve({
+      positions: this.timelinePositions,
+      sourcePointCount: this.timelinePositions.length,
+      processingTruncated: false,
+    });
+  }
+}
+
+test("map bilgisi olmayan eski kayıt güvenli biçimde katı belirsiz bırakır", async () => {
+  const service = new LocationService(new FakeEntities(), new FakePositions());
+  const result = await service.current(28, now);
+  assert.equal(result.data.position.zoneName, "Kat belirlenemedi");
+  assert.equal(result.data.position.floorPlanId, null);
+  assert.equal(result.data.position.mapId, null);
+});
+
+test("güncel, zaman noktasındaki ve geçmiş konumlar PDOP null ile sıfırı ayrı korur", async () => {
+  for (const pdop of [1.83, 20, 0, null]) {
+    const positions = new FakePositions();
+    const record = { ...positions.latestPosition!, pdop };
+    positions.latestPosition = record;
+    positions.nearest = async () => record;
+    positions.history = async () => ({ positions: [record], sourcePointCount: 1, processingTruncated: false });
+    const service = new LocationService(new FakeEntities(), positions);
+    assert.equal((await service.current(28, now)).data.position.pdop, pdop);
+    assert.equal((await service.atTime(28, record.observedAt, 30, now)).data.position?.pdop, pdop);
+    const history = await service.history({ entityId: 28, from: "2026-07-19T00:00:00Z", to: "2026-07-20T00:00:00Z", format: "route_points", limit: 100 }, now);
+    assert.ok("points" in history.data);
+    assert.equal(history.data.points[0]?.pdop, pdop);
+  }
+});
+
+test("tag başka ürüne atanmış olsa bile aralıktaki tarihsel atamalar birlikte kullanılır", async () => {
+  const entities = new FakeEntities();
+  const positions = new FakePositions();
+  const service = new LocationService(entities, positions);
+  const result = await service.history({
+    entityId: 28, from: "2026-07-18T00:00:00+03:00", to: "2026-07-19T00:00:00+03:00",
+    format: "route_points", limit: 2_000,
+  }, now);
+  assert.deepEqual(positions.seenAssignments.map((item) => item.tagCode), ["TAG-OLD", "TAG-NEW"]);
+  assert.ok("points" in result.data);
+  assert.deepEqual(result.data.points.map((item) => item.tagCode), ["TAG-OLD", "TAG-NEW"]);
+  assert.equal(result.data.entityName, "Palet 28");
+});
+
+test("silinmiş/eski tag geçmişte görünür ama güncel aktif tag sayılmaz", async () => {
+  const entities = new FakeEntities();
+  entities.active = null;
+  entities.range = [oldAssignment];
+  const service = new LocationService(entities, new FakePositions());
+  await assert.rejects(() => service.current(28, now), (error) => error instanceof LocationError && error.code === "TAG_ASSIGNMENT_NOT_FOUND");
+  const history = await service.history({
+    entityId: 28, from: "2026-07-18T00:00:00+03:00", to: "2026-07-18T12:00:00+03:00",
+    format: "route_points", limit: 100,
+  }, now);
+  assert.ok("points" in history.data);
+  assert.equal(history.data.points[0]?.tagCode, "TAG-OLD");
+});
+
+test("zone_timeline örneklenmemiş kayıtları oda aralıklarına birleştirir", async () => {
+  const positions = new FakePositions();
+  positions.timelinePositions = [
+    { tagCode: "TAG-OLD", x: 1, y: 1, observedAt: "2026-07-19T10:39:28+03:00", gapBeforeSeconds: null },
+    { tagCode: "TAG-OLD", x: 2, y: 1, observedAt: "2026-07-19T10:45:00+03:00", gapBeforeSeconds: 332 },
+    { tagCode: "TAG-NEW", x: 20, y: 1, observedAt: "2026-07-19T10:52:14+03:00", gapBeforeSeconds: 434 },
+    { tagCode: "TAG-NEW", x: 21, y: 1, observedAt: "2026-07-19T11:02:30+03:00", gapBeforeSeconds: 616 },
+  ];
+  // Repository gap değeri gerçek ardışık ham kaydı ifade eder. Bu testte zone birleşimini sınamak için normal akışı kullan.
+  positions.timelinePositions = positions.timelinePositions.map((position, index) => ({
+    ...position,
+    mapId: "test-floor",
+    gapBeforeSeconds: index === 0 ? null : 10,
+  }));
+  const resolver = (x: number) => x < 10 ? "Oda 34" : "Oda 65";
+  const service = new LocationService(new FakeEntities(), positions, resolver);
+  const result = await service.history({
+    entityId: 28, from: "2026-07-19T10:00:00+03:00", to: "2026-07-19T11:05:00+03:00",
+    format: "zone_timeline", limit: 100,
+  }, now);
+  assert.equal(positions.historyCallCount, 0);
+  assert.equal(positions.timelineCallCount, 1);
+  assert.deepEqual(positions.seenAssignments.map((assignment) => assignment.tagCode), ["TAG-OLD", "TAG-NEW"]);
+  assert.deepEqual(result.data, {
+    entityId: 28,
+    entityName: "Palet 28",
+    timeline: [
+      { zoneName: "Oda 34", mapId: "test-floor", floorPlanId: "test-floor", sourceZoneId: null, enteredAt: "2026-07-19T10:39:28+03:00", exitedAt: "2026-07-19T10:52:14+03:00", durationSeconds: 766 },
+      { zoneName: "Oda 65", mapId: "test-floor", floorPlanId: "test-floor", sourceZoneId: null, enteredAt: "2026-07-19T10:52:14+03:00", exitedAt: "2026-07-19T11:02:30+03:00", durationSeconds: 616 },
+    ],
+  });
+  assert.equal(result.meta.timezone, "Europe/Istanbul");
+  assert.ok("timeline" in result.data);
+  assert.deepEqual(Object.keys(result.data.timeline[0]).sort(), ["durationSeconds", "enteredAt", "exitedAt", "floorPlanId", "mapId", "sourceZoneId", "zoneName"]);
+});
+
+test("beş dakikadan uzun veri boşluğu aynı zone'u iki aralığa böler", async () => {
+  const positions = new FakePositions();
+  positions.timelinePositions = [
+    { tagCode: "TAG-NEW", x: 1, y: 1, mapId: "test-floor", observedAt: "2026-07-19T10:00:00+03:00", gapBeforeSeconds: null },
+    { tagCode: "TAG-NEW", x: 1, y: 1, mapId: "test-floor", observedAt: "2026-07-19T10:10:01+03:00", gapBeforeSeconds: 601 },
+  ];
+  const result = await new LocationService(new FakeEntities(), positions, () => "Oda 34").history({
+    entityId: 28, from: "2026-07-19T10:00:00+03:00", to: "2026-07-19T11:00:00+03:00",
+    format: "zone_timeline", limit: 100,
+  }, now);
+  assert.ok("timeline" in result.data);
+  assert.equal(result.data.timeline.length, 2);
+  assert.ok(result.data.timeline.every((entry) => entry.zoneName === "Oda 34" && entry.durationSeconds === 0));
+});
+
+test("konum yoksa boş timeline ve no_data döner", async () => {
+  const positions = new FakePositions();
+  positions.timelinePositions = [];
+  const result = await new LocationService(new FakeEntities(), positions).history({
+    entityId: 28, from: "2026-07-19T10:00:00+03:00", to: "2026-07-19T11:00:00+03:00",
+    format: "zone_timeline", limit: 100,
+  }, now);
+  assert.deepEqual(result.data, { entityId: 28, entityName: "Palet 28", timeline: [] });
+  assert.equal(result.meta.dataStatus, "no_data");
+});
+
+test("konum sadece bölgeler panelinde tanımlanmış çokgenlerden çözülür", () => {
+  const point = (x: number, y: number) => ({ pixel: { x, y }, world: { x, y } });
+  const config: RegionsConfig = {
+    ...DEFAULT_REGIONS_CONFIG,
+    map: { ...DEFAULT_REGIONS_CONFIG.map, mapId: "test-floor" },
+    regions: [
+      { id: "room-34", name: "Oda 34", color: "#00a896", polygon: [point(0, 0), point(4, 0), point(4, 4), point(0, 4)], roomCenter: point(2, 2), entrances: [] },
+      { id: "room-65", name: "Oda 65", color: "#00a896", polygon: [point(5, 0), point(9, 0), point(9, 4), point(5, 4)], roomCenter: point(7, 2), entrances: [] },
+    ],
+  };
+  assert.equal(resolveLocation(2, 2, "test-floor", config), "Oda 34");
+  assert.equal(resolveLocation(6, 2, "test-floor", config), "Oda 65");
+  assert.equal(resolveLocation(20, 20, "test-floor", config), "Tanımlı alan dışında");
+  assert.equal(resolveLocation(2, 2, "another-floor", config), "Tanımlı alan dışında");
+});
+
+test("PostgreSQL timestamp İstanbul ISO 8601 biçimine normalize edilir", () => {
+  assert.equal(toIstanbulIso("2026-07-19 07:39:28.976+00"), "2026-07-19T10:39:28.976+03:00");
+});

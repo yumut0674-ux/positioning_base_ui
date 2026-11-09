@@ -1,0 +1,147 @@
+
+> gekon-ips-control@0.1.0 test:notifications
+> node --import tsx --test tests/areaExitNotifications.test.ts tests/settingsApi.test.ts tests/settingsClient.test.ts tests/decisionLogsUi.test.ts tests/roomDecisionApi.test.ts tests/tagManagementPanel.test.ts
+
+TAP version 13
+# Subtest: waits exactly five seconds, uses the engine result/time/area and latches once per exit
+ok 1 - waits exactly five seconds, uses the engine result/time/area and latches once per exit
+  ---
+  duration_ms: 22.7693
+  type: 'test'
+  ...
+# Subtest: quick return cancels the deadline and a later exit can notify again
+ok 2 - quick return cancels the deadline and a later exit can notify again
+  ---
+  duration_ms: 0.8885
+  type: 'test'
+  ...
+# Subtest: disabled tags, missing map configuration, unknown floors and data loss cannot create exits
+ok 3 - disabled tags, missing map configuration, unknown floors and data loss cannot create exits
+  ---
+  duration_ms: 0.9749
+  type: 'test'
+  ...
+# Subtest: fallback consumes the quick-list outside label without inventing an area or engine timestamp
+ok 4 - fallback consumes the quick-list outside label without inventing an area or engine timestamp
+  ---
+  duration_ms: 0.7921
+  type: 'test'
+  ...
+# Subtest: pending alarms adopt a changed delay and a restart preserves the latch and outbox
+ok 5 - pending alarms adopt a changed delay and a restart preserves the latch and outbox
+  ---
+  duration_ms: 0.9735
+  type: 'test'
+  ...
+# Subtest: a data gap after a notification cannot re-arm the same outside episode
+ok 6 - a data gap after a notification cannot re-arm the same outside episode
+  ---
+  duration_ms: 0.213
+  type: 'test'
+  ...
+# Subtest: legacy settings gain defaults and notification durations reject invalid values
+ok 7 - legacy settings gain defaults and notification durations reject invalid values
+  ---
+  duration_ms: 4.5221
+  type: 'test'
+  ...
+# {"level":"error","event":"notifications.persistence_failed","timestamp":"2026-10-23T10:11:14.536Z","error":{"name":"Error","message":"offline","stack":"Error: offline\\n    at NotificationRepository.query (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaExitNotifications.test.ts:115:69)\\n    at <anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\notifications\\\\notificationRepository.ts:24:25)\\n    at async NotificationRepository.ensureSchema (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\notifications\\\\notificationRepository.ts:25:5)\\n    at async NotificationRepository.save (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\notifications\\\\notificationRepository.ts:29:5)\\n    at async NotificationRuntime.flush (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\notifications\\\\notificationRuntime.ts:127:9)\\n    at async TestContext.<anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaExitNotifications.test.ts:120:5)\\n    at async Test.run (node:internal/test_runner/test:1054:7)\\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+# Subtest: a database outage retains a durable notification and episode before offering it to clients
+ok 8 - a database outage retains a durable notification and episode before offering it to clients
+  ---
+  duration_ms: 57.5204
+  type: 'test'
+  ...
+# Subtest: repository writes idempotently to its own table and supports tag/map/area/time/cursor filters
+ok 9 - repository writes idempotently to its own table and supports tag/map/area/time/cursor filters
+  ---
+  duration_ms: 5.9972
+  type: 'test'
+  ...
+# Subtest: analyses combine and paginate notifications without changing room decisions
+ok 10 - analyses combine and paginate notifications without changing room decisions
+  ---
+  duration_ms: 2.0605
+  type: 'test'
+  ...
+# Subtest: decision filters, list and detail cover filtering, selection and diagnostic fields
+ok 11 - decision filters, list and detail cover filtering, selection and diagnostic fields
+  ---
+  duration_ms: 2.2112
+  type: 'test'
+  ...
+# Subtest: tag filter loads existing tags and exposes a searchable combobox
+ok 12 - tag filter loads existing tags and exposes a searchable combobox
+  ---
+  duration_ms: 0.5518
+  type: 'test'
+  ...
+# Subtest: decision CSV exports the documented columns and safely quotes values
+ok 13 - decision CSV exports the documented columns and safely quotes values
+  ---
+  duration_ms: 0.7146
+  type: 'test'
+  ...
+# Subtest: decision panel keeps polling deduplicated and defines a mobile list-detail mode
+ok 14 - decision panel keeps polling deduplicated and defines a mobile list-detail mode
+  ---
+  duration_ms: 2.2783
+  type: 'test'
+  ...
+# Subtest: room decision query validation is strict and enforces zoned dates and limits
+ok 15 - room decision query validation is strict and enforces zoned dates and limits
+  ---
+  duration_ms: 9.2252
+  type: 'test'
+  ...
+# Subtest: room decision query accepts all supported filters and defaults to one hour
+ok 16 - room decision query accepts all supported filters and defaults to one hour
+  ---
+  duration_ms: 0.7296
+  type: 'test'
+  ...
+# Subtest: settings API supplies defaults, persists seconds and applies changes only after a successful save
+ok 17 - settings API supplies defaults, persists seconds and applies changes only after a successful save
+  ---
+  duration_ms: 75.6247
+  type: 'test'
+  ...
+# Subtest: settings hot reload replaces an instance using the previous module's schema
+ok 18 - settings hot reload replaces an instance using the previous module's schema
+  ---
+  duration_ms: 8.6222
+  type: 'test'
+  ...
+# Subtest: report threshold defaults on legacy settings and persists independently of tracking
+ok 19 - report threshold defaults on legacy settings and persists independently of tracking
+  ---
+  duration_ms: 37.2413
+  type: 'test'
+  ...
+# Subtest: settings client fills missing report defaults and preserves saved thresholds
+ok 20 - settings client fills missing report defaults and preserves saved thresholds
+  ---
+  duration_ms: 43.9447
+  type: 'test'
+  ...
+# Subtest: settings observer can render a legacy cached response before refetching
+ok 21 - settings observer can render a legacy cached response before refetching
+  ---
+  duration_ms: 3.3312
+  type: 'test'
+  ...
+# Subtest: tag management panel owns the live-map trail controls
+ok 22 - tag management panel owns the live-map trail controls
+  ---
+  duration_ms: 2.2903
+  type: 'test'
+  ...
+1..22
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1028.0676

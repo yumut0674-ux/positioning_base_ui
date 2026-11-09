@@ -1,0 +1,110 @@
+{
+  "testId": "test-5c71fd2a-af35-40d8-ba88-ade771f2c493",
+  "testName": "Servis — Oda testi — AD5D457F2924852A",
+  "site": "Necmettin Hastanesi — Servis",
+  "timezone": "Europe/Istanbul",
+  "revision": 1,
+  "revisionReason": "Kullanıcının yeni Servis test kaydı, UTC milisaniyeleri ve açık tag kodu korunarak eklendi. Koridor etiketleri oda ziyareti olarak sayılmadı.",
+  "test": {
+    "from": "2026-10-12T17:31:47.413Z",
+    "to": "2026-10-12T17:51:19.215Z"
+  },
+  "visits": [
+    {
+      "roomId": "room-08",
+      "from": "2026-10-12T17:31:54.466Z",
+      "to": "2026-10-12T17:32:37.552Z"
+    },
+    {
+      "roomId": "room-16",
+      "from": "2026-10-12T17:32:41.706Z",
+      "to": "2026-10-12T17:33:21.014Z"
+    },
+    {
+      "roomId": "room-07",
+      "from": "2026-10-12T17:33:42.924Z",
+      "to": "2026-10-12T17:34:33.499Z"
+    },
+    {
+      "roomId": "room-15",
+      "from": "2026-10-12T17:35:06.812Z",
+      "to": "2026-10-12T17:37:00.759Z"
+    },
+    {
+      "roomId": "room-14",
+      "from": "2026-10-12T17:37:22.442Z",
+      "to": "2026-10-12T17:38:28.741Z"
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-10-12T17:38:42.363Z",
+      "to": "2026-10-12T17:39:58.499Z"
+    },
+    {
+      "roomId": "room-14",
+      "from": "2026-10-12T17:40:51.095Z",
+      "to": "2026-10-12T17:41:38.913Z"
+    },
+    {
+      "roomId": "room-12",
+      "from": "2026-10-12T17:42:00.533Z",
+      "to": "2026-10-12T17:42:24.449Z"
+    },
+    {
+      "roomId": "room-14",
+      "from": "2026-10-12T17:43:11.307Z",
+      "to": "2026-10-12T17:43:41.877Z"
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-10-12T17:43:51.215Z",
+      "to": "2026-10-12T17:44:43.559Z"
+    },
+    {
+      "roomId": "room-07",
+      "from": "2026-10-12T17:45:27.669Z",
+      "to": "2026-10-12T17:45:45.865Z"
+    },
+    {
+      "roomId": "room-15",
+      "from": "2026-10-12T17:46:02.092Z",
+      "to": "2026-10-12T17:46:32.906Z"
+    },
+    {
+      "roomId": "room-16",
+      "from": "2026-10-12T17:46:41.046Z",
+      "to": "2026-10-12T17:46:53.702Z"
+    },
+    {
+      "roomId": "room-09",
+      "from": "2026-10-12T17:47:00.105Z",
+      "to": "2026-10-12T17:48:48.305Z"
+    },
+    {
+      "roomId": "room-17",
+      "from": "2026-10-12T17:49:08.457Z",
+      "to": "2026-10-12T17:49:21.049Z"
+    },
+    {
+      "roomId": "room-08",
+      "from": "2026-10-12T17:49:26.505Z",
+      "to": "2026-10-12T17:49:39.204Z"
+    },
+    {
+      "roomId": "room-10",
+      "from": "2026-10-12T17:50:01.217Z",
+      "to": "2026-10-12T17:51:04.037Z"
+    }
+  ],
+  "corridorIntervals": [],
+  "groups": [
+    {
+      "id": "servis-5c71fd2a",
+      "tagCodes": [
+        "AD5D457F2924852A"
+      ],
+      "note": "Tag kodu kullanıcı test kaydında açıkça belirtilmiştir; rota bağımsızdır."
+    }
+  ],
+  "note": "Kaynak source.json içinde korunur. Z saatleri UTC; yerel gösterim Europe/Istanbul. Açık koridor aralıkları ve oda ziyaretleri dışındaki süre koridordur. Orijinal saatler değiştirilmez; katı ve ±2 sn sınır toleranslı sonuç üretilir."
+}

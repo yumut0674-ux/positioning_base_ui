@@ -1,0 +1,28 @@
+{
+  "test_id": "test-5c71fd2a-af35-40d8-ba88-ade771f2c493",
+  "test_name": "Oda testi",
+  "tag_id": "AD5D457F2924852A",
+  "tag_codes": ["AD5D457F2924852A"],
+  "timezone": "Europe/Istanbul",
+  "started_at": "2026-10-12T17:31:47.413Z",
+  "ended_at": "2026-10-12T17:51:19.215Z",
+  "rooms": [
+    {"room":"room-08","entered_at":"2026-10-12T17:31:54.466Z","exited_at":"2026-10-12T17:32:37.552Z","duration_seconds":43.086},
+    {"room":"room-16","entered_at":"2026-10-12T17:32:41.706Z","exited_at":"2026-10-12T17:33:21.014Z","duration_seconds":39.308},
+    {"room":"room-07","entered_at":"2026-10-12T17:33:42.924Z","exited_at":"2026-10-12T17:34:33.499Z","duration_seconds":50.575},
+    {"room":"room-15","entered_at":"2026-10-12T17:35:06.812Z","exited_at":"2026-10-12T17:37:00.759Z","duration_seconds":113.947},
+    {"room":"room-14","entered_at":"2026-10-12T17:37:22.442Z","exited_at":"2026-10-12T17:38:28.741Z","duration_seconds":66.299},
+    {"room":"room-05","entered_at":"2026-10-12T17:38:42.363Z","exited_at":"2026-10-12T17:39:58.499Z","duration_seconds":76.136},
+    {"room":"room-14","entered_at":"2026-10-12T17:40:51.095Z","exited_at":"2026-10-12T17:41:38.913Z","duration_seconds":47.818},
+    {"room":"room-12","entered_at":"2026-10-12T17:42:00.533Z","exited_at":"2026-10-12T17:42:24.449Z","duration_seconds":23.916},
+    {"room":"room-14","entered_at":"2026-10-12T17:43:11.307Z","exited_at":"2026-10-12T17:43:41.877Z","duration_seconds":30.570},
+    {"room":"room-05","entered_at":"2026-10-12T17:43:51.215Z","exited_at":"2026-10-12T17:44:43.559Z","duration_seconds":52.344},
+    {"room":"room-07","entered_at":"2026-10-12T17:45:27.669Z","exited_at":"2026-10-12T17:45:45.865Z","duration_seconds":18.196},
+    {"room":"room-15","entered_at":"2026-10-12T17:46:02.092Z","exited_at":"2026-10-12T17:46:32.906Z","duration_seconds":30.814},
+    {"room":"room-16","entered_at":"2026-10-12T17:46:41.046Z","exited_at":"2026-10-12T17:46:53.702Z","duration_seconds":12.656},
+    {"room":"room-09","entered_at":"2026-10-12T17:47:00.105Z","exited_at":"2026-10-12T17:48:48.305Z","duration_seconds":108.200},
+    {"room":"room-17","entered_at":"2026-10-12T17:49:08.457Z","exited_at":"2026-10-12T17:49:21.049Z","duration_seconds":12.592},
+    {"room":"room-08","entered_at":"2026-10-12T17:49:26.505Z","exited_at":"2026-10-12T17:49:39.204Z","duration_seconds":12.699},
+    {"room":"room-10","entered_at":"2026-10-12T17:50:01.217Z","exited_at":"2026-10-12T17:51:04.037Z","duration_seconds":62.820}
+  ]
+}

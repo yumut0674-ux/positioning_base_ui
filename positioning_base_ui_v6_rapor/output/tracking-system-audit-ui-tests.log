@@ -1,0 +1,76 @@
+✔ decision filters, list and detail cover filtering, selection and diagnostic fields (5.5867ms)
+✔ tag filter loads existing tags and exposes a searchable combobox (1.5984ms)
+✔ decision CSV exports the documented columns and safely quotes values (0.8152ms)
+✔ decision panel keeps polling deduplicated and defines a mobile list-detail mode (3.2699ms)
+✔ region drawing accepts short taps and rejects dragged pointers (1.5687ms)
+✔ global, room and door settings resolve in priority order without mutating inputs (1.8165ms)
+✔ spor-koridor editor and compiled motor use the configured speed for corridor and every room (13.3359ms)
+✔ legacy evidenceDurationMs maps to entry and exit and legacy config compiles (1.718ms)
+✔ cleaner preserves room and door overrides and rejects unknown fields (4.8707ms)
+✔ silent proximity distance validates its finite 0..20 metre range and warns outside silent coverage (2.5235ms)
+✔ validation endpoint compiles without writing the config file (13.4876ms)
+✖ atomic persistence round-trips overrides and failed validation keeps the last file (21.9552ms)
+✔ room-specific entry duration and required/ignored door roles affect decisions (17.5617ms)
+✔ score components and effective config are exposed in read-only diagnostics (1.7557ms)
+✔ preferred and optional missing-door policies use their configured evidence thresholds (2.1349ms)
+✔ door directions, weights and crossing expiry are enforced (1.7678ms)
+✔ help button is accessible and visibility actions open and close the panel (1.3795ms)
+✔ help search filters by label and description without Turkish case sensitivity (14.3888ms)
+✔ catalog covers base room, every engine setting, and every door setting (0.671ms)
+✔ door roles, score warning, override order and verified formulas are documented (0.6983ms)
+✔ opening help keeps the selected room form mounted and cannot mutate config (2.5983ms)
+✔ responsive property widths expand without changing the flexible map column (0.5646ms)
+✔ room decision query validation is strict and enforces zoned dates and limits (27.4653ms)
+✔ room decision query accepts all supported filters and defaults to one hour (2.6045ms)
+✔ compact room history preserves transitions and freshness between measurements (27.8351ms)
+✔ compact history handles repeated pending endpoints without losing freshness (3.1556ms)
+✔ decision stays index unsorted points by floor and keep exact interval boundaries (3.39ms)
+✔ route response retains median coordinates, actual observed range and aggregation counts (3.1083ms)
+﹣ PostgreSQL minute medians reject outliers and preserve floor, zone and assignment boundaries (1.3797ms) # SKIP
+﹣ PostgreSQL aggregates a full day before applying the display limit and retains actual coverage (0.2337ms) # SKIP
+﹣ PostgreSQL compact room visits preserve effective states across measurements, gaps and floor changes (0.159ms) # SKIP
+✔ report range accepts only selected tags and at most seven days (5.8819ms)
+✔ room selection matches both floor and room ID after durations are calculated (1.2836ms)
+✔ last preceding room seeds the start; missing intervals never add to room duration (1.4653ms)
+✔ stale preceding room is not carried into the report (0.3784ms)
+✔ only measured corridor evidence replaces an unknown room label (0.6884ms)
+✔ server report query uses the preceding measured decision and refuses truncated results (2.9083ms)
+✔ server accepts configured room and reports empty selected-room results (1.8726ms)
+✔ PDF is multipage with a repeated table header and Turkish text (5744.1884ms)
+✔ selected tracking-label panel presents a defined region instead of X/Y coordinates (47.4822ms)
+✔ selected tracking-label panel identifies a location outside configured areas (6.5385ms)
+✔ mobile tracking-label panel includes the map reveal action without technical coordinates (5.9122ms)
+✔ recent tags remain unique, newest first, and limited to five (4.7754ms)
+✔ recent tags serialize and restore through browser storage (0.5576ms)
+✔ location entry time is retained in the same area and reset after an area change (0.715ms)
+✔ tag selection records the visit and creates one map focus request (0.5375ms)
+✔ quick tag selection updates details without requesting a map focus on the live map (0.7363ms)
+✔ header omits the notifications control (15.2637ms)
+✔ sidebar uses explicit views without the alarms entry or badge (11.2ms)
+✔ existing analyses navigation opens through the active workspace style (11.4759ms)
+✔ status strip keeps tracking-label count, FPS, and clock only (25.7059ms)
+ℹ tests 51
+ℹ suites 0
+ℹ pass 47
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 3
+ℹ todo 0
+ℹ duration_ms 12013.8851
+
+✖ failing tests:
+
+test at tests\regionInferenceSettings.test.ts:1:5963
+✖ atomic persistence round-trips overrides and failed validation keeps the last file (21.9552ms)
+  Error: EPERM: operation not permitted, rename 'C:\Users\1548u\AppData\Local\Packages\sandbox.{23bb1c36-78d6-4eab-9d55-eddbed239b88}\AC\Temp\regions-config-6WgogG\regions.json.19288.1792066597856.tmp' -> 'C:\Users\1548u\AppData\Local\Packages\sandbox.{23bb1c36-78d6-4eab-9d55-eddbed239b88}\AC\Temp\regions-config-6WgogG\regions.json'
+      at async rename (node:internal/fs/promises:784:10)
+      at async persistRegionsConfig (C:\Users\1548u\Desktop\UWB\ui\base\app\api\regions\route.ts:83:89)
+      at async TestContext.<anonymous> (C:\Users\1548u\Desktop\UWB\ui\base\tests\regionInferenceSettings.test.ts:97:5)
+      at async Test.run (node:internal/test_runner/test:1054:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:744:7) {
+    errno: -4048,
+    code: 'EPERM',
+    syscall: 'rename',
+    path: 'C:\\Users\\1548u\\AppData\\Local\\Packages\\sandbox.{23bb1c36-78d6-4eab-9d55-eddbed239b88}\\AC\\Temp\\regions-config-6WgogG\\regions.json.19288.1792066597856.tmp',
+    dest: 'C:\\Users\\1548u\\AppData\\Local\\Packages\\sandbox.{23bb1c36-78d6-4eab-9d55-eddbed239b88}\\AC\\Temp\\regions-config-6WgogG\\regions.json'
+  }

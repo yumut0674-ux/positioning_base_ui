@@ -1,0 +1,25 @@
+{
+  "test_id": "test-9a7debf0-57ad-4df2-802b-ae92e4c20b13",
+  "test_name": "Oda testi",
+  "tag_id": "9C76E417B4CB5ECF",
+  "tag_codes": ["9C76E417B4CB5ECF"],
+  "timezone": "Europe/Istanbul",
+  "started_at": "2026-10-13T08:39:53.953Z",
+  "ended_at": "2026-10-13T08:47:57.185Z",
+  "rooms": [
+    {"room":"room-18","entered_at":"2026-10-13T08:40:20.524Z","exited_at":"2026-10-13T08:40:25.516Z","duration_seconds":4.992},
+    {"room":"room-08","entered_at":"2026-10-13T08:40:34.624Z","exited_at":"2026-10-13T08:41:26.424Z","duration_seconds":51.8},
+    {"room":"room-16","entered_at":"2026-10-13T08:41:30.349Z","exited_at":"2026-10-13T08:41:46.579Z","duration_seconds":16.23},
+    {"room":"room-07","entered_at":"2026-10-13T08:41:57.547Z","exited_at":"2026-10-13T08:42:10.390Z","duration_seconds":12.843},
+    {"room":"room-07","entered_at":"2026-10-13T08:42:20.393Z","exited_at":"2026-10-13T08:42:38.173Z","duration_seconds":17.78},
+    {"room":"room-04","entered_at":"2026-10-13T08:42:55.764Z","exited_at":"2026-10-13T08:43:07.729Z","duration_seconds":11.965},
+    {"room":"room-05","entered_at":"2026-10-13T08:43:15.032Z","exited_at":"2026-10-13T08:43:31.039Z","duration_seconds":16.007},
+    {"room":"room-14","entered_at":"2026-10-13T08:43:36.062Z","exited_at":"2026-10-13T08:43:47.151Z","duration_seconds":11.089},
+    {"room":"room-04","entered_at":"2026-10-13T08:43:52.411Z","exited_at":"2026-10-13T08:44:01.844Z","duration_seconds":9.433},
+    {"room":"room-13","entered_at":"2026-10-13T08:44:11.088Z","exited_at":"2026-10-13T08:45:07.609Z","duration_seconds":56.521},
+    {"room":"room-13","entered_at":"2026-10-13T08:45:31.355Z","exited_at":"2026-10-13T08:45:59.838Z","duration_seconds":28.483},
+    {"room":"room-02","entered_at":"2026-10-13T08:46:10.331Z","exited_at":"2026-10-13T08:46:42.212Z","duration_seconds":31.881},
+    {"room":"room-03","entered_at":"2026-10-13T08:46:50.072Z","exited_at":"2026-10-13T08:47:20.827Z","duration_seconds":30.755},
+    {"room":"room-04","entered_at":"2026-10-13T08:47:29.651Z","exited_at":"2026-10-13T08:47:42.983Z","duration_seconds":13.332}
+  ]
+}

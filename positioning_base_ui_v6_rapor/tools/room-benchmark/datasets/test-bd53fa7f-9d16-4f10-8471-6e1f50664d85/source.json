@@ -1,0 +1,27 @@
+{
+  "test_id": "test-bd53fa7f-9d16-4f10-8471-6e1f50664d85",
+  "test_name": "Oda testi",
+  "tag_id": "EA0FC8F8CA447FF5",
+  "tag_codes": ["EA0FC8F8CA447FF5"],
+  "timezone": "Europe/Istanbul",
+  "started_at": "2026-10-12T16:52:01.768Z",
+  "ended_at": "2026-10-12T16:56:33.023Z",
+  "rooms": [
+    {"room":"room-08","entered_at":"2026-10-12T16:52:20.375Z","exited_at":"2026-10-12T16:52:39.581Z","duration_seconds":19.206},
+    {"room":"corridor-main","entered_at":"2026-10-12T16:52:39.581Z","exited_at":"2026-10-12T16:53:01.451Z","duration_seconds":21.870},
+    {"room":"room-04","entered_at":"2026-10-12T16:53:01.451Z","exited_at":"2026-10-12T16:53:14.583Z","duration_seconds":13.132},
+    {"room":"corridor-main","entered_at":"2026-10-12T16:53:14.583Z","exited_at":"2026-10-12T16:53:31.444Z","duration_seconds":16.861},
+    {"room":"room-12","entered_at":"2026-10-12T16:53:31.444Z","exited_at":"2026-10-12T16:53:43.685Z","duration_seconds":12.241},
+    {"room":"corridor-main","entered_at":"2026-10-12T16:53:43.685Z","exited_at":"2026-10-12T16:54:05.274Z","duration_seconds":21.589},
+    {"room":"corridor-main","entered_at":"2026-10-12T16:54:10.114Z","exited_at":"2026-10-12T16:54:24.423Z","duration_seconds":14.309},
+    {"room":"corridor-main","entered_at":"2026-10-12T16:54:31.139Z","exited_at":"2026-10-12T16:54:43.583Z","duration_seconds":12.444},
+    {"room":"room-03","entered_at":"2026-10-12T16:54:43.583Z","exited_at":"2026-10-12T16:55:04.577Z","duration_seconds":20.994},
+    {"room":"corridor-main","entered_at":"2026-10-12T16:55:04.577Z","exited_at":"2026-10-12T16:55:13.764Z","duration_seconds":9.187},
+    {"room":"room-13","entered_at":"2026-10-12T16:55:13.764Z","exited_at":"2026-10-12T16:55:30.388Z","duration_seconds":16.624},
+    {"room":"corridor-main","entered_at":"2026-10-12T16:55:30.388Z","exited_at":"2026-10-12T16:55:50.802Z","duration_seconds":20.414},
+    {"room":"room-07","entered_at":"2026-10-12T16:55:50.802Z","exited_at":"2026-10-12T16:56:02.473Z","duration_seconds":11.671},
+    {"room":"corridor-main","entered_at":"2026-10-12T16:56:02.473Z","exited_at":"2026-10-12T16:56:16.014Z","duration_seconds":13.541},
+    {"room":"room-16","entered_at":"2026-10-12T16:56:16.014Z","exited_at":"2026-10-12T16:56:28.597Z","duration_seconds":12.583},
+    {"room":"corridor-main","entered_at":"2026-10-12T16:56:28.597Z","exited_at":"2026-10-12T16:56:33.023Z","duration_seconds":4.426}
+  ]
+}

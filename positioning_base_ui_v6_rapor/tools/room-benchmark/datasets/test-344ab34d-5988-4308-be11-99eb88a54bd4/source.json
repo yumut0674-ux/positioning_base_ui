@@ -1,0 +1,16 @@
+{
+  "test_id": "test-344ab34d-5988-4308-be11-99eb88a54bd4",
+  "test_name": "Oda testi",
+  "tag_id": "9C76E417B4CB5ECF",
+  "tag_codes": ["9C76E417B4CB5ECF"],
+  "timezone": "Europe/Istanbul",
+  "started_at": "2026-10-13T08:17:07.743Z",
+  "ended_at": "2026-10-13T08:21:35.984Z",
+  "rooms": [
+    {"room":"room-07","entered_at":"2026-10-13T08:17:19.548Z","exited_at":"2026-10-13T08:17:46.461Z","duration_seconds":26.913},
+    {"room":"room-14","entered_at":"2026-10-13T08:18:21.334Z","exited_at":"2026-10-13T08:18:42.328Z","duration_seconds":20.994},
+    {"room":"room-03","entered_at":"2026-10-13T08:19:07.378Z","exited_at":"2026-10-13T08:19:40.489Z","duration_seconds":33.111},
+    {"room":"room-13","entered_at":"2026-10-13T08:19:51.828Z","exited_at":"2026-10-13T08:20:38.575Z","duration_seconds":46.747},
+    {"room":"room-02","entered_at":"2026-10-13T08:20:59.448Z","exited_at":"2026-10-13T08:21:11.482Z","duration_seconds":12.034}
+  ]
+}

@@ -1,0 +1,962 @@
+[
+  {
+    "path": "src/app/AdminPageLayout.tsx",
+    "sha256": "12812e9707385b71c509df151d575c29045c939dda2cca3d2d33669fa9fe3c1a"
+  },
+  {
+    "path": "src/app/components/AppHeader.tsx",
+    "sha256": "012e7ef3df892d4efce5ac01b569ae85a4cce6bc755c94ca40f77b3919249073"
+  },
+  {
+    "path": "src/app/components/AppSidebar.tsx",
+    "sha256": "a45776306159bc4f4f3f19ec928ab8627dba728e087fb25c5a2351b843e058cc"
+  },
+  {
+    "path": "src/app/components/StatusStrip.tsx",
+    "sha256": "ceea501d18db06475842adf6893fa7cd800cb01fe92ccf426d82a0d1ae7ab98c"
+  },
+  {
+    "path": "src/app/IpsApplication.tsx",
+    "sha256": "28177f90c518e553be317e61a0c6583ce3f2eab513f78bbdcb399b1fbf8fd74f"
+  },
+  {
+    "path": "src/app/store/useIpsStore.ts",
+    "sha256": "c2d96dc725c7c1269f74838234294e137ed9b50a1ca14481730df5a52a3e2113"
+  },
+  {
+    "path": "src/app/uiMode.ts",
+    "sha256": "af90a9fed9d7fbd68b05aa6a7186d19796d6d962a1657f14ec96b9a63c3f2f7a"
+  },
+  {
+    "path": "src/features/assistant/components/historyChatWidget.module.css",
+    "sha256": "0a073957bd5311c14e11e867f987d93913c516a535f57a019b7027eb7a86cafc"
+  },
+  {
+    "path": "src/features/assistant/components/HistoryChatWidget.tsx",
+    "sha256": "a538f74f06d9d8470f563d57e8afa2506f89edca87e724fc675385d1d5a0e374"
+  },
+  {
+    "path": "src/features/assistant/services/assistantAvailability.ts",
+    "sha256": "00d4da411402a7283f1eca356c64fe4f249cd1522a44a1442cc3f79ed280b4f7"
+  },
+  {
+    "path": "src/features/assistant/services/assistantConversation.ts",
+    "sha256": "d80a300d06ca0b7ebee1821182ef395513ebab4e324cc799b2c350e7553f97d3"
+  },
+  {
+    "path": "src/features/assistantAdmin/components/gekonAiAdmin.module.css",
+    "sha256": "6c32bab88cc9be1b68dfb74f5cdb8c320aad85bd33e90b5e8e4695a1816bee7b"
+  },
+  {
+    "path": "src/features/assistantAdmin/components/GekonAiAdminPanel.tsx",
+    "sha256": "3fa819972350d070af32d9a5d3656775fd832e52421c360842268181cfbb8f49"
+  },
+  {
+    "path": "src/features/assistantAdmin/services/gekonAiAdminApi.ts",
+    "sha256": "5c1182da632fc7fc13612e822f77b4a38327168b30261cb62c04f928f1f5faf7"
+  },
+  {
+    "path": "src/features/assistantAdmin/types/assistantAdmin.types.ts",
+    "sha256": "846987c0a070cd2340e2fb276d3b7c97583fb3d4ffa00f92ac3ce3e97fd5a884"
+  },
+  {
+    "path": "src/features/decisionLogs/components/areaEventLogs.module.css",
+    "sha256": "1de35e2d5c08acddd3866afa20a22a6796bce6957c922641cb77ce46feb5286b"
+  },
+  {
+    "path": "src/features/decisionLogs/components/AreaEventLogs.tsx",
+    "sha256": "01a96510f9ef4b1fe09d59a0599a841c7b5eac1e82e56b795f96f886b967e47a"
+  },
+  {
+    "path": "src/features/decisionLogs/components/DecisionLogDetail.tsx",
+    "sha256": "e2b299664547ca5c4a48eb5d8989d603a51af7fde1112089e30c3d805b54ed8e"
+  },
+  {
+    "path": "src/features/decisionLogs/components/DecisionLogFilters.tsx",
+    "sha256": "dbc67e941dba52830a542819ebebb3309c0c097d9cfc2692e9c3bdd9f793a07b"
+  },
+  {
+    "path": "src/features/decisionLogs/components/DecisionLogList.tsx",
+    "sha256": "880d199dec3142b8a2bc39ec6cd4001626b6d8f14904dcb7169aefce4b50cdc8"
+  },
+  {
+    "path": "src/features/decisionLogs/components/decisionLogs.module.css",
+    "sha256": "94613da5c3b415d106dafc360037f7c17afc0c6b4b60a9afae91c9919b40a317"
+  },
+  {
+    "path": "src/features/decisionLogs/components/DecisionLogsPanel.tsx",
+    "sha256": "b9ba6e04b2ade8d6e3424bf4f3d65040c43405295157550692b10629056b7e74"
+  },
+  {
+    "path": "src/features/decisionLogs/services/areaEventLabels.ts",
+    "sha256": "21dd0d3d8ad7580f5e2a79859aa784d8b9900a625c008126dfab7dc2c975679d"
+  },
+  {
+    "path": "src/features/decisionLogs/services/decisionLogsApi.ts",
+    "sha256": "d2581675583e20218c617fcbe4ebd04806766ac38bd4f62cb8284444262722d9"
+  },
+  {
+    "path": "src/features/decisionLogs/types/decisionLog.types.ts",
+    "sha256": "3144d3ebf42da98da5a1da735a4f5868cc98a331da92a9b9b353bd22a52be6da"
+  },
+  {
+    "path": "src/features/history/components/RouteHistoryImageViewport.tsx",
+    "sha256": "17312d93cb17a9734e2270b7bc2a8ceea1b1abbab64fe81471ef0d05bb00bcc9"
+  },
+  {
+    "path": "src/features/history/components/routeHistoryPanel.module.css",
+    "sha256": "05ae9c463e3d1ee9d3fb954e88832c347469ee3523020344cad80286da603d71"
+  },
+  {
+    "path": "src/features/history/components/RouteHistoryPanel.tsx",
+    "sha256": "9a5af3136227b71e164dff689c78a5585a41b42e4e30c6f9331ac018b4191b29"
+  },
+  {
+    "path": "src/features/history/services/decisionTimeline.ts",
+    "sha256": "a0f62c076d0adba1675e77314375f0fb58ac566319fdd8685b85104399518277"
+  },
+  {
+    "path": "src/features/history/services/historyMapViewport.ts",
+    "sha256": "880710ef6e346b16a9b5298bb056d51b92312c4a14966c54ae0ecaf271b8e83c"
+  },
+  {
+    "path": "src/features/layers/components/LayerVisibilityPanel.tsx",
+    "sha256": "228f1b9c1e63da12f687d700412a52ad02fa36d1bbe97fc5cbd98923de1be81e"
+  },
+  {
+    "path": "src/features/map/components/HtmlTagNode.tsx",
+    "sha256": "30ae7079b5731b4bfa6062f471ec89ba884d2af3247318aee9c494e0f0ed87e5"
+  },
+  {
+    "path": "src/features/map/components/htmlTagOverlay.module.css",
+    "sha256": "b07d7bddbeacc22087e932d3751be4ee7dd01226ac42e8bb03fa0cbf0b017525"
+  },
+  {
+    "path": "src/features/map/components/MapViewport.tsx",
+    "sha256": "cbcb30544322bdfd4946aeb933fe4367436965c30ecee02c5e75ba20b380021e"
+  },
+  {
+    "path": "src/features/map/components/TagOverlay.tsx",
+    "sha256": "23fb660a5f8ad7d3f4117772814ab351741242c428e2b262141aad502597fbe3"
+  },
+  {
+    "path": "src/features/map/components/TagTrailLayer.tsx",
+    "sha256": "57ea1fa6bba4001f058cd04bbdf271f3bf0708cbf8eaa45f363765f2b3e9aa65"
+  },
+  {
+    "path": "src/features/map/config/mapConfig.ts",
+    "sha256": "5b3571a85298cf14e93ff38ecfe1f7140d92b867fa8ba1b2a6e510e46a929f51"
+  },
+  {
+    "path": "src/features/map/services/anchorApi.ts",
+    "sha256": "92f180232d16ee9ed7dc975c92fd3088e0e32048a48bbc6fdf94015810d773b4"
+  },
+  {
+    "path": "src/features/map/services/CoordinateTransformService.ts",
+    "sha256": "dfaea3ccb34889368161e0023b3924087e497a947a2efa8b5e44d13eecf35fc5"
+  },
+  {
+    "path": "src/features/map/services/htmlTagOverlay.ts",
+    "sha256": "3b93cecfb0e08e41ff6dd52a226078be40fcf487ef54213cc39b6c505f3c30ad"
+  },
+  {
+    "path": "src/features/map/services/LocationResolverService.ts",
+    "sha256": "aa0cb2c73b9ab65b9e69e3e21a2d0be49dc80c281e22863e476e11c89f79a9b9"
+  },
+  {
+    "path": "src/features/map/services/mapApi.ts",
+    "sha256": "6c717b3b20404ce1035ad5772e915169c98d1770b68fe606019a931de4c25d37"
+  },
+  {
+    "path": "src/features/map/services/mapSelection.ts",
+    "sha256": "bf3dfabcee6530189f22db8cbce44ed47e9ef337b708d4ac88ae91e234bd5e3f"
+  },
+  {
+    "path": "src/features/map/services/mapTouchGesture.ts",
+    "sha256": "0cbdf215470fff367b43f19b9fc6b72bb05c449d8b4d5978f7b12312b112df54"
+  },
+  {
+    "path": "src/features/map/services/RouteTimelineService.ts",
+    "sha256": "4f48f6959c8a22186f07eb5cbf3093d879babb11a4653b5d4120caf3b6cfd564"
+  },
+  {
+    "path": "src/features/map/types/map.types.ts",
+    "sha256": "75a56227e41cfa145c16822519bc4cd99e68e46fae490f6e73c184f5f66c4b67"
+  },
+  {
+    "path": "src/features/notifications/AreaExitToasts.tsx",
+    "sha256": "c8d305ca275b1594a9090b4c13db6f31d0609af2f7891e4b93a57c89e6839fc4"
+  },
+  {
+    "path": "src/features/notifications/notification.types.ts",
+    "sha256": "d0a122daec18bbb8052f1aaa7247675c5b17deaf37bce989899d380f293d7c86"
+  },
+  {
+    "path": "src/features/notifications/notifications.module.css",
+    "sha256": "4c92874ff6f711d68ec3d42ffcdc128d0e85ef0c0c19ad048ca5a1670481f459"
+  },
+  {
+    "path": "src/features/notifications/useAreaExitNotifications.ts",
+    "sha256": "323de667a452323864309c63aa5f1159ce804d61713ee77f2054dc72c7920d60"
+  },
+  {
+    "path": "src/features/regions/components/MapFilterPanel.tsx",
+    "sha256": "859463ea89916da3ff3ddfc4fa1d7bf26a88c099ce01808caa31bd7ba567dbd0"
+  },
+  {
+    "path": "src/features/regions/components/MapPdopFilterEditor.tsx",
+    "sha256": "83927af1b1e02e4b7aa55840b079d5293ce1dfa476467bc8c19c06c3a66b37c3"
+  },
+  {
+    "path": "src/features/regions/components/ParameterHelpPanel.tsx",
+    "sha256": "9cd527a17edae9297957a3a0a40de16226755d7a0af918a61816668a29731408"
+  },
+  {
+    "path": "src/features/regions/components/RawTagLayer.tsx",
+    "sha256": "482b06cb57e11cc117e6e5cc1e9e3f23d88e60e6dfa0f2fe1186423680d66d7d"
+  },
+  {
+    "path": "src/features/regions/components/RegionFilterFields.tsx",
+    "sha256": "4ddaa170404e0aea3606a3fe48f69a85beaaf7d54936ce34fe63b67d8abe221c"
+  },
+  {
+    "path": "src/features/regions/components/RegionInferenceEditor.tsx",
+    "sha256": "542340afc6bd351f3b2d9ae93a22ca4d09761caf430e4e4e972e4eb2fa2343e6"
+  },
+  {
+    "path": "src/features/regions/components/RegionManagementPanel.tsx",
+    "sha256": "04aee353cbdaf63d712c1a371b8f69cd56fa63cc9427067d6e58a2aebf01589d"
+  },
+  {
+    "path": "src/features/regions/components/regions.module.css",
+    "sha256": "638cb4b4602091ebe6ae86045ee28291d5538491ab6c4e0176e7dace41fcffbe"
+  },
+  {
+    "path": "src/features/regions/config/defaultRegionsConfig.ts",
+    "sha256": "814e9f43007675bc3f39d2b48c0b31bb61036e52c0125f089594686e0c08bfa7"
+  },
+  {
+    "path": "src/features/regions/config/inferenceParameterHelp.ts",
+    "sha256": "e8970020e83643675abc4f6d19a5f0820e88463d7a502c8331711a1d81406fe8"
+  },
+  {
+    "path": "src/features/regions/config/regionInferenceSettings.ts",
+    "sha256": "500d564bf4a1a683d6cc87fbd73f12b873d13304bf39c0692219dc0301c44556"
+  },
+  {
+    "path": "src/features/regions/services/affineTransform.ts",
+    "sha256": "8342143cd60614f8e8fc52454070cbf95e69d40061fb1e41414153b90097e279"
+  },
+  {
+    "path": "src/features/regions/services/areaEditorVisibility.ts",
+    "sha256": "1b055552f0aef0bc2b0d34b93301847ea6996c04a4064fc215a4d21ce236c9f5"
+  },
+  {
+    "path": "src/features/regions/services/rawTagPresentation.ts",
+    "sha256": "1aef7325f38f69f4ae285bb64e87d6aef53ee2111f054970d67d1f305ec47b98"
+  },
+  {
+    "path": "src/features/regions/services/regionEngineApi.ts",
+    "sha256": "7ed9c07284fd954c0106d054cc370b96c12d268598dc6f729b81ec01f3952b15"
+  },
+  {
+    "path": "src/features/regions/services/regionGesture.ts",
+    "sha256": "127f5b8044a69a080eeeae15767cb5854094418c929c5c5f3ab28f39d98f376b"
+  },
+  {
+    "path": "src/features/regions/services/regionsConfig.ts",
+    "sha256": "e7c040d0c2723d97e77440e011d37cb80ba21052ba18ed1cf829eeb3ac67d741"
+  },
+  {
+    "path": "src/features/regions/types/region.types.ts",
+    "sha256": "76eeb8dde212b638bba1a6f35aa1cb47fae1ec12436cc6527014930337912bec"
+  },
+  {
+    "path": "src/features/reports/components/routeReportDialog.module.css",
+    "sha256": "c9740837228d1941428f72500b31f13322c696ada355cd2167f639538978f7c4"
+  },
+  {
+    "path": "src/features/reports/components/RouteReportDialog.tsx",
+    "sha256": "192ceadce77181c93ec2c449c918b501638de56e26a3de25121751b02538d8d6"
+  },
+  {
+    "path": "src/features/roomTests/components/RoomTestPanel.tsx",
+    "sha256": "9ce3403d6880cd1c1b9a9022b99e0beb7b3d275e3db80022337ffe3bbb2ef41c"
+  },
+  {
+    "path": "src/features/roomTests/components/roomTests.module.css",
+    "sha256": "33ed467c15eae4ef1e9c1f76b011b5df67c974a2ae8e0f4302d97065fe4ef95a"
+  },
+  {
+    "path": "src/features/roomTests/components/RoomTestTagInput.tsx",
+    "sha256": "ee910a34fea19a0c314eee2025aec7c87aeca4fb2cb50c8bc2969f4479c912be"
+  },
+  {
+    "path": "src/features/roomTests/components/TestDialog.tsx",
+    "sha256": "35e2429dbf88b5ecaff2fa75c8c0f8a2a74b500a2182884319410223a11edc8a"
+  },
+  {
+    "path": "src/features/roomTests/components/TestHistoryDialog.tsx",
+    "sha256": "3db8ec6d4cac1830b571c7a61ba6a89141db166b0a5f51c890cc064630085453"
+  },
+  {
+    "path": "src/features/roomTests/components/TestPlanEditor.tsx",
+    "sha256": "862f9123ed4be535eab347408519d60cc9b0561646b166bb58e95702add9a0bf"
+  },
+  {
+    "path": "src/features/roomTests/services/roomTestApi.ts",
+    "sha256": "92c28bbba36329f7fb34e6025976be0bb9ff2d2c5ec249f9f79e6bde7602cc76"
+  },
+  {
+    "path": "src/features/roomTests/services/roomTestModel.ts",
+    "sha256": "e535fee33cb45694a439024a95ff0364b2ff220b565b16d87d3c6070882f2f73"
+  },
+  {
+    "path": "src/features/roomTests/services/roomTestStorage.ts",
+    "sha256": "5b54fd4cb941609a2917314b46ca65bedb570062b65fa2a65f2ecc841d0ae2f4"
+  },
+  {
+    "path": "src/features/roomTests/services/roomTestTags.ts",
+    "sha256": "c650e48e18b6c927a1d4157da5e6393ba9d142de717dfa93e1c32800332c331a"
+  },
+  {
+    "path": "src/features/roomTests/services/useRoomTestRecorder.ts",
+    "sha256": "21ba3dca4a73e0b859fe5995b5a2702473fcbee256ab3b422150bdc63dfebb69"
+  },
+  {
+    "path": "src/features/settings/components/settings.module.css",
+    "sha256": "3fbf0d8eae7709d1102c7855d6695edb6a5b914c650f6d7e0aff6ee0b1427551"
+  },
+  {
+    "path": "src/features/settings/components/SettingsPanel.tsx",
+    "sha256": "b5b2f666d962be80f1283ebb19f7c9de56583df0173489fe7c85c645a00df9e4"
+  },
+  {
+    "path": "src/features/settings/services/settingsApi.ts",
+    "sha256": "837c69b4fe5e0c5b97cf8acfc323149357f8608fc10e9ea83e5decc24486a7ea"
+  },
+  {
+    "path": "src/features/settings/types/settings.types.ts",
+    "sha256": "4837337ce4cd6d74753c676c46acbda0c890e3f79ef3925bb1d0a4e744b42371"
+  },
+  {
+    "path": "src/features/support/components/supportContact.module.css",
+    "sha256": "26821bdfc81392a4dabfe5c4131be4aedd583f90b3afb6552899529d147a0587"
+  },
+  {
+    "path": "src/features/support/components/SupportContactPanel.tsx",
+    "sha256": "a95233c57a2ae977b542c69dabca16fc629bf1938d1a5d398db18e8f166ffc6e"
+  },
+  {
+    "path": "src/features/tracking/components/TagInformationPanel.tsx",
+    "sha256": "8c490cbe8bca9ebb84a20eb078215b24af710a5019a73fe934005addea9fbce6"
+  },
+  {
+    "path": "src/features/tracking/components/TagLastSeen.tsx",
+    "sha256": "94b98f6429784771bf4b6d8bb198987d2b16bed6d189a67dc85d040fffe20b8e"
+  },
+  {
+    "path": "src/features/tracking/config/mapDisplayConfig.ts",
+    "sha256": "1beaf9280e959d0f3f48b185f0c9d3d47403fade73af8f96cb7c148f6debf7fe"
+  },
+  {
+    "path": "src/features/tracking/config/positionAnimationConfig.ts",
+    "sha256": "30563203c96e46ef4adc3ae03e05f5d3537539bf4086f30c961757d17325e402"
+  },
+  {
+    "path": "src/features/tracking/hooks/useAreaExitTracking.ts",
+    "sha256": "95402af93157dcaaaf65c2533ad2a7b00b9d0032cc4c99ed3e289c3e05e7ff60"
+  },
+  {
+    "path": "src/features/tracking/hooks/useMapDisplayTracking.ts",
+    "sha256": "5d3e7c2f1c35214554111b8b6970107570d31606bda2b9511099a90f21b3ca0f"
+  },
+  {
+    "path": "src/features/tracking/hooks/useRealtimeTracking.ts",
+    "sha256": "c1de398dfe997d5987571d025c19cbb40e716df94de677cf7166dccd9a6f1eec"
+  },
+  {
+    "path": "src/features/tracking/hooks/useTagPresenceClock.ts",
+    "sha256": "6c7e674c7907cd1ab732acc5a753be6c026fcf970a8180affca91f12e494b2e9"
+  },
+  {
+    "path": "src/features/tracking/hooks/useTagPresenceTracking.ts",
+    "sha256": "30a44090fa7c7d8cf16efcc7ab8c63e35de6ed5ded47b423a9c247dbc4042f8e"
+  },
+  {
+    "path": "src/features/tracking/hooks/useTagTrailSettingsStorage.ts",
+    "sha256": "59ecf6afb3df4a21f83b95ffc47893a636d0ea4f2731d73fc64f8d540a672d4e"
+  },
+  {
+    "path": "src/features/tracking/services/bindMapDisplayTracking.ts",
+    "sha256": "695b2bceb731bdd0c583310fb09dd3dab094fc45c8b1900efaecc82f59387cb4"
+  },
+  {
+    "path": "src/features/tracking/services/displayArea.ts",
+    "sha256": "cdf456447f1431d8be90c1fae6cd802fa315f8c20e8c81bb4fb097222ae000f9"
+  },
+  {
+    "path": "src/features/tracking/services/MapDisplayFilter.ts",
+    "sha256": "99642766872726c990ad72d8b2746db7e2bcf66f3a833c8522bc1599024523fb"
+  },
+  {
+    "path": "src/features/tracking/services/mapTrackingTags.ts",
+    "sha256": "b06af5025855c5664f3b2166293c56bcd7f636fba71e8ff52c8bd6ddfd43e3f6"
+  },
+  {
+    "path": "src/features/tracking/services/passiveAreaExitLookup.ts",
+    "sha256": "776507efa0895cff284714bd143ca5a4bfb4277cd66db332fd0afe4b39e40be0"
+  },
+  {
+    "path": "src/features/tracking/services/PositionAnimationController.ts",
+    "sha256": "8b7980297e72a55273423127e738a8b1c190d280a3d2f13ea5f488d710e22586"
+  },
+  {
+    "path": "src/features/tracking/services/positionFilters.ts",
+    "sha256": "50b9ab47c9d0fe0bf3485055956dfdd3d823a36b6c67a52940aa7a91d424d811"
+  },
+  {
+    "path": "src/features/tracking/services/roomDecisionLabel.ts",
+    "sha256": "b06fb8f5ad10f4d3f73e83343e6156baf01ead3bbe528d9e40298eec3874de21"
+  },
+  {
+    "path": "src/features/tracking/services/roomDisplayPolicy.ts",
+    "sha256": "6aae0f777ca6961c8739d48a121c02a863ea37691705d57793e34f3f9c75fe0f"
+  },
+  {
+    "path": "src/features/tracking/services/tagActivityPresentation.ts",
+    "sha256": "4918ff70d1aedfb93ed51d5478ac2dc1a4a3945618d4ac347a9bea82a4056825"
+  },
+  {
+    "path": "src/features/tracking/services/tagApi.ts",
+    "sha256": "79d09d5a1b7cb60ca868733cbf45fe5e84c699cbfe78c190e19c80d90dd8493b"
+  },
+  {
+    "path": "src/features/tracking/services/tagColor.ts",
+    "sha256": "9d71c94b7c8644b703756634791939b0633219eb854b06a63d92dc7fddb47002"
+  },
+  {
+    "path": "src/features/tracking/services/tagPanelState.ts",
+    "sha256": "83d24aaf8357dfc179b691ea21528514191d2bac926f59beb92c4fe85fc4c2cf"
+  },
+  {
+    "path": "src/features/tracking/services/tagPresencePresentation.ts",
+    "sha256": "6d82e628dcf5268d2c8abbfc9e7680b3c4a559325077ec0e0207f312627819b2"
+  },
+  {
+    "path": "src/features/tracking/services/tagQuickList.ts",
+    "sha256": "7795c18ba135f5bcf5c6f9385aaef8433c7119ff9ef34c3942966705c82f8722"
+  },
+  {
+    "path": "src/features/tracking/services/tagTrail.ts",
+    "sha256": "b4d530c5d42a55a95c089a23614d48f21fbd4893332ef6176e53d47c1c1f9dba"
+  },
+  {
+    "path": "src/features/tracking/services/tagTrailSettings.ts",
+    "sha256": "d299269afd6fe9a67383dc1726e5ab179a88ce6ba3e01a75375fc68f8746d856"
+  },
+  {
+    "path": "src/features/tracking/services/tagUpdateOrdering.ts",
+    "sha256": "a1dcf7ab3192bf3d140e5299a15a6d47020462c0bf16d0b72c088e316d1a4bee"
+  },
+  {
+    "path": "src/features/tracking/services/TrackingGateway.ts",
+    "sha256": "859dd4853604de25dedcdca32cbcd2c17efaaee8b56926aa075cf0d8e9db290f"
+  },
+  {
+    "path": "src/features/tracking/types/areaExit.types.ts",
+    "sha256": "f612089f1a0b46624c24ff19ad22f7edd3f491483dd923a52abd35e572e938cc"
+  },
+  {
+    "path": "src/features/tracking/types/tagPresence.types.ts",
+    "sha256": "f644e8c3ec1fa5be433b402cd0a6526a6eadbb3143c4275c4753a39bac8e525c"
+  },
+  {
+    "path": "src/features/tracking/types/tracking.types.ts",
+    "sha256": "9cc94c7795212b758a9750b528e7f01f38445f3bd0b1e20759eeb9921d3e76b4"
+  },
+  {
+    "path": "src/server/assistant/assistantAdminAuth.ts",
+    "sha256": "9138d6c145a4f97b32f4f3ea570428e592b46bea235574dc5645b96e982bcdff"
+  },
+  {
+    "path": "src/server/assistant/assistantAdminHttp.ts",
+    "sha256": "78076c6c2c26bc4b5ab0a9f016eb24a372bcd8183433df8d689bd2ae4e275123"
+  },
+  {
+    "path": "src/server/assistant/assistantManagementRepository.ts",
+    "sha256": "95e0ce6285309caaffd4c06dec361e6a051c142e1de9f26d31574a2cdd446eb7"
+  },
+  {
+    "path": "src/server/assistant/assistantRequestService.ts",
+    "sha256": "9e11ef0b2327843c75700193a21aee20838d6c1639d51c5746e92198371cfb2c"
+  },
+  {
+    "path": "src/server/assistant/conversationContext.ts",
+    "sha256": "fab4cd85ffa10abb648d760448a5b2a3ce5c085e4bd6c67a1241c8fc30d9384e"
+  },
+  {
+    "path": "src/server/assistant/locationAnswer.ts",
+    "sha256": "e9ddc9484870448cfc4a95b8de9e7c0992548f5186ec055ea3a63436f2976dbe"
+  },
+  {
+    "path": "src/server/location/entityRepository.ts",
+    "sha256": "f7002c368669a7aad6c24eafd00d4af5d49b78223dd107a2da472d363aa570a3"
+  },
+  {
+    "path": "src/server/location/entityService.ts",
+    "sha256": "51b3a6ec0dc82ff15deb87dfcec27df6428e2c77b7bb007b4ae5298e329300ee"
+  },
+  {
+    "path": "src/server/location/historyMapRenderer.ts",
+    "sha256": "dbbf745929dafe712c5b30eeb2dc674007268828d3685d9f1ddc462232d5ee0f"
+  },
+  {
+    "path": "src/server/location/http.ts",
+    "sha256": "4d1a864501ae8c57971437eec364176801b29a5f5be06f48e9c3bf6f05e3d9cc"
+  },
+  {
+    "path": "src/server/location/index.ts",
+    "sha256": "95021fffde01da8e5932305291c5cb34a868a0096b3e5bc50b127aa42a5bbee3"
+  },
+  {
+    "path": "src/server/location/location.types.ts",
+    "sha256": "5761c85151dee5a841a2885dbb31ac643bf2762570f5dafa8add01260c2e1901"
+  },
+  {
+    "path": "src/server/location/location.validation.ts",
+    "sha256": "9a883def2223eac797fb6461edd97f89afbd376fee7307338288cf2c26f00776"
+  },
+  {
+    "path": "src/server/location/locationErrors.ts",
+    "sha256": "f4fbde11307295c9abc8dcb489dbf0d11c480a11672c1fc575bb5d705b54d602"
+  },
+  {
+    "path": "src/server/location/locationService.ts",
+    "sha256": "f19973d74f00f14482071e052c52d925f99be7bff4dc787ec35b86450afbfb17"
+  },
+  {
+    "path": "src/server/location/positionRepository.ts",
+    "sha256": "50c828c558b33f5d5e75638178165380cab6355c7bac5b56fe155dab67c41865"
+  },
+  {
+    "path": "src/server/location/regionLocationResolver.ts",
+    "sha256": "4d155a730eedfe422492159131bb0376eb2347588aecce3afb84cd741098802d"
+  },
+  {
+    "path": "src/server/location/roomDecision.validation.ts",
+    "sha256": "db0f8e3be393259c814c364d8ba5ad51da0c301b6f64914379ccd24a4373d94c"
+  },
+  {
+    "path": "src/server/location/roomDecisionProjection.ts",
+    "sha256": "554791c1817c633b18d32a09b0e1974bafb4af2897803582727cd406e654a02c"
+  },
+  {
+    "path": "src/server/location/roomDecisionRepository.ts",
+    "sha256": "015db38bef009d12c320a37b57c2c934f2097d0423f9eab3f4635987f870ec8a"
+  },
+  {
+    "path": "src/server/logger.ts",
+    "sha256": "538889b01ddbad851b9530fc7b299e3b0771e847e87c715d0786e3c979a9a05f"
+  },
+  {
+    "path": "src/server/maps/map.types.ts",
+    "sha256": "1a140cdccb3d163298015c1b71309ede168ad088024c1f83f153857e40146451"
+  },
+  {
+    "path": "src/server/maps/map.validation.ts",
+    "sha256": "9d2b2ae7fd439d039ebb1aa67f1e93ab03f6d1fd6f884b8c3acf8b1e27bc99f6"
+  },
+  {
+    "path": "src/server/maps/mapRepository.ts",
+    "sha256": "ed63164dffe7e0b4aa7c21981bae47caebb21b99ea771d1aec4c976316cc8f72"
+  },
+  {
+    "path": "src/server/maps/mapService.ts",
+    "sha256": "87cc8115f655676749b4fd1433066380b38a3a8751b120eba4a5b6605c431e70"
+  },
+  {
+    "path": "src/server/maps/zoneMapResolver.ts",
+    "sha256": "ec5a996e7083ba691b6552101468e2b6857dc4599f74682775fab4ebc75a56f0"
+  },
+  {
+    "path": "src/server/notifications/analysisLogs.ts",
+    "sha256": "72b7aea760d256bc42d0b67b2f124f092bb047aed6701d873b3ce569167bc0ae"
+  },
+  {
+    "path": "src/server/notifications/AreaExitObserver.ts",
+    "sha256": "ad92b9a6de668d73ac53f75c00d9e810c716c5fc4b7ea568d524693df9bcfa4c"
+  },
+  {
+    "path": "src/server/notifications/notificationRepository.ts",
+    "sha256": "e92880c8fb28f9d200ff814f8aa37e36321fcca63e05decdeacb00f25b391afe"
+  },
+  {
+    "path": "src/server/notifications/notificationRuntime.ts",
+    "sha256": "c3846aa3337a0568de2d87e3fa0e67b2115172724a8d0c948c179e6b9fcd8e05"
+  },
+  {
+    "path": "src/server/postgresClient.ts",
+    "sha256": "f7e4e1080f5b0d8024bc6bdf92242cdc37ee922dad950551762a93fb940e67cb"
+  },
+  {
+    "path": "src/server/regionEngine/AreaTransitionEngine.ts",
+    "sha256": "d2997bea48596239b15e765651feada07d38f57b7b6aeb4b109e1e2e5eff26b8"
+  },
+  {
+    "path": "src/server/regionEngine/areaTransitionRepository.ts",
+    "sha256": "571762c03faf0b7f7a038d11a391541379dc87f5a853bbc34153f40f4583c3cd"
+  },
+  {
+    "path": "src/server/regionEngine/configLoader.ts",
+    "sha256": "a3637cef2d9495cf069530937ac9fc11d2c885b08deb5291a566e997fda0af63"
+  },
+  {
+    "path": "src/server/regionEngine/controller.ts",
+    "sha256": "eaf0712baed20748d320dece33ba9cb4c8bc744060a4559c2633ce02d44a2930"
+  },
+  {
+    "path": "src/server/regionEngine/geometry.ts",
+    "sha256": "1773ef82ee02bc71a9d80533e346793de80c778bea73a5db340fa5e88603d291"
+  },
+  {
+    "path": "src/server/regionEngine/LegacyRegionPositionEngine.ts",
+    "sha256": "ade9668721ac2afaab5268e040edb005ac2db7763cb282f7df4171a63ae43234"
+  },
+  {
+    "path": "src/server/regionEngine/ProcessedPositionServer.ts",
+    "sha256": "b52fbdb7ca98306872d37b5996d4023ab1f0346b2f108b99a1bbd58adba45ca2"
+  },
+  {
+    "path": "src/server/regionEngine/RegionPositionEngine.ts",
+    "sha256": "1bfb086305ad1b09f782e65885baf24def9886bd9cceb707301caa7c19a61d4b"
+  },
+  {
+    "path": "src/server/regionEngine/roomEngineSelection.ts",
+    "sha256": "f91255ffaf2eb7b3e01098ae4c82fc4f92e2ee3d08c5d8cb608000b35c91d362"
+  },
+  {
+    "path": "src/server/regionEngine/RoomHmmEngine.ts",
+    "sha256": "a2e45d61e177df6378b789f66c988770292fb66c0f4458b2ea1175b47689d7fe"
+  },
+  {
+    "path": "src/server/regionEngine/runtimeConfig.ts",
+    "sha256": "ce3c7223f505624867fde94ffd6235f5cf4ab7353fee220984835095122c3dde"
+  },
+  {
+    "path": "src/server/regionEngine/StepDistanceFilter.ts",
+    "sha256": "e885b56955f95a292cbcf4f00d72ab3d1385b560fafc4f17715e8a2788dcd4a3"
+  },
+  {
+    "path": "src/server/regionEngine/types.ts",
+    "sha256": "90d6c5a01f4ef324656cb0ed8829132cf2edca5bda6b1cd678351480ed61888c"
+  },
+  {
+    "path": "src/server/reports/assets/Roboto-Medium.ttf",
+    "sha256": "79a763229b01229cfd921a9a0108e58c162d045d828037e32c6fb85ed6f914be"
+  },
+  {
+    "path": "src/server/reports/assets/Roboto-Regular.ttf",
+    "sha256": "a93f6bc56ef0349a4426b717c182482bb878534f31077ae5e1b2b4dae7a089d1"
+  },
+  {
+    "path": "src/server/reports/routeReport.ts",
+    "sha256": "ac512403c8b172f501665cbaab078d4db6f7b75521082a53a22e8bc67b831529"
+  },
+  {
+    "path": "src/server/reports/routeReportPdf.ts",
+    "sha256": "4a1fe6706f5237a1a470d25b5c5c593d2dd80731756289c1fb39e54a8c1e1b03"
+  },
+  {
+    "path": "src/server/reports/routeReportRooms.ts",
+    "sha256": "c64d5ec834b17fb5e01f5ac8b1f8c6c1701e498f8d00685d52bc493caeaa4bf1"
+  },
+  {
+    "path": "src/server/reports/routeReportService.ts",
+    "sha256": "0dad8b38d00ce73665a2372f9c7560b262c6fceadd41a6847ffb97bc792fcc6b"
+  },
+  {
+    "path": "src/server/roomTests/roomTestHttp.ts",
+    "sha256": "8f4d46e402c8dacff9ec61c1c862d86f01cacf4f0d5ef5a584974ea41da974b5"
+  },
+  {
+    "path": "src/server/roomTests/roomTestRepository.ts",
+    "sha256": "43d3e7585e05fe7b4646a388ed549132fbc411efc09a25466790bc8c47d75951"
+  },
+  {
+    "path": "src/server/settings/settingsHttp.ts",
+    "sha256": "be47fe86be43db603e2172c441fb32df390b30f1ab100d61eb2dbcebc6e0eb6f"
+  },
+  {
+    "path": "src/server/settings/systemSettings.ts",
+    "sha256": "7a5cbae3d49c87c30d7f21b84509751949072f0018464bcc6118eee0693fce1f"
+  },
+  {
+    "path": "src/server/tracking/areaExitHttp.ts",
+    "sha256": "53c7c2a6ca6bf44e5d453715475bcab604a0f0c8694420e07b3ac43a8e37d46f"
+  },
+  {
+    "path": "src/server/tracking/areaExitReader.ts",
+    "sha256": "6a45b8240aeba223c8a14202d0b619cb08c5b905a1c09fe1edc14e989f265558"
+  },
+  {
+    "path": "src/server/tracking/lastObservedLocation.ts",
+    "sha256": "ba678f693f442a25cf857ec7bbf18d853077caecbb1d2c1c2b1696586c8a8766"
+  },
+  {
+    "path": "src/server/tracking/tagPresenceHttp.ts",
+    "sha256": "d0c22dded11c70e00eb013e0cab2d9913977e6f78b642c31f1bab4d7a62cb321"
+  },
+  {
+    "path": "src/server/tracking/tagPresenceRepository.ts",
+    "sha256": "db3fe7a7808bf303c1dafddc5f111bb1b091773084201af506cab5fdae634e7c"
+  },
+  {
+    "path": "src/server/tracking/tagPresenceRuntime.ts",
+    "sha256": "aac9434455859d75606aeff8db182413fccf284d5bc111150b3ce417e3ad2e3a"
+  },
+  {
+    "path": "src/server/tracking/TagPresenceService.ts",
+    "sha256": "f77a220f30345faf0fae10ef5f58be80a0c3ac713f564b02d6c150787790966e"
+  },
+  {
+    "path": "src/server/trackingBuffer.ts",
+    "sha256": "8fdb4c4b14187b6af362110b20b58788ba26bc78ff4114b6aea2dbd8eca74e42"
+  },
+  {
+    "path": "src/server/trackingFilterHttp.ts",
+    "sha256": "b8a668bd5cbdec3cd268825374e88fc800979a03adc75fd6aa5e88323e8c1ffe"
+  },
+  {
+    "path": "src/server/trackingFilterSettings.ts",
+    "sha256": "be3e1f57f7f4322b76681ddec727e951e8fd2630a31c7db0925154713d7e60c5"
+  },
+  {
+    "path": "src/shared/components/LogoMark.tsx",
+    "sha256": "4adb9ddd00192c23c6a95415480cdc0c89170dad136ac1cc13990f2f03125cbd"
+  },
+  {
+    "path": "src/shared/hooks/useElementSize.ts",
+    "sha256": "d18745c114704b940f73f1b88413ae994e7dd816a9d0ab72713306b2e496bbff"
+  },
+  {
+    "path": "src/shared/hooks/useFps.ts",
+    "sha256": "ad63fad787f4aca9c85b17077375400b5700d9ecabf069872145a34d3462e68c"
+  },
+  {
+    "path": "src/shared/tracking/pdop.ts",
+    "sha256": "4aaa0058b3013c91fd76332a6effec764d4c4862c02f9030f2c3f2962b9378d9"
+  },
+  {
+    "path": "src/shared/types/geometry.ts",
+    "sha256": "e18e61b82d7d71efa3c7f62515e6b372d4d82f1ea6317fa0400db6cf2f38b79b"
+  },
+  {
+    "path": "app/anchors/anchors.module.css",
+    "sha256": "cbf3150a050c3f838334dd2b43b5502b74666ba71d3b54248492d345cfcc9e30"
+  },
+  {
+    "path": "app/anchors/layout.tsx",
+    "sha256": "ec180ec9a8bf9233523de30eb769c34c955c222a81be068e1eb9772e4c96a873"
+  },
+  {
+    "path": "app/anchors/page.tsx",
+    "sha256": "87786111f4b6506362970e28d5dfd4267e6cf4debe9981400a2876ed3401db44"
+  },
+  {
+    "path": "app/api/admin/gekon-ai/requests/route.ts",
+    "sha256": "8d438942f2d4dece0dfe8b8c341f7dc69606bbfc4373d55e9a5e80a2bfc1ee8b"
+  },
+  {
+    "path": "app/api/admin/gekon-ai/requests/[id]/route.ts",
+    "sha256": "b37cd1c7ac8098408e09b4f181084f1a060872c95075fa17fed3d23aa0fd3b01"
+  },
+  {
+    "path": "app/api/admin/gekon-ai/session/route.ts",
+    "sha256": "6b6620c1e0643bcaba465ff10d44bbb6f066528033491025076d19e9d207f033"
+  },
+  {
+    "path": "app/api/admin/gekon-ai/settings/route.ts",
+    "sha256": "221cece49c80afdb8f0d16fa5bc2178fea74c60a803c45dcb9976d28f85b0749"
+  },
+  {
+    "path": "app/api/admin/gekon-ai/summary/route.ts",
+    "sha256": "fb965454794817b31911c4785fc5c9e0115247115759a15225bde731b8181efe"
+  },
+  {
+    "path": "app/api/anchors/route.ts",
+    "sha256": "2101765324fc73104d6129172a03a9428e553df6babb814935c7b3edf77967f0"
+  },
+  {
+    "path": "app/api/anchors/[id]/logs/route.ts",
+    "sha256": "fb82173f46fd9a3afc63e7cfd4ec3be580b2e68b1b2168238531d6284b845ad9"
+  },
+  {
+    "path": "app/api/area-events/route.ts",
+    "sha256": "8ee3bd2bdb2bf79f7ead2cb5be152e4bb22090716045b581668843ebdfa774da"
+  },
+  {
+    "path": "app/api/assistant/route.ts",
+    "sha256": "9846fa71acff2780505cba8f318542782ace16e350d379ee379517a015b4cbfa"
+  },
+  {
+    "path": "app/api/health/route.ts",
+    "sha256": "14a4263151e4db674fe274603df0aae63efcc762f23ca509364b3f6c2461f0b8"
+  },
+  {
+    "path": "app/api/location/entities/search/route.ts",
+    "sha256": "6d3614b84d34615635fb38555213e0e96aef83a79e5b88f75c4ec5ce872a1844"
+  },
+  {
+    "path": "app/api/location/entities/[entityId]/at/route.ts",
+    "sha256": "ffc4663c0b63b5d730286cfbe3b24d8d31c27473828435552bde120d5db4dd68"
+  },
+  {
+    "path": "app/api/location/entities/[entityId]/current/route.ts",
+    "sha256": "e73ac803bc252369a737defdaaec34c1a8608d6cf37827d9cc72b7ee3cd351b1"
+  },
+  {
+    "path": "app/api/location/entities/[entityId]/history/route.ts",
+    "sha256": "2d25a1a5d283c71b4f5549d4f669f151479eca20cf536e56710aee0ece5ffd3d"
+  },
+  {
+    "path": "app/api/location/history-map/selection/route.ts",
+    "sha256": "0b3531045f06c0361f5df18465253eb939282fe66042df59076977eacf948a85"
+  },
+  {
+    "path": "app/api/maps/route.ts",
+    "sha256": "01ad24c1319e37d6220d38cb3a26d9127715009d87c353d66dc505a468c3f475"
+  },
+  {
+    "path": "app/api/maps/[mapId]/regions/route.ts",
+    "sha256": "c765f90fa86417be46cbb6af5697e3baeb1e00321444916d723ef867abf5dbda"
+  },
+  {
+    "path": "app/api/maps/[mapId]/regions/validate/route.ts",
+    "sha256": "b4fb09f93a83cbc510d061b111e469a007830cf7cc13c954b4472add1a83dc06"
+  },
+  {
+    "path": "app/api/maps/[mapId]/route.ts",
+    "sha256": "d4fe1bc5d28c683b3a7e8e2580679c41c06eb6d1f1c6b75520a29ccff57d67eb"
+  },
+  {
+    "path": "app/api/maps/[mapId]/tracking-filter/route.ts",
+    "sha256": "ac1a455e3c0f465b4914bd5c1a51b4368df053fb58c491087abcd8b5092e436e"
+  },
+  {
+    "path": "app/api/notifications/route.ts",
+    "sha256": "fd079de5ddb3b1c81062f842b8b78b62cfcc3e7aa267a9c05c548d93eef7861f"
+  },
+  {
+    "path": "app/api/region-engine/config/route.ts",
+    "sha256": "4e11eda8e13e6ba11ae3da7310ac314cbe7f30a7a7f5394018976f0efbbc81ab"
+  },
+  {
+    "path": "app/api/region-engine/status/route.ts",
+    "sha256": "984ceeff8dc9ca93e437c5311d4fa9e77b0ceac1e8b0861642af8bb62a1fc013"
+  },
+  {
+    "path": "app/api/region-engine/tick/route.ts",
+    "sha256": "ee67db67fa5656f4c793605d2fde8bc15b934f6c577a1832038414559e68daa3"
+  },
+  {
+    "path": "app/api/regions/route.ts",
+    "sha256": "d4f1333e838256a0561f051fa400febeb88444fa10af58be018a36b07ca84c72"
+  },
+  {
+    "path": "app/api/regions/validate/route.ts",
+    "sha256": "be3dc11aa29722e6a0ab925e9ff2d509116ac4ea5f96346baec6237cb5a53d76"
+  },
+  {
+    "path": "app/api/reports/route-history/route.ts",
+    "sha256": "c82db09c61a8ae7fed3601040e4caa77ec9aaeed4c2ab439371f72cacae2df07"
+  },
+  {
+    "path": "app/api/room-decisions/route.ts",
+    "sha256": "aa105c43716e6ecf78b3b5731ffeca904eb00add310a5e2b435c95bcf1ceb8f5"
+  },
+  {
+    "path": "app/api/room-decisions/[decisionId]/route.ts",
+    "sha256": "0e3a65981c50c425c364b86f1b9fec086fbe3eb75f2205d2979455ca53605f5d"
+  },
+  {
+    "path": "app/api/room-tests/plans/route.ts",
+    "sha256": "b0e6cfe8f5cb4416ed67a3d43d0a6d4a982c1b44dd6150cc4212e6b996e2f63c"
+  },
+  {
+    "path": "app/api/room-tests/route.ts",
+    "sha256": "9dd4532789fe8cc131ce999c091bee82441db03449e035b24040494f457dc4e8"
+  },
+  {
+    "path": "app/api/room-tests/[id]/actions/route.ts",
+    "sha256": "d2b889e802e8e1b4bfe10c88d1266f55af567edca25360514762a5c37691947f"
+  },
+  {
+    "path": "app/api/room-tests/[id]/export/route.ts",
+    "sha256": "423160ee3f20c89376b64709ada32734d98e7b17a15dd1bf7076c64ba2f63426"
+  },
+  {
+    "path": "app/api/room-tests/[id]/route.ts",
+    "sha256": "14ad40e2dce74fe3b2e952d5867dfb28c22deea0ea2fcb694ec01952e80ee74b"
+  },
+  {
+    "path": "app/api/settings/route.ts",
+    "sha256": "c450152138ce65a18e4d9c8c9ca348531d4994df9d66b267c9ee8f93d67abbae"
+  },
+  {
+    "path": "app/api/support/route.ts",
+    "sha256": "69892d005f0c5c44385dd154492bee71c3ebf2f49aafe1f5e14687be66030125"
+  },
+  {
+    "path": "app/api/tags/route.ts",
+    "sha256": "49fded5b972555703fbad99a7e397a11b4c5064685b3dc060947cdd29eac48c4"
+  },
+  {
+    "path": "app/api/tracking/area-exits/route.ts",
+    "sha256": "dae45d335ba1726d64ba3a6ed45f20d477895934e598d4e445009df7c5b20b5e"
+  },
+  {
+    "path": "app/api/tracking/ingest/route.ts",
+    "sha256": "e64a5cafb455b4950013b2e112d0fdd063a826a64495804ef8c50539c9d0c042"
+  },
+  {
+    "path": "app/api/tracking/presence/route.ts",
+    "sha256": "6b7b43607975d0779882e209a965455f4990e8d0a6ff0bca32f199088f5e5e76"
+  },
+  {
+    "path": "app/api/tracking/processed/route.ts",
+    "sha256": "0729b370229ab990e4632f85e88d353fae44bc5f48c87f60abb9c64f685a3a95"
+  },
+  {
+    "path": "app/api/tracking/stream/route.ts",
+    "sha256": "e1319187f70a37d34e9556cc46ba604d7601740c6994a8b067d061db38563872"
+  },
+  {
+    "path": "app/globals.css",
+    "sha256": "a402a8a667f531e6c4d8ea675fe515f736fc6c14d48ed99cf2ac1b8f871fe848"
+  },
+  {
+    "path": "app/history/page.tsx",
+    "sha256": "1ab2971be593e3bcea3d9b990ca74a7a03fc151958f2cc32237e2ec790feb445"
+  },
+  {
+    "path": "app/HomeClient.tsx",
+    "sha256": "2b898c4001460c5b7a5cb0735d21a9626ee12d81117792176a59a85f5daf4bbe"
+  },
+  {
+    "path": "app/layout.tsx",
+    "sha256": "aebb2bc072fd9b11a0f21d6431d0a7da5422ba089f15e0e8b9b804cae1c0f39f"
+  },
+  {
+    "path": "app/page.tsx",
+    "sha256": "d5a3aa97a4982bb3e2c0364caed89bf82a37964a1da377b84c993251bc77f217"
+  },
+  {
+    "path": "app/tags/layout.tsx",
+    "sha256": "ec180ec9a8bf9233523de30eb769c34c955c222a81be068e1eb9772e4c96a873"
+  },
+  {
+    "path": "app/tags/page.tsx",
+    "sha256": "af0763bdbf82f9c36fb17ace6b77167a73170cdb14a469e352df852c07390143"
+  }
+]

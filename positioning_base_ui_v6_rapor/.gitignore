@@ -1,0 +1,63 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/.vinext/
+/out/
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm-cache/
+.codex-*.log
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+.env*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+next-env.d.ts
+/dist/
+# Local benchmark DB exports and durable runtime data (never commit).
+/.data/
+
+# Cloudflare Tunnel local credentials and machine-specific config
+/.cloudflared/
+/deploy/cloudflared/*.json
+/deploy/cloudflared/config.yml
+/deploy/cloudflared/*.log
+
+# Python terminal MCP demo
+/mcp/.venv/
+/mcp/__pycache__/
+
+# Local AI evaluation responses can contain sensitive patterns even when fixtures are synthetic.
+/tests/ai-evaluation/reports/*.json
+/tests/ai-evaluation/reports/*.md
+!/tests/ai-evaluation/reports/.gitkeep
+
+# Reproducible room inference diagnostics (reports/config stay reviewable)
+/.room-*.log
+/test_api/results/**/room-traces.json

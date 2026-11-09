@@ -1,0 +1,406 @@
+[
+  {
+    "scenario": "corridor",
+    "seed": 42,
+    "durationSeconds": 42.25,
+    "tagCount": 1,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 0,
+        "correctSeconds": 42.25,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 0,
+        "correctSeconds": 42.25,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      }
+    }
+  },
+  {
+    "scenario": "parallel-gap",
+    "seed": 42,
+    "durationSeconds": 42.25,
+    "tagCount": 1,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 1,
+        "correctSeconds": 41.25,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 0,
+        "correctSeconds": 42.25,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      }
+    }
+  },
+  {
+    "scenario": "door-turnback",
+    "seed": 42,
+    "durationSeconds": 14,
+    "tagCount": 1,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 1,
+        "correctSeconds": 13,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 0,
+        "correctSeconds": 14,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      }
+    }
+  },
+  {
+    "scenario": "entry-gap",
+    "seed": 42,
+    "durationSeconds": 61.25,
+    "tagCount": 1,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 44,
+        "correctSeconds": 17.25,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 59,
+        "delayMs": [
+          42750
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 1,
+        "correctSeconds": 20.5,
+        "unassignedRoomSeconds": 39.75,
+        "roomTruthSeconds": 59,
+        "delayMs": [
+          40750
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "inside-long-gap",
+    "seed": 42,
+    "durationSeconds": 70.5,
+    "tagCount": 1,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 14,
+        "correctSeconds": 56.5,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 68.25,
+        "delayMs": [
+          2750
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 1,
+        "correctSeconds": 69.5,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 68.25,
+        "delayMs": [
+          750
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "room-motion",
+    "seed": 42,
+    "durationSeconds": 70.5,
+    "tagCount": 1,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 3,
+        "correctSeconds": 67.5,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 68.25,
+        "delayMs": [
+          2750
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 1,
+        "correctSeconds": 69.5,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 68.25,
+        "delayMs": [
+          750
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "shared-wall-noise",
+    "seed": 42,
+    "durationSeconds": 35.25,
+    "tagCount": 1,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 3,
+        "correctSeconds": 32.25,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 33,
+        "delayMs": [
+          2750
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 1,
+        "correctSeconds": 34.25,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 33,
+        "delayMs": [
+          750
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "neighbor-jumps",
+    "seed": 42,
+    "durationSeconds": 70.5,
+    "tagCount": 1,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 3,
+        "correctSeconds": 67.5,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 68.25,
+        "delayMs": [
+          2750
+        ]
+      },
+      "legacy": {
+        "falseEntries": 1,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 3,
+        "uncertainSeconds": 3,
+        "correctSeconds": 62.5,
+        "unassignedRoomSeconds": 2,
+        "roomTruthSeconds": 68.25,
+        "delayMs": [
+          750
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "door-transfer",
+    "seed": 42,
+    "durationSeconds": 79.25,
+    "tagCount": 1,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 3,
+        "uncertainSeconds": 6,
+        "correctSeconds": 70.25,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 64.75,
+        "delayMs": [
+          2750,
+          2750
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 2,
+        "uncertainSeconds": 2,
+        "correctSeconds": 74.5,
+        "unassignedRoomSeconds": 0.75,
+        "roomTruthSeconds": 64.75,
+        "delayMs": [
+          750,
+          1750
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "relocation",
+    "seed": 42,
+    "durationSeconds": 79.25,
+    "tagCount": 1,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 25,
+        "uncertainSeconds": 17,
+        "correctSeconds": 37.25,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 64.75,
+        "delayMs": [
+          2750,
+          26750
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 37,
+        "uncertainSeconds": 2,
+        "correctSeconds": 39.25,
+        "unassignedRoomSeconds": 1,
+        "roomTruthSeconds": 64.75,
+        "delayMs": [
+          750,
+          26750
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "first-inside",
+    "seed": 42,
+    "durationSeconds": 16.75,
+    "tagCount": 1,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 2,
+        "correctSeconds": 14.75,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 16.75,
+        "delayMs": [
+          2000
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 1,
+        "correctSeconds": 15.75,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 16.75,
+        "delayMs": [
+          1000
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "packet-order",
+    "seed": 42,
+    "durationSeconds": 70.5,
+    "tagCount": 1,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 3,
+        "correctSeconds": 67.5,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 68.25,
+        "delayMs": [
+          2750
+        ]
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 0.25,
+        "correctSeconds": 70.25,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 68.25,
+        "delayMs": [
+          0
+        ]
+      }
+    }
+  },
+  {
+    "scenario": "variable-stream-gap",
+    "seed": 42,
+    "durationSeconds": 42.25,
+    "tagCount": 1,
+    "scores": {
+      "inference": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 9.5,
+        "correctSeconds": 32.75,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      },
+      "legacy": {
+        "falseEntries": 0,
+        "missedEntries": 0,
+        "wrongRoomSeconds": 0,
+        "uncertainSeconds": 0,
+        "correctSeconds": 42.25,
+        "unassignedRoomSeconds": 0,
+        "roomTruthSeconds": 0,
+        "delayMs": []
+      }
+    }
+  }
+]

@@ -1,0 +1,156 @@
+TAP version 13
+# Subtest: Servis has 18 silent rooms with 1 m door proximity, configured door geometry and its own entry/exit thresholds
+not ok 1 - Servis has 18 silent rooms with 1 m door proximity, configured door geometry and its own entry/exit thresholds
+  ---
+  duration_ms: 3.2675
+  type: 'test'
+  location: 'C:\\Users\\1548u\\Desktop\\cafer_motor\\positioning_base_ui_v5\\tests\\serviceRooms.test.ts:1:2726'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    21 !== 18
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 18
+  actual: 21
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\1548u\Desktop\cafer_motor\positioning_base_ui_v5\tests\serviceRooms.test.ts:52:10)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.start (node:internal/test_runner/test:944:17)
+    startSubtestAfterBootstrap (node:internal/test_runner/harness:296:17)
+  ...
+# Subtest: each Servis door retains its signal-loss threshold (1.3 m) independently of nearby doors
+ok 2 - each Servis door retains its signal-loss threshold (1.3 m) independently of nearby doors
+  ---
+  duration_ms: 9.0108
+  type: 'test'
+  ...
+# Subtest: door proximity (1.3 m) prevents inference in the corridor between opposing moved doors
+ok 3 - door proximity (1.3 m) prevents inference in the corridor between opposing moved doors
+  ---
+  duration_ms: 6.5045
+  type: 'test'
+  ...
+# Subtest: room numbering follows the Servis CAD labels and all coordinates use Servis calibration
+not ok 4 - room numbering follows the Servis CAD labels and all coordinates use Servis calibration
+  ---
+  duration_ms: 1.6963
+  type: 'test'
+  location: 'C:\\Users\\1548u\\Desktop\\cafer_motor\\positioning_base_ui_v5\\tests\\serviceRooms.test.ts:1:6545'
+  failureType: 'testCodeFailure'
+  error: 'Hemşire Bankosu'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (C:\Users\1548u\Desktop\cafer_motor\positioning_base_ui_v5\tests\serviceRooms.test.ts:139:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: rooms extend three metres behind their rear walls and adjacent rooms have a ten centimetre gap
+not ok 5 - rooms extend three metres behind their rear walls and adjacent rooms have a ten centimetre gap
+  ---
+  duration_ms: 115397.7856
+  type: 'test'
+  location: 'C:\\Users\\1548u\\Desktop\\cafer_motor\\positioning_base_ui_v5\\tests\\serviceRooms.test.ts:1:7438'
+  failureType: 'testCodeFailure'
+  error: 'false == true'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (C:\Users\1548u\Desktop\cafer_motor\positioning_base_ui_v5\tests\serviceRooms.test.ts:157:28)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: completed room fronts include corridor recesses and keep bathrooms and utility shafts separate
+not ok 6 - completed room fronts include corridor recesses and keep bathrooms and utility shafts separate
+  ---
+  duration_ms: 1.0213
+  type: 'test'
+  location: 'C:\\Users\\1548u\\Desktop\\cafer_motor\\positioning_base_ui_v5\\tests\\serviceRooms.test.ts:1:7977'
+  failureType: 'testCodeFailure'
+  error: 'Dr Odası: door is ten centimetres outside the completed front'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (C:\Users\1548u\Desktop\cafer_motor\positioning_base_ui_v5\tests\serviceRooms.test.ts:181:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: reliable measurements in the completed recess confirm its room and exit through the moved door
+ok 7 - reliable measurements in the completed recess confirm its room and exit through the moved door
+  ---
+  duration_ms: 13.8342
+  type: 'test'
+  ...
+# Subtest: every Servis room requires both five reliable measurements and two seconds before confirming entry
+ok 8 - every Servis room requires both five reliable measurements and two seconds before confirming entry
+  ---
+  duration_ms: 15.9838
+  type: 'test'
+  ...
+# Subtest: configured Servis gates record area entry and observed exit using their own wait settings
+not ok 9 - configured Servis gates record area entry and observed exit using their own wait settings
+  ---
+  duration_ms: 1.6492
+  type: 'test'
+  location: 'C:\\Users\\1548u\\Desktop\\cafer_motor\\positioning_base_ui_v5\\tests\\serviceRooms.test.ts:1:12343'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+    
+      [
+        'AREA_ENTERED',
+    -   'AREA_EXITED_OBSERVED'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: 'AREA_ENTERED'
+    1: 'AREA_EXITED_OBSERVED'
+  actual:
+    0: 'AREA_ENTERED'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (C:\Users\1548u\Desktop\cafer_motor\positioning_base_ui_v5\tests\serviceRooms.test.ts:280:12)
+    Test.runInAsyncScope (node:async_hooks:214:14)
+    Test.run (node:internal/test_runner/test:1047:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:744:18)
+    Test.postRun (node:internal/test_runner/test:1173:19)
+    Test.run (node:internal/test_runner/test:1101:12)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 4
+# fail 5
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 116149.143

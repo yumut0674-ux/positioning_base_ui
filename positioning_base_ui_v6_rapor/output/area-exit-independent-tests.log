@@ -1,0 +1,441 @@
+TAP version 13
+# Subtest: exit is read independently from the archive after silence/restart and a later entry supersedes it
+ok 1 - exit is read independently from the archive after silence/restart and a later entry supersedes it
+  ---
+  duration_ms: 16.3936
+  type: 'test'
+  ...
+# Subtest: aged exit remains available to AI as a past event rather than a corridor or live position
+ok 2 - aged exit remains available to AI as a past event rather than a corridor or live position
+  ---
+  duration_ms: 7.7521
+  type: 'test'
+  ...
+# Subtest: estimated room and repeated exits are classified independently with one exit per occurrence
+ok 3 - estimated room and repeated exits are classified independently with one exit per occurrence
+  ---
+  duration_ms: 2.1587
+  type: 'test'
+  ...
+# Subtest: report query carries estimated exits and their gate into the output
+ok 4 - report query carries estimated exits and their gate into the output
+  ---
+  duration_ms: 6.8063
+  type: 'test'
+  ...
+# Subtest: PDF includes exit even with no qualifying stays and contains no estimate label
+ok 5 - PDF includes exit even with no qualifying stays and contains no estimate label
+  ---
+  duration_ms: 2024.306
+  type: 'test'
+  ...
+# Subtest: exit reader uses existing history with SELECT only and does not mutate published decisions
+ok 6 - exit reader uses existing history with SELECT only and does not mutate published decisions
+  ---
+  duration_ms: 32.7855
+  type: 'test'
+  ...
+# Subtest: a newer unpublished-to-DB inside decision supersedes the earlier exit; unknown tags and future outputs are excluded
+ok 7 - a newer unpublished-to-DB inside decision supersedes the earlier exit; unknown tags and future outputs are excluded
+  ---
+  duration_ms: 0.6533
+  type: 'test'
+  ...
+# Subtest: display history changes neither client tracking objects nor presence; delayed history cannot replace newer display history
+ok 8 - display history changes neither client tracking objects nor presence; delayed history cannot replace newer display history
+  ---
+  duration_ms: 2.5964
+  type: 'test'
+  ...
+# Subtest: an API read failure and invalid input cannot change tracking state
+ok 9 - an API read failure and invalid input cannot change tracking state
+  ---
+  duration_ms: 68.25
+  type: 'test'
+  ...
+# Subtest: a newer live re-entry hides a delayed archive exit response without changing the decision
+ok 10 - a newer live re-entry hides a delayed archive exit response without changing the decision
+  ---
+  duration_ms: 3.4355
+  type: 'test'
+  ...
+# Subtest: current and last location phrasings use local data
+ok 11 - current and last location phrasings use local data
+  ---
+  duration_ms: 159.4778
+  type: 'test'
+  ...
+# Subtest: offline current question reports last observation without claiming live presence
+ok 12 - offline current question reports last observation without claiming live presence
+  ---
+  duration_ms: 1.7668
+  type: 'test'
+  ...
+# Subtest: last location remains available with an explicit timestamp when tracking is offline
+ok 13 - last location remains available with an explicit timestamp when tracking is offline
+  ---
+  duration_ms: 1.6218
+  type: 'test'
+  ...
+# Subtest: uncertain latest measurement includes the earlier verified room and its own timestamp
+ok 14 - uncertain latest measurement includes the earlier verified room and its own timestamp
+  ---
+  duration_ms: 5.2576
+  type: 'test'
+  ...
+# Subtest: ambiguous names, missing records and missing measurements are not guessed
+ok 15 - ambiguous names, missing records and missing measurements are not guessed
+  ---
+  duration_ms: 3.2027
+  type: 'test'
+  ...
+# Subtest: unrelated and mixed-instruction questions are not intercepted
+ok 16 - unrelated and mixed-instruction questions are not intercepted
+  ---
+  duration_ms: 3.3464
+  type: 'test'
+  ...
+# Subtest: subjectless question requests clarification when no selection exists
+ok 17 - subjectless question requests clarification when no selection exists
+  ---
+  duration_ms: 1.0106
+  type: 'test'
+  ...
+# Subtest: exit history enriches only the active assignment and a reader outage leaves current tracking intact
+ok 18 - exit history enriches only the active assignment and a reader outage leaves current tracking intact
+  ---
+  duration_ms: 13.6824
+  type: 'test'
+  ...
+# Subtest: map bilgisi olmayan eski kayıt güvenli biçimde katı belirsiz bırakır
+ok 19 - map bilgisi olmayan eski kayıt güvenli biçimde katı belirsiz bırakır
+  ---
+  duration_ms: 1.0751
+  type: 'test'
+  ...
+# Subtest: güncel, zaman noktasındaki ve geçmiş konumlar PDOP null ile sıfırı ayrı korur
+ok 20 - güncel, zaman noktasındaki ve geçmiş konumlar PDOP null ile sıfırı ayrı korur
+  ---
+  duration_ms: 5.1587
+  type: 'test'
+  ...
+# Subtest: tag başka ürüne atanmış olsa bile aralıktaki tarihsel atamalar birlikte kullanılır
+ok 21 - tag başka ürüne atanmış olsa bile aralıktaki tarihsel atamalar birlikte kullanılır
+  ---
+  duration_ms: 0.8302
+  type: 'test'
+  ...
+# Subtest: silinmiş/eski tag geçmişte görünür ama güncel aktif tag sayılmaz
+ok 22 - silinmiş/eski tag geçmişte görünür ama güncel aktif tag sayılmaz
+  ---
+  duration_ms: 1.1549
+  type: 'test'
+  ...
+# Subtest: zone_timeline örneklenmemiş kayıtları oda aralıklarına birleştirir
+ok 23 - zone_timeline örneklenmemiş kayıtları oda aralıklarına birleştirir
+  ---
+  duration_ms: 12.1667
+  type: 'test'
+  ...
+# Subtest: beş dakikadan uzun veri boşluğu aynı zone'u iki aralığa böler
+ok 24 - beş dakikadan uzun veri boşluğu aynı zone'u iki aralığa böler
+  ---
+  duration_ms: 1.735
+  type: 'test'
+  ...
+# Subtest: konum yoksa boş timeline ve no_data döner
+ok 25 - konum yoksa boş timeline ve no_data döner
+  ---
+  duration_ms: 5.9868
+  type: 'test'
+  ...
+# Subtest: konum sadece bölgeler panelinde tanımlanmış çokgenlerden çözülür
+ok 26 - konum sadece bölgeler panelinde tanımlanmış çokgenlerden çözülür
+  ---
+  duration_ms: 2.6081
+  type: 'test'
+  ...
+# Subtest: PostgreSQL timestamp İstanbul ISO 8601 biçimine normalize edilir
+ok 27 - PostgreSQL timestamp İstanbul ISO 8601 biçimine normalize edilir
+  ---
+  duration_ms: 1.2326
+  type: 'test'
+  ...
+# Subtest: Pacemaker 2: replay actual 18:50 workbook records through the store and desktop/mobile components
+    # Subtest: 18:50:45 — before the exit, the interface still shows corridor
+    ok 1 - 18:50:45 — before the exit, the interface still shows corridor
+      ---
+      duration_ms: 128.1507
+      type: 'test'
+      ...
+    # Subtest: 18:50:46.305 — first recorded exit appears with gate and correct clock
+    ok 2 - 18:50:46.305 — first recorded exit appears with gate and correct clock
+      ---
+      duration_ms: 24.1634
+      type: 'test'
+      ...
+    # Subtest: 18:50:50.301 — later measurements retain the original 18:50:46 exit time
+    ok 3 - 18:50:50.301 — later measurements retain the original 18:50:46 exit time
+      ---
+      duration_ms: 24.888
+      type: 'test'
+      ...
+    # Subtest: 18:51:00 — passive status does not erase the exit
+    ok 4 - 18:51:00 — passive status does not erase the exit
+      ---
+      duration_ms: 23.9895
+      type: 'test'
+      ...
+    # Subtest: 18:51:50 — no-data hiding does not replace the exit with unknown room
+    ok 5 - 18:51:50 — no-data hiding does not replace the exit with unknown room
+      ---
+      duration_ms: 31.1764
+      type: 'test'
+      ...
+    # Subtest: restart while fresh preserves v4 display; archived exit is shown on the passive transition
+    ok 6 - restart while fresh preserves v4 display; archived exit is shown on the passive transition
+      ---
+      duration_ms: 45.1619
+      type: 'test'
+      ...
+    # Subtest: 19:35 — restart after a long data gap still shows the recorded exit
+    ok 7 - 19:35 — restart after a long data gap still shows the recorded exit
+      ---
+      duration_ms: 22.9928
+      type: 'test'
+      ...
+    # Subtest: legacy snapshot — reading the existing archived decision restores the same exit text
+    ok 8 - legacy snapshot — reading the existing archived decision restores the same exit text
+      ---
+      duration_ms: 24.5494
+      type: 'test'
+      ...
+    1..8
+ok 28 - Pacemaker 2: replay actual 18:50 workbook records through the store and desktop/mobile components
+  ---
+  duration_ms: 338.9633
+  type: 'test'
+  ...
+# Subtest: Pacemaker's existing live exit is displayed after passive/no-data transitions without an archive request
+ok 29 - Pacemaker's existing live exit is displayed after passive/no-data transitions without an archive request
+  ---
+  duration_ms: 66.1829
+  type: 'test'
+  ...
+# Subtest: an old restored tag without a live decision requests history once on becoming passive, never every four seconds
+ok 30 - an old restored tag without a live decision requests history once on becoming passive, never every four seconds
+  ---
+  duration_ms: 5.5297
+  type: 'test'
+  ...
+# Subtest: a cold start with an already passive tag requests once; a live exit arriving during that lookup makes the reply obsolete
+ok 31 - a cold start with an already passive tag requests once; a live exit arriving during that lookup makes the reply obsolete
+  ---
+  duration_ms: 2.0338
+  type: 'test'
+  ...
+# Subtest: a passive tag with a valid room assignment does not request exit history
+ok 32 - a passive tag with a valid room assignment does not request exit history
+  ---
+  duration_ms: 1.0063
+  type: 'test'
+  ...
+# Subtest: independent one-time replies merge by tag even when received out of order
+ok 33 - independent one-time replies merge by tag even when received out of order
+  ---
+  duration_ms: 3.0852
+  type: 'test'
+  ...
+# Subtest: report range accepts only selected tags and at most seven days
+ok 34 - report range accepts only selected tags and at most seven days
+  ---
+  duration_ms: 8.321
+  type: 'test'
+  ...
+# Subtest: room selection matches both floor and room ID after durations are calculated
+ok 35 - room selection matches both floor and room ID after durations are calculated
+  ---
+  duration_ms: 3.8426
+  type: 'test'
+  ...
+# Subtest: last preceding room seeds the start; missing intervals never add to room duration
+ok 36 - last preceding room seeds the start; missing intervals never add to room duration
+  ---
+  duration_ms: 2.2892
+  type: 'test'
+  ...
+# Subtest: stale preceding room is not carried into the report
+ok 37 - stale preceding room is not carried into the report
+  ---
+  duration_ms: 2.4095
+  type: 'test'
+  ...
+# Subtest: only measured corridor evidence replaces an unknown room label
+ok 38 - only measured corridor evidence replaces an unknown room label
+  ---
+  duration_ms: 1.2979
+  type: 'test'
+  ...
+# Subtest: server report query uses the preceding measured decision and refuses truncated results
+ok 39 - server report query uses the preceding measured decision and refuses truncated results
+  ---
+  duration_ms: 71.9721
+  type: 'test'
+  ...
+# Subtest: server accepts configured room and reports empty selected-room results
+ok 40 - server accepts configured room and reports empty selected-room results
+  ---
+  duration_ms: 3.0775
+  type: 'test'
+  ...
+# Subtest: PDF is multipage with a repeated table header and Turkish text
+ok 41 - PDF is multipage with a repeated table header and Turkish text
+  ---
+  duration_ms: 2477.2585
+  type: 'test'
+  ...
+# Subtest: PDF shows corridor durations, omits missing decisions and applies the configurable minimum
+ok 42 - PDF shows corridor durations, omits missing decisions and applies the configurable minimum
+  ---
+  duration_ms: 923.1059
+  type: 'test'
+  ...
+# Subtest: PDF merges consecutive visible room records and sums only their included durations
+ok 43 - PDF merges consecutive visible room records and sums only their included durations
+  ---
+  duration_ms: 123.1732
+  type: 'test'
+  ...
+# Subtest: an exit candidate keeps the committed room so one visit stays one row
+ok 44 - an exit candidate keeps the committed room so one visit stays one row
+  ---
+  duration_ms: 0.9131
+  type: 'test'
+  ...
+# Subtest: strict one-minute boundary hides an unassigned tag and retains the observation
+ok 45 - strict one-minute boundary hides an unassigned tag and retains the observation
+  ---
+  duration_ms: 12.5454
+  type: 'test'
+  ...
+# Subtest: only an unexpired current room assignment exempts a silent tag
+ok 46 - only an unexpired current room assignment exempts a silent tag
+  ---
+  duration_ms: 4.6611
+  type: 'test'
+  ...
+# Subtest: timer decisions, duplicates, out-of-order and synthetic raw messages do not refresh the raw clock
+ok 47 - timer decisions, duplicates, out-of-order and synthetic raw messages do not refresh the raw clock
+  ---
+  duration_ms: 1.1552
+  type: 'test'
+  ...
+# Subtest: fresh data recovers a tag, but a delayed historical backlog and future timestamps do not
+ok 48 - fresh data recovers a tag, but a delayed historical backlog and future timestamps do not
+  ---
+  duration_ms: 3.3192
+  type: 'test'
+  ...
+# Subtest: disabling the engine, losing a room, reconfiguring or moving floors removes the exemption immediately
+ok 49 - disabling the engine, losing a room, reconfiguring or moving floors removes the exemption immediately
+  ---
+  duration_ms: 1.1569
+  type: 'test'
+  ...
+# Subtest: changing the global timeout re-evaluates existing tags without restarting room inference
+ok 50 - changing the global timeout re-evaluates existing tags without restarting room inference
+  ---
+  duration_ms: 0.448
+  type: 'test'
+  ...
+# Subtest: restored observations keep their location but never restore a current room assignment
+ok 51 - restored observations keep their location but never restore a current room assignment
+  ---
+  duration_ms: 3.0721
+  type: 'test'
+  ...
+# Subtest: last observed place uses raw geometry, handles corridors, ambiguous rooms and unresolved floors
+ok 52 - last observed place uses raw geometry, handles corridors, ambiguous rooms and unresolved floors
+  ---
+  duration_ms: 2.3504
+  type: 'test'
+  ...
+# Subtest: presence SSE starts with an atomic snapshot, publishes versioned changes and cleans up on abort
+ok 53 - presence SSE starts with an atomic snapshot, publishes versioned changes and cleans up on abort
+  ---
+  duration_ms: 81.3354
+  type: 'test'
+  ...
+# Subtest: presence persistence keeps only registered tags, orders upserts by measurement and restores valid raw observations
+ok 54 - presence persistence keeps only registered tags, orders upserts by measurement and restores valid raw observations
+  ---
+  duration_ms: 14.9639
+  type: 'test'
+  ...
+# Subtest: a schema/persistence failure is reported and a later save can retry
+ok 55 - a schema/persistence failure is reported and a later save can retry
+  ---
+  duration_ms: 2.2895
+  type: 'test'
+  ...
+# Subtest: newer engine publications based on older evidence update presence without changing raw clocks
+ok 56 - newer engine publications based on older evidence update presence without changing raw clocks
+  ---
+  duration_ms: 8.5945
+  type: 'test'
+  ...
+# Subtest: v4 reference: tracking acceptance, persistence and room calculation sources are byte-identical
+ok 57 - v4 reference: tracking acceptance, persistence and room calculation sources are byte-identical
+  ---
+  duration_ms: 13.1184
+  type: 'test'
+  ...
+# Subtest: v4 parity: Room 7 door approach followed by 60 seconds of repeated coordinates
+ok 58 - v4 parity: Room 7 door approach followed by 60 seconds of repeated coordinates
+  ---
+  duration_ms: 396.3778
+  type: 'test'
+  ...
+# 91 raw observations; 93 complete publications and all presence snapshots matched v4
+# Subtest: v4 parity: measured Room 4 becomes inferred with 120 seconds of repeated observations
+ok 59 - v4 parity: measured Room 4 becomes inferred with 120 seconds of repeated observations
+  ---
+  duration_ms: 277.0325
+  type: 'test'
+  ...
+# 200 raw observations; 201 complete publications and all presence snapshots matched v4
+# Subtest: v4 parity: measured Room 4 becomes inferred with 120 seconds of low-anchor observations
+ok 60 - v4 parity: measured Room 4 becomes inferred with 120 seconds of low-anchor observations
+  ---
+  duration_ms: 278.5089
+  type: 'test'
+  ...
+# 200 raw observations; 201 complete publications and all presence snapshots matched v4
+# Subtest: v4 parity: gate exit and 90 seconds without data
+ok 61 - v4 parity: gate exit and 90 seconds without data
+  ---
+  duration_ms: 140.7737
+  type: 'test'
+  ...
+# 48 raw observations; 138 complete publications and all presence snapshots matched v4
+# Subtest: all live tag presentations, including an already published exit, match v4 HTML on desktop/mobile
+ok 62 - all live tag presentations, including an already published exit, match v4 HTML on desktop/mobile
+  ---
+  duration_ms: 548.4805
+  type: 'test'
+  ...
+# Subtest: passive tags with no recorded exit preserve v4 last-location text, badges and map controls
+ok 63 - passive tags with no recorded exit preserve v4 last-location text, badges and map controls
+  ---
+  duration_ms: 241.3953
+  type: 'test'
+  ...
+1..63
+# tests 71
+# suites 0
+# pass 71
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 6129.7617

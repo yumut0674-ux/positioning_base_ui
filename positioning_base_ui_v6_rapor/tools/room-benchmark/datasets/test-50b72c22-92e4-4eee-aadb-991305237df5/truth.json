@@ -1,0 +1,28 @@
+{
+  "testId": "test-50b72c22-92e4-4eee-aadb-991305237df5",
+  "timezone": "Europe/Istanbul",
+  "revision": 2,
+  "revisionReason": "2026-09-25 kullanıcı doğrulaması: bu testte D95660981D60BDA1 taşındı",
+  "test": {
+    "from": "2026-09-24T08:04:37.492Z",
+    "to": "2026-09-24T08:06:53.315Z"
+  },
+  "visits": [
+    {
+      "roomId": "room-03",
+      "from": "2026-09-24T08:04:45.609Z",
+      "to": "2026-09-24T08:05:21.962Z"
+    },
+    {
+      "roomId": "room-05",
+      "from": "2026-09-24T08:05:26.651Z",
+      "to": "2026-09-24T08:06:03.824Z"
+    },
+    {
+      "roomId": "room-06",
+      "from": "2026-09-24T08:06:12.241Z",
+      "to": "2026-09-24T08:06:41.189Z"
+    }
+  ],
+  "groups": [{"id":"saha-rotasi","tagCodes":["D95660981D60BDA1"]}]
+}

@@ -1,0 +1,17 @@
+{
+  "testId": "test-4192b569-b345-4a41-a028-32b342ab4710",
+  "testName": "servis2",
+  "site": "Necmettin Hastanesi — Servis",
+  "timezone": "Europe/Istanbul",
+  "revision": 1,
+  "revisionReason": "Kullanıcının servis2 kaydı UTC zamanları korunarak aktarıldı. Kullanıcı cihaz tagını taşıdığını belirtti; SELECT ad-kod eşleşmesini doğruladı. Kullanıcı saatleri kaydırmak yerine giriş/çıkış sınırlarında ±2 saniye tolerans istedi.",
+  "test": {"from":"2026-10-12T15:14:10.978Z","to":"2026-10-12T15:17:25.149Z"},
+  "visits": [
+    {"roomId":"room-11","from":"2026-10-12T15:14:23.568Z","to":"2026-10-12T15:14:52.113Z"},
+    {"roomId":"room-12","from":"2026-10-12T15:15:30.905Z","to":"2026-10-12T15:15:49.833Z"},
+    {"roomId":"room-14","from":"2026-10-12T15:16:04.039Z","to":"2026-10-12T15:16:23.473Z"},
+    {"roomId":"room-08","from":"2026-10-12T15:16:46.761Z","to":"2026-10-12T15:17:14.043Z"}
+  ],
+  "groups": [{"id":"servis2-cihaz","tagCodes":["EA0FC8F8CA447FF5"],"note":"Taşınan tag adı cihaz kullanıcı tarafından belirtildi; DB tags kaydıyla kod eşleştirildi."}],
+  "note": "Oda ziyaretleri arasındaki süre koridordur. Kaynak source.json içinde korunur; saatlere +2 saniye eklenmedi. Standart rapor katı ve ±2 saniye sınır toleranslı sonuçları birlikte üretir."
+}

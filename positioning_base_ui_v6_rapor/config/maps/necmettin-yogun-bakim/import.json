@@ -1,0 +1,23 @@
+{
+  "sourceImage": "yoÄ-unbakÄ-mv2-3840x2160-1px-0.6188cm-origin-x719.75-y3039.8px.png",
+  "calibrationSource": "PNG filename",
+  "centimetersPerPixel": 0.6188,
+  "originPixel": {
+    "x": 719.75,
+    "y": 3039.8
+  },
+  "sourceJsonExportCalibration": {
+    "widthPx": 3840,
+    "heightPx": 2160,
+    "paddingPx": 80,
+    "centimetersPerPixel": 0.6250000000000584,
+    "originPixel": {
+      "x": 731.6342825417292,
+      "y": 3020.391203346554
+    },
+    "pixelOrigin": "top-left",
+    "xDirection": "right",
+    "yDirection": "down"
+  },
+  "note": "PNG filename calibration is used because source JSON export calibration differs from the supplied PNG."
+}

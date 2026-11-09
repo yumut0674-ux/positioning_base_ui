@@ -1,0 +1,147 @@
+TAP version 13
+# Subtest: Pacemaker 2: replay actual 18:50 workbook records through the store and desktop/mobile components
+    # Subtest: 18:50:45 — before the exit, the interface still shows corridor
+    ok 1 - 18:50:45 — before the exit, the interface still shows corridor
+      ---
+      duration_ms: 137.5461
+      type: 'test'
+      ...
+    # Subtest: 18:50:46.305 — first recorded exit appears with gate and correct clock
+    ok 2 - 18:50:46.305 — first recorded exit appears with gate and correct clock
+      ---
+      duration_ms: 22.2647
+      type: 'test'
+      ...
+    # Subtest: 18:50:50.301 — later measurements retain the original 18:50:46 exit time
+    ok 3 - 18:50:50.301 — later measurements retain the original 18:50:46 exit time
+      ---
+      duration_ms: 23.1909
+      type: 'test'
+      ...
+    # Subtest: 18:51:00 — passive status does not erase the exit
+    ok 4 - 18:51:00 — passive status does not erase the exit
+      ---
+      duration_ms: 18.7957
+      type: 'test'
+      ...
+    # Subtest: 18:51:50 — no-data hiding does not replace the exit with unknown room
+    ok 5 - 18:51:50 — no-data hiding does not replace the exit with unknown room
+      ---
+      duration_ms: 20.3907
+      type: 'test'
+      ...
+    # Subtest: restart while fresh preserves v4 display; archived exit is shown on the passive transition
+    ok 6 - restart while fresh preserves v4 display; archived exit is shown on the passive transition
+      ---
+      duration_ms: 34.8948
+      type: 'test'
+      ...
+    # Subtest: 19:35 — restart after a long data gap still shows the recorded exit
+    ok 7 - 19:35 — restart after a long data gap still shows the recorded exit
+      ---
+      duration_ms: 17.9841
+      type: 'test'
+      ...
+    # Subtest: legacy snapshot — reading the existing archived decision restores the same exit text
+    ok 8 - legacy snapshot — reading the existing archived decision restores the same exit text
+      ---
+      duration_ms: 16.2085
+      type: 'test'
+      ...
+    1..8
+ok 1 - Pacemaker 2: replay actual 18:50 workbook records through the store and desktop/mobile components
+  ---
+  duration_ms: 301.845
+  type: 'test'
+  ...
+# Subtest: Pacemaker's existing live exit is displayed after passive/no-data transitions without an archive request
+ok 2 - Pacemaker's existing live exit is displayed after passive/no-data transitions without an archive request
+  ---
+  duration_ms: 75.7899
+  type: 'test'
+  ...
+# Subtest: an old restored tag without a live decision requests history once on becoming passive, never every four seconds
+ok 3 - an old restored tag without a live decision requests history once on becoming passive, never every four seconds
+  ---
+  duration_ms: 7.2674
+  type: 'test'
+  ...
+# Subtest: a cold start with an already passive tag requests once; a live exit arriving during that lookup makes the reply obsolete
+ok 4 - a cold start with an already passive tag requests once; a live exit arriving during that lookup makes the reply obsolete
+  ---
+  duration_ms: 0.7415
+  type: 'test'
+  ...
+# Subtest: a passive tag with a valid room assignment does not request exit history
+ok 5 - a passive tag with a valid room assignment does not request exit history
+  ---
+  duration_ms: 1.3911
+  type: 'test'
+  ...
+# Subtest: independent one-time replies merge by tag even when received out of order
+ok 6 - independent one-time replies merge by tag even when received out of order
+  ---
+  duration_ms: 1.5365
+  type: 'test'
+  ...
+# Subtest: newer engine publications based on older evidence update presence without changing raw clocks
+ok 7 - newer engine publications based on older evidence update presence without changing raw clocks
+  ---
+  duration_ms: 8.1624
+  type: 'test'
+  ...
+# Subtest: v4 reference: tracking acceptance, persistence and room calculation sources are byte-identical
+ok 8 - v4 reference: tracking acceptance, persistence and room calculation sources are byte-identical
+  ---
+  duration_ms: 20.6005
+  type: 'test'
+  ...
+# Subtest: v4 parity: Room 7 door approach followed by 60 seconds of repeated coordinates
+ok 9 - v4 parity: Room 7 door approach followed by 60 seconds of repeated coordinates
+  ---
+  duration_ms: 365.0001
+  type: 'test'
+  ...
+# 91 raw observations; 93 complete publications and all presence snapshots matched v4
+# Subtest: v4 parity: measured Room 4 becomes inferred with 120 seconds of repeated observations
+ok 10 - v4 parity: measured Room 4 becomes inferred with 120 seconds of repeated observations
+  ---
+  duration_ms: 242.9414
+  type: 'test'
+  ...
+# 200 raw observations; 201 complete publications and all presence snapshots matched v4
+# Subtest: v4 parity: measured Room 4 becomes inferred with 120 seconds of low-anchor observations
+ok 11 - v4 parity: measured Room 4 becomes inferred with 120 seconds of low-anchor observations
+  ---
+  duration_ms: 256.4678
+  type: 'test'
+  ...
+# 200 raw observations; 201 complete publications and all presence snapshots matched v4
+# Subtest: v4 parity: gate exit and 90 seconds without data
+ok 12 - v4 parity: gate exit and 90 seconds without data
+  ---
+  duration_ms: 124.5531
+  type: 'test'
+  ...
+# 48 raw observations; 138 complete publications and all presence snapshots matched v4
+# Subtest: all live tag presentations, including an already published exit, match v4 HTML on desktop/mobile
+ok 13 - all live tag presentations, including an already published exit, match v4 HTML on desktop/mobile
+  ---
+  duration_ms: 530.292
+  type: 'test'
+  ...
+# Subtest: passive tags with no recorded exit preserve v4 last-location text, badges and map controls
+ok 14 - passive tags with no recorded exit preserve v4 last-location text, badges and map controls
+  ---
+  duration_ms: 215.167
+  type: 'test'
+  ...
+1..14
+# tests 22
+# suites 0
+# pass 22
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2966.7078

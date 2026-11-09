@@ -1,0 +1,1533 @@
+
+> gekon-ips-control@0.1.0 test:tracking
+> node --import tsx --test tests/trackingIngest.test.ts tests/trackingPdop.test.ts tests/mapPdopFilter.test.ts tests/regionPositionEngine.test.ts tests/roomHmmEngine.test.ts tests/stepDistanceFilter.test.ts tests/roomExitRegression.test.ts tests/processedPositionServer.test.ts tests/regionEngineApi.test.ts tests/regionEngineStartup.test.ts tests/positionAnimationController.test.ts tests/positionFilters.test.ts tests/tagUpdateOrdering.test.ts tests/demoSharing.test.ts tests/tagSimulator.test.mjs tests/legacyRegionPositionEngine.test.ts tests/roomDecisionPersistence.test.ts tests/areaTransitions.test.ts
+
+TAP version 13
+# Subtest: motion labels cannot change area transitions or establish source health
+ok 1 - motion labels cannot change area transitions or establish source health
+  ---
+  duration_ms: 14.0229
+  type: 'test'
+  ...
+# Subtest: normal entry and observed exit use raw gate and inside/outside evidence
+ok 2 - normal entry and observed exit use raw gate and inside/outside evidence
+  ---
+  duration_ms: 2.1729
+  type: 'test'
+  ...
+# Subtest: exit gate dropout becomes estimated after 30 seconds, with separate measurement and decision times
+ok 3 - exit gate dropout becomes estimated after 30 seconds, with separate measurement and decision times
+  ---
+  duration_ms: 0.893
+  type: 'test'
+  ...
+# Subtest: return within wait cancels exit; room or inside dropout never creates an exit
+ok 4 - return within wait cancels exit; room or inside dropout never creates an exit
+  ---
+  duration_ms: 1.2009
+  type: 'test'
+  ...
+# Subtest: late, duplicate, implausible and low quality packets cannot confirm a transition
+ok 5 - late, duplicate, implausible and low quality packets cannot confirm a transition
+  ---
+  duration_ms: 0.9177
+  type: 'test'
+  ...
+# Subtest: multiple gates and floor handoff share a transition id
+ok 6 - multiple gates and floor handoff share a transition id
+  ---
+  duration_ms: 1.4412
+  type: 'test'
+  ...
+# Subtest: restart preserves pending exit, idempotent event identity and global outage guard
+ok 7 - restart preserves pending exit, idempotent event identity and global outage guard
+  ---
+  duration_ms: 1.2805
+  type: 'test'
+  ...
+# Subtest: another map staying live does not turn a failed map's pending gates into mass exits
+ok 8 - another map staying live does not turn a failed map's pending gates into mass exits
+  ---
+  duration_ms: 0.7932
+  type: 'test'
+  ...
+# Subtest: single tag needs independent healthy heartbeat; unknown and outage keep a visible pending reason
+ok 9 - single tag needs independent healthy heartbeat; unknown and outage keep a visible pending reason
+  ---
+  duration_ms: 1.4647
+  type: 'test'
+  ...
+# Subtest: a stale healthy signal never authorizes mass estimated exits
+ok 10 - a stale healthy signal never authorizes mass estimated exits
+  ---
+  duration_ms: 4.5623
+  type: 'test'
+  ...
+# Subtest: outside confirmation after a long gap is estimated, while timely gate evidence is observed
+ok 11 - outside confirmation after a long gap is estimated, while timely gate evidence is observed
+  ---
+  duration_ms: 1.3184
+  type: 'test'
+  ...
+# Subtest: source health payload validates freshness independently of positions
+ok 12 - source health payload validates freshness independently of positions
+  ---
+  duration_ms: 1.3773
+  type: 'test'
+  ...
+# Subtest: legacy config works and invalid area association is rejected
+ok 13 - legacy config works and invalid area association is rejected
+  ---
+  duration_ms: 4.0875
+  type: 'test'
+  ...
+# Subtest: area state and events use persisted JSON and idempotent event insertion
+ok 14 - area state and events use persisted JSON and idempotent event insertion
+  ---
+  duration_ms: 40.1083
+  type: 'test'
+  ...
+# {"level":"error","event":"area_transition.state_spool_failed","timestamp":"2026-10-23T09:59:19.366Z","pendingWrites":1,"queuedEvents":0,"queuedStates":1,"batchSize":2,"maxPendingEvents":2,"maxPendingStates":1,"coalescedStateWrites":100,"droppedRecords":0,"rejectedWrites":1,"error":{"name":"Error","message":"Alan durum diski kuyruğu dolu; yeni durum kalıcı yazılamadı","stack":"Error: Alan durum diski kuyruğu dolu; yeni durum kalıcı yazılamadı\\n    at AreaTransitionRepository.saveState (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:60:83)\\n    at <anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaTransitions.test.ts:197:31)\\n    at getActual (node:assert:530:5)\\n    at Function.throws (node:assert:676:24)\\n    at TestContext.<anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaTransitions.test.ts:197:12)\\n    at async Test.run (node:internal/test_runner/test:1054:7)\\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+# {"level":"error","event":"area_transition.event_spool_failed","timestamp":"2026-10-23T09:59:19.374Z","pendingWrites":3,"queuedEvents":2,"queuedStates":1,"batchSize":2,"maxPendingEvents":2,"maxPendingStates":1,"coalescedStateWrites":100,"droppedRecords":0,"rejectedWrites":2,"error":{"name":"AreaTransitionPersistenceError","message":"Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı","stack":"AreaTransitionPersistenceError: Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı\\n    at AreaTransitionRepository.ensureEventCapacity (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:79:19)\\n    at AreaTransitionRepository.saveEvent (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:69:12)\\n    at <anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaTransitions.test.ts:202:31)\\n    at getActual (node:assert:530:5)\\n    at Function.throws (node:assert:676:24)\\n    at TestContext.<anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaTransitions.test.ts:202:12)\\n    at async Test.run (node:internal/test_runner/test:1054:7)\\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+# {"level":"error","event":"area_transition.persistence_failed","timestamp":"2026-10-23T09:59:19.378Z","pendingWrites":3,"queuedEvents":2,"queuedStates":1,"batchSize":2,"maxPendingEvents":2,"maxPendingStates":1,"coalescedStateWrites":100,"droppedRecords":0,"rejectedWrites":2,"error":{"name":"Error","message":"database offline","stack":"Error: database offline\\n    at AreaTransitionRepository.query (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaTransitions.test.ts:193:60)\\n    at <anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:106:24)\\n    at AreaTransitionRepository.flush (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:122:5)\\n    at TestContext.<anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaTransitions.test.ts:204:17)\\n    at async Test.run (node:internal/test_runner/test:1054:7)\\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+# Subtest: DB outage preserves bounded batches and durable event files for restart and retry
+ok 15 - DB outage preserves bounded batches and durable event files for restart and retry
+  ---
+  duration_ms: 409.1698
+  type: 'test'
+  ...
+# {"level":"error","event":"area_transition.event_spool_failed","timestamp":"2026-10-23T09:59:19.414Z","pendingWrites":2,"queuedEvents":1,"queuedStates":1,"batchSize":50,"maxPendingEvents":1,"maxPendingStates":20000,"coalescedStateWrites":3,"droppedRecords":0,"rejectedWrites":1,"error":{"name":"AreaTransitionPersistenceError","message":"Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı","stack":"AreaTransitionPersistenceError: Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı\\n    at AreaTransitionRepository.ensureEventCapacity (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:79:19)\\n    at AreaTransitionEngine.reserveEvents (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaTransitions.test.ts:223:65)\\n    at AreaTransitionEngine.tick (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\regionEngine\\\\AreaTransitionEngine.ts:175:12)\\n    at <anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaTransitions.test.ts:228:32)\\n    at getActual (node:assert:530:5)\\n    at Function.throws (node:assert:676:24)\\n    at TestContext.<anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaTransitions.test.ts:228:12)\\n    at async Test.run (node:internal/test_runner/test:1054:7)\\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+# Subtest: a full durable event queue rolls back the engine transition until it can be persisted
+ok 16 - a full durable event queue rolls back the engine transition until it can be persisted
+  ---
+  duration_ms: 29.0908
+  type: 'test'
+  ...
+# {"level":"error","event":"area_transition.event_spool_failed","timestamp":"2026-10-23T09:59:19.446Z","pendingWrites":1,"queuedEvents":0,"queuedStates":1,"batchSize":50,"maxPendingEvents":1,"maxPendingStates":20000,"coalescedStateWrites":2,"droppedRecords":0,"rejectedWrites":1,"error":{"name":"AreaTransitionPersistenceError","message":"Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı","stack":"AreaTransitionPersistenceError: Alan olay diski kuyruğu dolu; yeni geçiş kalıcı yazılamadı\\n    at AreaTransitionRepository.ensureEventCapacity (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\regionEngine\\\\areaTransitionRepository.ts:79:19)\\n    at AreaTransitionEngine.reserveEvents (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaTransitions.test.ts:244:65)\\n    at AreaTransitionEngine.reserveForMeasurement (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\regionEngine\\\\AreaTransitionEngine.ts:111:10)\\n    at AreaTransitionEngine.advance (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\regionEngine\\\\AreaTransitionEngine.ts:145:16)\\n    at AreaTransitionEngine.ingest (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\src\\\\server\\\\regionEngine\\\\AreaTransitionEngine.ts:99:54)\\n    at send (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaTransitions.test.ts:245:71)\\n    at <anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaTransitions.test.ts:249:25)\\n    at getActual (node:assert:530:5)\\n    at Function.throws (node:assert:676:24)\\n    at TestContext.<anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\areaTransitions.test.ts:249:12)"}}
+# Subtest: floor handoff reserves both linked event slots before changing either area
+ok 17 - floor handoff reserves both linked event slots before changing either area
+  ---
+  duration_ms: 23.7255
+  type: 'test'
+  ...
+# Subtest: PostgreSQL commits an event and its final state, restores them, and deduplicates replay
+ok 18 - PostgreSQL commits an event and its final state, restores them, and deduplicates replay # SKIP
+  ---
+  duration_ms: 0.2436
+  type: 'test'
+  ...
+# Subtest: area configuration survives the validated API save and file reload
+ok 19 - area configuration survives the validated API save and file reload
+  ---
+  duration_ms: 7.417
+  type: 'test'
+  ...
+# Subtest: editor visibility is per map, independent per item and keeps hidden items recoverable
+ok 20 - editor visibility is per map, independent per item and keeps hidden items recoverable
+  ---
+  duration_ms: 0.9148
+  type: 'test'
+  ...
+# Subtest: processed browser stream URL is same-origin and contains no private service port
+ok 21 - processed browser stream URL is same-origin and contains no private service port
+  ---
+  duration_ms: 1.7088
+  type: 'test'
+  ...
+# Subtest: processed proxy streams SSE and cancels upstream when the browser stream closes
+ok 22 - processed proxy streams SSE and cancels upstream when the browser stream closes
+  ---
+  duration_ms: 3097.8528
+  type: 'test'
+  ...
+# {"level":"error","event":"tracking.processed_proxy_unavailable","timestamp":"2026-10-23T09:59:21.727Z","error":{"name":"TypeError","message":"fetch failed","stack":"TypeError: fetch failed\\n    at node:internal/deps/undici/undici:13510:13\\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\\n    at async GET (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\app\\\\api\\\\tracking\\\\processed\\\\route.ts:30:16)\\n    at async TestContext.<anonymous> (C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\tests\\\\demoSharing.test.ts:80:22)\\n    at async Test.run (node:internal/test_runner/test:1054:7)\\n    at async Test.processPendingSubtests (node:internal/test_runner/test:744:7)"}}
+# Subtest: processed proxy returns a generic 503 when its loopback upstream is unavailable
+ok 23 - processed proxy returns a generic 503 when its loopback upstream is unavailable
+  ---
+  duration_ms: 6.9407
+  type: 'test'
+  ...
+# Subtest: an unconfigured optional assistant does not make an otherwise healthy response fail
+ok 24 - an unconfigured optional assistant does not make an otherwise healthy response fail
+  ---
+  duration_ms: 1.4723
+  type: 'test'
+  ...
+# Subtest: health response strips sensitive internal failure details
+ok 25 - health response strips sensitive internal failure details
+  ---
+  duration_ms: 0.9266
+  type: 'test'
+  ...
+# {"level":"info","event":"region_engine.region_engine_enabled","timestamp":"2026-10-23T09:59:17.583Z"}
+# {"level":"info","event":"region_engine.region_config_loaded","timestamp":"2026-10-23T09:59:17.583Z","score":1}
+# {"level":"info","event":"region_engine.region_entry_candidate","timestamp":"2026-10-23T09:59:17.584Z","vehicleId":"vehicle-1","regionId":"room-a","score":0.5}
+# {"level":"info","event":"region_engine.vehicle_entered_region","timestamp":"2026-10-23T09:59:17.584Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+# {"level":"info","event":"region_engine.vehicle_pinned_to_region_center","timestamp":"2026-10-23T09:59:17.584Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+# {"level":"info","event":"region_engine.vehicle_exited_region","timestamp":"2026-10-23T09:59:17.585Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+# {"level":"info","event":"region_engine.region_engine_disabled","timestamp":"2026-10-23T09:59:17.585Z"}
+# {"level":"info","event":"region_engine.region_engine_enabled","timestamp":"2026-10-23T09:59:17.592Z"}
+# {"level":"info","event":"region_engine.region_config_loaded","timestamp":"2026-10-23T09:59:17.592Z","score":1}
+# {"level":"info","event":"region_engine.region_entry_candidate","timestamp":"2026-10-23T09:59:17.592Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+# {"level":"info","event":"region_engine.vehicle_entered_region","timestamp":"2026-10-23T09:59:17.593Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+# {"level":"info","event":"region_engine.vehicle_pinned_to_region_center","timestamp":"2026-10-23T09:59:17.593Z","vehicleId":"vehicle-1","regionId":"room-a","score":1}
+# {"level":"info","event":"region_engine.region_entry_candidate","timestamp":"2026-10-23T09:59:17.593Z","vehicleId":"vehicle-2","regionId":"room-a","score":1}
+# {"level":"info","event":"region_engine.vehicle_entered_region","timestamp":"2026-10-23T09:59:17.593Z","vehicleId":"vehicle-2","regionId":"room-a","score":1}
+# {"level":"info","event":"region_engine.vehicle_pinned_to_region_center","timestamp":"2026-10-23T09:59:17.593Z","vehicleId":"vehicle-2","regionId":"room-a","score":1}
+# {"level":"info","event":"region_engine.region_engine_disabled","timestamp":"2026-10-23T09:59:17.593Z"}
+# Subtest: disabled engine does not process or mutate raw positions
+ok 26 - disabled engine does not process or mutate raw positions
+  ---
+  duration_ms: 3.8884
+  type: 'test'
+  ...
+# Subtest: outside, entry, inferred pinning and confirmed exit preserve the expected coordinates
+ok 27 - outside, entry, inferred pinning and confirmed exit preserve the expected coordinates
+  ---
+  duration_ms: 5.5165
+  type: 'test'
+  ...
+# Subtest: one scheduler handles multiple vehicles and disable clears all state
+ok 28 - one scheduler handles multiple vehicles and disable clears all state
+  ---
+  duration_ms: 2.6275
+  type: 'test'
+  ...
+# Subtest: center-less regions are skipped and invalid rule config is rejected
+ok 29 - center-less regions are skipped and invalid rule config is rejected
+  ---
+  duration_ms: 1.2895
+  type: 'test'
+  ...
+# Subtest: yoğun bakım haritası PDOP sınırı 70 (filtre kapalı: olasılıksal motor zayıf PDOP'u kendisi tartar), diğer haritalar ve bilinmeyen kat 20 kullanır
+ok 30 - yoğun bakım haritası PDOP sınırı 70 (filtre kapalı: olasılıksal motor zayıf PDOP'u kendisi tartar), diğer haritalar ve bilinmeyen kat 20 kullanır
+  ---
+  duration_ms: 12.6158
+  type: 'test'
+  ...
+# Subtest: kapatılan PDOP filtresi sonlu sayıları kabul eder; null ve sıfır korunur
+ok 31 - kapatılan PDOP filtresi sonlu sayıları kabul eder; null ve sıfır korunur
+  ---
+  duration_ms: 0.8771
+  type: 'test'
+  ...
+# Subtest: hot reload PDOP davranışını güncellerken mevcut tamponu, kuyruğu ve dinleyicileri korur
+ok 32 - hot reload PDOP davranışını güncellerken mevcut tamponu, kuyruğu ve dinleyicileri korur
+  ---
+  duration_ms: 24.7681
+  type: 'test'
+  ...
+# Subtest: PDOP ayarları harita bazında kalıcıdır; kaydetme cache'e hemen yansır ve diğer haritayı değiştirmez
+ok 33 - PDOP ayarları harita bazında kalıcıdır; kaydetme cache'e hemen yansır ve diğer haritayı değiştirmez
+  ---
+  duration_ms: 75.848
+  type: 'test'
+  ...
+# Subtest: harita filtre API'si ayarları kaydeder; hatalı ayar ve harita seçimi dosyayı değiştirmez
+ok 34 - harita filtre API'si ayarları kaydeder; hatalı ayar ve harita seçimi dosyayı değiştirmez
+  ---
+  duration_ms: 96.3195
+  type: 'test'
+  ...
+# Subtest: eşik güncelleme ve açma/kapatma motor durumunu sıfırlamaz; kabul edilen veriye mevcut oda algoritması uygulanır
+ok 35 - eşik güncelleme ve açma/kapatma motor durumunu sıfırlamaz; kabul edilen veriye mevcut oda algoritması uygulanır
+  ---
+  duration_ms: 116.1381
+  type: 'test'
+  ...
+# Subtest: valid REGION_CENTER changes use the existing spatial transition
+ok 36 - valid REGION_CENTER changes use the existing spatial transition
+  ---
+  duration_ms: 4.4948
+  type: 'test'
+  ...
+# Subtest: field room-03 to room-05 relocation fades, snaps, and finishes exactly at the target
+ok 37 - field room-03 to room-05 relocation fades, snaps, and finishes exactly at the target
+  ---
+  duration_ms: 1.4503
+  type: 'test'
+  ...
+# Subtest: RAW to room-03 centre crosses a narrow map gap without sticking at the door
+ok 38 - RAW to room-03 centre crosses a narrow map gap without sticking at the door
+  ---
+  duration_ms: 0.6957
+  type: 'test'
+  ...
+# Subtest: REGION_CENTER outside the display area cannot start a relocation
+ok 39 - REGION_CENTER outside the display area cannot start a relocation
+  ---
+  duration_ms: 0.3
+  type: 'test'
+  ...
+# Subtest: room centre to RAW corridor fades across a map gap and reaches the latest measurement without restarting
+ok 40 - room centre to RAW corridor fades across a map gap and reaches the latest measurement without restarting
+  ---
+  duration_ms: 6.0061
+  type: 'test'
+  ...
+# Subtest: a disconnected target arriving after the hidden midpoint is reached even without another packet
+ok 41 - a disconnected target arriving after the hidden midpoint is reached even without another packet
+  ---
+  duration_ms: 0.8375
+  type: 'test'
+  ...
+# Subtest: RAW relocation across a concave corridor does not freeze and never draws an outside point
+ok 42 - RAW relocation across a concave corridor does not freeze and never draws an outside point
+  ---
+  duration_ms: 0.6974
+  type: 'test'
+  ...
+# Subtest: disabled animation relocates immediately across a map gap and still rejects an outside target
+ok 43 - disabled animation relocates immediately across a map gap and still rejects an outside target
+  ---
+  duration_ms: 0.5051
+  type: 'test'
+  ...
+# Subtest: repeated publication at the same room centre does not restart relocation
+ok 44 - repeated publication at the same room centre does not restart relocation
+  ---
+  duration_ms: 0.9953
+  type: 'test'
+  ...
+# Subtest: retains a renderer attached before the tag's first position arrives
+ok 45 - retains a renderer attached before the tag's first position arrives
+  ---
+  duration_ms: 0.8933
+  type: 'test'
+  ...
+# Subtest: interpolates from message timestamps without restarting when irregular updates arrive
+ok 46 - interpolates from message timestamps without restarting when irregular updates arrive
+  ---
+  duration_ms: 0.4076
+  type: 'test'
+  ...
+# Subtest: a 1500 ms message gap remains a regular timestamp-based segment
+ok 47 - a 1500 ms message gap remains a regular timestamp-based segment
+  ---
+  duration_ms: 0.2855
+  type: 'test'
+  ...
+# Subtest: a three-second corridor packet gap stays buffered instead of bypassing the display delay
+ok 48 - a three-second corridor packet gap stays buffered instead of bypassing the display delay
+  ---
+  duration_ms: 0.359
+  type: 'test'
+  ...
+# Subtest: the corridor buffer retains a full display delay at ten updates per second
+ok 49 - the corridor buffer retains a full display delay at ten updates per second
+  ---
+  duration_ms: 0.629
+  type: 'test'
+  ...
+# Subtest: out-of-order rendered samples and exact duplicates cannot move a tag backwards
+ok 50 - out-of-order rendered samples and exact duplicates cannot move a tag backwards
+  ---
+  duration_ms: 0.2666
+  type: 'test'
+  ...
+# Subtest: production speed limit prevents both large jumps and long-frame catch-up jumps
+ok 51 - production speed limit prevents both large jumps and long-frame catch-up jumps
+  ---
+  duration_ms: 0.6597
+  type: 'test'
+  ...
+# Subtest: extrapolation is velocity based, capped, and then holds the last projected point
+ok 52 - extrapolation is velocity based, capped, and then holds the last projected point
+  ---
+  duration_ms: 0.3489
+  type: 'test'
+  ...
+# Subtest: REGION_CENTER eases toward its exact centre, ignores repeats, and never extrapolates
+ok 53 - REGION_CENTER eases toward its exact centre, ignores repeats, and never extrapolates
+  ---
+  duration_ms: 0.4136
+  type: 'test'
+  ...
+# Subtest: RAW after REGION_CENTER changes without a wall-crossing route, then resumes buffered movement
+ok 54 - RAW after REGION_CENTER changes without a wall-crossing route, then resumes buffered movement
+  ---
+  duration_ms: 0.313
+  type: 'test'
+  ...
+# Subtest: disabled animation applies the newest value immediately and needs no update loop
+ok 55 - disabled animation applies the newest value immediately and needs no update loop
+  ---
+  duration_ms: 0.2579
+  type: 'test'
+  ...
+# Subtest: teleports and overlong segments use a short controlled transition
+ok 56 - teleports and overlong segments use a short controlled transition
+  ---
+  duration_ms: 0.2694
+  type: 'test'
+  ...
+# Subtest: receivedAt is the timestamp fallback
+ok 57 - receivedAt is the timestamp fallback
+  ---
+  duration_ms: 0.2176
+  type: 'test'
+  ...
+# Subtest: tags have independent buffers and stale state follows the configured timeout
+ok 58 - tags have independent buffers and stale state follows the configured timeout
+  ---
+  duration_ms: 0.3013
+  type: 'test'
+  ...
+# Subtest: buffer size is bounded
+ok 59 - buffer size is bounded
+  ---
+  duration_ms: 0.2919
+  type: 'test'
+  ...
+# Subtest: synthetic centre heartbeats neither reset measurement age nor move a pinned tag
+ok 60 - synthetic centre heartbeats neither reset measurement age nor move a pinned tag
+  ---
+  duration_ms: 0.239
+  type: 'test'
+  ...
+# Subtest: stationary UWB jitter stays inside the visual dead-band
+ok 61 - stationary UWB jitter stays inside the visual dead-band
+  ---
+  duration_ms: 2.7717
+  type: 'test'
+  ...
+# Subtest: normal movement follows the recent average more gently than individual measurements
+ok 62 - normal movement follows the recent average more gently than individual measurements
+  ---
+  duration_ms: 0.5104
+  type: 'test'
+  ...
+# Subtest: the display target averages accepted measurements in a three-second rolling window
+ok 63 - the display target averages accepted measurements in a three-second rolling window
+  ---
+  duration_ms: 0.405
+  type: 'test'
+  ...
+# Subtest: a repeated timestamp cannot overweight a measurement or keep moving the marker
+ok 64 - a repeated timestamp cannot overweight a measurement or keep moving the marker
+  ---
+  duration_ms: 1.1875
+  type: 'test'
+  ...
+# Subtest: averaging reduces side-to-side wobble during a steady corridor walk
+ok 65 - averaging reduces side-to-side wobble during a steady corridor walk
+  ---
+  duration_ms: 0.6468
+  type: 'test'
+  ...
+# Subtest: the average has a bounded sample count and reset discards the old route
+ok 66 - the average has a bounded sample count and reset discards the old route
+  ---
+  duration_ms: 0.3359
+  type: 'test'
+  ...
+# Subtest: a single impossible jump is held and a return to the route clears it
+ok 67 - a single impossible jump is held and a return to the route clears it
+  ---
+  duration_ms: 0.4138
+  type: 'test'
+  ...
+# Subtest: two nearby fast measurements confirm real relocation without snapping
+ok 68 - two nearby fast measurements confirm real relocation without snapping
+  ---
+  duration_ms: 0.2121
+  type: 'test'
+  ...
+# Subtest: long measurement gaps are accepted as unknown movement, not rejected as spikes
+ok 69 - long measurement gaps are accepted as unknown movement, not rejected as spikes
+  ---
+  duration_ms: 0.3623
+  type: 'test'
+  ...
+# Subtest: processed server publishes backward-compatible position events over SSE
+# {"level":"error","event":"region_engine.processed_port_start_failed","timestamp":"2026-10-23T09:59:17.781Z","port":59229,"message":"REGION_POSITION_PORT 59229 kullanımda; boş bir 300x portu seçin","error":{"name":"Error","message":"listen EADDRINUSE: address already in use 127.0.0.1:59229","stack":"Error: listen EADDRINUSE: address already in use 127.0.0.1:59229\\n    at Server.setupListenHandle [as _listen2] (node:net:1940:16)\\n    at listenInCluster (node:net:1997:12)\\n    at node:net:2206:7\\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)"}}
+ok 70 - processed server publishes backward-compatible position events over SSE
+  ---
+  duration_ms: 86.1566
+  type: 'test'
+  ...
+# Subtest: processed port reports a clear error when the configured port is occupied
+ok 71 - processed port reports a clear error when the configured port is occupied
+  ---
+  duration_ms: 6.6929
+  type: 'test'
+  ...
+# Subtest: region engine status GET exposes the expected backward-compatible shape
+ok 72 - region engine status GET exposes the expected backward-compatible shape
+  ---
+  duration_ms: 8.891
+  type: 'test'
+  ...
+# Subtest: status PUT validates input and repeated disable requests are idempotent
+ok 73 - status PUT validates input and repeated disable requests are idempotent
+  ---
+  duration_ms: 6.2212
+  type: 'test'
+  ...
+# {"level":"error","event":"tag_presence.restore_failed","timestamp":"2026-10-23T09:59:18.997Z","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \\n    at internalConnectMultiple (node:net:1134:18)\\n    at afterConnectMultiple (node:net:1715:7)"}}
+# {"level":"error","event":"notifications.refresh_failed","timestamp":"2026-10-23T09:59:19.097Z","error":{"name":"AggregateError","message":"","stack":"AggregateError [ECONNREFUSED]: \\n    at internalConnectMultiple (node:net:1134:18)\\n    at afterConnectMultiple (node:net:1715:7)"}}
+# {"level":"info","event":"region_engine.installed","timestamp":"2026-10-23T09:59:19.103Z","mapId":"necmettin-servis","algorithm":"hmm","source":"C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\config\\\\maps\\\\necmettin-servis\\\\room-engine.json"}
+# {"level":"info","event":"region_engine.installed","timestamp":"2026-10-23T09:59:19.104Z","mapId":"necmettin-yogun-bakim","algorithm":"hmm","source":"C:\\\\Users\\\\1548u\\\\Desktop\\\\cafer_motor\\\\positioning_base_ui_v4\\\\config\\\\maps\\\\necmettin-yogun-bakim\\\\room-engine.json"}
+# Subtest: server startup enables room detection for live maps and manual disable remains effective
+ok 74 - server startup enables room detection for live maps and manual disable remains effective
+  ---
+  duration_ms: 179.5558
+  type: 'test'
+  ...
+# Subtest: moving, unknown and absent motion labels preserve room decisions, filters and signal-loss inference
+ok 75 - moving, unknown and absent motion labels preserve room decisions, filters and signal-loss inference
+  ---
+  duration_ms: 31.5253
+  type: 'test'
+  ...
+# Subtest: stationary measurements cannot initialize room state; moving resumes normal inference
+ok 76 - stationary measurements cannot initialize room state; moving resumes normal inference
+  ---
+  duration_ms: 1.4452
+  type: 'test'
+  ...
+# Subtest: stationary coordinates cannot alter room evidence or distance references, including timer inference
+ok 77 - stationary coordinates cannot alter room evidence or distance references, including timer inference
+  ---
+  duration_ms: 2.4536
+  type: 'test'
+  ...
+# Subtest: disabled engine does not mutate input
+ok 78 - disabled engine does not mutate input
+  ---
+  duration_ms: 0.6083
+  type: 'test'
+  ...
+# Subtest: kat1-ortopedi uses 4.5 m/s globally and for every effective region setting
+ok 79 - kat1-ortopedi uses 4.5 m/s globally and for every effective region setting
+  ---
+  duration_ms: 3.3521
+  type: 'test'
+  ...
+# Subtest: kat1-ortopedi accepts a reasonable 4.5 m/s step and rejects a jump beyond speed plus tolerance
+ok 80 - kat1-ortopedi accepts a reasonable 4.5 m/s step and rejects a jump beyond speed plus tolerance
+  ---
+  duration_ms: 3.8686
+  type: 'test'
+  ...
+# Subtest: time and independent measurements are both required, even with count=1
+ok 81 - time and independent measurements are both required, even with count=1
+  ---
+  duration_ms: 1.3304
+  type: 'test'
+  ...
+# Subtest: raw room motion always yields exact configured centre
+ok 82 - raw room motion always yields exact configured centre
+  ---
+  duration_ms: 1.7918
+  type: 'test'
+  ...
+# Subtest: parallel door blackout and approach without crossing never assign a room
+ok 83 - parallel door blackout and approach without crossing never assign a room
+  ---
+  duration_ms: 1.8627
+  type: 'test'
+  ...
+# Subtest: directional door crossing and one strong inside measurement allow estimated entry, never measured entry
+ok 84 - directional door crossing and one strong inside measurement allow estimated entry, never measured entry
+  ---
+  duration_ms: 1.3685
+  type: 'test'
+  ...
+# Subtest: required door crossing can infer a silent concrete room when signal stops at the wall
+ok 85 - required door crossing can infer a silent concrete room when signal stops at the wall
+  ---
+  duration_ms: 1.3788
+  type: 'test'
+  ...
+# Subtest: synthetic publications preserve measurement time, long gaps expose uncertainty
+ok 86 - synthetic publications preserve measurement time, long gaps expose uncertainty
+  ---
+  duration_ms: 0.8329
+  type: 'test'
+  ...
+# Subtest: a single neighbor jump cannot replace a confirmed room, while a sustained direct sequence can
+ok 87 - a single neighbor jump cannot replace a confirmed room, while a sustained direct sequence can
+  ---
+  duration_ms: 1.3944
+  type: 'test'
+  ...
+# Subtest: wall measurements alone do not confirm adjacent room
+ok 88 - wall measurements alone do not confirm adjacent room
+  ---
+  duration_ms: 5.5132
+  type: 'test'
+  ...
+# Subtest: confirmed door exit releases centre, subsequent room entry succeeds
+ok 89 - confirmed door exit releases centre, subsequent room entry succeeds
+  ---
+  duration_ms: 1.8567
+  type: 'test'
+  ...
+# Subtest: long blackout allows relocation without invented transition time
+ok 90 - long blackout allows relocation without invented transition time
+  ---
+  duration_ms: 1.4695
+  type: 'test'
+  ...
+# Subtest: old, duplicate, delayed and low quality packets add no confirmation evidence
+ok 91 - old, duplicate, delayed and low quality packets add no confirmation evidence
+  ---
+  duration_ms: 1.1401
+  type: 'test'
+  ...
+# Subtest: long evidence gaps reset candidates instead of finishing old counters
+ok 92 - long evidence gaps reset candidates instead of finishing old counters
+  ---
+  duration_ms: 1.9406
+  type: 'test'
+  ...
+# Subtest: tag histories and tag count are bounded and independent
+ok 93 - tag histories and tag count are bounded and independent
+  ---
+  duration_ms: 53.7707
+  type: 'test'
+  ...
+# Subtest: coverage profiles affect dropout timing without raising entry confidence
+ok 94 - coverage profiles affect dropout timing without raising entry confidence
+  ---
+  duration_ms: 0.8815
+  type: 'test'
+  ...
+# Subtest: missing doors and narrow rooms report limitations without fabricated geometry
+ok 95 - missing doors and narrow rooms report limitations without fabricated geometry
+  ---
+  duration_ms: 1.0339
+  type: 'test'
+  ...
+# Subtest: live decisions project to history and expiry is not a measured room visit
+ok 96 - live decisions project to history and expiry is not a measured room visit
+  ---
+  duration_ms: 1.3671
+  type: 'test'
+  ...
+# Subtest: reference scenarios reproduce exactly; adding tags cannot change tag one
+ok 97 - reference scenarios reproduce exactly; adding tags cannot change tag one
+  ---
+  duration_ms: 31.1897
+  type: 'test'
+  ...
+# Subtest: all scenarios include useful correct coverage, room visits are not hidden by uncertainty
+ok 98 - all scenarios include useful correct coverage, room visits are not hidden by uncertainty
+  ---
+  duration_ms: 93.4858
+  type: 'test'
+  ...
+# Subtest: physical scenario routes cross room boundaries only at defined doors
+ok 99 - physical scenario routes cross room boundaries only at defined doors
+  ---
+  duration_ms: 4.1637
+  type: 'test'
+  ...
+# Subtest: candidate confidence cannot increase during a blackout, including the lost transition
+ok 100 - candidate confidence cannot increase during a blackout, including the lost transition
+  ---
+  duration_ms: 0.6613
+  type: 'test'
+  ...
+# Subtest: sustained corridor measurements after a long gap release an old room
+ok 101 - sustained corridor measurements after a long gap release an old room
+  ---
+  duration_ms: 1.1787
+  type: 'test'
+  ...
+# Subtest: confirmed corridor exit clears relocation before the next room entry
+ok 102 - confirmed corridor exit clears relocation before the next room entry
+  ---
+  duration_ms: 2.1061
+  type: 'test'
+  ...
+# Subtest: silent door proximity infers an estimated room from one corridor measurement and later becomes lost
+ok 103 - silent door proximity infers an estimated room from one corridor measurement and later becomes lost
+  ---
+  duration_ms: 1.6001
+  type: 'test'
+  ...
+# Subtest: silent door proximity enforces distance and deterministically selects the nearest then first equal door
+ok 104 - silent door proximity enforces distance and deterministically selects the nearest then first equal door
+  ---
+  duration_ms: 2.5578
+  type: 'test'
+  ...
+# Subtest: silent door proximity needs neither movement history nor movement toward the door
+ok 105 - silent door proximity needs neither movement history nor movement toward the door
+  ---
+  duration_ms: 1.7539
+  type: 'test'
+  ...
+# Subtest: each accepted corridor measurement replaces or clears the silent door candidate
+ok 106 - each accepted corridor measurement replaces or clears the silent door candidate
+  ---
+  duration_ms: 0.8608
+  type: 'test'
+  ...
+# Subtest: configured corridor geometry prevents nearby non-corridor positions from becoming candidates
+ok 107 - configured corridor geometry prevents nearby non-corridor positions from becoming candidates
+  ---
+  duration_ms: 0.8075
+  type: 'test'
+  ...
+# Subtest: regular and intermittent rooms and disabled proximity settings preserve existing behavior
+ok 108 - regular and intermittent rooms and disabled proximity settings preserve existing behavior
+  ---
+  duration_ms: 2.2356
+  type: 'test'
+  ...
+# Subtest: ineligible doors never become silent proximity candidates
+ok 109 - ineligible doors never become silent proximity candidates
+  ---
+  duration_ms: 2.3547
+  type: 'test'
+  ...
+# Subtest: real inside evidence supersedes a prior proximity-only inferred room
+ok 110 - real inside evidence supersedes a prior proximity-only inferred room
+  ---
+  duration_ms: 1.1344
+  type: 'test'
+  ...
+# Subtest: reliable silent-room evidence supersedes the corridor proximity candidate without using crossing direction
+ok 111 - reliable silent-room evidence supersedes the corridor proximity candidate without using crossing direction
+  ---
+  duration_ms: 0.8686
+  type: 'test'
+  ...
+# Subtest: scenario A: reliable silent-room measurements confirm entry without a door crossing
+ok 112 - scenario A: reliable silent-room measurements confirm entry without a door crossing
+  ---
+  duration_ms: 0.858
+  type: 'test'
+  ...
+# Subtest: scenario B: the real Room 3 config confirms a long reliable inside replay without a door crossing
+ok 113 - scenario B: the real Room 3 config confirms a long reliable inside replay without a door crossing
+  ---
+  duration_ms: 3.6953
+  type: 'test'
+  ...
+# Subtest: scenario C: the real Room 5 config confirms fourteen reliable inside samples without a door crossing
+ok 114 - scenario C: the real Room 5 config confirms fourteen reliable inside samples without a door crossing
+  ---
+  duration_ms: 7.1322
+  type: 'test'
+  ...
+# Subtest: scenario B: one reliable silent-room measurement survives signal loss as a nonzero inference
+ok 115 - scenario B: one reliable silent-room measurement survives signal loss as a nonzero inference
+  ---
+  duration_ms: 3.694
+  type: 'test'
+  ...
+# Subtest: scenario C: a reliable corridor point near a silent door infers entry without motion evidence
+ok 116 - scenario C: a reliable corridor point near a silent door infers entry without motion evidence
+  ---
+  duration_ms: 1.2488
+  type: 'test'
+  ...
+# Subtest: silent-room raw evidence produces a stronger bounded inference than corridor proximity alone
+ok 117 - silent-room raw evidence produces a stronger bounded inference than corridor proximity alone
+  ---
+  duration_ms: 2.1474
+  type: 'test'
+  ...
+# Subtest: scenario D: corridor signal loss away from every silent door becomes location lost
+ok 118 - scenario D: corridor signal loss away from every silent door becomes location lost
+  ---
+  duration_ms: 0.737
+  type: 'test'
+  ...
+# Subtest: scenario E: data returning inside a proximity-inferred room keeps and confirms that room
+ok 119 - scenario E: data returning inside a proximity-inferred room keeps and confirms that room
+  ---
+  duration_ms: 1.0777
+  type: 'test'
+  ...
+# Subtest: scenario F: seven reliable points confirm a required-door silent room without rejection
+ok 120 - scenario F: seven reliable points confirm a required-door silent room without rejection
+  ---
+  duration_ms: 0.9776
+  type: 'test'
+  ...
+# Subtest: scenario G: one wall-band sample does not clear a proximity-inferred silent room
+ok 121 - scenario G: one wall-band sample does not clear a proximity-inferred silent room
+  ---
+  duration_ms: 0.7108
+  type: 'test'
+  ...
+# Subtest: scenario H: proximity inference chooses the nearest door without a movement vector
+ok 122 - scenario H: proximity inference chooses the nearest door without a movement vector
+  ---
+  duration_ms: 0.6485
+  type: 'test'
+  ...
+# Subtest: scenario G: a room-specific manual threshold change takes effect only after config reload
+ok 123 - scenario G: a room-specific manual threshold change takes effect only after config reload
+  ---
+  duration_ms: 1.1273
+  type: 'test'
+  ...
+# Subtest: scenario I: one impossible-speed packet is rejected without clearing a confirmed silent room
+ok 124 - scenario I: one impossible-speed packet is rejected without clearing a confirmed silent room
+  ---
+  duration_ms: 0.9849
+  type: 'test'
+  ...
+# Subtest: a rejected low-quality packet does not postpone the accepted sample stale deadline
+ok 125 - a rejected low-quality packet does not postpone the accepted sample stale deadline
+  ---
+  duration_ms: 0.9083
+  type: 'test'
+  ...
+# Subtest: scenario J: required-door regular and intermittent rooms retain their existing entry policy
+ok 126 - scenario J: required-door regular and intermittent rooms retain their existing entry policy
+  ---
+  duration_ms: 1.5591
+  type: 'test'
+  ...
+# Subtest: silent room exit needs continuous reliable corridor count and duration, not a required door
+ok 127 - silent room exit needs continuous reliable corridor count and duration, not a required door
+  ---
+  duration_ms: 1.1188
+  type: 'test'
+  ...
+# Subtest: one corridor jump is cancelled by reliable room data and timer publications add no exit evidence
+ok 128 - one corridor jump is cancelled by reliable room data and timer publications add no exit evidence
+  ---
+  duration_ms: 0.8824
+  type: 'test'
+  ...
+# Subtest: silent exit evidence resets after maxEvidenceGapMs and rejected packets never increment it
+ok 129 - silent exit evidence resets after maxEvidenceGapMs and rejected packets never increment it
+  ---
+  duration_ms: 0.909
+  type: 'test'
+  ...
+# Subtest: required-door regular and intermittent rooms still cannot exit through corridor evidence alone
+ok 130 - required-door regular and intermittent rooms still cannot exit through corridor evidence alone
+  ---
+  duration_ms: 1.8635
+  type: 'test'
+  ...
+# Subtest: after a doorless silent exit, dropout near another silent door infers that room by Euclidean distance
+ok 131 - after a doorless silent exit, dropout near another silent door infers that room by Euclidean distance
+  ---
+  duration_ms: 1.3244
+  type: 'test'
+  ...
+# Subtest: 21 September 2026 real route exits Rooms 3 and 5 without doors and infers Room 6 at the recorded cutoff
+ok 132 - 21 September 2026 real route exits Rooms 3 and 5 without doors and infers Room 6 at the recorded cutoff
+  ---
+  duration_ms: 9.9292
+  type: 'test'
+  ...
+# Subtest: decision trace explains silent-door inference and far-corridor loss without changing the decision
+ok 133 - decision trace explains silent-door inference and far-corridor loss without changing the decision
+  ---
+  duration_ms: 1.1832
+  type: 'test'
+  ...
+# Subtest: direct room switch requires three reliable target-room samples spread across configured time
+ok 134 - direct room switch requires three reliable target-room samples spread across configured time
+  ---
+  duration_ms: 0.8361
+  type: 'test'
+  ...
+# Subtest: anonymized fast field fixtures confirm Room 3 to Room 5 without a corridor publication
+ok 135 - anonymized fast field fixtures confirm Room 3 to Room 5 without a corridor publication
+  ---
+  duration_ms: 53.0986
+  type: 'test'
+  ...
+# Subtest: sparse field fixture cannot confirm Room 5 or retain Room 3 after a long loss
+ok 136 - sparse field fixture cannot confirm Room 5 or retain Room 3 after a long loss
+  ---
+  duration_ms: 28.5216
+  type: 'test'
+  ...
+# Subtest: an active old room still yields to the nearest silent target-door cutoff without directional movement
+ok 137 - an active old room still yields to the nearest silent target-door cutoff without directional movement
+  ---
+  duration_ms: 1.0886
+  type: 'test'
+  ...
+# Subtest: one reliable sample inside another silent room followed by loss infers that room
+ok 138 - one reliable sample inside another silent room followed by loss infers that room
+  ---
+  duration_ms: 1.2121
+  type: 'test'
+  ...
+# Subtest: 24 September fast field samples infer Room 6 during the recorded cutoff
+ok 139 - 24 September fast field samples infer Room 6 during the recorded cutoff
+  ---
+  duration_ms: 8.1705
+  type: 'test'
+  ...
+# Subtest: old room support and later corridor evidence prevent a one-sample target-room cutoff
+ok 140 - old room support and later corridor evidence prevent a one-sample target-room cutoff
+  ---
+  duration_ms: 1.3651
+  type: 'test'
+  ...
+# Subtest: one-sample cutoff ignores rejected room points and does not bypass regular-room policy
+ok 141 - one-sample cutoff ignores rejected room points and does not bypass regular-room policy
+  ---
+  duration_ms: 2.1644
+  type: 'test'
+  ...
+# Subtest: direct room switch is cancelled by old-room support, restarted for a different target, and ignores rejected packets
+ok 142 - direct room switch is cancelled by old-room support, restarted for a different target, and ignores rejected packets
+  ---
+  duration_ms: 2.7957
+  type: 'test'
+  ...
+# Subtest: insufficient direct room evidence does not retain the old room past roomSwitchUncertainAfterMs
+ok 143 - insufficient direct room evidence does not retain the old room past roomSwitchUncertainAfterMs
+  ---
+  duration_ms: 0.87
+  type: 'test'
+  ...
+# Subtest: decision trace snapshots entry evidence, required-door rejection, door crossing and exit
+ok 144 - decision trace snapshots entry evidence, required-door rejection, door crossing and exit
+  ---
+  duration_ms: 2.5374
+  type: 'test'
+  ...
+# Subtest: decision trace classifies rejected measurements, long loss and config reload
+ok 145 - decision trace classifies rejected measurements, long loss and config reload
+  ---
+  duration_ms: 2.306
+  type: 'test'
+  ...
+# Subtest: decision trace is an additive output and the established processed-position contract stays intact
+ok 146 - decision trace is an additive output and the established processed-position contract stays intact
+  ---
+  duration_ms: 0.7358
+  type: 'test'
+  ...
+# Subtest: decision queue stores raw decisions and state changes, deduplicates synthetic centres
+ok 147 - decision queue stores raw decisions and state changes, deduplicates synthetic centres
+  ---
+  duration_ms: 12.7157
+  type: 'test'
+  ...
+# Subtest: decision buffer caps memory, including an interrupted persistence flush
+ok 148 - decision buffer caps memory, including an interrupted persistence flush
+  ---
+  duration_ms: 136.8288
+  type: 'test'
+  ...
+# Subtest: raw buffer is bounded and received/measurement times persist independently
+ok 149 - raw buffer is bounded and received/measurement times persist independently
+  ---
+  duration_ms: 600.3872
+  type: 'test'
+  ...
+# Subtest: LocationService exposes the live decision and keeps inferred/uncertain visits separate
+ok 150 - LocationService exposes the live decision and keeps inferred/uncertain visits separate
+  ---
+  duration_ms: 8.2801
+  type: 'test'
+  ...
+# Subtest: PostgreSQL roundtrip uses separate decision table and preserves measurement/publication timestamps
+ok 151 - PostgreSQL roundtrip uses separate decision table and preserves measurement/publication timestamps # SKIP
+  ---
+  duration_ms: 0.1648
+  type: 'test'
+  ...
+# Subtest: decision log list applies combined filters, merges pending records and uses a stable cursor
+ok 152 - decision log list applies combined filters, merges pending records and uses a stable cursor
+  ---
+  duration_ms: 4.8115
+  type: 'test'
+  ...
+# Subtest: decision list keyset order does not skip equal timestamps
+ok 153 - decision list keyset order does not skip equal timestamps
+  ---
+  duration_ms: 17.1862
+  type: 'test'
+  ...
+# Subtest: recent decision detail is shared across route repository instances
+ok 154 - recent decision detail is shared across route repository instances
+  ---
+  duration_ms: 1.6829
+  type: 'test'
+  ...
+# Subtest: default preferred policy releases a room after sustained reliable corridor evidence without a door crossing
+ok 155 - default preferred policy releases a room after sustained reliable corridor evidence without a door crossing
+  ---
+  duration_ms: 16.1687
+  type: 'test'
+  ...
+# Subtest: named corridor connections and legacy corridor aliases both prove required door crossings
+ok 156 - named corridor connections and legacy corridor aliases both prove required door crossings
+  ---
+  duration_ms: 5.2201
+  type: 'test'
+  ...
+# Subtest: a different named corridor cannot satisfy the required door connection
+ok 157 - a different named corridor cannot satisfy the required door connection
+  ---
+  duration_ms: 1.2283
+  type: 'test'
+  ...
+# Subtest: required doors still block a wall exit even with sustained reliable corridor data
+ok 158 - required doors still block a wall exit even with sustained reliable corridor data
+  ---
+  duration_ms: 1.2278
+  type: 'test'
+  ...
+# Subtest: a corridor spike, wall-band points, rejected packets and timers do not complete a preferred exit
+ok 159 - a corridor spike, wall-band points, rejected packets and timers do not complete a preferred exit
+  ---
+  duration_ms: 1.8407
+  type: 'test'
+  ...
+# Subtest: corridor evidence restarts after a long gap instead of releasing on one new packet
+ok 160 - corridor evidence restarts after a long gap instead of releasing on one new packet
+  ---
+  duration_ms: 1.086
+  type: 'test'
+  ...
+# Subtest: saha \#1: kapıda verisi kesilen tag doğru odaya (206) tahmini atanır ve uzun süre silinmez
+ok 161 - saha \#1: kapıda verisi kesilen tag doğru odaya (206) tahmini atanır ve uzun süre silinmez
+  ---
+  duration_ms: 141.3374
+  type: 'test'
+  ...
+# Subtest: saha \#1 (yoğun bakım): Oda 7 kapısında kesilen tag Oda 7'ye atanır
+ok 162 - saha \#1 (yoğun bakım): Oda 7 kapısında kesilen tag Oda 7'ye atanır
+  ---
+  duration_ms: 7.6351
+  type: 'test'
+  ...
+# Subtest: saha \#2: sağdaki odaya girerken sola düşen 2 sıçrama tagı soldaki odaya atamaz
+ok 163 - saha \#2: sağdaki odaya girerken sola düşen 2 sıçrama tagı soldaki odaya atamaz
+  ---
+  duration_ms: 20.1052
+  type: 'test'
+  ...
+# Subtest: saha \#3: çıkış kapısından çıkan tag Dr Odası'na atanmaz, alan dışı olarak işaretlenir
+ok 164 - saha \#3: çıkış kapısından çıkan tag Dr Odası'na atanmaz, alan dışı olarak işaretlenir
+  ---
+  duration_ms: 23.8185
+  type: 'test'
+  ...
+# Subtest: saha \#4: 202 kapısının önünde (yanal 1 m) kesilen tag koridorda sabit kalmaz, 202'ye atanır
+ok 165 - saha \#4: 202 kapısının önünde (yanal 1 m) kesilen tag koridorda sabit kalmaz, 202'ye atanır
+  ---
+  duration_ms: 10.9774
+  type: 'test'
+  ...
+# Subtest: koridor ortasında hareketsiz (10 sn blink) tag odaya atanmaz
+ok 166 - koridor ortasında hareketsiz (10 sn blink) tag odaya atanmaz
+  ---
+  duration_ms: 69.6705
+  type: 'test'
+  ...
+# Subtest: kapıların önünden geçen tag hiçbir odaya atanmaz; 1,5 sn paket boşluğu oda girişi sayılmaz
+ok 167 - kapıların önünden geçen tag hiçbir odaya atanmaz; 1,5 sn paket boşluğu oda girişi sayılmaz
+  ---
+  duration_ms: 41.4173
+  type: 'test'
+  ...
+# Subtest: odadan çıkan tag koridor verisiyle hızlı (≤3 sn) koridora döner
+ok 168 - odadan çıkan tag koridor verisiyle hızlı (≤3 sn) koridora döner
+  ---
+  duration_ms: 17.4918
+  type: 'test'
+  ...
+# Subtest: içeriden sürekli veri gelen odada (duvar dibi) tag odada kalır
+ok 169 - içeriden sürekli veri gelen odada (duvar dibi) tag odada kalır
+  ---
+  duration_ms: 57.3761
+  type: 'test'
+  ...
+# Subtest: tag hareketsiz bildirince kapının hemen önünde 3 dk beklese de odaya atanmaz
+ok 170 - tag hareketsiz bildirince kapının hemen önünde 3 dk beklese de odaya atanmaz
+  ---
+  duration_ms: 50.5482
+  type: 'test'
+  ...
+# Subtest: odada hareketsiz tagın koridora düşen seyrek ölçümleri odadan çıkış sayılmaz; hareket bildirince hızla çıkar
+ok 171 - odada hareketsiz tagın koridora düşen seyrek ölçümleri odadan çıkış sayılmaz; hareket bildirince hızla çıkar
+  ---
+  duration_ms: 35.275
+  type: 'test'
+  ...
+# Subtest: Jetson'un koridora kırptığı oda içi çözüm (solverRaw) oda kanıtı sayılır
+ok 172 - Jetson'un koridora kırptığı oda içi çözüm (solverRaw) oda kanıtı sayılır
+  ---
+  duration_ms: 13.4236
+  type: 'test'
+  ...
+# Subtest: bağlantı koparsa son karar korunur ve gösterilir; oda çıkışı ve alan çıkışı bildirilir
+ok 173 - bağlantı koparsa son karar korunur ve gösterilir; oda çıkışı ve alan çıkışı bildirilir
+  ---
+  duration_ms: 90.5668
+  type: 'test'
+  ...
+# Subtest: iki komşu kapının arasında susan tag koridorda bırakılmaz, en olası odaya alınır (16 Ekim rastgele test, 207)
+ok 174 - iki komşu kapının arasında susan tag koridorda bırakılmaz, en olası odaya alınır (16 Ekim rastgele test, 207)
+  ---
+  duration_ms: 10.3465
+  type: 'test'
+  ...
+# Subtest: 3 anchorlu (ayna çözümlü) ölçüm odadaki tagı karşı odaya atamaz; 4+ anchorlu ölçüm kullanılır
+ok 175 - 3 anchorlu (ayna çözümlü) ölçüm odadaki tagı karşı odaya atamaz; 4+ anchorlu ölçüm kullanılır
+  ---
+  duration_ms: 12.5023
+  type: 'test'
+  ...
+# Subtest: kararlı mod: kapı eşiğinde 5 sn beklemek odayı göstermez, 10 sn kalınca gösterir
+ok 176 - kararlı mod: kapı eşiğinde 5 sn beklemek odayı göstermez, 10 sn kalınca gösterir
+  ---
+  duration_ms: 19.2971
+  type: 'test'
+  ...
+# Subtest: ayar doğrulaması ve harita başına motor seçimi
+ok 177 - ayar doğrulaması ve harita başına motor seçimi
+  ---
+  duration_ms: 31.7559
+  type: 'test'
+  ...
+# Subtest: hareket bayrağı yokken kapı önünde duran tag (10 sn'de bir ölçüm) odaya girip çıkmaz
+ok 178 - hareket bayrağı yokken kapı önünde duran tag (10 sn'de bir ölçüm) odaya girip çıkmaz
+  ---
+  duration_ms: 81.7997
+  type: 'test'
+  ...
+# Subtest: yoğun bakım (camlı oda): odadaki tag duvar dibinde koridorda görünse de odadan çıkmış sayılmaz; gerçek çıkış yayımlanır
+ok 179 - yoğun bakım (camlı oda): odadaki tag duvar dibinde koridorda görünse de odadan çıkmış sayılmaz; gerçek çıkış yayımlanır
+  ---
+  duration_ms: 16.9175
+  type: 'test'
+  ...
+# Subtest: yoğun bakım cam cephe: odadaki tagın cephenin önüne (koridora) düşen noktaları odada sayılır; koridorun ortası koridordur
+ok 180 - yoğun bakım cam cephe: odadaki tagın cephenin önüne (koridora) düşen noktaları odada sayılır; koridorun ortası koridordur
+  ---
+  duration_ms: 42.6289
+  type: 'test'
+  ...
+# Subtest: yoğun bakım: hareketsiz tagın koridordaki işareti Jetson sıçramalarıyla oynamaz, gerçekten yer değiştirince taşınır
+ok 181 - yoğun bakım: hareketsiz tagın koridordaki işareti Jetson sıçramalarıyla oynamaz, gerçekten yer değiştirince taşınır
+  ---
+  duration_ms: 61.366
+  type: 'test'
+  ...
+# Subtest: hareketsiz tag (IMU): oda kararı donar, karşı odaya sıçrayan noktalar ve veri boşlukları kararı değiştirmez; hareket edince normale döner
+ok 182 - hareketsiz tag (IMU): oda kararı donar, karşı odaya sıçrayan noktalar ve veri boşlukları kararı değiştirmez; hareket edince normale döner
+  ---
+  duration_ms: 38.8222
+  type: 'test'
+  ...
+# Subtest: yoğun bakım saha 21 Ekim: hareketsiz HBM'nin tek Jetson sıçraması ve tekrarlanan alan dışı koordinatı Oda 3'e kilitlemez
+ok 183 - yoğun bakım saha 21 Ekim: hareketsiz HBM'nin tek Jetson sıçraması ve tekrarlanan alan dışı koordinatı Oda 3'e kilitlemez
+  ---
+  duration_ms: 106.1523
+  type: 'test'
+  ...
+# Subtest: yoğun bakım saha 22 Ekim: hareketsiz tekerlekli sandalye sol kapıdan çıkınca koridorun ucunda donmuş kalmaz, alan dışı olur
+ok 184 - yoğun bakım saha 22 Ekim: hareketsiz tekerlekli sandalye sol kapıdan çıkınca koridorun ucunda donmuş kalmaz, alan dışı olur
+  ---
+  duration_ms: 45.8159
+  type: 'test'
+  ...
+# Subtest: existing maps and the new-map template enable 10 metres and 2 relocation measurements
+ok 185 - existing maps and the new-map template enable 10 metres and 2 relocation measurements
+  ---
+  duration_ms: 36.1584
+  type: 'test'
+  ...
+# Subtest: distance rejection is independent of speed and preserves accepted timing, history and cadence
+ok 186 - distance rejection is independent of speed and preserves accepted timing, history and cadence
+  ---
+  duration_ms: 8.3134
+  type: 'test'
+  ...
+# Subtest: distance equality passes, an excess fails, and a sub-threshold point still obeys speed
+ok 187 - distance equality passes, an excess fails, and a sub-threshold point still obeys speed
+  ---
+  duration_ms: 2.2034
+  type: 'test'
+  ...
+# Subtest: both violated filters are logged, while a long gap never exempts the distance limit
+ok 188 - both violated filters are logged, while a long gap never exempts the distance limit
+  ---
+  duration_ms: 2.4102
+  type: 'test'
+  ...
+# Subtest: two coherent distant samples reset only the reference, and subsequent samples must reprove the room
+ok 189 - two coherent distant samples reset only the reference, and subsequent samples must reprove the room
+  ---
+  duration_ms: 5.2881
+  type: 'test'
+  ...
+# Subtest: returning to the accepted location cancels the distant candidate
+ok 190 - returning to the accepted location cancels the distant candidate
+  ---
+  duration_ms: 1.287
+  type: 'test'
+  ...
+# Subtest: two rapid samples do not reset before minimum duration and timers never confirm candidates
+ok 191 - two rapid samples do not reset before minimum duration and timers never confirm candidates
+  ---
+  duration_ms: 1.2794
+  type: 'test'
+  ...
+# Subtest: duplicates and out-of-order packets after rejection neither count nor erase the valid candidate
+ok 192 - duplicates and out-of-order packets after rejection neither count nor erase the valid candidate
+  ---
+  duration_ms: 0.7437
+  type: 'test'
+  ...
+# Subtest: low or non-finite quality breaks candidate continuity and cannot extend accepted validity
+ok 193 - low or non-finite quality breaks candidate continuity and cannot extend accepted validity
+  ---
+  duration_ms: 2.2766
+  type: 'test'
+  ...
+# Subtest: stale measurements break the candidate and do not infer a room or refresh its support
+ok 194 - stale measurements break the candidate and do not infer a room or refresh its support
+  ---
+  duration_ms: 1.257
+  type: 'test'
+  ...
+# Subtest: a speed violation between candidate points restarts the candidate even if the cluster radius passes
+ok 195 - a speed violation between candidate points restarts the candidate even if the cluster radius passes
+  ---
+  duration_ms: 0.7243
+  type: 'test'
+  ...
+# Subtest: cluster drift, excessive gaps and total window expiry restart verification
+ok 196 - cluster drift, excessive gaps and total window expiry restart verification
+  ---
+  duration_ms: 1.9488
+  type: 'test'
+  ...
+# Subtest: distance-rejected room and corridor samples cannot create silent-door or room-switch evidence
+ok 197 - distance-rejected room and corridor samples cannot create silent-door or room-switch evidence
+  ---
+  duration_ms: 1.6837
+  type: 'test'
+  ...
+# Subtest: continuous rejects age the accepted location to lost without adding evidence
+ok 198 - continuous rejects age the accepted location to lost without adding evidence
+  ---
+  duration_ms: 1.2078
+  type: 'test'
+  ...
+# Subtest: tag removal, configuration reload and separate tags establish independent references
+ok 199 - tag removal, configuration reload and separate tags establish independent references
+  ---
+  duration_ms: 1.6912
+  type: 'test'
+  ...
+# Subtest: setting zero restores the existing speed/freshness/quality pipeline
+ok 200 - setting zero restores the existing speed/freshness/quality pipeline
+  ---
+  duration_ms: 0.7215
+  type: 'test'
+  ...
+# Subtest: configuration enforces finite map-wide parameters and keeps the filter in API round trips
+ok 201 - configuration enforces finite map-wide parameters and keeps the filter in API round trips
+  ---
+  duration_ms: 3.0313
+  type: 'test'
+  ...
+# Subtest: live room simulation CLI options are deterministic and validated
+ok 202 - live room simulation CLI options are deterministic and validated
+  ---
+  duration_ms: 3.5353
+  type: 'test'
+  ...
+# Subtest: random simulator delays stay within inclusive limits
+ok 203 - random simulator delays stay within inclusive limits
+  ---
+  duration_ms: 4.3544
+  type: 'test'
+  ...
+# Subtest: interval environment validation falls back for non-numeric values and rejects inverted bounds
+ok 204 - interval environment validation falls back for non-numeric values and rejects inverted bounds
+  ---
+  duration_ms: 0.6097
+  type: 'test'
+  ...
+# Subtest: default simulator cadence is fixed at one update per second
+ok 205 - default simulator cadence is fixed at one update per second
+  ---
+  duration_ms: 0.271
+  type: 'test'
+  ...
+# Subtest: simulator sends source heartbeat separately from tag positions when configured
+ok 206 - simulator sends source heartbeat separately from tag positions when configured
+  ---
+  duration_ms: 3.8536
+  type: 'test'
+  ...
+# Subtest: simulation endpoint selection distinguishes local and public destinations
+ok 207 - simulation endpoint selection distinguishes local and public destinations
+  ---
+  duration_ms: 0.3453
+  type: 'test'
+  ...
+# Subtest: tags follow the corridor, visit a room centre, then stay there for 2–20 seconds
+ok 208 - tags follow the corridor, visit a room centre, then stay there for 2–20 seconds
+  ---
+  duration_ms: 1.1122
+  type: 'test'
+  ...
+# Subtest: a new position tick aborts unfinished response waits instead of skipping the send
+ok 209 - a new position tick aborts unfinished response waits instead of skipping the send
+  ---
+  duration_ms: 1.4095
+  type: 'test'
+  ...
+# Subtest: stalled HTTP responses never suppress later one-second position ticks
+ok 210 - stalled HTTP responses never suppress later one-second position ticks
+  ---
+  duration_ms: 1.3126
+  type: 'test'
+  ...
+# Subtest: old centre-only room definitions cannot create a wall shortcut
+ok 211 - old centre-only room definitions cannot create a wall shortcut
+  ---
+  duration_ms: 0.9947
+  type: 'test'
+  ...
+# Subtest: normal payload carries the zone contract and multi-floor output is deterministic
+ok 212 - normal payload carries the zone contract and multi-floor output is deterministic
+  ---
+  duration_ms: 0.9763
+  type: 'test'
+  ...
+# Subtest: null and unknown zone scenarios emit explicit values
+ok 213 - null and unknown zone scenarios emit explicit values
+  ---
+  duration_ms: 0.772
+  type: 'test'
+  ...
+# Subtest: delayed old-floor and same-coordinate scenarios preserve explicit floor evidence
+ok 214 - delayed old-floor and same-coordinate scenarios preserve explicit floor evidence
+  ---
+  duration_ms: 1.4207
+  type: 'test'
+  ...
+# Subtest: same measurement accepts only a strictly newer valid engine publication
+ok 215 - same measurement accepts only a strictly newer valid engine publication
+  ---
+  duration_ms: 3.6238
+  type: 'test'
+  ...
+# Subtest: same measurement accepts newer ROOM_TRANSITIONED publication and rejects the older decision
+ok 216 - same measurement accepts newer ROOM_TRANSITIONED publication and rejects the older decision
+  ---
+  duration_ms: 0.4504
+  type: 'test'
+  ...
+# Subtest: store shows inferred Room 6 and later LOCATION_LOST without changing measurement age
+ok 217 - store shows inferred Room 6 and later LOCATION_LOST without changing measurement age
+  ---
+  duration_ms: 2.2802
+  type: 'test'
+  ...
+# {"level":"warn","event":"tracking.zone_unresolved","timestamp":"2026-10-23T09:59:19.621Z","zoneId":"not-configured"}
+# Subtest: kaynak heartbeat'i ayrı token ve bilinen zone gerektirir
+ok 218 - kaynak heartbeat'i ayrı token ve bilinen zone gerektirir
+  ---
+  duration_ms: 16.5102
+  type: 'test'
+  ...
+# {"level":"warn","event":"tracking.zone_unresolved","timestamp":"2026-10-23T09:59:19.626Z","zoneId":"zone-a"}
+# {"level":"warn","event":"tracking.zone_unresolved","timestamp":"2026-10-23T09:59:19.632Z","zoneId":"zone-b"}
+# Subtest: örnek position payload'ı boş 204 ile kabul edilir; konum, PDOP ve zaman korunur
+ok 219 - örnek position payload'ı boş 204 ile kabul edilir; konum, PDOP ve zaman korunur
+  ---
+  duration_ms: 2.7719
+  type: 'test'
+  ...
+# Subtest: yeni tek-tag sözleşmesi PDOP olmadan kabul edilir; koordinat, kimlik, etiket ve zaman korunur
+ok 220 - yeni tek-tag sözleşmesi PDOP olmadan kabul edilir; koordinat, kimlik, etiket ve zaman korunur
+  ---
+  duration_ms: 2.823
+  type: 'test'
+  ...
+# Subtest: geçersiz motion_label konum akışına girmeden 400 döndürür
+ok 221 - geçersiz motion_label konum akışına girmeden 400 döndürür
+  ---
+  duration_ms: 2.582
+  type: 'test'
+  ...
+# Subtest: null ve bilinmeyen zone kabul edilir fakat haritaya çözülmez
+ok 222 - null ve bilinmeyen zone kabul edilir fakat haritaya çözülmez
+  ---
+  duration_ms: 1.4857
+  type: 'test'
+  ...
+# Subtest: zone alanlarında tip ve uzunluk doğrulaması uygulanır
+ok 223 - zone alanlarında tip ve uzunluk doğrulaması uygulanır
+  ---
+  duration_ms: 0.5816
+  type: 'test'
+  ...
+# Subtest: negatif koordinatlar geçerlidir
+ok 224 - negatif koordinatlar geçerlidir
+  ---
+  duration_ms: 0.4149
+  type: 'test'
+  ...
+# Subtest: ingest POST aynı route üzerindeki SSE akışına position eventi yayınlar
+ok 225 - ingest POST aynı route üzerindeki SSE akışına position eventi yayınlar
+  ---
+  duration_ms: 1.6546
+  type: 'test'
+  ...
+# Subtest: PDOP 20 dahil, sıfır, null ve eski eksik alan konumla birlikte kabul edilir
+ok 226 - PDOP 20 dahil, sıfır, null ve eski eksik alan konumla birlikte kabul edilir
+  ---
+  duration_ms: 0.988
+  type: 'test'
+  ...
+# Subtest: PDOP harita çözümünden sonra tüm konum işlemlerinden önce elenir
+ok 227 - PDOP harita çözümünden sonra tüm konum işlemlerinden önce elenir
+  ---
+  duration_ms: 0.9949
+  type: 'test'
+  ...
+# Subtest: yoğun bakımda PDOP filtresi kapalı (olasılıksal motor zayıf PDOP'u kendisi tartar): 70 üstü de işlenir; haritasız kat 20 sınırını kullanır
+ok 228 - yoğun bakımda PDOP filtresi kapalı (olasılıksal motor zayıf PDOP'u kendisi tartar): 70 üstü de işlenir; haritasız kat 20 sınırını kullanır
+  ---
+  duration_ms: 3.7916
+  type: 'test'
+  ...
+# Subtest: harita PDOP filtresi kapalıyken büyük sonlu değerler normal veri akışına devam eder
+ok 229 - harita PDOP filtresi kapalıyken büyük sonlu değerler normal veri akışına devam eder
+  ---
+  duration_ms: 0.517
+  type: 'test'
+  ...
+# Subtest: PDOP string, boolean, nesne ve sonlu olmayan sayı olamaz
+ok 230 - PDOP string, boolean, nesne ve sonlu olmayan sayı olamaz
+  ---
+  duration_ms: 1.3068
+  type: 'test'
+  ...
+# Subtest: geçersiz sözleşme payload'ları açıklayıcı 400 döndürür
+    # Subtest: yanlış type
+    ok 1 - yanlış type
+      ---
+      duration_ms: 0.3877
+      type: 'test'
+      ...
+    # Subtest: eksik tag_id
+    ok 2 - eksik tag_id
+      ---
+      duration_ms: 0.2767
+      type: 'test'
+      ...
+    # Subtest: sayısal tag_id
+    ok 3 - sayısal tag_id
+      ---
+      duration_ms: 0.222
+      type: 'test'
+      ...
+    # Subtest: konum dizisi
+    ok 4 - konum dizisi
+      ---
+      duration_ms: 0.2899
+      type: 'test'
+      ...
+    # Subtest: string x
+    ok 5 - string x
+      ---
+      duration_ms: 0.2256
+      type: 'test'
+      ...
+    # Subtest: string y
+    ok 6 - string y
+      ---
+      duration_ms: 0.2336
+      type: 'test'
+      ...
+    # Subtest: geçersiz timestamp
+    ok 7 - geçersiz timestamp
+      ---
+      duration_ms: 0.2508
+      type: 'test'
+      ...
+    # Subtest: fazladan alan
+    ok 8 - fazladan alan
+      ---
+      duration_ms: 0.2595
+      type: 'test'
+      ...
+    1..8
+ok 231 - geçersiz sözleşme payload'ları açıklayıcı 400 döndürür
+  ---
+  duration_ms: 2.8541
+  type: 'test'
+  ...
+# Subtest: bozuk JSON 400 döndürür
+ok 232 - bozuk JSON 400 döndürür
+  ---
+  duration_ms: 0.3601
+  type: 'test'
+  ...
+# Subtest: Jetson motion (0 hareketli / 1 hareketsiz) ve motion_label kabul edilir; bilinmeyen değer bilinmiyor sayılır
+ok 233 - Jetson motion (0 hareketli / 1 hareketsiz) ve motion_label kabul edilir; bilinmeyen değer bilinmiyor sayılır
+  ---
+  duration_ms: 0.6468
+  type: 'test'
+  ...
+# Subtest: Jetson raw_x/raw_y yalnız raw_inside=false iken (bölgeye kırpılmış çözüm) solverRaw olarak taşınır
+ok 234 - Jetson raw_x/raw_y yalnız raw_inside=false iken (bölgeye kırpılmış çözüm) solverRaw olarak taşınır
+  ---
+  duration_ms: 0.4329
+  type: 'test'
+  ...
+# Subtest: Jetson inlier_anchor_count kabul edilir ve anchorCount olarak taşınır
+ok 235 - Jetson inlier_anchor_count kabul edilir ve anchorCount olarak taşınır
+  ---
+  duration_ms: 0.3421
+  type: 'test'
+  ...
+# Subtest: raw buffer PDOP filtresi kayıt sorgusu, SSE, motor ve geçmiş kuyruğundan önce uygulanır
+ok 236 - raw buffer PDOP filtresi kayıt sorgusu, SSE, motor ve geçmiş kuyruğundan önce uygulanır
+  ---
+  duration_ms: 23.7419
+  type: 'test'
+  ...
+# Subtest: ham konum ve PDOP birlikte yayınlanır ve yazılır; null ile sıfır ayrı tutulur
+ok 237 - ham konum ve PDOP birlikte yayınlanır ve yazılır; null ile sıfır ayrı tutulur
+  ---
+  duration_ms: 2.5703
+  type: 'test'
+  ...
+# Subtest: konum repository'si güncel ve tarihsel sorgularda PDOP null ve sıfırı korur
+ok 238 - konum repository'si güncel ve tarihsel sorgularda PDOP null ve sıfırı korur
+  ---
+  duration_ms: 1.891
+  type: 'test'
+  ...
+# Subtest: oda motoru kabul edilmiş konumun PDOP değerini ham ve işlenmiş çıktıda korur
+ok 239 - oda motoru kabul edilmiş konumun PDOP değerini ham ve işlenmiş çıktıda korur
+  ---
+  duration_ms: 8.8822
+  type: 'test'
+  ...
+# Subtest: PostgreSQL PDOP sütununa kabul edilen konumlarla birlikte null ve sıfır ayrı yazılır
+ok 240 - PostgreSQL PDOP sütununa kabul edilen konumlarla birlikte null ve sıfır ayrı yazılır # SKIP
+  ---
+  duration_ms: 0.1708
+  type: 'test'
+  ...
+1..240
+# tests 248
+# suites 0
+# pass 245
+# fail 0
+# cancelled 0
+# skipped 3
+# todo 0
+# duration_ms 4817.2452

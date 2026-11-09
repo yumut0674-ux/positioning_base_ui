@@ -1,0 +1,678 @@
+{
+  "source": {
+    "workbook": "tag_ham_motor_20261023_1830_1930.xlsx",
+    "sha256": "bc844d8b1359dae6353982302da4de98c56fc5fbfea82d61da187eef1850f03f",
+    "motorRange": "Motor_Kararlari!A790:AF795",
+    "rawRange": "Ham_Veriler!A790:P795",
+    "description": "Recorded raw observations and engine outputs, replayed without running the room engine."
+  },
+  "tagCode": "9C76E417B4CB5ECF",
+  "tagName": "Pacemaker 2",
+  "records": [
+    {
+      "motorSheetRow": 790,
+      "rawSheetRow": 790,
+      "raw": {
+        "tagCode": "9C76E417B4CB5ECF",
+        "timestamp": "2026-10-23T15:50:45.311000+00:00",
+        "receivedAt": "2026-10-23T15:50:45.319000+00:00",
+        "x": 1.9571759259259258,
+        "y": 21.07306241426612,
+        "pdop": 2.5020237455094896,
+        "mapId": "necmettin-yogun-bakim",
+        "sourceZoneId": "neuyogun",
+        "sourceZoneName": "Neüyoğun"
+      },
+      "decision": {
+        "x": 1.9571759259259258,
+        "y": 21.07306241426612,
+        "pdop": 2.5020237455094896,
+        "mapId": "necmettin-yogun-bakim",
+        "motion": "moving",
+        "tagCode": "9C76E417B4CB5ECF",
+        "synthetic": false,
+        "timestamp": "2026-10-23T18:50:45.311+03:00",
+        "decisionId": "d0f575572da5d4b2ff96d4fd51226b8f4b21736cfc2fcbbc3b46b7223a6932c7",
+        "receivedAt": "2026-10-23T15:50:45.319Z",
+        "motionLabel": "moving",
+        "publishedAt": "2026-10-23T15:50:45.322Z",
+        "rawPosition": {
+          "x": 1.9571759259259258,
+          "y": 21.07306241426612,
+          "pdop": 2.5020237455094896,
+          "mapId": "necmettin-yogun-bakim",
+          "motion": "moving",
+          "tagCode": "9C76E417B4CB5ECF",
+          "timestamp": "2026-10-23T18:50:45.311+03:00",
+          "receivedAt": "2026-10-23T15:50:45.319Z",
+          "motionLabel": "moving",
+          "sourceZoneId": "neuyogun",
+          "sourceZoneName": "Neüyoğun"
+        },
+        "sourceZoneId": "neuyogun",
+        "configVersion": "be3d8bb83a1d296f",
+        "decisionTrace": {
+          "input": {
+            "x": 1.9571759259259258,
+            "y": 21.07306241426612,
+            "measuredAt": "2026-10-23T18:50:45.311+03:00",
+            "receivedAt": "2026-10-23T15:50:45.319Z",
+            "signalGapMs": 11
+          },
+          "outcome": {
+            "confidence": 0.567,
+            "measurementKind": "measured"
+          },
+          "reasons": [
+            {
+              "code": "CORRIDOR_MEASURED",
+              "message": "Ölçülen koridor konumu"
+            },
+            {
+              "code": "ENGINE_OBSERVATION",
+              "message": "Olasılıklar: corridor %57, outside %23, room-01 %19, room-09 %1"
+            }
+          ],
+          "trigger": "measurement",
+          "evidence": {
+            "score": {
+              "base": 0,
+              "door": 0,
+              "total": 0.567,
+              "duration": 0,
+              "measurements": 0
+            },
+            "lastReliableLocation": {
+              "x": 1.9571759259259258,
+              "y": 21.07306241426612,
+              "kind": "corridor",
+              "measuredAt": "2026-10-23T18:50:45.311+03:00"
+            }
+          },
+          "severity": "info",
+          "eventType": "MEASUREMENT_ACCEPTED",
+          "nextState": "TRACKING_OUTSIDE",
+          "previousState": "ENTRY_CANDIDATE"
+        },
+        "engineVersion": "room-hmm-2",
+        "positionSource": "RAW",
+        "sourceZoneName": "Neüyoğun",
+        "regionInference": {
+          "state": "TRACKING_OUTSIDE",
+          "enabled": true,
+          "reasons": [
+            "Ölçülen koridor konumu"
+          ],
+          "exitedAt": "2026-10-23T15:50:33.172Z",
+          "regionId": null,
+          "confidence": 0.567,
+          "regionName": null,
+          "validUntil": "2026-10-23T15:50:48.311Z",
+          "exitedRegionId": "room-04",
+          "uncertainAfter": "2026-10-23T15:51:45.311Z",
+          "measurementKind": "measured",
+          "candidateRegionId": null,
+          "lastKnownRegionId": "room-04"
+        },
+        "lastRawDataTimestamp": "2026-10-23T18:50:45.311+03:00"
+      }
+    },
+    {
+      "motorSheetRow": 791,
+      "rawSheetRow": 791,
+      "raw": {
+        "tagCode": "9C76E417B4CB5ECF",
+        "timestamp": "2026-10-23T15:50:45.728000+00:00",
+        "receivedAt": "2026-10-23T15:50:45.742000+00:00",
+        "x": 1.4323302469135804,
+        "y": 21.46337448559671,
+        "pdop": 2.563931483836382,
+        "mapId": "necmettin-yogun-bakim",
+        "sourceZoneId": "neuyogun",
+        "sourceZoneName": "Neüyoğun"
+      },
+      "decision": {
+        "x": 1.4323302469135804,
+        "y": 21.46337448559671,
+        "pdop": 2.563931483836382,
+        "mapId": "necmettin-yogun-bakim",
+        "motion": "moving",
+        "tagCode": "9C76E417B4CB5ECF",
+        "synthetic": false,
+        "timestamp": "2026-10-23T18:50:45.728+03:00",
+        "decisionId": "07c415ad0e85146c0dad9db52fd2ef81af30ba6ec206eb79c86f8d6c32336c4a",
+        "receivedAt": "2026-10-23T15:50:45.742Z",
+        "motionLabel": "moving",
+        "publishedAt": "2026-10-23T15:50:45.744Z",
+        "rawPosition": {
+          "x": 1.4323302469135804,
+          "y": 21.46337448559671,
+          "pdop": 2.563931483836382,
+          "mapId": "necmettin-yogun-bakim",
+          "motion": "moving",
+          "tagCode": "9C76E417B4CB5ECF",
+          "timestamp": "2026-10-23T18:50:45.728+03:00",
+          "receivedAt": "2026-10-23T15:50:45.742Z",
+          "motionLabel": "moving",
+          "sourceZoneId": "neuyogun",
+          "sourceZoneName": "Neüyoğun"
+        },
+        "sourceZoneId": "neuyogun",
+        "configVersion": "be3d8bb83a1d296f",
+        "decisionTrace": {
+          "input": {
+            "x": 1.4323302469135804,
+            "y": 21.46337448559671,
+            "measuredAt": "2026-10-23T18:50:45.728+03:00",
+            "receivedAt": "2026-10-23T15:50:45.742Z",
+            "signalGapMs": 16
+          },
+          "outcome": {
+            "confidence": 0.594,
+            "measurementKind": "measured"
+          },
+          "reasons": [
+            {
+              "code": "CORRIDOR_MEASURED",
+              "message": "Ölçülen koridor konumu"
+            },
+            {
+              "code": "ENGINE_OBSERVATION",
+              "message": "Olasılıklar: corridor %59, outside %34, room-01 %6, room-09 %0"
+            }
+          ],
+          "trigger": "measurement",
+          "evidence": {
+            "score": {
+              "base": 0,
+              "door": 0,
+              "total": 0.594,
+              "duration": 0,
+              "measurements": 0
+            },
+            "lastReliableLocation": {
+              "x": 1.4323302469135804,
+              "y": 21.46337448559671,
+              "kind": "corridor",
+              "measuredAt": "2026-10-23T18:50:45.728+03:00"
+            }
+          },
+          "severity": "info",
+          "eventType": "MEASUREMENT_ACCEPTED",
+          "nextState": "TRACKING_OUTSIDE",
+          "previousState": "TRACKING_OUTSIDE"
+        },
+        "engineVersion": "room-hmm-2",
+        "positionSource": "RAW",
+        "sourceZoneName": "Neüyoğun",
+        "regionInference": {
+          "state": "TRACKING_OUTSIDE",
+          "enabled": true,
+          "reasons": [
+            "Ölçülen koridor konumu"
+          ],
+          "exitedAt": "2026-10-23T15:50:33.172Z",
+          "regionId": null,
+          "confidence": 0.594,
+          "regionName": null,
+          "validUntil": "2026-10-23T15:50:48.728Z",
+          "exitedRegionId": "room-04",
+          "uncertainAfter": "2026-10-23T15:51:45.728Z",
+          "measurementKind": "measured",
+          "candidateRegionId": null,
+          "lastKnownRegionId": "room-04"
+        },
+        "lastRawDataTimestamp": "2026-10-23T18:50:45.728+03:00"
+      }
+    },
+    {
+      "motorSheetRow": 792,
+      "rawSheetRow": 792,
+      "raw": {
+        "tagCode": "9C76E417B4CB5ECF",
+        "timestamp": "2026-10-23T15:50:46.305000+00:00",
+        "receivedAt": "2026-10-23T15:50:46.313000+00:00",
+        "x": 0.7902006172839507,
+        "y": 22.1,
+        "pdop": 4.010136625177763,
+        "mapId": "necmettin-yogun-bakim",
+        "sourceZoneId": "neuyogun",
+        "sourceZoneName": "Neüyoğun"
+      },
+      "decision": {
+        "x": 0.7902006172839507,
+        "y": 22.1,
+        "pdop": 4.010136625177763,
+        "mapId": "necmettin-yogun-bakim",
+        "motion": "moving",
+        "tagCode": "9C76E417B4CB5ECF",
+        "synthetic": false,
+        "timestamp": "2026-10-23T18:50:46.305+03:00",
+        "decisionId": "21c047348df42662e01ec1271777be158f0cbb1d3fca19b5331cad329d11a6e0",
+        "receivedAt": "2026-10-23T15:50:46.313Z",
+        "motionLabel": "moving",
+        "publishedAt": "2026-10-23T15:50:46.315Z",
+        "rawPosition": {
+          "x": 0.7902006172839507,
+          "y": 22.1,
+          "pdop": 4.010136625177763,
+          "mapId": "necmettin-yogun-bakim",
+          "motion": "moving",
+          "tagCode": "9C76E417B4CB5ECF",
+          "timestamp": "2026-10-23T18:50:46.305+03:00",
+          "receivedAt": "2026-10-23T15:50:46.313Z",
+          "motionLabel": "moving",
+          "sourceZoneId": "neuyogun",
+          "sourceZoneName": "Neüyoğun"
+        },
+        "sourceZoneId": "neuyogun",
+        "configVersion": "be3d8bb83a1d296f",
+        "decisionTrace": {
+          "input": {
+            "x": 0.7902006172839507,
+            "y": 22.1,
+            "measuredAt": "2026-10-23T18:50:46.305+03:00",
+            "receivedAt": "2026-10-23T15:50:46.313Z",
+            "signalGapMs": 10
+          },
+          "outcome": {
+            "confidence": 0.753,
+            "measurementKind": "estimated"
+          },
+          "reasons": [
+            {
+              "code": "LEFT_AREA_VIA_GATE",
+              "message": "Tag çıkış kapısından alan dışına çıktı"
+            },
+            {
+              "code": "ENGINE_OBSERVATION",
+              "message": "Olasılıklar: outside %75, corridor %20, room-01 %5, room-09 %0"
+            }
+          ],
+          "trigger": "measurement",
+          "evidence": {
+            "score": {
+              "base": 0,
+              "door": 0,
+              "total": 0.753,
+              "duration": 0,
+              "measurements": 0
+            },
+            "lastReliableLocation": {
+              "x": 0.7902006172839507,
+              "y": 22.1,
+              "kind": "corridor",
+              "measuredAt": "2026-10-23T18:50:46.305+03:00"
+            }
+          },
+          "severity": "info",
+          "eventType": "MEASUREMENT_ACCEPTED",
+          "nextState": "TRACKING_OUTSIDE",
+          "previousState": "TRACKING_OUTSIDE"
+        },
+        "engineVersion": "room-hmm-2",
+        "positionSource": "RAW",
+        "sourceZoneName": "Neüyoğun",
+        "regionInference": {
+          "state": "TRACKING_OUTSIDE",
+          "enabled": true,
+          "reasons": [
+            "Tag çıkış kapısından alan dışına çıktı"
+          ],
+          "exitedAt": "2026-10-23T15:50:33.172Z",
+          "regionId": null,
+          "confidence": 0.753,
+          "leftAreaAt": "2026-10-23T15:50:46.305Z",
+          "regionName": null,
+          "validUntil": "2026-10-23T15:50:49.305Z",
+          "outsideArea": true,
+          "leftAreaGate": "Ameliyathane giriş / çıkış kapısı",
+          "exitedRegionId": "room-04",
+          "uncertainAfter": "2026-10-23T15:51:46.305Z",
+          "measurementKind": "estimated",
+          "candidateRegionId": null,
+          "lastKnownRegionId": "room-04"
+        },
+        "lastRawDataTimestamp": "2026-10-23T18:50:46.305+03:00"
+      }
+    },
+    {
+      "motorSheetRow": 793,
+      "rawSheetRow": 793,
+      "raw": {
+        "tagCode": "9C76E417B4CB5ECF",
+        "timestamp": "2026-10-23T15:50:47.339000+00:00",
+        "receivedAt": "2026-10-23T15:50:47.345000+00:00",
+        "x": 3.233616255144033,
+        "y": 21.572736625514406,
+        "pdop": 5.959946819903925,
+        "mapId": "necmettin-yogun-bakim",
+        "sourceZoneId": "neuyogun",
+        "sourceZoneName": "Neüyoğun"
+      },
+      "decision": {
+        "x": 3.233616255144033,
+        "y": 21.572736625514406,
+        "pdop": 5.959946819903925,
+        "mapId": "necmettin-yogun-bakim",
+        "motion": "moving",
+        "tagCode": "9C76E417B4CB5ECF",
+        "synthetic": false,
+        "timestamp": "2026-10-23T18:50:47.339+03:00",
+        "decisionId": "8b15d2cbde76eb4731445921a10329ed9d4fdbe09da081b39b481d71eb1b95b3",
+        "receivedAt": "2026-10-23T15:50:47.345Z",
+        "motionLabel": "moving",
+        "publishedAt": "2026-10-23T15:50:47.347Z",
+        "rawPosition": {
+          "x": 3.233616255144033,
+          "y": 21.572736625514406,
+          "pdop": 5.959946819903925,
+          "mapId": "necmettin-yogun-bakim",
+          "motion": "moving",
+          "tagCode": "9C76E417B4CB5ECF",
+          "timestamp": "2026-10-23T18:50:47.339+03:00",
+          "receivedAt": "2026-10-23T15:50:47.345Z",
+          "motionLabel": "moving",
+          "sourceZoneId": "neuyogun",
+          "sourceZoneName": "Neüyoğun"
+        },
+        "sourceZoneId": "neuyogun",
+        "configVersion": "be3d8bb83a1d296f",
+        "decisionTrace": {
+          "input": {
+            "x": 3.233616255144033,
+            "y": 21.572736625514406,
+            "measuredAt": "2026-10-23T18:50:47.339+03:00",
+            "receivedAt": "2026-10-23T15:50:47.345Z",
+            "signalGapMs": 7
+          },
+          "outcome": {
+            "confidence": 0.794,
+            "measurementKind": "estimated"
+          },
+          "reasons": [
+            {
+              "code": "LEFT_AREA_VIA_GATE",
+              "message": "Tag çıkış kapısından alan dışına çıktı"
+            },
+            {
+              "code": "ENGINE_OBSERVATION",
+              "message": "Olasılıklar: outside %79, corridor %19, room-01 %1, room-09 %0"
+            }
+          ],
+          "trigger": "measurement",
+          "evidence": {
+            "score": {
+              "base": 0,
+              "door": 0,
+              "total": 0.794,
+              "duration": 0,
+              "measurements": 0
+            },
+            "lastReliableLocation": {
+              "x": 3.233616255144033,
+              "y": 21.572736625514406,
+              "kind": "corridor",
+              "measuredAt": "2026-10-23T18:50:47.339+03:00"
+            }
+          },
+          "severity": "info",
+          "eventType": "MEASUREMENT_ACCEPTED",
+          "nextState": "TRACKING_OUTSIDE",
+          "previousState": "TRACKING_OUTSIDE"
+        },
+        "engineVersion": "room-hmm-2",
+        "positionSource": "RAW",
+        "sourceZoneName": "Neüyoğun",
+        "regionInference": {
+          "state": "TRACKING_OUTSIDE",
+          "enabled": true,
+          "reasons": [
+            "Tag çıkış kapısından alan dışına çıktı"
+          ],
+          "exitedAt": "2026-10-23T15:50:33.172Z",
+          "regionId": null,
+          "confidence": 0.794,
+          "leftAreaAt": "2026-10-23T15:50:46.305Z",
+          "regionName": null,
+          "validUntil": "2026-10-23T15:50:50.339Z",
+          "outsideArea": true,
+          "leftAreaGate": "Ameliyathane giriş / çıkış kapısı",
+          "exitedRegionId": "room-04",
+          "uncertainAfter": "2026-10-23T15:51:47.339Z",
+          "measurementKind": "estimated",
+          "candidateRegionId": null,
+          "lastKnownRegionId": "room-04"
+        },
+        "lastRawDataTimestamp": "2026-10-23T18:50:47.339+03:00"
+      }
+    },
+    {
+      "motorSheetRow": 794,
+      "rawSheetRow": 794,
+      "raw": {
+        "tagCode": "9C76E417B4CB5ECF",
+        "timestamp": "2026-10-23T15:50:47.800000+00:00",
+        "receivedAt": "2026-10-23T15:50:47.806000+00:00",
+        "x": 1.1127314814814815,
+        "y": 22.1,
+        "pdop": 21.185824117475246,
+        "mapId": "necmettin-yogun-bakim",
+        "sourceZoneId": "neuyogun",
+        "sourceZoneName": "Neüyoğun"
+      },
+      "decision": {
+        "x": 1.1127314814814815,
+        "y": 22.1,
+        "pdop": 21.185824117475246,
+        "mapId": "necmettin-yogun-bakim",
+        "motion": "moving",
+        "tagCode": "9C76E417B4CB5ECF",
+        "synthetic": false,
+        "timestamp": "2026-10-23T18:50:47.800+03:00",
+        "decisionId": "1cb8a8f5b8b980a423aaf4d4d874a7de054ecdfb31285504cba93d4b45901cef",
+        "receivedAt": "2026-10-23T15:50:47.806Z",
+        "motionLabel": "moving",
+        "publishedAt": "2026-10-23T15:50:47.808Z",
+        "rawPosition": {
+          "x": 1.1127314814814815,
+          "y": 22.1,
+          "pdop": 21.185824117475246,
+          "mapId": "necmettin-yogun-bakim",
+          "motion": "moving",
+          "tagCode": "9C76E417B4CB5ECF",
+          "timestamp": "2026-10-23T18:50:47.800+03:00",
+          "receivedAt": "2026-10-23T15:50:47.806Z",
+          "motionLabel": "moving",
+          "sourceZoneId": "neuyogun",
+          "sourceZoneName": "Neüyoğun"
+        },
+        "sourceZoneId": "neuyogun",
+        "configVersion": "be3d8bb83a1d296f",
+        "decisionTrace": {
+          "input": {
+            "x": 1.1127314814814815,
+            "y": 22.1,
+            "measuredAt": "2026-10-23T18:50:47.800+03:00",
+            "receivedAt": "2026-10-23T15:50:47.806Z",
+            "signalGapMs": 7
+          },
+          "outcome": {
+            "confidence": 0.892,
+            "measurementKind": "estimated"
+          },
+          "reasons": [
+            {
+              "code": "SPIKE_DOWNWEIGHTED",
+              "message": "Fiziksel olarak tutarsız/zayıf ölçüm; etkisi sınırlandı"
+            },
+            {
+              "code": "LEFT_AREA_VIA_GATE",
+              "message": "Tag çıkış kapısından alan dışına çıktı"
+            },
+            {
+              "code": "ENGINE_OBSERVATION",
+              "message": "Olasılıklar: outside %89, corridor %10, room-01 %1, room-09 %0"
+            }
+          ],
+          "trigger": "measurement",
+          "evidence": {
+            "score": {
+              "base": 0,
+              "door": 0,
+              "total": 0.892,
+              "duration": 0,
+              "measurements": 0
+            },
+            "lastReliableLocation": {
+              "x": 1.1127314814814815,
+              "y": 22.1,
+              "kind": "corridor",
+              "measuredAt": "2026-10-23T18:50:47.800+03:00"
+            }
+          },
+          "severity": "warning",
+          "eventType": "MEASUREMENT_REJECTED",
+          "nextState": "TRACKING_OUTSIDE",
+          "previousState": "TRACKING_OUTSIDE"
+        },
+        "engineVersion": "room-hmm-2",
+        "positionSource": "RAW",
+        "sourceZoneName": "Neüyoğun",
+        "regionInference": {
+          "state": "TRACKING_OUTSIDE",
+          "enabled": true,
+          "reasons": [
+            "Fiziksel olarak tutarsız/zayıf ölçüm; etkisi sınırlandı",
+            "Tag çıkış kapısından alan dışına çıktı"
+          ],
+          "exitedAt": "2026-10-23T15:50:33.172Z",
+          "regionId": null,
+          "confidence": 0.892,
+          "leftAreaAt": "2026-10-23T15:50:46.305Z",
+          "regionName": null,
+          "validUntil": "2026-10-23T15:50:50.800Z",
+          "outsideArea": true,
+          "leftAreaGate": "Ameliyathane giriş / çıkış kapısı",
+          "exitedRegionId": "room-04",
+          "uncertainAfter": "2026-10-23T15:51:47.800Z",
+          "measurementKind": "estimated",
+          "candidateRegionId": null,
+          "lastKnownRegionId": "room-04"
+        },
+        "lastRawDataTimestamp": "2026-10-23T18:50:47.800+03:00"
+      }
+    },
+    {
+      "motorSheetRow": 795,
+      "rawSheetRow": 795,
+      "raw": {
+        "tagCode": "9C76E417B4CB5ECF",
+        "timestamp": "2026-10-23T15:50:50.301000+00:00",
+        "receivedAt": "2026-10-23T15:50:50.308000+00:00",
+        "x": 2.819212962962963,
+        "y": 22.1,
+        "pdop": 5.515953065731307,
+        "mapId": "necmettin-yogun-bakim",
+        "sourceZoneId": "neuyogun",
+        "sourceZoneName": "Neüyoğun"
+      },
+      "decision": {
+        "x": 2.819212962962963,
+        "y": 22.1,
+        "pdop": 5.515953065731307,
+        "mapId": "necmettin-yogun-bakim",
+        "motion": "moving",
+        "tagCode": "9C76E417B4CB5ECF",
+        "synthetic": false,
+        "timestamp": "2026-10-23T18:50:50.301+03:00",
+        "decisionId": "de16b8853dca593b681c218508d7a7bc919b0b79eec82feae52bed3570526d3b",
+        "receivedAt": "2026-10-23T15:50:50.308Z",
+        "motionLabel": "moving",
+        "publishedAt": "2026-10-23T15:50:50.310Z",
+        "rawPosition": {
+          "x": 2.819212962962963,
+          "y": 22.1,
+          "pdop": 5.515953065731307,
+          "mapId": "necmettin-yogun-bakim",
+          "motion": "moving",
+          "tagCode": "9C76E417B4CB5ECF",
+          "timestamp": "2026-10-23T18:50:50.301+03:00",
+          "receivedAt": "2026-10-23T15:50:50.308Z",
+          "motionLabel": "moving",
+          "sourceZoneId": "neuyogun",
+          "sourceZoneName": "Neüyoğun"
+        },
+        "sourceZoneId": "neuyogun",
+        "configVersion": "be3d8bb83a1d296f",
+        "decisionTrace": {
+          "input": {
+            "x": 2.819212962962963,
+            "y": 22.1,
+            "measuredAt": "2026-10-23T18:50:50.301+03:00",
+            "receivedAt": "2026-10-23T15:50:50.308Z",
+            "signalGapMs": 8
+          },
+          "outcome": {
+            "confidence": 0.939,
+            "measurementKind": "estimated"
+          },
+          "reasons": [
+            {
+              "code": "LEFT_AREA_VIA_GATE",
+              "message": "Tag çıkış kapısından alan dışına çıktı"
+            },
+            {
+              "code": "ENGINE_OBSERVATION",
+              "message": "Olasılıklar: outside %94, corridor %6, room-01 %0, unknown %0"
+            }
+          ],
+          "trigger": "measurement",
+          "evidence": {
+            "score": {
+              "base": 0,
+              "door": 0,
+              "total": 0.939,
+              "duration": 0,
+              "measurements": 0
+            },
+            "lastReliableLocation": {
+              "x": 2.819212962962963,
+              "y": 22.1,
+              "kind": "corridor",
+              "measuredAt": "2026-10-23T18:50:50.301+03:00"
+            }
+          },
+          "severity": "info",
+          "eventType": "MEASUREMENT_ACCEPTED",
+          "nextState": "TRACKING_OUTSIDE",
+          "previousState": "TRACKING_OUTSIDE"
+        },
+        "engineVersion": "room-hmm-2",
+        "positionSource": "RAW",
+        "sourceZoneName": "Neüyoğun",
+        "regionInference": {
+          "state": "TRACKING_OUTSIDE",
+          "enabled": true,
+          "reasons": [
+            "Tag çıkış kapısından alan dışına çıktı"
+          ],
+          "exitedAt": "2026-10-23T15:50:33.172Z",
+          "regionId": null,
+          "confidence": 0.939,
+          "leftAreaAt": "2026-10-23T15:50:46.305Z",
+          "regionName": null,
+          "validUntil": "2026-10-23T15:50:53.301Z",
+          "outsideArea": true,
+          "leftAreaGate": "Ameliyathane giriş / çıkış kapısı",
+          "exitedRegionId": "room-04",
+          "uncertainAfter": "2026-10-23T15:51:50.301Z",
+          "measurementKind": "estimated",
+          "candidateRegionId": null,
+          "lastKnownRegionId": "room-04"
+        },
+        "lastRawDataTimestamp": "2026-10-23T18:50:50.301+03:00"
+      }
+    }
+  ]
+}

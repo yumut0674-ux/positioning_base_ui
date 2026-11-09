@@ -1,0 +1,6 @@
+{
+  "extends": "../../../tsconfig.json",
+  "compilerOptions": {"incremental": false},
+  "include": ["audit-servis-f93aa2c0.ts", "import-servis-f93aa2c0.ts", "diagnose-servis-f93aa2c0.ts", "report-servis-f93aa2c0.ts"],
+  "exclude": ["../../../node_modules", "../reports"]
+}

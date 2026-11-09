@@ -1,0 +1,24 @@
+{
+  "testId": "test-ab1564af-4f54-41e0-8b48-463e3f607ac5",
+  "timezone": "Europe/Istanbul",
+  "revision": 2,
+  "revisionReason": "Kullanıcı bu testte üç tag'ın birlikte taşındığını doğruladı; üç aday aynı rota grubuna bağlandı",
+  "test": {
+    "from": "2026-09-26T11:44:34.150Z",
+    "to": "2026-09-26T11:48:32.976Z"
+  },
+  "visits": [
+    { "roomId": "room-03", "from": "2026-09-26T11:45:18.677Z", "to": "2026-09-26T11:45:54.661Z" },
+    { "roomId": "room-05", "from": "2026-09-26T11:45:59.248Z", "to": "2026-09-26T11:46:43.174Z" },
+    { "roomId": "room-06", "from": "2026-09-26T11:46:50.173Z", "to": "2026-09-26T11:47:28.966Z" },
+    { "roomId": "room-03", "from": "2026-09-26T11:47:38.029Z", "to": "2026-09-26T11:48:13.800Z" }
+  ],
+  "groups": [
+    {
+      "id": "uc-tag-birlikte",
+      "tagCodes": ["D95660981D60BDA1", "9A8FA14BB93426F1", "06F0623201E95CE8"],
+      "note": "Kullanıcı üç tag'ın birlikte taşındığını doğruladı"
+    }
+  ],
+  "note": "Oda aralıkları arasındaki süre koridordur."
+}
